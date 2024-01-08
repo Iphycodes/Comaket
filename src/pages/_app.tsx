@@ -1,6 +1,13 @@
-import 'grc/styles/globals.css'
-import type { AppProps } from 'next/app'
+import CreateGlobalStyle from '@grc/styles/global';
+import '@grc/styles/globals.css';
+import '@grc/styles/_override.scss';
+import type { AppProps } from 'next/app';
 
 export default function App({ Component, pageProps }: AppProps) {
-  return <Component {...pageProps} />
+  return (
+    <>
+      <CreateGlobalStyle />
+      <Component {...pageProps} />
+    </>
+  );
 }
