@@ -11,7 +11,7 @@ const nunito = Nunito({
 export const metadata: Metadata = {
   title: 'Giro',
   description: 'This is a financial app',
-  viewport: { width: 'device-width', initialScale: 1 },
+  // viewport: { width: 'device-width', initialScale: 1 },
   icons: { icon: '/favicon.ico' },
 };
 
