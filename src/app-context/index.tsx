@@ -1,3 +1,4 @@
+'use client';
 import { createContext, ReactNode } from 'react';
 import { IUseTheme, useTheme } from '@grc/hooks/useTheme';
 
