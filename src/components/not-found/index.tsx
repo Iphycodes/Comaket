@@ -1,5 +1,6 @@
+'use client';
 import { StyledLink, StyleErrorPage } from './not-found.style';
-import { mediaSize, useMediaQuery } from '@grc/components/_shared/responsiveness';
+import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 
 export default function NotFound() {
   const isMobile = useMediaQuery(mediaSize.mobile);

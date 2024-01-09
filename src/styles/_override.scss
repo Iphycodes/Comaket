@@ -1,1 +1,17 @@
 @import 'giro.min.css';
+
+.register-form{
+  .ant-input-number-group-wrapper{
+    width: 100% !important;
+  }
+  .ant-input-number-group{
+    height: 100% !important;
+  }
+  .ant-input-number-input-wrap{
+    height: 100% !important;
+    input{
+      height: 100% !important;
+    }
+
+  }
+}
