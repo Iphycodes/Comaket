@@ -2,7 +2,7 @@
 import React, { ReactElement, useMemo } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import { Button } from 'antd';
-// import { Giro as GiroLogo } from '@grc/_shared/assets/svgs';
+import { Giro as GiroLogo } from '@grc/_shared/assets/svgs';
 
 export interface LayoutProps {
   children?: ReactElement | ReactElement[];
@@ -22,10 +22,10 @@ const AppsBaseLayout = (props: LayoutProps) => {
   }, [pathname]);
 
   return (
-    <main className="min-h-screen flex flex-col items-center p-2.5 bg-white px-4">
+    <main className="h-screen flex flex-col items-center p-2.5 bg-white px-4">
       <header className="w-[54rem] max-w-full flex bg-white items-center justify-between justify-items-center py-7 px-6 md:flex-wrap">
-        {/* <GiroLogo /> */}
-        <h3 className="text-3xl font-extrabold text-blue"> Giro Financial</h3>
+        <GiroLogo />
+        {/* <h3 className="text-3xl font-extrabold text-blue"> Giro Financial</h3> */}
         {isSignUpPage ? (
           <div className="flex items-center justify-center">
             <div>{`Already have an account?`}</div>
