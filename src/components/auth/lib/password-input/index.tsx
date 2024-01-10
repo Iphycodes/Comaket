@@ -19,9 +19,19 @@ const PasswordInput = (props: PasswordInputProps) => {
     if (onChange) onChange(e);
   };
 
+  const handlePaste = (event: any) => {
+    event.preventDefault();
+    return false;
+  };
+
   return (
     <div>
-      <Input.Password onChange={onChangePassword} placeholder={'Enter password'} className="h-14" />
+      <Input.Password
+        onChange={onChangePassword}
+        placeholder={'Enter password'}
+        className="h-14"
+        onPaste={handlePaste}
+      />
       {level > -1 && (
         <div className="mt-2.5">
           <PasswordStrengthIndicator level={level} settings={settings} />
