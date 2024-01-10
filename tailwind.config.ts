@@ -15,7 +15,8 @@ const config: Config = {
       },
       colors: {
         transparent: 'transparent',
-        blue: '#1e88e5'
+        blue: '#1e88e5',
+        sky: 'rgba(30, 136, 229, 0.3);'
       }
     },
   },
