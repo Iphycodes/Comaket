@@ -8,10 +8,11 @@ type LoginProps = {
   mobileResponsive: boolean;
   theme: string;
   onRememberMe: (value: any, email: string) => void;
+  handleLogin: (payload: Record<string, any>) => void;
 };
 
 const Login = (props: LoginProps) => {
-  const { onRememberMe } = props;
+  const { onRememberMe, handleLogin } = props;
 
   const [username, setUsername] = useState('');
   const [switchValue, setSwitchValue] = useState(false);
@@ -29,7 +30,7 @@ const Login = (props: LoginProps) => {
   };
 
   const onFinish = (values: Record<string, any>) => {
-    console.log('login values::', values);
+    handleLogin(values);
   };
   return (
     <motion.div
