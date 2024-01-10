@@ -3,10 +3,9 @@
 type LoginProps = {
   mobileResponsive: boolean;
   theme: string;
-  onRememberMe: (value: any, email: string) => void;
 };
 
-const Login = (props: LoginProps) => {
+const SplashScreen = (props: LoginProps) => {
   const {} = props;
   return (
     <div className="flex justify-center gap-2">
@@ -17,4 +16,4 @@ const Login = (props: LoginProps) => {
   );
 };
 
-export default Login;
+export default SplashScreen;

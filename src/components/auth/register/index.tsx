@@ -8,15 +8,22 @@ import PasswordInput from '../lib/password-input';
 type RegisterProps = {
   mobileResponsive: boolean;
   theme: string;
+  handleRegisterUser: (payload: Record<string, any>) => void;
 };
 
 const Register = (props: RegisterProps) => {
-  const {} = props;
+  const { handleRegisterUser } = props;
   const [form] = Form.useForm();
 
   const onFinish = (values: Record<string, any>) => {
-    console.log('register values::', values);
+    handleRegisterUser(values);
   };
+
+  const handlePaste = (event: any) => {
+    event.preventDefault();
+    return false;
+  };
+
   return (
     <motion.div
       style={{ backgroundColor: 'transparent' }}
@@ -26,8 +33,8 @@ const Register = (props: RegisterProps) => {
       className="w-3/4"
     >
       <div className="w-full">
-        <header className="text-left text-3xl font-bold text-blue pb-7">Register</header>
-        <span className="py-4 text-gray-400">Fill out the details below to register</span>
+        <header className="text-left text-3xl font-bold text-blue pb-3">Register</header>
+        <span className="text-gray-400">Fill out the details below to register</span>
         {/* <h3>
           {error && <Alert type="error" message={error} showIcon closable></Alert>}
         </h3> */}
@@ -38,8 +45,8 @@ const Register = (props: RegisterProps) => {
           onFinish={(value) => {
             onFinish(value);
           }}
-          name="signin-form"
-          className="mt-4 register-form"
+          name="register-form"
+          className="mt-5 register-form"
         >
           <Row gutter={[16, 16]}>
             <Col md={12} xs={24}>
@@ -142,6 +149,7 @@ const Register = (props: RegisterProps) => {
                   placeholder="Enter Password"
                   className="h-14"
                   visibilityToggle={false}
+                  onPaste={handlePaste}
                 />
               </Form.Item>
             </Col>

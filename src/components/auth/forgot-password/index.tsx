@@ -5,13 +5,15 @@ import { motion } from 'framer-motion';
 type ForgotPasswordProps = {
   mobileResponsive: boolean;
   theme: string;
+  handleForgotPassword: (payload: Record<string, any>) => void;
 };
 
 const ForgotPassword = (props: ForgotPasswordProps) => {
-  const {} = props;
+  const { handleForgotPassword } = props;
   const [form] = Form.useForm();
 
   const onFinish = (values: Record<string, any>) => {
+    handleForgotPassword(values);
     console.log('forgot password values::', values);
   };
   return (
@@ -37,11 +39,11 @@ const ForgotPassword = (props: ForgotPasswordProps) => {
           onFinish={(value) => {
             onFinish(value);
           }}
-          name="signin-form"
+          name="forgot-password-form"
           className="mt-4"
         >
           <Form.Item
-            name="username"
+            name="email"
             rules={[{ required: true, type: 'email', message: 'Email is invalid' }]}
             label={<span>Email</span>}
           >
@@ -56,7 +58,7 @@ const ForgotPassword = (props: ForgotPasswordProps) => {
             loading={false}
             htmlType="submit"
           >
-            Reset Password
+            Send
           </Button>
         </Form>
       </div>
