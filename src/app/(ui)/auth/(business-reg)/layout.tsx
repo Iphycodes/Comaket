@@ -12,11 +12,11 @@ const BusinessLayout = (props: LayoutProps) => {
   const { children } = props;
 
   return (
-    <main className="min-h-screen flex flex items-center bg-white">
+    <main className="h-screen flex flex items-center bg-white">
       <div
         className={` ${
           mobileResponsive ? 'hidden' : 'flex-[2_1_0%]'
-        } bg-sky border-r-2 border-solid min-h-screen flex flex-col items-center justify-center justify-items-center justify-self-center content-center text-black py-7 px-12 text-center`}
+        } bg-sky border-r-2 border-solid h-screen flex flex-col items-center justify-center justify-items-center justify-self-center content-center text-black py-7 px-12 text-center`}
       >
         <GiroLogo />
         <div className="mt-7 flex flex-col items-center">
