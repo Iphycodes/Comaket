@@ -1,21 +1,22 @@
 @import 'giro.min.css';
 
-.register-form, .reset-password-form{
-  .ant-input-number-group-wrapper, .ant-input-number-in-form-item{
+.register-form,
+.reset-password-form {
+  .ant-input-number-group-wrapper,
+  .ant-input-number-in-form-item {
     width: 100% !important;
   }
-  .ant-input-number-group{
+  .ant-input-number-group {
     height: 100% !important;
   }
-  .ant-input-number-input-wrap{
+  .ant-input-number-input-wrap {
     height: 100% !important;
-    input{
+    input {
       height: 100% !important;
     }
-
   }
 }
-.react-code-input{  
+.react-code-input {
   margin: 32px -20px 32px 0;
   text-align: center;
   input {
@@ -42,4 +43,14 @@
     display: flex;
     align-items: center !important;
   }
+}
+
+.ant-menu-item-selected,
+.ant-menu-item-active {
+  background-color: transparent !important;
+  color: #000000 !important;
+}
+
+.ant-menu-item-selected {
+  font-weight: 700 !important;
 }

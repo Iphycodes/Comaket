@@ -22,12 +22,12 @@ const SplashScreen = (props: LoginProps) => {
   const giroSystems: GiroSystemsProps[] = [
     {
       title: 'Giro Debit',
-      url: '',
+      url: '/giro-debit',
       icon: <GiroLogo />,
     },
     {
       title: 'Giro Mandate',
-      url: '',
+      url: '/giro-mandate',
       icon: <GiroLogo />,
     },
   ];
