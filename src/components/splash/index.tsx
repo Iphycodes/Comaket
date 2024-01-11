@@ -30,14 +30,9 @@ const SplashScreen = (props: LoginProps) => {
       url: '',
       icon: <GiroLogo />,
     },
-    {
-      title: 'Giro Face-Proof',
-      url: '',
-      icon: <GiroLogo />,
-    },
   ];
   return (
-    <div className="flex justify-center items-center flex-col gap-10" style={{ height: '100vh' }}>
+    <div className="flex justify-center items-center flex-col gap-10">
       <div className="flex font-semibold" style={{ fontSize: '32px' }}>
         Please select a Giro system
       </div>
