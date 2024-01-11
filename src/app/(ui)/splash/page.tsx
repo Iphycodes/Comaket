@@ -8,7 +8,12 @@ const SplashScreenPage = () => {
   const mobileResponsive = useMediaQuery(mediaSize.mobile);
   const { theme } = useContext(AppContext);
 
-  return <SplashScreen mobileResponsive={mobileResponsive} theme={theme} />;
+  return (
+    <div>
+      <header className="flex items-center justify-end px-10 py-2">Sign-out</header>
+      <SplashScreen mobileResponsive={mobileResponsive} theme={theme} />
+    </div>
+  );
 };
 
 export default SplashScreenPage;
