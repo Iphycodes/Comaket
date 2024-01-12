@@ -29,7 +29,7 @@ const CustomToolTip = ({
       className={` ${className}`}
       color={'#ffffff'}
       title={title}
-      arrowPointAtCenter
+      arrow={{ pointAtCenter: true }}
     >
       {children}
     </Tooltip>
