@@ -19,7 +19,7 @@ const VerifyEmailPage = () => {
       verificationCode: code,
     };
     console.log('VerifyEmail values::', payload);
-    router.push(`/auth/business/register`);
+    router.push(`/app`);
   };
   const handleResendPasscode = () => {
     console.log('otp resent to::', email);

@@ -1,9 +1,11 @@
 'use client';
 import { isValidPassword } from '@grc/_shared/helpers';
 import { Button, Checkbox, Col, Form, Input, InputNumber, Row } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import PasswordInput from '../lib/password-input';
+import CustomToolTip from '@grc/_shared/components/custom-tooltip';
 
 type RegisterProps = {
   mobileResponsive: boolean;
@@ -65,6 +67,28 @@ const Register = (props: RegisterProps) => {
                 label={<span>Last Name</span>}
               >
                 <Input placeholder="Last Name" className="h-14" />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={[16, 16]}>
+            <Col md={24} xs={24}>
+              <Form.Item
+                name="name"
+                rules={[{ required: true, message: 'Enter account name' }]}
+                label={
+                  <span>
+                    AccountName{' '}
+                    <CustomToolTip
+                      title="This is the name to be associated with your business."
+                      placement={'right'}
+                    >
+                      {' '}
+                      <InfoCircleOutlined />
+                    </CustomToolTip>
+                  </span>
+                }
+              >
+                <Input placeholder="Account Name" className="h-14" />
               </Form.Item>
             </Col>
           </Row>
