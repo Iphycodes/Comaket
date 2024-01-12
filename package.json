@@ -33,7 +33,6 @@
     "react-detect-offline": "^2.4.5",
     "react-dom": "^18.2.0",
     "react-preloader-icon": "^1.0.0",
-    "remixicon": "^4.0.1",
     "sass": "^1.69.7",
     "styled-components": "^6.1.6",
     "zxcvbn": "^4.4.2"
@@ -62,6 +61,7 @@
     "lint-staged": "^15.2.0",
     "postcss": "^8",
     "prettier": "^3.1.1",
+    "remixicon": "^4.0.1",
     "tailwindcss": "^3.3.0",
     "typescript": "^5"
   }

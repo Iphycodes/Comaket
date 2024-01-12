@@ -6,6 +6,7 @@ import { TransactionsDataType, transactionsData } from './libs/transactions-data
 import { ColumnsType } from 'antd/lib/table';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 import { CaretUpOutlined, CaretDownOutlined } from '@ant-design/icons';
+import {} from 'remixicon';
 
 const TransactionsTable = () => {
   const isMobile = useMediaQuery(mediaSize.mobile);
@@ -14,7 +15,7 @@ const TransactionsTable = () => {
     {
       title: (
         <span className="flex items-center gap-1">
-          Date{' '}
+          <span>Date</span>
           <span className="flex flex-col items-center justify-center gap-0 text-[7px]">
             <CaretUpOutlined />
             <CaretDownOutlined />
