@@ -1,10 +1,5 @@
 import { MenuProps } from 'antd';
-import {
-  AppstoreAddOutlined,
-  RiseOutlined,
-  SettingOutlined,
-  BookOutlined,
-} from '@ant-design/icons';
+import { DashboardOutlined, RiseOutlined, SettingOutlined, BookOutlined } from '@ant-design/icons';
 import Link from 'next/link';
 
 type MenuItem = Required<MenuProps>['items'][number];
@@ -37,16 +32,25 @@ function getItem(
 
 export const siderItems: MenuItem[] = [
   getItem(
-    'Dashboard',
-    '1',
-    <AppstoreAddOutlined
-      style={{ fontSize: '15px', fontWeight: 'bolder' }}
-      className="menu-icon"
-    />,
-    '/dashboard'
-  ),
-  getItem('Transactions', '2', <RiseOutlined style={{ fontSize: '14px' }} />, '/transactions'),
-  getItem('Settings', '3', <SettingOutlined style={{ fontSize: '15px' }} />, '/settings'),
+    'Navigation',
+    'grp',
+    null,
+    undefined,
+    [
+      getItem(
+        'Dashboard',
+        '1',
+        <DashboardOutlined
+          style={{ fontSize: '15px', fontWeight: 'bolder' }}
+          className="menu-icon"
+        />,
+        '/dashboard'
+      ),
+      getItem('Transactions', '2', <RiseOutlined style={{ fontSize: '14px' }} />, '/transactions'),
+      getItem('Settings', '3', <SettingOutlined style={{ fontSize: '15px' }} />, '/settings'),
 
-  getItem('Accounts', '4', <BookOutlined style={{ fontSize: '15px' }} />, '/accounts'),
+      getItem('Accounts', '4', <BookOutlined style={{ fontSize: '15px' }} />, '/accounts'),
+    ],
+    'group'
+  ),
 ];

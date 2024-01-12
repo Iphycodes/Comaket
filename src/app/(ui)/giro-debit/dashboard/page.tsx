@@ -1,7 +1,8 @@
+import DashBoard from '@grc/components/giro-debit/dashboard';
 import React from 'react';
 
 const DashboardPage = () => {
-  return <div>This is Dashboard Page</div>;
+  return <DashBoard />;
 };
 
 export default DashboardPage;
