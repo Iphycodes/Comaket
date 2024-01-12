@@ -47,9 +47,8 @@ export const siderItems: MenuItem[] = [
         '/dashboard'
       ),
       getItem('Transactions', '2', <RiseOutlined style={{ fontSize: '14px' }} />, '/transactions'),
-      getItem('Settings', '3', <SettingOutlined style={{ fontSize: '15px' }} />, '/settings'),
-
-      getItem('Accounts', '4', <BookOutlined style={{ fontSize: '15px' }} />, '/accounts'),
+      getItem('Disbursement', '3', <BookOutlined style={{ fontSize: '15px' }} />, '/disbursement'),
+      getItem('Settings', '4', <SettingOutlined style={{ fontSize: '15px' }} />, '/settings'),
     ],
     'group'
   ),

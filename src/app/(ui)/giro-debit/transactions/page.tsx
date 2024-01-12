@@ -1,4 +1,4 @@
-import Transactions from '@grc/components/giro-debit/transactions/indedx';
+import Transactions from '@grc/components/giro-debit/transactions';
 import React from 'react';
 
 const TransactionPage = () => {

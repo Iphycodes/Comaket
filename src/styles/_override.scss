@@ -54,3 +54,23 @@
 .ant-menu-item-selected {
   font-weight: 700 !important;
 }
+
+.transaction-table {
+  .ant-table-body {
+    .ant-table-row {
+      .ant-table-cell {
+        font-size: 13px;
+        font-weight: 700;
+        color: rgba(0, 0, 0, 0.3);
+        border: 0;
+      }
+    }
+  }
+}
+
+.virtual-account-select{
+  .ant-select-selector{
+    border: 1px solid black !important;
+    border-radius: 0 !important;
+  }
+}

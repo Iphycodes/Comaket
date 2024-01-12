@@ -43,7 +43,7 @@ const AppsBaseLayout = (props: GiroDebitPageProps) => {
       >
         <AppHeader />
         <Content className="main-content" style={{ background: '#ffffff' }}>
-          <div style={{ padding: 40, minHeight: 1260 }}>{children}</div>
+          <div style={{ padding: 40, minHeight: '100vh' }}>{children}</div>
         </Content>
         {/* <AppFooter /> */}
         <Footer>Footer</Footer>
