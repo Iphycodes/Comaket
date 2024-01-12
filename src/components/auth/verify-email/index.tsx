@@ -10,13 +10,16 @@ type VerifyEmailProps = {
   handleVerifyEmail: (code: string) => void;
   handleResendPasscode: () => void;
   email: string | null;
-  verifyEmailLoading: boolean;
+  isLoading: {
+    isSendVerificationCodeLoading: boolean;
+    verifyEmailLoading: boolean;
+  };
+  error?: string | undefined;
 };
 
 const circularIcon = (size = '32px') => <LoadingOutlined style={{ fontSize: size }} spin />;
 const VerifyEmail = (props: VerifyEmailProps) => {
-  const { handleVerifyEmail, handleResendPasscode, email, verifyEmailLoading, mobileResponsive } =
-    props;
+  const { handleVerifyEmail, handleResendPasscode, email, isLoading, mobileResponsive } = props;
 
   return (
     <motion.div
@@ -31,19 +34,23 @@ const VerifyEmail = (props: VerifyEmailProps) => {
         <span className="text-gray-400">
           We have sent a verification code to your registered email address ({email ?? ''})
         </span>
-
-        {/* <h3>
-          {error && <Alert type="error" message={error} showIcon closable></Alert>}
-        </h3> */}
+        {/* 
+        {
+          error && <h3 className='my-7'>
+            <Alert type="error" message={error} showIcon closable={true}></Alert>
+          </h3>
+        } */}
         <div className="relative">
           <ReactCodeInput
             type={'number'}
             autoFocus
-            inputProps={{ disabled: verifyEmailLoading }}
+            inputProps={{
+              disabled: isLoading.verifyEmailLoading || isLoading.isSendVerificationCodeLoading,
+            }}
             onCompleted={handleVerifyEmail}
             className="react-code-input"
           />
-          {verifyEmailLoading && (
+          {isLoading.verifyEmailLoading && (
             <div
               className={`absolute ${mobileResponsive ? 'top-0 right-2/4' : 'top-2.5 right-[48%]'}`}
             >
@@ -58,7 +65,7 @@ const VerifyEmail = (props: VerifyEmailProps) => {
             className="font-semibold py-1 px-1.5 text-blue"
             type="link"
             onClick={handleResendPasscode}
-            disabled={verifyEmailLoading}
+            disabled={isLoading.verifyEmailLoading || isLoading.isSendVerificationCodeLoading}
           >
             Click to resend
           </Button>

@@ -10,10 +10,14 @@ type ResetPasswordProps = {
   theme: string;
   handleResetPasswordSubmit: (payload: Record<string, any>) => void;
   handleResendPasscode: () => void;
+  isLoading: {
+    isResendingVerificationCode: boolean;
+    isResettingPassword: boolean;
+  };
 };
 
 const ResetPassword = (props: ResetPasswordProps) => {
-  const { handleResetPasswordSubmit, handleResendPasscode } = props;
+  const { handleResetPasswordSubmit, handleResendPasscode, isLoading } = props;
   const [form] = Form.useForm();
 
   const onFinish = (values: Record<string, any>) => {
@@ -117,9 +121,9 @@ const ResetPassword = (props: ResetPasswordProps) => {
           <Button
             className="opacity-100 hover:opacity-70 mt-1.5 bg-blue text-white h-14 rounded-lg"
             type="primary"
-            disabled={false}
+            disabled={isLoading.isResendingVerificationCode || isLoading.isResettingPassword}
             block
-            loading={false}
+            loading={isLoading.isResendingVerificationCode || isLoading.isResettingPassword}
             htmlType="submit"
           >
             Reset Password
@@ -131,6 +135,7 @@ const ResetPassword = (props: ResetPasswordProps) => {
               className="font-semibold py-1 px-1.5 text-blue"
               type="text"
               onClick={handleResendPasscode}
+              disabled={isLoading.isResendingVerificationCode || isLoading.isResettingPassword}
             >
               Click to resend
             </Button>

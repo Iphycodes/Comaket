@@ -14,7 +14,7 @@ const THEME_KEY_SET = 'giro-client-storage/set';
 const ls = Storage(THEME_KEY, { set: THEME_KEY_SET });
 
 export const changeTheme = (theme: ThemeInterface = 'dark') => {
-  document.documentElement.setAttribute('data-theme', theme);
+  document?.documentElement?.setAttribute('data-theme', theme);
   ls.set(theme);
 };
 

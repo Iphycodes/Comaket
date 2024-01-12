@@ -9,11 +9,12 @@ type LoginProps = {
   theme: string;
   onRememberMe: (value: any, email: string) => void;
   handleLogin: (payload: Record<string, any>) => void;
+  isLoading: boolean;
+  error?: string | undefined;
 };
 
 const Login = (props: LoginProps) => {
-  const { onRememberMe, handleLogin } = props;
-
+  const { onRememberMe, handleLogin, isLoading } = props;
   const [username, setUsername] = useState('');
   const [switchValue, setSwitchValue] = useState(false);
   const initialUsername = (typeof window !== 'undefined' && localStorage.getItem('username')) || '';
@@ -32,6 +33,7 @@ const Login = (props: LoginProps) => {
   const onFinish = (values: Record<string, any>) => {
     handleLogin(values);
   };
+
   return (
     <motion.div
       style={{ backgroundColor: 'transparent' }}
@@ -42,9 +44,12 @@ const Login = (props: LoginProps) => {
     >
       <div className="w-full">
         <header className="text-left text-3xl font-bold text-blue pb-7">Welcome Back</header>
-        {/* <h3>
-          {error && <Alert type="error" message={error} showIcon closable></Alert>}
-        </h3> */}
+
+        {/* {
+          error as string && <h3 className='mb-7'>
+            <Alert type="error" message={error} showIcon closable={false}></Alert>
+          </h3>
+        } */}
         <Form
           form={form}
           initialValues={initialValues}
@@ -89,9 +94,9 @@ const Login = (props: LoginProps) => {
           <Button
             className="opacity-100 hover:opacity-70 mt-1.5 bg-blue text-white h-14 rounded-lg"
             type="primary"
-            disabled={false}
+            disabled={isLoading}
             block
-            loading={false}
+            loading={isLoading}
             htmlType="submit"
           >
             Sign in
