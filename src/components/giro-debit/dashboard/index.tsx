@@ -17,7 +17,7 @@ const DashBoard = () => {
           </Space>
           <div className="text-4xl font-bold">&#x20A6;2,500,000.00</div>
           <Button
-            className="opacity-100 hover:opacity-95 mt-1.5 font-bold bg-black text-white h-10"
+            className="opacity-100 hover:opacity-95 mt-1.5 font-bold bg-black text-white h-12"
             type="primary"
             disabled={false}
             block
