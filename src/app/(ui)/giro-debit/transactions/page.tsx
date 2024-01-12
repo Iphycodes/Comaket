@@ -1,7 +1,8 @@
+import Transactions from '@grc/components/giro-debit/transactions/indedx';
 import React from 'react';
 
 const TransactionPage = () => {
-  return <div>This is Transaction Page</div>;
+  return <Transactions />;
 };
 
 export default TransactionPage;
