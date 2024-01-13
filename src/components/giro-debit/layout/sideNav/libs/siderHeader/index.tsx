@@ -21,7 +21,7 @@ export const SiderHeader = (props: SiderHeaderProps) => {
   //     }
   //   };
   return (
-    <div className="flex flex-col justify-start items-start gap-5 py-5 px-5">
+    <div className="flex flex-col justify-start items-start gap-10 py-2 mt-2 px-5">
       {!collapsed && (
         <Image
           src={'/assets/svgs/giro-logo.svg'}
