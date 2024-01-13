@@ -1,20 +1,23 @@
 'use client';
 import { isValidPassword } from '@grc/_shared/helpers';
-import { Button, Checkbox, Col, Form, Input, InputNumber, Row } from 'antd';
+import { Button, Checkbox, Col, Form, FormInstance, Input, InputNumber, Row } from 'antd';
+import { InfoCircleOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import PasswordInput from '../lib/password-input';
+import CustomToolTip from '@grc/_shared/components/custom-tooltip';
 
 type RegisterProps = {
   mobileResponsive: boolean;
   theme: string;
   handleRegisterUser: (payload: Record<string, any>) => void;
+  isRegisterLoading: boolean;
+  form: FormInstance<any>;
+  error?: string | undefined;
 };
 
 const Register = (props: RegisterProps) => {
-  const { handleRegisterUser } = props;
-  const [form] = Form.useForm();
-
+  const { handleRegisterUser, isRegisterLoading, form } = props;
   const onFinish = (values: Record<string, any>) => {
     handleRegisterUser(values);
   };
@@ -35,9 +38,11 @@ const Register = (props: RegisterProps) => {
       <div className="w-full">
         <header className="text-left text-3xl font-bold text-blue pb-3">Register</header>
         <span className="text-gray-400">Fill out the details below to register</span>
-        {/* <h3>
-          {error && <Alert type="error" message={error} showIcon closable></Alert>}
-        </h3> */}
+        {/* {
+          error as string && <h3 className='my-7'>
+            <Alert type="error" message={error} showIcon closable={false}></Alert>
+          </h3>
+        } */}
         <Form
           form={form}
           layout="vertical"
@@ -46,7 +51,7 @@ const Register = (props: RegisterProps) => {
             onFinish(value);
           }}
           name="register-form"
-          className="mt-5 register-form"
+          className="register-form"
         >
           <Row gutter={[16, 16]}>
             <Col md={12} xs={24}>
@@ -65,6 +70,28 @@ const Register = (props: RegisterProps) => {
                 label={<span>Last Name</span>}
               >
                 <Input placeholder="Last Name" className="h-14" />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={[16, 16]}>
+            <Col md={24} xs={24}>
+              <Form.Item
+                name="name"
+                rules={[{ required: true, message: 'Enter account name' }]}
+                label={
+                  <span>
+                    AccountName{' '}
+                    <CustomToolTip
+                      title="This is the name to be associated with your business."
+                      placement={'right'}
+                    >
+                      {' '}
+                      <InfoCircleOutlined />
+                    </CustomToolTip>
+                  </span>
+                }
+              >
+                <Input placeholder="Account Name" className="h-14" />
               </Form.Item>
             </Col>
           </Row>
@@ -196,9 +223,9 @@ const Register = (props: RegisterProps) => {
           <Button
             className="opacity-100 hover:opacity-70 mt-1.5 bg-blue text-white h-14 rounded-lg"
             type="primary"
-            disabled={false}
+            disabled={isRegisterLoading}
             block
-            loading={false}
+            loading={isRegisterLoading}
             htmlType="submit"
           >
             Create Account

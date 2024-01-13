@@ -6,15 +6,15 @@ type ForgotPasswordProps = {
   mobileResponsive: boolean;
   theme: string;
   handleForgotPassword: (payload: Record<string, any>) => void;
+  isLoading: boolean;
 };
 
 const ForgotPassword = (props: ForgotPasswordProps) => {
-  const { handleForgotPassword } = props;
+  const { handleForgotPassword, isLoading } = props;
   const [form] = Form.useForm();
 
   const onFinish = (values: Record<string, any>) => {
     handleForgotPassword(values);
-    console.log('forgot password values::', values);
   };
   return (
     <motion.div
@@ -53,9 +53,9 @@ const ForgotPassword = (props: ForgotPasswordProps) => {
           <Button
             className="opacity-100 hover:opacity-70 mt-1.5 bg-blue text-white h-14 rounded-lg"
             type="primary"
-            disabled={false}
+            disabled={isLoading}
             block
-            loading={false}
+            loading={isLoading}
             htmlType="submit"
           >
             Send
