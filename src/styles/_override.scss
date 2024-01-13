@@ -72,9 +72,9 @@
   }
 }
 
-.virtual-account-select {
+.business-selector {
   .ant-select-selector {
     // border: 1px solid black !important;
-    // border-radius: 0 !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.09);
   }
 }

@@ -40,7 +40,7 @@ export const siderItems: MenuItem[] = [
     <MdAdd size={15} />
   ),
   getItem(
-    <span className="font-thin text-[14px]">Manage Businesses</span>,
+    <span className="font-thin text-[14px]">Manage All Businesses</span>,
     'business_sub_2',
     <MdManageAccounts size={15} />
   ),

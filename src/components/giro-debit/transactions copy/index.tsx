@@ -8,23 +8,21 @@ import { FaRegCalendarAlt, FaSearch } from 'react-icons/fa';
 const Transactions = () => {
   return (
     <div className="w-full flex flex-col gap-10">
-      <div className="flex flex-col-reverse justify-between gap-5 items-start font-semibold">
-        <div className="flex flex-col-reverse border gap-5 p-5 shadow-sm">
-          <div className="flex flex-col gap-2">
-            <Space size={5}>
-              <WalletIcon />
-              <span>Giro Balance :</span>
-            </Space>
-            <div className="text-4xl font-bold">&#x20A6;25,000.00</div>
-            <div className="font-thin">Total Balance from all accounts</div>
-          </div>
-          <div className="flex flex-col">
-            <Select
-              size="large"
-              className="w-[300px] font-normal virtual-account-select"
-              placeholder="Select a virtual account"
-            />
-          </div>
+      <div className="flex w-full justify-between items-center font-semibold">
+        <div className="flex flex-col gap-2">
+          <Space size={5}>
+            <WalletIcon />
+            <span>Giro Balance :</span>
+          </Space>
+          <div className="text-4xl font-bold">&#x20A6;2,500,000.00</div>
+          <div className="font-thin">Total Balance from all accounts</div>
+        </div>
+        <div className="flex flex-col">
+          <Select
+            size="large"
+            className="w-[400px] font-normal virtual-account-select"
+            placeholder="Select a virtual account"
+          />
         </div>
       </div>
       <div className="w-full">

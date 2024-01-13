@@ -31,7 +31,17 @@ export const SiderHeader = (props: SiderHeaderProps) => {
           style={{}}
         />
       )}
-      <Select placeholder={'Business'} style={{}} className="w-[200px]" />
+      <div className="w-full">
+        <span className="px-2 text-[12px]" style={{ color: '#666666' }}>
+          Business
+        </span>
+        <Select
+          placeholder={'Business'}
+          size="large"
+          style={{}}
+          className="w-full business-selector"
+        />
+      </div>
     </div>
   );
 };

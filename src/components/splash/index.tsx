@@ -21,7 +21,7 @@ const SplashScreen = (props: LoginProps) => {
   const giroSystems: GiroSystemsProps[] = [
     {
       title: 'Giro Debit',
-      url: '/giro-debit',
+      url: '/giro-debit/dashboard',
       logo: '/assets/imgs/debit-logo.png',
     },
     {
@@ -34,8 +34,8 @@ const SplashScreen = (props: LoginProps) => {
     <div className="flex justify-center items-center flex-col gap-10">
       <div className="flex flex-col gap-10">
         <div className="flex flex-col text-left text-[24px] font-semibold">
-          <div style={{ fontFamily: 'Roboto Mono, monospace' }}>Select a Giro system</div>
-          <span className="font-thin text-[14px]">
+          <div>Select a Giro system</div>
+          <span className="text-[14px] text-gray-500">
             Enter any of the system to explore it's features
           </span>
         </div>
@@ -57,7 +57,7 @@ const SplashScreen = (props: LoginProps) => {
                       height={60}
                       style={{ width: '50px', height: '50px' }}
                     />
-                    <span style={{ fontFamily: 'Roboto Mono, monospace' }}>{title}</span>
+                    <span style={{}}>{title}</span>
                   </div>
                 </div>
               </>

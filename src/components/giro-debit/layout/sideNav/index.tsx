@@ -55,6 +55,7 @@ export const SideNav = (props: SideNavProps) => {
         }}
         mode="inline"
         items={siderItems}
+        defaultSelectedKeys={['1']}
       />
     </Sider>
   );

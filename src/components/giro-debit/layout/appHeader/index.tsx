@@ -26,7 +26,7 @@ export const AppHeader = (props: AppHeaderProps) => {
 
   return (
     <Header
-      className="layout-header"
+      className="layout-header shadow-sm"
       style={{
         position: 'sticky',
         top: 0,
@@ -45,13 +45,13 @@ export const AppHeader = (props: AppHeaderProps) => {
           <div className="font-bold text-3">{`${currentPath}`}</div>
         )}
         <div className="flex items-center gap-10">
-          <Link className="hover:text-black hover:font-bold" href={'/'}>
+          <Link className="hover:text-black hover:font-semibold" href={'/'}>
             API Documentation
           </Link>
-          <Link className="hover:text-black hover:font-bold" href={'/'}>
+          <Link className="hover:text-black hover:font-semibold" href={'/'}>
             For Developers
           </Link>
-          <Dropdown menu={{ items }} className="header-drop-down" trigger={['click']}>
+          <Dropdown menu={{ items }} className="header-drop-down">
             <Space className="cursor-pointer" size={5}>
               <Image
                 src={'/assets/svgs/user-circle.svg'}
