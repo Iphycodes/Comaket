@@ -1,7 +1,6 @@
 'use client';
-import { Giro as GiroLogo } from '@grc/_shared/assets/svgs';
 import { useRouter } from 'next/navigation';
-import { ReactElement } from 'react';
+import Image from 'next/image';
 
 type LoginProps = {
   mobileResponsive: boolean;
@@ -11,7 +10,7 @@ type LoginProps = {
 type GiroSystemsProps = {
   title: string;
   url: string;
-  icon: ReactElement;
+  logo: string;
 };
 
 const SplashScreen = (props: LoginProps) => {
@@ -23,34 +22,48 @@ const SplashScreen = (props: LoginProps) => {
     {
       title: 'Giro Debit',
       url: '/giro-debit',
-      icon: <GiroLogo />,
+      logo: '/assets/imgs/debit-logo.png',
     },
     {
       title: 'Giro Mandate',
       url: '/giro-mandate',
-      icon: <GiroLogo />,
+      logo: '/assets/imgs/mandate-logo.png',
     },
   ];
   return (
     <div className="flex justify-center items-center flex-col gap-10">
-      <div className="flex font-semibold" style={{ fontSize: '32px' }}>
-        Please select a Giro system
-      </div>
-      <div className="flex gap-10">
-        {giroSystems.map(({ title, icon, url }, idx) => {
-          return (
-            <div
-              key={idx}
-              className="w-60 h-60 shadow-sm relative border flex justify-center items-center cursor-pointer hover:bg-slate-50"
-              onClick={() => push(url)}
-            >
-              <span className="absolute inline-block bg-blue-500 text-sm text-white py-1 px-2 bg-blue top-2 right-0">
-                {title}
-              </span>
-              {icon}
-            </div>
-          );
-        })}
+      <div className="flex flex-col gap-10">
+        <div className="flex flex-col text-left text-[24px] font-semibold">
+          <div style={{ fontFamily: 'Roboto Mono, monospace' }}>Select a Giro system</div>
+          <span className="font-thin text-[14px]">
+            Enter any of the system to explore it's features
+          </span>
+        </div>
+
+        <div className="flex gap-10">
+          {giroSystems.map(({ title, logo, url }, idx) => {
+            return (
+              <>
+                <div
+                  key={idx}
+                  className="h-40 w-48 rounded-lg shadow-md hover:border hover:border-cyan-100 shadow-gray-200 hover:shadow-cyan-200 relative flex justify-center items-center cursor-pointer"
+                  onClick={() => push(url)}
+                >
+                  <div className="flex flex-col justify-center items-center font-semibold gap-4">
+                    <Image
+                      src={logo}
+                      alt="logo"
+                      width={60}
+                      height={60}
+                      style={{ width: '50px', height: '50px' }}
+                    />
+                    <span style={{ fontFamily: 'Roboto Mono, monospace' }}>{title}</span>
+                  </div>
+                </div>
+              </>
+            );
+          })}
+        </div>
       </div>
     </div>
   );
