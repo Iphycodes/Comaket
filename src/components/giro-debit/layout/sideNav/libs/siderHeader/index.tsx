@@ -1,6 +1,7 @@
 'use client';
 import React, { Dispatch, SetStateAction } from 'react';
 import Image from 'next/image';
+import { Select } from 'antd';
 // import { MenuFoldOutlined, CloseOutlined } from '@ant-design/icons';
 
 export interface SiderHeaderProps {
@@ -20,7 +21,7 @@ export const SiderHeader = (props: SiderHeaderProps) => {
   //     }
   //   };
   return (
-    <div className="flex justify-start items-center py-5 px-7">
+    <div className="flex flex-col justify-start items-start gap-5 py-5 px-5">
       {!collapsed && (
         <Image
           src={'/assets/svgs/giro-logo.svg'}
@@ -30,6 +31,7 @@ export const SiderHeader = (props: SiderHeaderProps) => {
           style={{}}
         />
       )}
+      <Select placeholder={'Business'} style={{}} className="w-[200px]" />
     </div>
   );
 };

@@ -1,4 +1,4 @@
-import { MenuProps, Select } from 'antd';
+import { MenuProps } from 'antd';
 import { RiDashboardLine } from 'react-icons/ri';
 import { GrTransaction } from 'react-icons/gr';
 import { PiMoney } from 'react-icons/pi';
@@ -35,23 +35,14 @@ function getItem(
 
 export const siderItems: MenuItem[] = [
   getItem(
-    <Select placeholder={'Business'} style={{}} className="w-[200px]" />,
-    '5',
-    null,
-    undefined,
-    [
-      getItem(
-        <span className="font-thin text-[14px]">Add Business</span>,
-        'business_sub_1',
-        <MdAdd size={15} />
-      ),
-      getItem(
-        <span className="font-thin text-[14px]">Manage Businesses</span>,
-        'business_sub_2',
-        <MdManageAccounts size={15} />
-      ),
-    ],
-    'group'
+    <span className="font-thin text-[14px]">Add Business</span>,
+    'business_sub_1',
+    <MdAdd size={15} />
+  ),
+  getItem(
+    <span className="font-thin text-[14px]">Manage Businesses</span>,
+    'business_sub_2',
+    <MdManageAccounts size={15} />
   ),
   getItem(
     'Navigation',
