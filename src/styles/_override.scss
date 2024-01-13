@@ -1,21 +1,22 @@
 @import 'giro.min.css';
 
-.register-form, .reset-password-form{
-  .ant-input-number-group-wrapper, .ant-input-number-in-form-item{
+.register-form,
+.reset-password-form {
+  .ant-input-number-group-wrapper,
+  .ant-input-number-in-form-item {
     width: 100% !important;
   }
-  .ant-input-number-group{
+  .ant-input-number-group {
     height: 100% !important;
   }
-  .ant-input-number-input-wrap{
+  .ant-input-number-input-wrap {
     height: 100% !important;
-    input{
+    input {
       height: 100% !important;
     }
-
   }
 }
-.react-code-input{  
+.react-code-input {
   margin: 32px -20px 32px 0;
   text-align: center;
   input {
@@ -41,5 +42,39 @@
     overflow: hidden;
     display: flex;
     align-items: center !important;
+  }
+}
+
+// .ant-menu-item-selected,
+// .ant-menu-item-active {
+//   // background-color: transparent !important;
+//   // color: #000000 !important;
+// }
+.ant-menu-item-active {
+  color: #666666 !important;
+}
+
+.ant-menu-item-selected {
+  background-color: rgba(0, 0, 0, 0.06) !important;
+  color: #666666 !important;
+}
+
+.transaction-table {
+  .ant-table-body {
+    .ant-table-row {
+      .ant-table-cell {
+        font-size: 13px;
+        font-weight: 700;
+        color: rgba(0, 0, 0, 0.3);
+        border: 0;
+      }
+    }
+  }
+}
+
+.business-selector {
+  .ant-select-selector {
+    // border: 1px solid black !important;
+    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.09);
   }
 }
