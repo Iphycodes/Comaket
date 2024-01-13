@@ -22,24 +22,14 @@ export const SiderHeader = (props: SiderHeaderProps) => {
   return (
     <div className="flex justify-start items-center py-5 px-7">
       {!collapsed && (
-        <Image src={'/assets/imgs/debit-logo.png'} alt="debit-logo" width={50} height={60} />
+        <Image
+          src={'/assets/svgs/giro-logo.svg'}
+          alt="debit-logo"
+          width={140}
+          height={60}
+          style={{}}
+        />
       )}
-
-      {/* <MenuToggle collapsed={collapsed}>
-        {isMobile || isTablet ? (
-          <CloseOutlined
-            className="hamburger"
-            style={{ fontSize: "24px" }}
-            // onClick={() => HandleToggleSider()}
-          />
-        ) : (
-          <MenuFoldOutlined
-            className="hamburger"
-            style={{ fontSize: "24px" }}
-            // onClick={() => HandleToggleSider()}
-          />
-        )}
-      </MenuToggle> */}
     </div>
   );
 };

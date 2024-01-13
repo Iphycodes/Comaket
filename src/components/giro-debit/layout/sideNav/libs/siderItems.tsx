@@ -1,9 +1,9 @@
 import { MenuProps, Select } from 'antd';
-import { PlusOutlined } from '@ant-design/icons';
 import { RiDashboardLine } from 'react-icons/ri';
 import { GrTransaction } from 'react-icons/gr';
 import { PiMoney } from 'react-icons/pi';
 import { RiListSettingsLine } from 'react-icons/ri';
+import { MdManageAccounts, MdAdd } from 'react-icons/md';
 
 import Link from 'next/link';
 
@@ -20,7 +20,7 @@ function getItem(
   const menuIcon = <span>{icon}</span>;
   const menuLabel = (
     <div className="flex items-center justify-between">
-      <Link href={`/giro-debit/${to}`}>{label}</Link>
+      {to ? <Link href={`/giro-debit/${to}`}>{label}</Link> : <span>{label}</span>}
     </div>
   );
   return {
@@ -41,9 +41,15 @@ export const siderItems: MenuItem[] = [
     undefined,
     [
       getItem(
-        <span className="font-thin">Add Business</span>,
+        <span className="font-thin text-[14px]">Add Business</span>,
         '4',
-        <PlusOutlined size={20} />,
+        <MdAdd size={15} />,
+        '/settings'
+      ),
+      getItem(
+        <span className="font-thin text-[14px]">Manage Businesses</span>,
+        '4',
+        <MdManageAccounts size={15} />,
         '/settings'
       ),
     ],
