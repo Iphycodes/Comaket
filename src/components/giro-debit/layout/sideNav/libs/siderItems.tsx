@@ -42,15 +42,13 @@ export const siderItems: MenuItem[] = [
     [
       getItem(
         <span className="font-thin text-[14px]">Add Business</span>,
-        '4',
-        <MdAdd size={15} />,
-        '/settings'
+        'business_sub_1',
+        <MdAdd size={15} />
       ),
       getItem(
         <span className="font-thin text-[14px]">Manage Businesses</span>,
-        '4',
-        <MdManageAccounts size={15} />,
-        '/settings'
+        'business_sub_2',
+        <MdManageAccounts size={15} />
       ),
     ],
     'group'
