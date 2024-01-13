@@ -33,8 +33,9 @@ export const AppHeader = (props: AppHeaderProps) => {
         height: 'auto',
         display: 'flex',
         alignItems: 'center',
-        padding: `${isMobile ? '10px' : '5px 40px'}`,
+        padding: `${isMobile ? '10px' : '0 40px'}`,
         backgroundColor: '#ffffff',
+        borderBottom: '1px solid #F3F3F3',
       }}
     >
       <div className="flex justify-between items-center min-w-full bg-white">

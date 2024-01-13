@@ -45,14 +45,18 @@
   }
 }
 
-.ant-menu-item-selected,
+// .ant-menu-item-selected,
+// .ant-menu-item-active {
+//   // background-color: transparent !important;
+//   // color: #000000 !important;
+// }
 .ant-menu-item-active {
-  background-color: transparent !important;
-  color: #000000 !important;
+  color: #666666 !important;
 }
 
 .ant-menu-item-selected {
-  font-weight: 700 !important;
+  background-color: rgba(0, 0, 0, 0.06) !important;
+  color: #666666 !important;
 }
 
 .transaction-table {
@@ -68,8 +72,8 @@
   }
 }
 
-.virtual-account-select{
-  .ant-select-selector{
+.virtual-account-select {
+  .ant-select-selector {
     // border: 1px solid black !important;
     // border-radius: 0 !important;
   }

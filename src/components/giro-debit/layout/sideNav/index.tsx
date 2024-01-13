@@ -47,12 +47,11 @@ export const SideNav = (props: SideNavProps) => {
     >
       <SiderHeader collapsed={collapse} setCollapsed={setCollapse} />
       <Menu
-        className="sider-menu hover:bg-white"
+        className="sider-menu"
         style={{
-          fontSize: '14px',
+          fontSize: '16px',
           backgroundColor: '#F3F3F3',
           color: '#666666',
-          fontWeight: '600',
         }}
         mode="inline"
         items={siderItems}
