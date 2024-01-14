@@ -25,7 +25,7 @@ const TransactionsTable = (props: TransactionTableProps) => {
     },
     {
       title: (
-        <span className="flex text-[12px] font-bold text-gray-500 items-center gap-1">
+        <span className="flex text-[14px] font-semibold text-gray-500 items-center gap-1">
           <span>Date</span>
           <RiExpandUpDownFill size={15} />
         </span>
@@ -38,7 +38,7 @@ const TransactionsTable = (props: TransactionTableProps) => {
     },
     {
       title: (
-        <span className="flex text-[12px] font-bold text-gray-500 items-center gap-1">
+        <span className="flex text-[14px] font-semibold text-gray-500 items-center gap-1">
           <span>Type</span>
           <RiExpandUpDownFill size={15} />
         </span>
@@ -49,7 +49,7 @@ const TransactionsTable = (props: TransactionTableProps) => {
     },
     {
       title: (
-        <span className="flex text-[12px] font-bold text-gray-500 items-center gap-1">
+        <span className="flex text-[14px] font-semibold text-gray-500 items-center gap-1">
           <span>Session ID</span>
           <RiExpandUpDownFill size={15} />
         </span>
@@ -62,7 +62,7 @@ const TransactionsTable = (props: TransactionTableProps) => {
     },
     {
       title: (
-        <span className="flex text-[12px] font-bold text-gray-500 items-center gap-1">
+        <span className="flex text-[14px] font-semibold text-gray-500 items-center gap-1">
           <span>Reciepient</span>
           <RiExpandUpDownFill size={15} />
         </span>
@@ -76,7 +76,7 @@ const TransactionsTable = (props: TransactionTableProps) => {
     },
     {
       title: (
-        <span className="flex text-[12px] font-bold text-gray-500 items-center gap-1">
+        <span className="flex text-[14px] font-semibold text-gray-500 items-center gap-1">
           <span>Reciepient Status</span>
           <RiExpandUpDownFill size={15} />
         </span>
@@ -101,7 +101,7 @@ const TransactionsTable = (props: TransactionTableProps) => {
     },
     {
       title: (
-        <span className="flex text-[12px] font-bold text-gray-500 items-center gap-1">
+        <span className="flex text-[14px] font-semibold text-gray-500 items-center gap-1">
           <span>Reciepient Bank</span>
           <RiExpandUpDownFill size={15} />
         </span>
@@ -115,7 +115,7 @@ const TransactionsTable = (props: TransactionTableProps) => {
     },
     {
       title: (
-        <span className="flex text-[12px] font-bold text-gray-500 items-center gap-1">
+        <span className="flex text-[14px] font-semibold text-gray-500 items-center gap-1">
           <span>Amount</span>
           <RiExpandUpDownFill size={15} />
         </span>
