@@ -42,7 +42,7 @@ const LoginPage = () => {
               router.push(`/auth/verify-email?email=${loginResponse.data.data.email}`);
             });
         } else {
-          router.push('/app');
+          router.push('/apps');
         }
       }
     }

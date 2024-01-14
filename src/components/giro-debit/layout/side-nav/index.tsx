@@ -1,31 +1,44 @@
 'use client';
-import React, { ReactElement, useState } from 'react';
+import React, { useContext, useState } from 'react';
 import { Layout, Menu } from 'antd';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
-import { siderItems } from './libs/siderItems';
 import { SiderHeader } from './libs/siderHeader';
+import { MenuItem } from '@grc/_shared/helpers';
+import { AppContext } from '@grc/app-context';
+import { usePathname, useRouter } from 'next/navigation';
 const { Sider } = Layout;
 
 export interface SideNavProps {
-  items?: ReactElement[];
+  items: MenuItem[];
   setCollapsed?: React.Dispatch<React.SetStateAction<boolean>>;
   collapsed?: boolean;
 }
 
 export const SideNav = (props: SideNavProps) => {
-  const {} = props;
+  const { items } = props;
   const isMobile = useMediaQuery(mediaSize.mobile);
-  //   const isTablet = useMediaQuery(mediaSize.tablet);
   const [collapse, setCollapse] = useState<boolean>(false);
   //   const { collapse, setCollapse } = useContext(AppContext);
+  //   const isTablet = useMediaQuery(mediaSize.tablet);
+  const { handleLogOut } = useContext(AppContext);
+  const router = useRouter();
+  const pathname = usePathname();
+  const urlPath = pathname?.split('/');
 
-  //   const { theme } = useContext(AppContext);
+  const handleMenuClick = ({ key }: { key: React.Key | string }) => {
+    if (key === 'logout') {
+      handleLogOut();
+      router.push('/login');
+    } else {
+      router.push(`/apps/giro-debit/${key}`);
+    }
+  };
 
   return (
     <Sider
       collapsed={false}
       collapsedWidth={isMobile ? 0 : 80}
-      className="dash-sider"
+      className="dash-sider text-lg"
       width={250}
       //   theme={'light'}
       style={{
@@ -54,8 +67,10 @@ export const SideNav = (props: SideNavProps) => {
           color: '#666666',
         }}
         mode="inline"
-        items={siderItems}
+        items={items}
         defaultSelectedKeys={['1']}
+        selectedKeys={[urlPath?.[3] as string]}
+        onClick={handleMenuClick}
       />
     </Sider>
   );

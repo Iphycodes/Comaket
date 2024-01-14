@@ -6,7 +6,7 @@ export const GET = 'GET';
 
 /** url **/
 export const registerUrl = 'auth/sign-up';
-export const businessUrl = 'accounts';
+export const accountUrl = 'accounts';
 export const constantUrl = 'constants';
 export const loginUrl = 'auth/sign-in';
 export const verifyEmailUrl = 'auth/verify-email';
@@ -176,40 +176,80 @@ export const IdentityType = [
   },
 ];
 
-export const accountData = [
+export const transactionData = [
   {
-    type: 'Pay Out',
-    id: '3EF5RR6D',
+    entry: 'debit',
+    id: '00001',
     date: '12/06/23',
     time: '00:34:12',
     amount: '450,234',
+    currency: 'NGN',
+    recipient: 'john doe',
+    status: 'successful',
   },
   {
-    type: 'Pay Out',
-    id: '3EF5RR6D',
+    entry: 'debit',
+    id: '00002',
     date: '12/06/23',
     time: '00:34:12',
     amount: '450,234',
+    currency: 'NGN',
+    recipient: 'john doe',
+    status: 'successful',
   },
   {
-    type: 'Pay Out',
-    id: '3EF5RR6D',
+    entry: 'credit',
+    id: '00003',
     date: '12/06/23',
     time: '00:34:12',
     amount: '450,234',
+    currency: 'NGN',
+    recipient: 'sinzu money',
+    status: 'successful',
   },
   {
-    type: 'Pay Out',
-    id: '3EF5RR6D',
+    entry: 'credit',
+    id: '00004',
     date: '12/06/23',
     time: '00:34:12',
     amount: '450,234',
+    currency: 'NGN',
+    recipient: 'sinzu money',
+    status: 'successful',
   },
   {
-    type: 'Pay Out',
-    id: '3EF5RR6D',
+    entry: 'debit',
+    id: '00005',
     date: '12/06/23',
     time: '00:34:12',
     amount: '450,234',
+    currency: 'NGN',
+    recipient: 'john doe',
+    status: 'failed',
+  },
+];
+
+export const statisticsFilter = ['all', 'week', 'month', 'quarter', 'year'];
+
+export const statCardProps = [
+  {
+    title: 'Total',
+    value: 10034000,
+  },
+  {
+    title: 'Pending',
+    value: 3,
+  },
+  {
+    title: 'Processing',
+    value: 1,
+  },
+  {
+    title: 'Successful',
+    value: 401030,
+  },
+  {
+    title: 'Failed',
+    value: 2,
   },
 ];

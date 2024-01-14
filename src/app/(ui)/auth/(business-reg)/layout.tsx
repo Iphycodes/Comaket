@@ -12,7 +12,7 @@ const BusinessLayout = (props: LayoutProps) => {
   const { children } = props;
 
   return (
-    <main className="h-screen flex flex items-center bg-white">
+    <main className="h-screen flex items-center bg-white">
       <div
         className={` ${
           mobileResponsive ? 'hidden' : 'flex-[2_1_0%]'

@@ -2,7 +2,7 @@ import { api } from '@grc/services/api';
 import {
   appUrl,
   constantUrl,
-  businessUrl,
+  accountUrl,
   forgotPasswordUrl,
   loginUrl,
   POST,
@@ -20,7 +20,7 @@ import type {
   sendVerificationRequestType,
   verifyRequestType,
 } from '@grc/_shared/namespace/auth';
-import { businessResponseType } from '@grc/_shared/namespace/auth';
+import { accountResponseType } from '@grc/_shared/namespace/auth';
 import { updateUserTag } from '@grc/services/tags';
 
 export const authApi = api?.injectEndpoints({
@@ -43,18 +43,18 @@ export const authApi = api?.injectEndpoints({
         };
       },
     }),
-    business: builder.mutation<businessResponseType, registerRequestType>({
+    account: builder.mutation<accountResponseType, registerRequestType>({
       query: ({ payload }) => {
         return {
-          url: businessUrl,
+          url: accountUrl,
           method: POST,
           body: payload,
         };
       },
     }),
-    getBusinesses: builder.query({
+    getAccounts: builder.query({
       query: () => ({
-        url: `${businessUrl}`,
+        url: `${accountUrl}`,
       }),
     }),
     verifyEmail: builder.mutation<authResponseType, verifyRequestType>({
@@ -129,12 +129,12 @@ export const {
   useVerifyEmailMutation,
   useForgotPasswordMutation,
   useResetPasswordMutation,
-  useLazyGetBusinessesQuery,
+  useLazyGetAccountsQuery,
   useSendVerificationMutation,
-  useBusinessMutation,
+  useAccountMutation,
   useLazyGetAppQuery,
   useLazyGetConstantsQuery,
   useLazyGetLoggedInUserQuery,
   useUpdateLoggedInUserMutation,
-  endpoints: { login, getBusinesses, getApp, getConstants },
+  endpoints: { login, getAccounts, getApp, getConstants },
 } = authApi;

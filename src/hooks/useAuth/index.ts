@@ -1,7 +1,8 @@
 import { useAppDispatch, useAppSelector } from '@grc/redux/store';
-import { logout } from '@grc/redux/slices/auth';
+import { logout, setCurrentAccount } from '@grc/redux/slices/auth';
 import {
   useForgotPasswordMutation,
+  useLazyGetAccountsQuery,
   useLazyGetAppQuery,
   useLazyGetConstantsQuery,
   useLazyGetLoggedInUserQuery,
@@ -19,8 +20,9 @@ import type { AuthDataType } from '@grc/_shared/namespace/auth';
 import { useEffect } from 'react';
 import { selectAppData, selectConstants } from '@grc/redux/selectors/auth';
 import { AppDataType } from '@grc/_shared/namespace/auth';
+import { AccountNamespace } from '@grc/_shared/namespace/account';
 
-// type Business = BusinessNamespace.Business;
+type Business = AccountNamespace.Account;
 
 interface useAuthProps {
   key?: string;
@@ -53,10 +55,13 @@ interface UseAuthReturnType {
   categories: Record<string, any>[];
   constantsResponse: Record<string, any>;
   isLiveMode: string | null;
+  handleCurrentAccount: (currentAccount: string) => void;
+  currentAccount: Business | any;
+  triggerAcccountsResponse: Record<string, any>;
 }
 
 export const useAuth = ({
-  // callAccounts = false,
+  callAccounts = false,
   callApp = false,
   callConstants = false,
   callUser = false,
@@ -74,15 +79,24 @@ export const useAuth = ({
   const [sendVerification, sendVerificationResponse] = useSendVerificationMutation();
   const [forgotPassword, forgotPasswordResponse] = useForgotPasswordMutation();
   const [resetPassword, resetPasswordResponse] = useResetPasswordMutation();
+  const [triggerAccounts, triggerAcccountsResponse] = useLazyGetAccountsQuery();
   const [triggerApp] = useLazyGetAppQuery();
   const [triggerConstants, constantsResponse] = useLazyGetConstantsQuery();
-  const { authData, isLiveMode } = useAppSelector((state) => state.auth);
+  const { authData, isLiveMode, currentAccount } = useAppSelector((state) => state.auth);
   const appData = useAppSelector((state) => selectAppData(state, {}));
   const constants = useAppSelector((state) => selectConstants(state, {}));
 
   const handleLogOut = () => {
     dispatch(logout());
   };
+
+  const handleCurrentAccount = (currentAccount: Business | string) => {
+    const business = currentAccount === 'string' ? JSON.parse(currentAccount) : currentAccount;
+    dispatch(setCurrentAccount(business));
+  };
+  useEffect(() => {
+    if (callAccounts) triggerAccounts({});
+  }, [callAccounts]);
 
   useEffect(() => {
     if (callApp) triggerApp({});
@@ -95,6 +109,12 @@ export const useAuth = ({
   useEffect(() => {
     if (callUser) triggerUser(params);
   }, [callUser]);
+
+  useEffect(() => {
+    if (authData?.currentAccount) {
+      handleCurrentAccount(authData?.currentAccount);
+    }
+  }, [authData]);
 
   const sessionToken: string | undefined = Cookies.get(AUTH_TOKEN_KEY);
 
@@ -120,5 +140,8 @@ export const useAuth = ({
     updateUser,
     updateUserResponse,
     isLiveMode,
+    handleCurrentAccount,
+    currentAccount,
+    triggerAcccountsResponse,
   };
 };
