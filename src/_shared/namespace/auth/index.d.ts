@@ -1,5 +1,5 @@
 import optionType from '../index';
-import { BusinessNamespace } from '@/_shared/namespace/business';
+import { AccountNamespace } from '@grc/_shared/namespace/account';
 
 export interface User {
   email: string;
@@ -51,14 +51,14 @@ export interface AuthDataType {
     state: string;
     country: string;
   };
-  businesses: BusinessNamespace.Business[];
+  accounts: AccountNamespace.Account[];
   token: string;
   isEmailVerified: boolean;
   createdAt: Date;
   updatedAt: Date;
   lastLogin: Date;
-  accounts: Array<BusinessNamespace.Business>;
-  currentAccount: BusinessNamespace.Business & {
+  // accounts: Array<AccountNamespace.Account>;
+  currentAccount: AccountNamespace.Account & {
     pubKey: { live: string; test: string };
     webhooks: Array<string>;
   };
@@ -69,9 +69,9 @@ export interface authResponseType {
   data: AuthDataType;
 }
 
-export interface businessResponseType {
+export interface accountResponseType {
   meta: Record<'token', string>;
-  data: BusinessNamespace.Business;
+  data: AccountNamespace.Account;
 }
 
 export interface AppDataType {

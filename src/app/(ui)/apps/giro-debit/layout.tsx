@@ -1,8 +1,10 @@
 'use client';
 
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
-import { AppHeader } from '@grc/components/giro-debit/layout/appHeader';
-import { SideNav } from '@grc/components/giro-debit/layout/sideNav';
+import { appNav } from '@grc/app/nav';
+import { AppHeader } from '@grc/components/giro-debit/layout/app-header';
+import { SideNav } from '@grc/components/giro-debit/layout/side-nav';
+import { useAuth } from '@grc/hooks/useAuth';
 import { Layout } from 'antd';
 import { Footer } from 'antd/es/layout/layout';
 import { ReactElement } from 'react';
@@ -21,6 +23,11 @@ const AppsBaseLayout = (props: GiroDebitPageProps) => {
   const { children } = props;
   const mobileResponsive = useMediaQuery(mediaSize.mobile);
   const tabletResponsive = useMediaQuery(mediaSize.tablet);
+  const {} = useAuth({
+    callAccounts: false,
+    callCurrentAccount: false,
+    callUser: true,
+  });
   //   const { theme } = useContext(AppContext);
   // const [collapse, setCollapse] = useState<boolean>(false);
 
@@ -29,7 +36,7 @@ const AppsBaseLayout = (props: GiroDebitPageProps) => {
   return (
     <Layout hasSider={true}>
       {/* <SideNav setCollapsed={setCollapsed} collapsed={collapsed} /> */}
-      <SideNav />
+      <SideNav items={appNav.items} />
       <Layout
         className="body-layout"
         style={{

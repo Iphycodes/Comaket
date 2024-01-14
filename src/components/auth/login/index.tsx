@@ -82,13 +82,10 @@ const Login = (props: LoginProps) => {
           <div className="flex items-center justify-between">
             <Form.Item valuePropName="checked" name="rememberMe">
               <Switch onChange={onSwitchChange} size="small" /> Remember me
-            </Form.Item>
-            <u>
-              {' '}
-              <Link href={'/auth/forgot-password'} className="text-blue">
-                Forgot password
-              </Link>
-            </u>
+            </Form.Item>{' '}
+            <Link href={'/auth/forgot-password'} className="text-blue underline">
+              Forgot password
+            </Link>
           </div>
 
           <Button

@@ -23,7 +23,7 @@ const CustomToolTip = ({
         textAlign: 'left',
         fontSize: '14px',
         padding: '10px 15px',
-        fontWeight: 600,
+        fontWeight: 500,
       }}
       overlayClassName=""
       className={` ${className}`}
