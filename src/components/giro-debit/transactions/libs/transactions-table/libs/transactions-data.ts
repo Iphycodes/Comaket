@@ -15,7 +15,7 @@ export const transactionsData = <TransactionsDataType[]>[
     key: '1',
     date: '12 Jan 24, 2:30 PM',
     type: 'transfer',
-    sessionId: '908890989329992321443433433543333333334445334665665645',
+    sessionId: '9088909893299',
     time: '2:30pm',
     reciepient: 'Ifeanyi Ogbonna',
     reciepientAccountStatus: 'approved',

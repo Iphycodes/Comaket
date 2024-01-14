@@ -63,10 +63,10 @@
   .ant-table-body {
     .ant-table-row {
       .ant-table-cell {
-        font-size: 13px;
-        font-weight: 700;
-        color: rgba(0, 0, 0, 0.3);
-        border: 0;
+        // font-size: 16px;
+        font-weight: 500;
+        padding-top: 20px !important;
+        padding-bottom: 20px !important;
       }
     }
   }
@@ -78,3 +78,42 @@
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.09);
   }
 }
+
+.live-mode-switch.ant-switch {
+  .ant-switch-inner {
+    background-color: #666666 !important;
+  }
+}
+
+.live-mode-switch.ant-switch-checked {
+  .ant-switch-inner {
+    background-color: rgb(4, 219, 4) !important;
+  }
+}
+
+// .ant-switch-checked,
+// .ant-switch-unchecked {
+//   position: relative !important;
+// }
+
+// .ant-switch-checked,
+// .ant-switch-unchecked {
+//   svg {
+//     position: absolute !important;
+//   }
+// }
+
+// .ant-switch-checked {
+//   svg {
+//     left: -5px !important;
+//     top: 2px !important;
+//     font-size: 18px !important;
+//   }
+// }
+
+// .ant-switch-unchecked {
+//   svg {
+//     top: 23px !important;
+//     font-size: 20px !important;
+//   }
+// }
