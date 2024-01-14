@@ -34,11 +34,22 @@
   }
 }
 
-.business-register-form {
+.business-register-form{
   .ant-select-selector,
   .ant-select-in-form-item,
   .ant-select-selection-item {
     height: 3.5rem !important;
+    overflow: hidden;
+    display: flex;
+    align-items: center !important;
+  }
+}
+
+.select-virtual-account{
+  .ant-select-selector,
+  .ant-select-in-form-item,
+  .ant-select-selection-item {
+    height: 3rem !important;
     overflow: hidden;
     display: flex;
     align-items: center !important;
@@ -72,9 +83,27 @@
   }
 }
 
-.business-selector {
+.dash-sider{
   .ant-select-selector {
     // border: 1px solid black !important;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.09);
   }
+  .ant-select-selector,
+  .ant-select-in-form-item,
+  .ant-select-selection-item {
+    height: 2.3rem !important;
+    overflow: hidden;
+    display: flex;
+    align-items: center !important;
+  }
+
+  .ant-menu-item:last-child {
+    position:absolute;
+    bottom: 50px;
+  }
+
+}
+.dashboard-transaction-list:hover{
+  background-color: #eee !important;
+
 }

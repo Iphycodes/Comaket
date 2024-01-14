@@ -1,51 +1,192 @@
 'use client';
-import { Button, Space } from 'antd';
-import { Wallet as WalletIcon } from '@grc/_shared/assets/svgs';
+import { Button, Card, Col, List, Row, Space, Tag } from 'antd';
+import Link from 'next/link';
+import { AuthDataType } from '@grc/_shared/namespace/auth';
+import SelectVirtualAcct from './libs/select-virtual-acct';
+import CreateAcctCard from './libs/create-acct-card';
+import { capitalize, startCase, toLower } from 'lodash';
+import { ArrowUpIcon, ArrowDownIcon } from '@grc/_shared/assets/svgs';
+import { statCardProps, statisticsFilter } from '@grc/_shared/constant';
+import { Dispatch, Fragment, SetStateAction, useState } from 'react';
+import formatNumber from '@grc/_shared/helpers';
+import { AccountNamespace } from '@grc/_shared/namespace/account';
 
-const DashBoard = () => {
+type DashBoardProps = {
+  authData?: AuthDataType | null;
+  transactions: Record<string, any>[];
+  setFilter: Dispatch<SetStateAction<string>>;
+  currentAccount: AccountNamespace.Account | null;
+};
+const DashBoard = (props: DashBoardProps) => {
+  const { transactions, setFilter, currentAccount } = props;
+  const [activeFilter, setActiveFilter] = useState('all');
+
   return (
-    <div className="w-full flex flex-col gap-5">
-      <div className="flex w-full justify-between items-center font-semibold">
-        <div className="flex flex-col gap-4">
-          <div className="text-3xl">Welcome, Ifeanyi</div>
-          <div className="font-thin">Here's an overview of your account today</div>
-        </div>
-        <div className="flex flex-col">
-          <Space size={5}>
-            <WalletIcon />
-            <span>Giro Balance :</span>
-          </Space>
-          <div className="text-4xl font-bold">&#x20A6;2,500,000.00</div>
-          <Button
-            className="opacity-100 hover:opacity-95 mt-1.5 font-bold bg-black text-white h-12"
-            type="primary"
-            disabled={false}
-            block
-            loading={false}
-            htmlType="submit"
-          >
-            Add Fund
-          </Button>
-        </div>
+    <div className="w-full min-h-screen flex flex-col gap-5">
+      <div>
+        <div className="text-3xl">Hello, {startCase(toLower(currentAccount?.name))}</div>
+        <div className="text-sm mt-2">Here's an overview of your account today</div>
       </div>
-      <div className="flex justify-between items-center px-5 py-10 w-full border text-gray-500">
-        <div className="flex flex-col gap-1">
-          <div className="font-bold text-[16px]">Create a Virtual Account</div>
-          <span className="text-[12px]">
-            A virtual account allows you to commence funding on Giro
-          </span>
-        </div>
-        <Button
-          className="opacity-100 bg-blue hover:opacity-95 px-6 text-white h-10"
-          type="primary"
-          disabled={false}
-          loading={false}
-          htmlType="submit"
-          style={{ borderRadius: 0 }}
-        >
-          Verified Profile
-        </Button>
-      </div>
+      <Row gutter={[16, 16]} className="mt-4 justify-between">
+        <Col md={10} xs={24} className="rounded-2xl">
+          <Card className="shadow-md hover:border shadow-gray-300">
+            <div>
+              <SelectVirtualAcct
+                isLoadingAccounts={false}
+                vAccount={{} as any}
+                accounts={[
+                  { accountName: 'john doe', accountNumber: '00000', bankName: 'demo' } as any,
+                ]}
+                setVAccount={() => {}}
+              />
+            </div>
+            <div className="mt-9">
+              <CreateAcctCard isVerified={true} setOpenCreateModal={() => {}} />
+            </div>
+          </Card>
+        </Col>
+        <Col md={12} xs={24} className="rounded-2xl">
+          <Card className="flex flex-col gap-2 p-7 shadow-md hover:border shadow-gray-300">
+            <div>
+              <div>Giro Balance</div>
+              <span className="text-3xl mt-3">&#x20A6; 2,500,000.00</span>
+            </div>
+            <div className="mt-1 text-sm">Account balance</div>
+            <span className="text-2xl">&#x20A6; 150,000.00</span>
+            <div>
+              <Button
+                className="opacity-100 hover:opacity-70 mt-3 bg-blue text-white h-10 rounded-lg font-bold px-8"
+                type="primary"
+                disabled={false}
+                block={false}
+                loading={false}
+                htmlType="submit"
+              >
+                Top up
+              </Button>
+            </div>
+          </Card>
+        </Col>
+      </Row>
+      <Row className="mt-16">
+        <Col md={24} xs={24}>
+          <Card className="shadow-md hover:border shadow-gray-300">
+            <header className="flex flex-wrap gap-2 justify-between items-center">
+              <span>Transaction Summary</span>
+              <div>
+                <Space size={5}>
+                  {statisticsFilter.map((filter, index) => (
+                    <Button
+                      className={`${
+                        activeFilter == filter
+                          ? 'border border-blue text-blue'
+                          : ' bg-white text-black'
+                      } `}
+                      key={index}
+                      onClick={() => {
+                        setFilter(() => (filter == 'all' ? '' : filter));
+                        setActiveFilter(filter);
+                      }}
+                      type="default"
+                    >
+                      {filter.toUpperCase()}
+                    </Button>
+                  ))}
+                </Space>
+              </div>
+            </header>
+            <section className="w-full flex flex-wrap gap-5 mt-10">
+              {statCardProps.map(({ title, value }, idx) => {
+                return (
+                  <Fragment key={idx}>
+                    <div
+                      key={idx}
+                      className="h-40 w-48 rounded-lg shadow-md hover:border shadow-gray-200 relative flex justify-center items-center"
+                    >
+                      <div className="flex flex-col justify-center items-center font-semibold gap-4">
+                        <span className="w-[50px] h-[50px] p-4 rounded-full border border-b-slate-900 flex items-center justify-center">
+                          {formatNumber(value, 0)}
+                        </span>
+                        <span>{title}</span>
+                      </div>
+                    </div>
+                  </Fragment>
+                );
+              })}
+            </section>
+          </Card>
+        </Col>
+      </Row>
+      <Row className="mt-16">
+        <Col md={12} xs={24}>
+          <Card className="shadow-md hover:border shadow-gray-300">
+            <List
+              header={<div className="font-bold">Recent transactions</div>}
+              footer={
+                transactions && (
+                  <div className="text-center">
+                    <Link prefetch className="text-blue" href={'/apps/giro-debit/transactions'}>
+                      See all &rarr;
+                    </Link>
+                  </div>
+                )
+              }
+              dataSource={transactions}
+              loading={false}
+              locale={{
+                emptyText: (
+                  <div className="text-gray-500 text-justify">
+                    <div>No Data Available</div>
+                    <div>
+                      Transaction insight will be shown here once you create a virtual account and
+                      commence pay-ins and pay-outs
+                    </div>
+                  </div>
+                ),
+              }}
+              renderItem={(item: Record<string, any>, index) => (
+                <List.Item className="dashboard-transaction-list" key={index}>
+                  <div className="w-full flex justify-between items-center text-left  p-2">
+                    <span>
+                      {item?.entry === 'debit' ? (
+                        <span className="flex items-center gap-2">
+                          <ArrowUpIcon /> Pay Out
+                        </span>
+                      ) : (
+                        <span className="flex items-center gap-2">
+                          <div className="rotate-90">
+                            <ArrowDownIcon />
+                          </div>
+                          Pay In
+                        </span>
+                      )}
+                    </span>{' '}
+                    <span>{startCase(capitalize(item?.recipient))}</span>
+                    <span>
+                      {item?.currency} {item?.amount}
+                    </span>{' '}
+                    <span>
+                      {' '}
+                      <Tag
+                        color={
+                          item?.status === 'successful'
+                            ? 'success'
+                            : item?.status === 'processing'
+                              ? 'processing'
+                              : 'red'
+                        }
+                      >
+                        {item?.status}
+                      </Tag>
+                    </span>
+                    <span>{item?.date}</span>
+                  </div>
+                </List.Item>
+              )}
+            />
+          </Card>
+        </Col>
+      </Row>
     </div>
   );
 };

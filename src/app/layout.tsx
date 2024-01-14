@@ -1,5 +1,6 @@
 import '../styles/globals.css';
 import '../styles/_override.scss';
+import 'remixicon/fonts/remixicon.css';
 import React, { ReactElement } from 'react';
 import type { Metadata } from 'next';
 import { Nunito } from 'next/font/google';

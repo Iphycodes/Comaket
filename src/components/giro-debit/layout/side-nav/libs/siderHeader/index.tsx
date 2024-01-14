@@ -1,7 +1,8 @@
 'use client';
 import React, { Dispatch, SetStateAction } from 'react';
 import Image from 'next/image';
-import { Select } from 'antd';
+import { Button, Select } from 'antd';
+import { PlusIcon, ManageBusinessIcon } from '@grc/_shared/assets/svgs';
 // import { MenuFoldOutlined, CloseOutlined } from '@ant-design/icons';
 
 export interface SiderHeaderProps {
@@ -32,15 +33,28 @@ export const SiderHeader = (props: SiderHeaderProps) => {
         />
       )}
       <div className="w-full">
-        <span className="px-2 text-[12px]" style={{ color: '#666666' }}>
-          Business
+        <span className="py-2 px-1 text-[15px] font-semibold" style={{ color: '#666666' }}>
+          Businesses
         </span>
         <Select
-          placeholder={'Business'}
-          size="large"
-          style={{}}
+          placeholder={'Select a business'}
+          size="middle"
           className="w-full business-selector"
         />
+      </div>
+      <div className="w-full gap-3 flex flex-col items-center justify-center border-b-2 border-gray-300 pb-5 mb-3">
+        <Button type="primary" className="flex items-center" ghost block icon={<PlusIcon />}>
+          Add New Business
+        </Button>
+        <Button
+          type="primary"
+          className="flex items-center"
+          ghost
+          block
+          icon={<ManageBusinessIcon />}
+        >
+          Manage All Businesses
+        </Button>
       </div>
     </div>
   );

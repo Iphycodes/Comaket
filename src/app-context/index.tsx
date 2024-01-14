@@ -5,6 +5,7 @@ import { useAppDispatch } from '@grc/redux/store';
 import { logout } from '@grc/redux/slices/auth';
 import { useAuth } from '@grc/hooks/useAuth';
 import { AuthDataType } from '@grc/_shared/namespace/auth';
+import { AccountNamespace } from '@grc/_shared/namespace/account';
 
 type AppProviderPropType = {
   children: ReactNode;
@@ -13,6 +14,7 @@ type AppProviderPropType = {
 interface AppContextPropType extends IUseTheme {
   handleLogOut: () => void;
   authData: AuthDataType | null;
+  currentAccount: AccountNamespace.Account | null;
 }
 
 export const AppContext = createContext<AppContextPropType>({
@@ -20,11 +22,12 @@ export const AppContext = createContext<AppContextPropType>({
   onChangeTheme: () => {},
   theme: '',
   authData: null,
+  currentAccount: null,
 });
 
 export const AppProvider = (props: AppProviderPropType) => {
   const { children } = props;
-  const { authData } = useAuth({});
+  const { authData, currentAccount } = useAuth({});
   // const {} = useTheme();
   const dispatch = useAppDispatch();
   const handleLogOut = () => dispatch(logout());
@@ -34,6 +37,7 @@ export const AppProvider = (props: AppProviderPropType) => {
     // onChangeTheme,
     handleLogOut,
     authData,
+    currentAccount,
   };
 
   return <AppContext.Provider value={values}>{children}</AppContext.Provider>;

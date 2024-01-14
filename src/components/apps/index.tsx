@@ -1,5 +1,6 @@
 'use client';
 import { useRouter } from 'next/navigation';
+import { Fragment } from 'react';
 import Image from 'next/image';
 
 type LoginProps = {
@@ -13,7 +14,7 @@ type GiroSystemsProps = {
   logo: string;
 };
 
-const SplashScreen = (props: LoginProps) => {
+const Apps = (props: LoginProps) => {
   const {} = props;
 
   const { push } = useRouter();
@@ -21,29 +22,29 @@ const SplashScreen = (props: LoginProps) => {
   const giroSystems: GiroSystemsProps[] = [
     {
       title: 'Giro Debit',
-      url: '/giro-debit/dashboard',
+      url: '/apps/giro-debit/dashboard',
       logo: '/assets/imgs/debit-logo.png',
     },
     {
       title: 'Giro Mandate',
-      url: '/giro-mandate',
+      url: '/apps/giro-mandate',
       logo: '/assets/imgs/mandate-logo.png',
     },
   ];
   return (
-    <div className="flex justify-center items-center flex-col gap-10">
+    <div className="flex justify-center items-center flex-col gap-10 mt-10">
       <div className="flex flex-col gap-10">
         <div className="flex flex-col text-left text-[24px] font-semibold">
-          <div>Select a Giro system</div>
+          <div>Giro systems</div>
           <span className="text-[14px] text-gray-500">
-            Enter any of the system to explore it's features
+            Select a system to explore it's features
           </span>
         </div>
 
         <div className="flex gap-10">
           {giroSystems.map(({ title, logo, url }, idx) => {
             return (
-              <>
+              <Fragment key={idx}>
                 <div
                   key={idx}
                   className="h-40 w-48 rounded-lg shadow-md hover:border hover:border-cyan-100 shadow-gray-200 hover:shadow-cyan-200 relative flex justify-center items-center cursor-pointer"
@@ -60,7 +61,7 @@ const SplashScreen = (props: LoginProps) => {
                     <span style={{}}>{title}</span>
                   </div>
                 </div>
-              </>
+              </Fragment>
             );
           })}
         </div>
@@ -69,4 +70,4 @@ const SplashScreen = (props: LoginProps) => {
   );
 };
 
-export default SplashScreen;
+export default Apps;
