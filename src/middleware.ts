@@ -6,6 +6,12 @@ import { AuthToken } from './_shared/helpers';
 export function middleware(request: NextRequest) {
   const url = request.nextUrl.clone();
   const path = request.nextUrl.pathname;
+
+  // if (!request.cookies || typeof request.cookies.get !== 'function') {
+  //   console.error('Cookies object or get method is not available.');
+  //   return NextResponse.next();
+  // }
+
   const cookies = request.cookies.get(AUTH_TOKEN_KEY);
   const { isLoggedIn } = AuthToken(cookies?.value);
   const basePath = url.pathname.split('/')[1];

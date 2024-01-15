@@ -73,11 +73,12 @@
 .transaction-table {
   .ant-table-body {
     .ant-table-row {
+      cursor: pointer;
       .ant-table-cell {
-        font-size: 13px;
-        font-weight: 700;
-        color: rgba(0, 0, 0, 0.3);
-        border: 0;
+        font-size: 15px;
+        font-weight: 400;
+        padding-top: 20px !important;
+        padding-bottom: 20px !important;
       }
     }
   }
@@ -102,6 +103,18 @@
     bottom: 50px;
   }
 
+}
+
+.live-mode-switch.ant-switch {
+  .ant-switch-inner {
+    background-color: #666666 !important;
+  }
+}
+
+.live-mode-switch.ant-switch-checked {
+  .ant-switch-inner {
+    background-color: rgb(4, 219, 4) !important;
+  }
 }
 .dashboard-transaction-list:hover{
   background-color: #eee !important;
