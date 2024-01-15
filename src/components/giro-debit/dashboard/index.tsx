@@ -54,7 +54,7 @@ const DashBoard = (props: DashBoardProps) => {
         </div>
         <Row gutter={[40, 40]} className="mt-4 justify-between">
           <Col md={12} xs={24} className="rounded-2xl">
-            <Card className="shadow-md hover:border shadow-gray-300">
+            <Card className="shadow-sm hover:border shadow-gray-300">
               <div>
                 <SelectVirtualAcct
                   isLoadingAccounts={false}
@@ -74,7 +74,7 @@ const DashBoard = (props: DashBoardProps) => {
             </Card>
           </Col>
           <Col md={12} xs={24} className="rounded-2xl">
-            <Card className="flex flex-col gap-2 shadow-md hover:border shadow-gray-300">
+            <Card className="flex flex-col gap-2 shadow-sm hover:border shadow-gray-300">
               <div>
                 <div className="text-bold text-2xl font-bold text-blue flex items-center gap-[5px]">
                   Giro Wallet
@@ -108,7 +108,7 @@ const DashBoard = (props: DashBoardProps) => {
         </Row>
         <Row gutter={[40, 40]} className="mt-16">
           <Col md={12} xs={24}>
-            <Card className="shadow-md hover:border shadow-gray-300 h-full">
+            <Card className="shadow-sm hover:border shadow-gray-300 h-full">
               <List
                 className="overflow-y-auto"
                 header={<div className="font-bold">Recent transactions</div>}
@@ -178,7 +178,7 @@ const DashBoard = (props: DashBoardProps) => {
           </Col>
 
           <Col md={12} xs={24}>
-            <Card className="shadow-md hover:border shadow-gray-300">
+            <Card className="shadow-sm hover:border shadow-gray-300">
               <header className="flex flex-wrap gap-2 justify-between items-center">
                 <span className="font-bold">Transaction Summary</span>
                 <div>
@@ -224,7 +224,7 @@ const DashBoard = (props: DashBoardProps) => {
         </Row>
         <Row className="mt-16">
           <Col md={24} xs={24}>
-            <Card className="shadow-md hover:border shadow-gray-300">
+            <Card className="shadow-sm hover:border shadow-gray-300">
               <header className="flex flex-wrap gap-2 justify-between items-center">
                 <span>Transaction Summary</span>
                 <div>

@@ -7,6 +7,7 @@ import { SideNav } from '@grc/components/giro-debit/layout/side-nav';
 import { useAuth } from '@grc/hooks/useAuth';
 import { Layout } from 'antd';
 import { Footer } from 'antd/es/layout/layout';
+import { usePathname, useRouter } from 'next/navigation';
 import { ReactElement } from 'react';
 
 const { Content } = Layout;
@@ -23,19 +24,22 @@ const AppsBaseLayout = (props: GiroDebitPageProps) => {
   const { children } = props;
   const mobileResponsive = useMediaQuery(mediaSize.mobile);
   const tabletResponsive = useMediaQuery(mediaSize.tablet);
+  const { push } = useRouter();
+  const pathname = usePathname();
+  const pathUrl = pathname?.split('/');
+  const isSettingsPath = pathUrl?.[3];
+  const currentPage = pathUrl?.[4];
+
   const {} = useAuth({
     callAccounts: false,
     callCurrentAccount: false,
     callUser: true,
   });
-  //   const { theme } = useContext(AppContext);
-  // const [collapse, setCollapse] = useState<boolean>(false);
-
+  const formatPathText = (value: string) => value.replace(/\s+/g, '-').toLowerCase();
   const collapse = false;
 
   return (
     <Layout hasSider={true}>
-      {/* <SideNav setCollapsed={setCollapsed} collapsed={collapsed} /> */}
       <SideNav items={appNav.items} />
       <Layout
         className="body-layout"
@@ -50,7 +54,33 @@ const AppsBaseLayout = (props: GiroDebitPageProps) => {
       >
         <AppHeader />
         <Content className="main-content" style={{ background: '#ffffff' }}>
-          <div style={{ padding: 40, minHeight: '100vh' }}>{children}</div>
+          <div style={{ padding: 40, minHeight: '100vh' }}>
+            {isSettingsPath?.toLowerCase() === 'settings' && (
+              <div className="flex border-b border-gray-300 shadow-sm">
+                {' '}
+                {[
+                  'Profile Details',
+                  'Business Profile',
+                  'API Keys & Webhook URL',
+                  'Change Password',
+                  'Account Setting',
+                ].map((text, index) => (
+                  <div
+                    onClick={() => push(`/apps/giro-debit/settings/${formatPathText(text)}`)}
+                    key={`setting-tab_${index}`}
+                    className={`text-base tracking-wide ${
+                      formatPathText(text) === currentPage
+                        ? 'text-blue border-b-2 font-medium border-blue'
+                        : 'text-black'
+                    } py-4 px-3 cursor-pointer`}
+                  >
+                    <span>{text}</span>
+                  </div>
+                ))}
+              </div>
+            )}
+            {children}
+          </div>
         </Content>
         {/* <AppFooter /> */}
         <Footer>Footer</Footer>
