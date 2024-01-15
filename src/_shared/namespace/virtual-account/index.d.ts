@@ -1,6 +1,6 @@
 import { AppObject } from '@/_shared/namespace';
 
-export namespace AccountNamespace {
+export namespace VirtualAccountNamespace {
   export interface Account extends AppObject {
     id: string;
     accountName: string;
