@@ -8,7 +8,7 @@ interface ICreateVirtualAcct {
   isLoadingCreateVirtualAccount: boolean;
 }
 
-const CreateVirtualAcct = (props: ICreateVirtualAcct) => {
+const CreateVirtualAcctForm = (props: ICreateVirtualAcct) => {
   const { handleCreateVirtualAcct, isLoadingCreateVirtualAccount } = props;
   const [form] = Form.useForm();
   const { authData } = useContext(AppContext);
@@ -16,29 +16,37 @@ const CreateVirtualAcct = (props: ICreateVirtualAcct) => {
 
   return (
     <main>
-      <div style={{ fontSize: 24, textAlign: 'left' }}>Create A Virtual Account</div>
+      <div className="text-left text-2xl">Create A Virtual Account</div>
       <Form
         name={'create-virtual-acct-form'}
         form={form}
+        layout="vertical"
+        requiredMark={false}
         onFinish={handleCreateVirtualAcct}
         initialValues={{
           ...pick(authData, ['bvn']),
           accountName: `${authData?.firstName} ${authData?.lastName}`,
         }}
+        className="mt-7 text-left"
       >
         <Row>
           <Col md={24} xs={24}>
-            <div>Account Name</div>
             <Form.Item
               name="accountName"
               rules={[{ required: true, message: 'Please enter account name' }]}
-              label={<span>Email</span>}
+              label={<span>Account Name</span>}
             >
-              <Input placeholder="Account name" />
+              <Input placeholder="Enter account name" className="h-14" />
             </Form.Item>
           </Col>
         </Row>
-        <Button type="primary" block htmlType={'submit'} loading={isLoadingCreateVirtualAccount}>
+        <Button
+          type="primary"
+          className="opacity-100 hover:opacity-70 mt-1 bg-blue text-white h-12 rounded-lg font-bold px-8"
+          block
+          htmlType={'submit'}
+          loading={isLoadingCreateVirtualAccount}
+        >
           Create Virtual Account
         </Button>
       </Form>
@@ -46,4 +54,4 @@ const CreateVirtualAcct = (props: ICreateVirtualAcct) => {
   );
 };
 
-export default CreateVirtualAcct;
+export default CreateVirtualAcctForm;

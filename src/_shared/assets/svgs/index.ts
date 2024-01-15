@@ -10,6 +10,8 @@ import SettingsIcon from './settings.svg';
 import LogoutIcon from './logout.svg';
 import PlusIcon from './plus.svg';
 import ManageBusinessIcon from './manage-business.svg';
+import CloseIcon from './close.svg';
+import CopyIcon from './copy.svg';
 
 export {
   Giro,
@@ -24,4 +26,6 @@ export {
   DisbursementIcon,
   SettingsIcon,
   LogoutIcon,
+  CloseIcon,
+  CopyIcon,
 };

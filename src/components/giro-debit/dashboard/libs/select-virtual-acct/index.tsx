@@ -1,12 +1,12 @@
 import { memo, useEffect } from 'react';
 import { Form, Select } from 'antd';
 import { startCase, isEmpty, pick, toLower } from 'lodash';
-import { AccountNamespace } from '@grc/_shared/namespace/virtual-account';
+import { VirtualAccountNamespace } from '@grc/_shared/namespace/virtual-account';
 
 interface ISelectVirtualAcct {
-  setVAccount: (acct: AccountNamespace.Account | null) => void;
-  vAccount: AccountNamespace.Account | null;
-  accounts: AccountNamespace.Account[];
+  setVAccount: (acct: VirtualAccountNamespace.Account | null) => void;
+  vAccount: VirtualAccountNamespace.Account | null;
+  accounts: VirtualAccountNamespace.Account[];
   isLoadingAccounts: boolean;
   theme?: string;
 }
