@@ -1,11 +1,10 @@
 'use client';
 
-import { Table, Tag } from 'antd';
+import { Card, Table, Tag, Tooltip } from 'antd';
 import React from 'react';
 import { TransactionsDataType, transactionsData } from './libs/transactions-data';
 import { ColumnsType } from 'antd/lib/table';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
-import { RiExpandUpDownFill, RiCircleFill } from 'react-icons/ri';
 
 interface TransactionTableProps {
   handleRowClick: (record: any) => void;
@@ -17,45 +16,35 @@ const TransactionsTable = (props: TransactionTableProps) => {
 
   const columns: ColumnsType<TransactionsDataType> = [
     {
-      title: null,
-      dataIndex: '',
-      key: 'bullet',
-      render: () => <RiCircleFill color="green" size={10} />,
-      width: 30,
-    },
-    {
       title: (
         <span className="flex text-[14px] font-semibold text-gray-500 items-center gap-1">
           <span>Date</span>
-          <RiExpandUpDownFill size={15} />
         </span>
       ),
       ellipsis: {
         showTitle: true,
       },
       dataIndex: 'date',
-      key: 'name',
+      key: 'date',
     },
     {
       title: (
         <span className="flex text-[14px] font-semibold text-gray-500 items-center gap-1">
           <span>Type</span>
-          <RiExpandUpDownFill size={15} />
         </span>
       ),
       dataIndex: 'type',
-      key: 'age',
+      key: 'type',
       render: (text) => <span>{text}</span>,
     },
     {
       title: (
         <span className="flex text-[14px] font-semibold text-gray-500 items-center gap-1">
           <span>Session ID</span>
-          <RiExpandUpDownFill size={15} />
         </span>
       ),
       dataIndex: 'sessionId',
-      key: 'age',
+      key: 'sessionId',
       ellipsis: {
         showTitle: true,
       },
@@ -64,11 +53,10 @@ const TransactionsTable = (props: TransactionTableProps) => {
       title: (
         <span className="flex text-[14px] font-semibold text-gray-500 items-center gap-1">
           <span>Reciepient</span>
-          <RiExpandUpDownFill size={15} />
         </span>
       ),
       dataIndex: 'reciepient',
-      key: 'agency',
+      key: 'reciepient',
       ellipsis: {
         showTitle: true,
       },
@@ -78,11 +66,10 @@ const TransactionsTable = (props: TransactionTableProps) => {
       title: (
         <span className="flex text-[14px] font-semibold text-gray-500 items-center gap-1">
           <span>Reciepient Status</span>
-          <RiExpandUpDownFill size={15} />
         </span>
       ),
       dataIndex: 'reciepientAccountStatus',
-      key: 'agency',
+      key: 'reciepientAccountStatus',
       ellipsis: {
         showTitle: true,
       },
@@ -103,11 +90,10 @@ const TransactionsTable = (props: TransactionTableProps) => {
       title: (
         <span className="flex text-[14px] font-semibold text-gray-500 items-center gap-1">
           <span>Reciepient Bank</span>
-          <RiExpandUpDownFill size={15} />
         </span>
       ),
       dataIndex: 'reciepientBank',
-      key: 'agency',
+      key: 'reciepientBank',
       ellipsis: {
         showTitle: true,
       },
@@ -117,14 +103,25 @@ const TransactionsTable = (props: TransactionTableProps) => {
       title: (
         <span className="flex text-[14px] font-semibold text-gray-500 items-center gap-1">
           <span>Amount</span>
-          <RiExpandUpDownFill size={15} />
         </span>
       ),
       dataIndex: 'amount',
-      key: 'agency',
+      key: 'amount',
       ellipsis: {
         showTitle: true,
       },
+    },
+    {
+      dataIndex: '',
+      key: 'view',
+      width: 40,
+      render: () => (
+        <span>
+          <Tooltip title="view">
+            <i className="ri-eye-line font-bold hover:text-green-500" color="red"></i>
+          </Tooltip>
+        </span>
+      ),
     },
   ];
 
@@ -132,17 +129,17 @@ const TransactionsTable = (props: TransactionTableProps) => {
     onClick: () => handleRowClick(record),
   });
   return (
-    <>
+    <Card className="shadow-sm">
       <Table
         size="large"
         columns={columns}
-        pagination={{ pageSize: 10, position: ['bottomCenter'] }}
+        pagination={{ pageSize: 10, position: ['bottomLeft'] }}
         dataSource={transactionsData}
         scroll={{ y: 350, x: isMobile ? true : 0 }}
         className={'transaction-table'}
         onRow={rowProps}
       />
-    </>
+    </Card>
   );
 };
 

@@ -34,7 +34,7 @@
   }
 }
 
-.business-register-form{
+.business-register-form {
   .ant-select-selector,
   .ant-select-in-form-item,
   .ant-select-selection-item {
@@ -45,7 +45,7 @@
   }
 }
 
-.select-virtual-account{
+.select-virtual-account {
   .ant-select-selector,
   .ant-select-in-form-item,
   .ant-select-selection-item {
@@ -84,7 +84,7 @@
   }
 }
 
-.dash-sider{
+.dash-sider {
   .ant-select-selector {
     // border: 1px solid black !important;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.09);
@@ -99,10 +99,9 @@
   }
 
   .ant-menu-item:last-child {
-    position:absolute;
+    position: absolute;
     bottom: 50px;
   }
-
 }
 
 .live-mode-switch.ant-switch {
@@ -116,7 +115,13 @@
     background-color: rgb(4, 219, 4) !important;
   }
 }
-.dashboard-transaction-list:hover{
+.dashboard-transaction-list:hover {
   background-color: #eee !important;
+}
 
+.dropdown-popover {
+  .ant-popover-inner {
+    padding: 5px 2px !important;
+    margin-top: -2px !important;
+  }
 }
