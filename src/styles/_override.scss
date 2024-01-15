@@ -1,7 +1,7 @@
 @import 'giro.min.css';
 
 .register-form,
-.reset-password-form {
+.reset-password-form, .update-profile-details-form, .update-business-profile-form {
   .ant-input-number-group-wrapper,
   .ant-input-number-in-form-item {
     width: 100% !important;
@@ -34,7 +34,7 @@
   }
 }
 
-.business-register-form{
+.business-register-form, .update-profile-details-form, .update-business-profile-form{
   .ant-select-selector,
   .ant-select-in-form-item,
   .ant-select-selection-item {
@@ -119,4 +119,10 @@
 .dashboard-transaction-list:hover{
   background-color: #eee !important;
 
+}
+
+.update-api-key-webhook-form{
+  .ant-input-disabled, .ant-input-affix-wrapper-disabled{
+    background-color: rgba(255, 255, 255, 1) !important;
+  }
 }
