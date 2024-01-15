@@ -227,9 +227,25 @@ export const transactionData = [
     recipient: 'john doe',
     status: 'failed',
   },
+  {
+    entry: 'credit',
+    id: '00003',
+    date: '12/06/23',
+    time: '00:34:12',
+    amount: '450,234',
+    currency: 'NGN',
+    recipient: 'sinzu money',
+    status: 'successful',
+  },
 ];
 
-export const statisticsFilter = ['all', 'week', 'month', 'quarter', 'year'];
+export const statisticsFilter = [
+  { label: 'all', value: 'all' },
+  { label: 'week', value: 'week' },
+  { label: 'month', value: 'month' },
+  { label: 'quarter', value: 'quarter' },
+  { label: 'year', value: 'year' },
+];
 
 export const statCardProps = [
   {
@@ -253,3 +269,19 @@ export const statCardProps = [
     value: 2,
   },
 ];
+
+export const mockTransactionAnalyticsData = {
+  labels: [
+    'Pending Transactions',
+    'Processing Transactions',
+    'Successful Transactions',
+    'Failed Transactions',
+  ],
+  datasets: [
+    {
+      backgroundColor: ['#B21F00', '#C9DE00', '#2FDE00', '#00A6B4', '#6800B4'],
+      hoverBackgroundColor: ['#501800', '#4B5000', '#175000', '#003350', '#35014F'],
+      data: [300, 50, 430, 223],
+    },
+  ],
+};

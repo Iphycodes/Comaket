@@ -82,7 +82,7 @@ export const getItem = (menuItem: NavItem): MenuItem => {
   } as MenuItem;
 };
 
-export default function formatNumber(num: number, precision: number = 2): string | number {
+export const formatNumber = (num: number, precision: number = 2): string | number => {
   const map = [
     { suffix: 'T', threshold: 1e12 },
     { suffix: 'B', threshold: 1e9 },
@@ -99,4 +99,32 @@ export default function formatNumber(num: number, precision: number = 2): string
   }
 
   return num;
+};
+export const calculateTotal = (data: any) => {
+  return data.reduce((total: number, value: number) => total + value, 0);
+};
+
+export const getStatusColor = (status: string) => {
+  console.log('I called:::', status);
+  switch (status.toLowerCase()) {
+    case 'successful':
+      return 'green-500';
+    case 'pending':
+      return 'yellow-500';
+    case 'processing':
+      return 'blue';
+    case 'total':
+      return 'slate-900';
+    case 'failed':
+      return 'red-500';
+    default:
+      return 'slate-900';
+  }
+};
+export enum GET_COLOR {
+  successful = 'green-500',
+  pending = 'yellow-500',
+  processing = 'blue',
+  total = 'slate-900',
+  failed = 'red-500',
 }

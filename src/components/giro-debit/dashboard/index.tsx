@@ -1,18 +1,24 @@
 'use client';
-import { Button, Card, Col, List, Row, Space, Tag } from 'antd';
+import { Dispatch, Fragment, SetStateAction, useState } from 'react';
 import Link from 'next/link';
+import { Button, Card, Col, List, Row, Select, Space, Tag } from 'antd';
+import { formatNumber, getStatusColor } from '@grc/_shared/helpers';
+import { AccountNamespace } from '@grc/_shared/namespace/account';
+import CustomModal from '@grc/_shared/components/custom-modal';
 import { AuthDataType } from '@grc/_shared/namespace/auth';
+import { ArrowUpIcon, ArrowDownIcon } from '@grc/_shared/assets/svgs';
 import SelectVirtualAcct from './libs/select-virtual-acct';
 import CreateAcctCard from './libs/create-acct-card';
 import { capitalize, startCase, toLower } from 'lodash';
-import { ArrowUpIcon, ArrowDownIcon } from '@grc/_shared/assets/svgs';
-import { statCardProps, statisticsFilter } from '@grc/_shared/constant';
-import { Dispatch, Fragment, SetStateAction, useState } from 'react';
-import formatNumber from '@grc/_shared/helpers';
-import { AccountNamespace } from '@grc/_shared/namespace/account';
-import CustomModal from '@grc/_shared/components/custom-modal';
+import {
+  mockTransactionAnalyticsData,
+  statCardProps,
+  statisticsFilter,
+} from '@grc/_shared/constant';
 import AcctDetails from './libs/acct-details';
 import CreateVirtualAcctForm from './libs/create-virtual-acct-form';
+import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import { Doughnut } from 'react-chartjs-2';
 
 type DashBoardProps = {
   authData?: AuthDataType | null;
@@ -23,6 +29,9 @@ type DashBoardProps = {
   openCreateModal: boolean;
   setOpenCreateModal: Dispatch<SetStateAction<boolean>>;
 };
+
+ChartJS.register(ArcElement, Tooltip, Legend);
+
 const DashBoard = (props: DashBoardProps) => {
   const {
     transactions,
@@ -34,6 +43,7 @@ const DashBoard = (props: DashBoardProps) => {
   } = props;
   const [activeFilter, setActiveFilter] = useState('all');
   const [toggleTopUp, setToggleTopUp] = useState(false);
+  let delayed: any;
 
   return (
     <>
@@ -42,8 +52,8 @@ const DashBoard = (props: DashBoardProps) => {
           <div className="text-3xl">Hello, {startCase(toLower(currentAccount?.name))}</div>
           <div className="text-sm mt-2">Here's an overview of your account today</div>
         </div>
-        <Row gutter={[16, 16]} className="mt-4 justify-between">
-          <Col md={10} xs={24} className="rounded-2xl">
+        <Row gutter={[40, 40]} className="mt-4 justify-between">
+          <Col md={12} xs={24} className="rounded-2xl">
             <Card className="shadow-md hover:border shadow-gray-300">
               <div>
                 <SelectVirtualAcct
@@ -64,19 +74,28 @@ const DashBoard = (props: DashBoardProps) => {
             </Card>
           </Col>
           <Col md={12} xs={24} className="rounded-2xl">
-            <Card className="flex flex-col gap-2 p-7 shadow-md hover:border shadow-gray-300">
+            <Card className="flex flex-col gap-2 shadow-md hover:border shadow-gray-300">
               <div>
-                <div>Giro Balance</div>
-                <span className="text-3xl mt-3">&#x20A6; 2,500,000.00</span>
+                <div className="text-bold text-2xl font-bold text-blue flex items-center gap-[5px]">
+                  Giro Wallet
+                </div>
+                {/* <div className='w-full flex flex-wrap gap-2 items-center mt-3'> */}
+                <div className="flex flex-col pr-3">
+                  <span className="text-2xl mt-3">&#x20A6; 2,500,000.00</span>
+                  <div className="font-medium">Overall Balance</div>
+                </div>
+                <div className="flex flex-col mt-4">
+                  <span className="text-2xl">&#x20A6; 150,000.00</span>
+                  <div className="font-medium">Current Account Balance</div>
+                </div>
               </div>
-              <div className="mt-1 text-sm">Account balance</div>
-              <span className="text-2xl">&#x20A6; 150,000.00</span>
+              {/* </div> */}
               <div>
                 <Button
                   className="opacity-100 hover:opacity-70 mt-3 bg-blue text-white h-10 rounded-lg font-bold px-8"
                   type="primary"
                   disabled={false}
-                  block={false}
+                  block={true}
                   loading={false}
                   htmlType="submit"
                   onClick={() => setToggleTopUp(true)}
@@ -87,63 +106,15 @@ const DashBoard = (props: DashBoardProps) => {
             </Card>
           </Col>
         </Row>
-        <Row className="mt-16">
-          <Col md={24} xs={24}>
-            <Card className="shadow-md hover:border shadow-gray-300">
-              <header className="flex flex-wrap gap-2 justify-between items-center">
-                <span>Transaction Summary</span>
-                <div>
-                  <Space size={5}>
-                    {statisticsFilter.map((filter, index) => (
-                      <Button
-                        className={`${
-                          activeFilter == filter
-                            ? 'border border-blue text-blue'
-                            : ' bg-white text-black'
-                        } `}
-                        key={index}
-                        onClick={() => {
-                          setFilter(() => (filter == 'all' ? '' : filter));
-                          setActiveFilter(filter);
-                        }}
-                        type="default"
-                      >
-                        {filter.toUpperCase()}
-                      </Button>
-                    ))}
-                  </Space>
-                </div>
-              </header>
-              <section className="w-full flex flex-wrap gap-5 mt-10">
-                {statCardProps.map(({ title, value }, idx) => {
-                  return (
-                    <Fragment key={idx}>
-                      <div
-                        key={idx}
-                        className="h-40 w-48 rounded-lg shadow-md hover:border shadow-gray-200 relative flex justify-center items-center"
-                      >
-                        <div className="flex flex-col justify-center items-center font-semibold gap-4">
-                          <span className="w-[50px] h-[50px] p-4 rounded-full border border-b-slate-900 flex items-center justify-center">
-                            {formatNumber(value, 0)}
-                          </span>
-                          <span>{title}</span>
-                        </div>
-                      </div>
-                    </Fragment>
-                  );
-                })}
-              </section>
-            </Card>
-          </Col>
-        </Row>
-        <Row className="mt-16">
+        <Row gutter={[40, 40]} className="mt-16">
           <Col md={12} xs={24}>
-            <Card className="shadow-md hover:border shadow-gray-300">
+            <Card className="shadow-md hover:border shadow-gray-300 h-full">
               <List
+                className="overflow-y-auto"
                 header={<div className="font-bold">Recent transactions</div>}
                 footer={
                   transactions && (
-                    <div className="text-center">
+                    <div className="text-center mt-5">
                       <Link prefetch className="text-blue" href={'/apps/giro-debit/transactions'}>
                         See all &rarr;
                       </Link>
@@ -165,7 +136,7 @@ const DashBoard = (props: DashBoardProps) => {
                 }}
                 renderItem={(item: Record<string, any>, index) => (
                   <List.Item className="dashboard-transaction-list" key={index}>
-                    <div className="w-full flex justify-between items-center text-left  p-2">
+                    <div className="w-full flex justify-between items-center text-left p-2">
                       <span>
                         {item?.entry === 'debit' ? (
                           <span className="flex items-center gap-2">
@@ -203,6 +174,104 @@ const DashBoard = (props: DashBoardProps) => {
                   </List.Item>
                 )}
               />
+            </Card>
+          </Col>
+
+          <Col md={12} xs={24}>
+            <Card className="shadow-md hover:border shadow-gray-300">
+              <header className="flex flex-wrap gap-2 justify-between items-center">
+                <span className="font-bold">Transaction Summary</span>
+                <div>
+                  <Space size={7}>
+                    <Select
+                      loading={false}
+                      options={statisticsFilter}
+                      defaultValue={statisticsFilter[0]}
+                      placeholder="Select a country"
+                    />
+                  </Space>
+                </div>
+              </header>
+              <div className="mt-5 flex items-center justify-center">
+                <Doughnut
+                  data={mockTransactionAnalyticsData}
+                  options={{
+                    responsive: true,
+                    plugins: {
+                      legend: {
+                        position: 'bottom',
+                        align: 'center',
+                      },
+                    },
+
+                    animation: {
+                      onComplete: () => {
+                        delayed = true;
+                      },
+                      delay: (context: any) => {
+                        let delay = 0;
+                        if (context.type === 'data' && context.mode === 'default' && !delayed) {
+                          delay = context.dataIndex * 300 + context.datasetIndex * 100;
+                        }
+                        return delay;
+                      },
+                    },
+                  }}
+                />
+              </div>
+            </Card>
+          </Col>
+        </Row>
+        <Row className="mt-16">
+          <Col md={24} xs={24}>
+            <Card className="shadow-md hover:border shadow-gray-300">
+              <header className="flex flex-wrap gap-2 justify-between items-center">
+                <span>Transaction Summary</span>
+                <div>
+                  <Space size={5}>
+                    {statisticsFilter.map(({ value }, index) => (
+                      <Button
+                        className={`${
+                          activeFilter == value
+                            ? 'border border-blue text-blue'
+                            : ' bg-white text-black'
+                        } `}
+                        key={`option-${index}`}
+                        onClick={() => {
+                          setFilter(() => (value == 'all' ? '' : value));
+                          setActiveFilter(value);
+                        }}
+                        type="default"
+                      >
+                        {value.toUpperCase()}
+                      </Button>
+                    ))}
+                  </Space>
+                </div>
+              </header>
+              <section className="w-full flex flex-wrap gap-5 mt-10 ">
+                {statCardProps.map(({ title, value }, idx) => {
+                  return (
+                    <Fragment key={`${title}-${idx}`}>
+                      <div
+                        key={idx}
+                        className="h-40 w-48 rounded-lg shadow-md hover:border shadow-gray-200 relative flex justify-center items-center"
+                      >
+                        <div className="flex flex-col justify-center items-center font-semibold gap-4">
+                          <span
+                            className={`w-[50px] h-[50px] p-4 rounded-full border-4 border-b-${getStatusColor(
+                              title
+                            )} flex items-center justify-center`}
+                          >
+                            {formatNumber(value, 0)}
+                          </span>
+                          <span>{title}</span>
+                        </div>
+                      </div>
+                    </Fragment>
+                  );
+                })}
+              </section>
             </Card>
           </Col>
         </Row>
