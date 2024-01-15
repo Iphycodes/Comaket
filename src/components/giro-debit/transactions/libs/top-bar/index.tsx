@@ -1,27 +1,23 @@
 'use client';
-import { Space } from 'antd';
-import { GrTransaction } from 'react-icons/gr';
-import { FaRegCalendarAlt, FaSearch } from 'react-icons/fa';
+
+import { Button, Input } from 'antd';
 
 const TopBar = () => {
   return (
-    <div className="w-full flex justify-between px-3 items-center">
-      <div className="flex items-center">
-        <Space className="text-[13px] font-bold cursor-pointer" size={5}>
-          <GrTransaction size={10} />
-          Make a Payment
-        </Space>
-      </div>
-      <div className="flex items-center gap-5">
-        <Space className="text-[13px] font-bold cursor-pointer" size={2}>
-          <FaSearch size={12} />
-          Search
-        </Space>
-        <Space className="text-[13px] font-bold cursor-pointer" size={2}>
-          <FaRegCalendarAlt size={15} />
-          12th Jan, 24
-        </Space>
-      </div>
+    <div className="w-full flex justify-between gap-3 items-center">
+      <Input
+        placeholder={'Search Transaction'}
+        size="large"
+        className="bg-gray-100 w-80 border-gray-400"
+        style={{ borderRadius: '5px' }}
+      />
+
+      <Button
+        className="flex justify-center bg-cyan-50 border-cyan-700 items-center h-12 w-12"
+        shape="circle"
+      >
+        <i className="ri-filter-line text-[22px] text-blue"></i>
+      </Button>
     </div>
   );
 };
