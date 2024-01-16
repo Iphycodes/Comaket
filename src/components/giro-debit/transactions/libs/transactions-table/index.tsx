@@ -124,6 +124,11 @@ const TransactionsTable = (props: TransactionTableProps) => {
       dataIndex: '',
       key: 'view',
       width: 40,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
       render: (_: any, record: TransactionsDataType) => (
         <span>
           <Tooltip title="view">
