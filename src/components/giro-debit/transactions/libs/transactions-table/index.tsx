@@ -1,7 +1,7 @@
 'use client';
 
 import { Card, Table, Tag, Tooltip } from 'antd';
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 import { TransactionsDataType, transactionsData } from './libs/transactions-data';
 import { ColumnsType } from 'antd/lib/table';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
@@ -9,11 +9,19 @@ import TableFooter from './libs/table-footer';
 
 interface TransactionTableProps {
   handleRowClick: (record: any) => void;
+  setTransactionDrawerOpen: () => void;
+  setSelectedRecord: Dispatch<SetStateAction<TransactionsDataType>>;
 }
 
 const TransactionsTable = (props: TransactionTableProps) => {
-  const { handleRowClick } = props;
+  const { handleRowClick, setTransactionDrawerOpen, setSelectedRecord } = props;
   const isMobile = useMediaQuery(mediaSize.mobile);
+
+  const handleAdvancedViewClick = (record: TransactionsDataType) => {
+    setTransactionDrawerOpen();
+
+    setSelectedRecord(record);
+  };
 
   const columns: ColumnsType<TransactionsDataType> = [
     {
@@ -116,17 +124,21 @@ const TransactionsTable = (props: TransactionTableProps) => {
       dataIndex: '',
       key: 'view',
       width: 40,
-      render: () => (
+      render: (_: any, record: TransactionsDataType) => (
         <span>
           <Tooltip title="view">
-            <i className="ri-eye-line font-bold hover:text-blue" color="red"></i>
+            <i
+              className="ri-eye-line cursor-pointer font-bold hover:text-blue"
+              color="red"
+              onClick={() => handleAdvancedViewClick(record)}
+            ></i>
           </Tooltip>
         </span>
       ),
     },
   ];
 
-  const rowProps = (record: any) => ({
+  const rowClick = (record: any) => ({
     onClick: () => handleRowClick(record),
   });
   return (
@@ -134,11 +146,11 @@ const TransactionsTable = (props: TransactionTableProps) => {
       <Table
         size="large"
         columns={columns}
-        pagination={{ pageSize: 10, position: ['bottomLeft'] }}
+        pagination={{ pageSize: 8, position: ['bottomLeft'] }}
         dataSource={transactionsData}
-        scroll={{ y: 350, x: isMobile ? true : 0 }}
+        scroll={{ x: isMobile ? true : 0 }}
         className={'transaction-table'}
-        onRow={rowProps}
+        onRow={rowClick}
         footer={() => <TableFooter />}
       />
     </Card>

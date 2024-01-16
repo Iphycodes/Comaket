@@ -13,16 +13,7 @@ const onFinish = (values: any) => {
 
 const FilterDrawer = ({ open, onClose }: FilterDrawerProps) => {
   return (
-    <Drawer
-      closeIcon={false}
-      className="filter-drawer p-0"
-      onClose={onClose}
-      open={open}
-      style={{ padding: 0 }}
-      drawerStyle={{ padding: 0 }}
-      contentWrapperStyle={{ padding: 0 }}
-      rootStyle={{ padding: 0 }}
-    >
+    <Drawer closeIcon={false} className="filter-drawer p-0" onClose={onClose} open={open}>
       <div className="w-full sticky top-0 z-10 bg-blue text-white flex p-5 justify-between items-center gap-3">
         <span className="text-lg">Filter Transaction Log</span>
         <span onClick={onClose}>

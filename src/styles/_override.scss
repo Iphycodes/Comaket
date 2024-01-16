@@ -143,6 +143,12 @@
   }
 }
 
+.advanced-transaction-drawer {
+  .ant-drawer-body {
+    padding: 0 !important;
+  }
+}
+
 .update-api-key-webhook-form {
   .ant-input-disabled,
   .ant-input-affix-wrapper-disabled {
