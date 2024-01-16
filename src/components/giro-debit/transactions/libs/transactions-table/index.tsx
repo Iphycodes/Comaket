@@ -119,7 +119,7 @@ const TransactionsTable = (props: TransactionTableProps) => {
       render: () => (
         <span>
           <Tooltip title="view">
-            <i className="ri-eye-line font-bold hover:text-green-500" color="red"></i>
+            <i className="ri-eye-line font-bold hover:text-blue" color="red"></i>
           </Tooltip>
         </span>
       ),

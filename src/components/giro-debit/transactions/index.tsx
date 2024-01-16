@@ -37,7 +37,7 @@ const Transactions = () => {
         <Card className="flex shadow-md" style={{ flex: 1 }}></Card>
       </div>
       <div className="w-full flex gap-3 items-center justify-between">
-        <div className="border-2 p-3 px-6 font-bold border-blue bg-cyan-50 rounded-3xl shadow-sm">
+        <div className="border p-3 px-6 font-bold border-blue bg-cyan-50 rounded-3xl shadow-sm">
           Ifeanyi Emmanuel | 0065453363 | Demo
         </div>
         <TopBar handleDrawerToggle={() => handleDrawerToggle(true)} />
