@@ -125,3 +125,14 @@
     margin-top: -2px !important;
   }
 }
+
+.filter-drawer {
+  .ant-drawer-body {
+    padding: 0 !important;
+
+    .ant-select-selector {
+      border: 1px solid #1677ff !important;
+      border-radius: 2px !important;
+    }
+  }
+}

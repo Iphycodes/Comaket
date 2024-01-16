@@ -138,6 +138,7 @@ const TransactionsTable = (props: TransactionTableProps) => {
         scroll={{ y: 350, x: isMobile ? true : 0 }}
         className={'transaction-table'}
         onRow={rowProps}
+        footer={() => <div className="w-full">Footer</div>}
       />
     </Card>
   );
