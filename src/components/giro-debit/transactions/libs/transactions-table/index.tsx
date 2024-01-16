@@ -5,6 +5,7 @@ import React from 'react';
 import { TransactionsDataType, transactionsData } from './libs/transactions-data';
 import { ColumnsType } from 'antd/lib/table';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
+import TableFooter from './libs/table-footer';
 
 interface TransactionTableProps {
   handleRowClick: (record: any) => void;
@@ -138,7 +139,7 @@ const TransactionsTable = (props: TransactionTableProps) => {
         scroll={{ y: 350, x: isMobile ? true : 0 }}
         className={'transaction-table'}
         onRow={rowProps}
-        footer={() => <div className="w-full">Footer</div>}
+        footer={() => <TableFooter />}
       />
     </Card>
   );
