@@ -1,7 +1,9 @@
 @import 'giro.min.css';
 
 .register-form,
-.reset-password-form {
+.reset-password-form,
+.update-profile-details-form,
+.update-business-profile-form {
   .ant-input-number-group-wrapper,
   .ant-input-number-in-form-item {
     width: 100% !important;
@@ -35,13 +37,17 @@
 }
 
 .business-register-form {
-  .ant-select-selector,
-  .ant-select-in-form-item,
-  .ant-select-selection-item {
-    height: 3.5rem !important;
-    overflow: hidden;
-    display: flex;
-    align-items: center !important;
+  .business-register-form,
+  .update-profile-details-form,
+  .update-business-profile-form {
+    .ant-select-selector,
+    .ant-select-in-form-item,
+    .ant-select-selection-item {
+      height: 3.5rem !important;
+      overflow: hidden;
+      display: flex;
+      align-items: center !important;
+    }
   }
 }
 
@@ -134,5 +140,12 @@
       border: 1px solid #1677ff !important;
       border-radius: 2px !important;
     }
+  }
+}
+
+.update-api-key-webhook-form {
+  .ant-input-disabled,
+  .ant-input-affix-wrapper-disabled {
+    background-color: rgba(255, 255, 255, 1) !important;
   }
 }

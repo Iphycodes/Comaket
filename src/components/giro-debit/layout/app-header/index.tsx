@@ -69,7 +69,7 @@ export const AppHeader = (props: AppHeaderProps) => {
 
   return (
     <Header
-      className="layout-header shadow-sm 2-50"
+      className="layout-header shadow-sm"
       style={{
         position: 'sticky',
         top: 0,
