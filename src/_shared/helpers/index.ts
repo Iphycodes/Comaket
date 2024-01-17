@@ -1,8 +1,9 @@
 import React from 'react';
 import { jwtDecode } from 'jwt-decode';
 import Cookie from 'js-cookie';
-import { AUTH_TOKEN_KEY } from '@grc/_shared/constant';
+import { AUTH_TOKEN_KEY, COLOR_LIST_ALPHA } from '@grc/_shared/constant';
 import { MenuProps } from 'antd';
+import * as _ from 'lodash';
 
 export const numberFormat = (value: number | bigint, currency?: string) => {
   const formatter = new Intl.NumberFormat();
@@ -105,7 +106,6 @@ export const calculateTotal = (data: any) => {
 };
 
 export const getStatusColor = (status: string) => {
-  console.log('I called:::', status);
   switch (status.toLowerCase()) {
     case 'successful':
       return 'green-500';
@@ -128,3 +128,12 @@ export enum GET_COLOR {
   total = 'slate-900',
   failed = 'red-500',
 }
+
+export const getRandomColorByString = (name: string) => {
+  name = name?.toUpperCase();
+  return _.get(COLOR_LIST_ALPHA, getFirstCharacter(name) ?? 'A') ?? '#7B68ED';
+};
+
+export const getFirstCharacter = (name: string) => {
+  return _.capitalize(name?.charAt(0));
+};
