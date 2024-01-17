@@ -1,3 +1,6 @@
+import moment from 'moment';
+import { faker } from '@faker-js/faker';
+
 export const POST = 'POST';
 export const PUT = 'PUT';
 export const PATCH = 'PATCH';
@@ -47,6 +50,36 @@ export const status = [
   { label: 'Success', value: 'successful' },
   { label: 'Failed', value: 'failed' },
 ];
+
+// eslint-disable-next-line
+// export enum COLOR_LIST_ALPHA {
+//   A = '#3E82FF',
+//   B = '#C1EAFD',
+//   C = '#F56A00',
+//   D = '#7265E6',
+//   E = '#FFBF00',
+//   F = '#00A2AE',
+//   G = '#9C9C9D',
+//   H = '#F3D19B',
+//   I = '#CA99BC',
+//   J = '#BAB8F5',
+//   K = '#7B68ED',
+//   L = '#3E82FF',
+//   M = '#F3D19B',
+//   N = '#7265E6',
+//   O = '#CA99BC',
+//   P = '#F56A00',
+//   Q = '#CA99BC',
+//   R = '#F3D19B',
+//   S = '#F3D19B',
+//   T = '#9C9C9D',
+//   U = '#FFBF00',
+//   V = '#F3D19B',
+//   W = '#7265E6',
+//   X = '#00A2AE',
+//   Y = '#CA99BC',
+//   Z = '#C1EAFD',
+// }
 
 export const walletBalance = (data: Array<Record<string, any>>) => {
   return data?.reduce((curr, acc) => {
@@ -180,9 +213,9 @@ export const transactionData = [
   {
     entry: 'debit',
     id: '00001',
-    date: '12/06/23',
+    createdAt: '12/06/23',
     time: '00:34:12',
-    amount: '450,234',
+    amount: 45023400,
     currency: 'NGN',
     recipient: 'john doe',
     status: 'successful',
@@ -190,39 +223,39 @@ export const transactionData = [
   {
     entry: 'debit',
     id: '00002',
-    date: '12/06/23',
+    createdAt: '12/06/23',
     time: '00:34:12',
-    amount: '450,234',
+    amount: 45023400,
     currency: 'NGN',
     recipient: 'john doe',
-    status: 'successful',
+    status: 'processing',
   },
   {
     entry: 'credit',
     id: '00003',
-    date: '12/06/23',
+    createdAt: '12/06/23',
     time: '00:34:12',
-    amount: '450,234',
+    amount: 45023400,
     currency: 'NGN',
     recipient: 'sinzu money',
     status: 'successful',
   },
-  {
-    entry: 'credit',
-    id: '00004',
-    date: '12/06/23',
-    time: '00:34:12',
-    amount: '450,234',
-    currency: 'NGN',
-    recipient: 'sinzu money',
-    status: 'successful',
-  },
+  // {
+  //   entry: 'credit',
+  //   id: '00004',
+  //   createdAt: '12/06/23',
+  //   time: '00:34:12',
+  //   amount: 45023400,
+  //   currency: 'NGN',
+  //   recipient: 'sinzu money',
+  //   status: 'successful',
+  // },
   {
     entry: 'debit',
     id: '00005',
-    date: '12/06/23',
+    createdAt: '12/06/23',
     time: '00:34:12',
-    amount: '450,234',
+    amount: 45023400,
     currency: 'NGN',
     recipient: 'john doe',
     status: 'failed',
@@ -230,9 +263,9 @@ export const transactionData = [
   {
     entry: 'credit',
     id: '00003',
-    date: '12/06/23',
+    createdAt: '12/06/23',
     time: '00:34:12',
-    amount: '450,234',
+    amount: 45023400,
     currency: 'NGN',
     recipient: 'sinzu money',
     status: 'successful',
@@ -285,3 +318,60 @@ export const mockTransactionAnalyticsData = {
     },
   ],
 };
+
+const labels = Array.from({ length: 9 }, (_, index) =>
+  moment().subtract(index, 'months').format('MMMM')
+);
+export const mockTransactionAnalyticsData2 = {
+  labels: labels,
+  datasets: [
+    {
+      label: 'My First Dataset',
+      data: [65, 59, 80, 81, 56, 55, 40],
+      backgroundColor: 'rgba(0, 128, 0, 0.2)',
+      borderColor: 'rgba(0, 128, 0, 1)',
+      borderWidth: 1,
+      // barThickness: 70,
+    },
+  ],
+};
+
+export const comparativeAnalysisData = {
+  labels,
+  datasets: [
+    {
+      label: 'Dataset 1',
+      data: labels.map(() => faker.number.int({ min: 0, max: 1000 })),
+      backgroundColor: 'rgba(255, 99, 132, 0.5)',
+    },
+    {
+      label: 'Dataset 2',
+      data: labels.map(() => faker.number.int({ min: 0, max: 1000 })),
+      backgroundColor: 'rgba(53, 162, 235, 0.5)',
+    },
+  ],
+};
+
+export const smoothLineChartData = {
+  labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+  datasets: [
+    {
+      label: '',
+      data: [50, 60, 55, 73, 65, 90, 75],
+      fill: true,
+      backgroundColor: 'rgba(75, 192, 192, 0.2)',
+      borderColor: 'rgba(75, 192, 192, 1)',
+      borderWidth: 2,
+    },
+  ],
+};
+
+export const CashFlowAnalytics = [
+  { type: 'income', amount: 9000000, count: 60200 },
+  { type: 'spendings', amount: 7500000, count: 40 },
+];
+// export const MockVirtualAccounts = [];
+export const MockVirtualAccounts: any = [
+  { id: '001', accountName: 'The 30th Concept', accountNumber: '004002001', amount: 3300000000 },
+  { id: '002', accountName: 'Jay Doe Biz', accountNumber: '004002003', amount: 52000000 },
+];
