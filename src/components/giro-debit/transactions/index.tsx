@@ -34,18 +34,15 @@ const Transactions = () => {
   return (
     <div className="w-full flex flex-col gap-5">
       <div className="w-full flex gap-5">
-        <div style={{ flex: 2 }}>
+        <div style={{ flex: 3 }}>
           {' '}
           <BalanceCard />
         </div>
-        <Card className="shadow-md" style={{ flex: 1 }}></Card>
-        <Card className="flex shadow-md" style={{ flex: 1 }}></Card>
-        <Card className="flex shadow-md" style={{ flex: 1 }}></Card>
+        <Card className="shadow-sm shadow-gray-200" style={{ flex: 2 }}></Card>
+        <Card className="flex shadow-sm shadow-gray-200" style={{ flex: 2 }}></Card>
+        <Card className="flex shadow-sm shadow-gray-200" style={{ flex: 2 }}></Card>
       </div>
-      <div className="w-full flex gap-3 items-center justify-between">
-        <div className="border p-3 px-6 text-blue font-bold border-blue bg-cyan-50 rounded-3xl shadow-sm">
-          Ifeanyi Emmanuel | 0065453363 | Demo
-        </div>
+      <div className="w-full flex gap-3 items-center justify-end">
         <TopBar handleDrawerToggle={() => handleDrawerToggle(true)} />
       </div>
       <TransactionsTable

@@ -26,9 +26,9 @@ export const AppHeader = (props: AppHeaderProps) => {
   const isMobile = useMediaQuery(mediaSize.mobile);
   const pathname = usePathname();
   const pathUrl = pathname?.split('/');
-  // const currentPath = `${pathUrl?.[2]}`.toUpperCase() ?? '';
   const theme = 'light';
   const currentPath = `${pathUrl?.[3]}`.toUpperCase() ?? '';
+  const { currentAccount } = useContext(AppContext);
 
   const router = useRouter();
   const { handleLogOut } = useContext(AppContext);
@@ -37,8 +37,8 @@ export const AppHeader = (props: AppHeaderProps) => {
     if (key === 'logout') {
       handleLogOut();
       router.push('/login');
-    } else {
-      router.push(`/apps/user/${key}`);
+    } else if (key === 'my-profile') {
+      router.push('/apps/giro-debit/settings/profile-details');
     }
   };
 
@@ -47,7 +47,7 @@ export const AppHeader = (props: AppHeaderProps) => {
       <div>
         <div
           className="cursor-pointer rounded-sm px-3 py-1 hover:bg-gray-100"
-          onClick={() => handleMenuClick('')}
+          onClick={() => handleMenuClick('my-profile')}
         >
           <Space className="p-1" size={15}>
             <UserOutlined />
@@ -117,14 +117,13 @@ export const AppHeader = (props: AppHeaderProps) => {
             <div className="cursor-pointer flex items-center gap-2">
               <Avatar
                 style={{
-                  backgroundColor: getRandomColorByString('Ifeanyi'),
+                  backgroundColor: getRandomColorByString(currentAccount?.name ?? ''),
                   verticalAlign: 'middle',
                 }}
-                // size="small"
               >
-                {_.isEmpty('') && getFirstCharacter('Ifeanyi')}
+                {_.isEmpty('') && getFirstCharacter(currentAccount?.name ?? '')}
               </Avatar>
-              <span className="font-bold">{'Username'}</span>
+              <span className="font-bold">{currentAccount?.name}</span>
               <CaretDownOutlined size={10} />
             </div>
           </Popover>
