@@ -4,7 +4,7 @@ import SelectVirtualAcct from '@grc/components/giro-debit/dashboard/libs/select-
 
 const BalanceCard = () => {
   return (
-    <Card className="flex flex-col border gap-5 shadow-md w-full">
+    <Card className="flex flex-col border gap-5 shadow-sm shadow-gray-300 w-full">
       <div>
         <SelectVirtualAcct
           isLoadingAccounts={false}

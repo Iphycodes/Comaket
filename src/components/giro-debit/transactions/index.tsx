@@ -38,9 +38,9 @@ const Transactions = () => {
           {' '}
           <BalanceCard />
         </div>
-        <Card className="shadow-md" style={{ flex: 1 }}></Card>
-        <Card className="flex shadow-md" style={{ flex: 1 }}></Card>
-        <Card className="flex shadow-md" style={{ flex: 1 }}></Card>
+        <Card className="shadow-sm shadow-gray-300" style={{ flex: 1 }}></Card>
+        <Card className="flex shadow-sm shadow-gray-300" style={{ flex: 1 }}></Card>
+        <Card className="flex shadow-sm shadow-gray-300" style={{ flex: 1 }}></Card>
       </div>
       <div className="w-full flex gap-3 items-center justify-between">
         <div className="border p-3 px-6 text-blue font-bold border-blue bg-cyan-50 rounded-3xl shadow-sm">

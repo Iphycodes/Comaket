@@ -38,8 +38,7 @@ export const AppHeader = (props: AppHeaderProps) => {
       handleLogOut();
       router.push('/login');
     } else {
-      // this will route to the profile page when it is created
-      console.log('profile route');
+      router.push('/apps/giro-debit/settings/profile-details');
     }
   };
 
