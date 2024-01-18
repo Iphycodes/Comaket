@@ -2,10 +2,11 @@
 
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 import { appNav } from '@grc/app/nav';
+import SelectVirtualAcct from '@grc/components/giro-debit/dashboard/libs/select-virtual-acct';
 import { AppHeader } from '@grc/components/giro-debit/layout/app-header';
 import { SideNav } from '@grc/components/giro-debit/layout/side-nav';
 import { useAuth } from '@grc/hooks/useAuth';
-import { Layout } from 'antd';
+import { Layout, Space } from 'antd';
 import { Footer } from 'antd/es/layout/layout';
 import { usePathname, useRouter } from 'next/navigation';
 import { ReactElement } from 'react';
@@ -53,8 +54,30 @@ const AppsBaseLayout = (props: GiroDebitPageProps) => {
         }}
       >
         <AppHeader />
-        <Content className="main-content" style={{ background: '#ffffff' }}>
-          <div style={{ padding: 40, minHeight: '100vh' }}>
+        <div
+          className="flex w-full items-center justify-end px-10 border-b h-8 bg-cyan-50"
+          style={{ position: 'sticky', minHeight: '32px', top: 64, zIndex: 10 }}
+        >
+          <Space size={10}>
+            <span className="font-thin text-[14px] text-blue">Switch Virtual Account: </span>
+            <SelectVirtualAcct
+              isLoadingAccounts={false}
+              vAccount={{} as any}
+              accounts={[
+                { accountName: 'John doe', accountNumber: '00000', bankName: 'demo' } as any,
+              ]}
+              setVAccount={() => {}}
+              className="virtual-select"
+            />
+            {/* <Select
+              placeholder={'Virtual Account'}
+              size="small"
+              className="w-[240px] virtual-select"
+            /> */}
+          </Space>
+        </div>
+        <Content className="main-content">
+          <div className="bg-gray-50" style={{ padding: 40, minHeight: '100vh' }}>
             {isSettingsPath?.toLowerCase() === 'settings' && (
               <div className="flex border-b border-gray-300 shadow-sm">
                 {' '}

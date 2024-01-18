@@ -117,6 +117,12 @@
   }
 }
 
+.virtual-select {
+  .ant-select-selector {
+    border: 1px solid rgb(30 136 229) !important;
+  }
+}
+
 .live-mode-switch.ant-switch-checked {
   .ant-switch-inner {
     background-color: rgb(4, 219, 4) !important;
@@ -155,4 +161,8 @@
   .ant-input-affix-wrapper-disabled {
     background-color: rgba(255, 255, 255, 1) !important;
   }
+}
+
+.virtual-select-form-item.ant-form-item {
+  margin: 0 !important;
 }

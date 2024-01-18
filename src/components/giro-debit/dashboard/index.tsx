@@ -63,7 +63,6 @@ ChartJS.register(
 const DashBoard = (props: DashBoardProps) => {
   const {
     transactions,
-    // setFilter,
     currentAccount,
     handleCreateVirtualAcct,
     openCreateModal,

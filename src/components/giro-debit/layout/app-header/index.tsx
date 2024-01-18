@@ -37,7 +37,7 @@ export const AppHeader = (props: AppHeaderProps) => {
     if (key === 'logout') {
       handleLogOut();
       router.push('/login');
-    } else {
+    } else if (key === 'my-profile') {
       router.push('/apps/giro-debit/settings/profile-details');
     }
   };
@@ -47,7 +47,7 @@ export const AppHeader = (props: AppHeaderProps) => {
       <div>
         <div
           className="cursor-pointer rounded-sm px-3 py-1 hover:bg-gray-100"
-          onClick={() => handleMenuClick('')}
+          onClick={() => handleMenuClick('my-profile')}
         >
           <Space className="p-1" size={15}>
             <UserOutlined />
