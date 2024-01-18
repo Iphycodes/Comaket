@@ -8,6 +8,33 @@ import DisbursementHistory from './libs/disbursement-records';
 import TopUp from './libs/top-up';
 
 const Disbursement = () => {
+  const mockPayoutsData = [
+    {
+      color: 'green',
+      title: 'Total Single Payout',
+      percentage: 40,
+      value: '\u20A6200000',
+    },
+    {
+      color: 'rgb(30 136 229)',
+      title: 'Total Batch Payout',
+      percentage: 20,
+      value: '\u20A6350000',
+    },
+    {
+      color: '#C9DE00',
+      title: 'Total Pending Payout',
+      percentage: 29.5,
+      value: '\u20A655000',
+    },
+    {
+      color: '#B21F00',
+      title: 'Total Failed Payout',
+      percentage: 29.5,
+      value: '\u20A616000',
+    },
+  ];
+
   return (
     <div className="w-full flex flex-col gap-5">
       <div className="flex w-full justify-between items-center font-semibold pb-2 border-b-2">
@@ -39,34 +66,18 @@ const Disbursement = () => {
         <TopUp /> */}
         <div className="flex w-full gap-6 justify-between">
           <div className="flex gap-5 justify-between flex-wrap" style={{ flex: 6 }}>
-            <TransactionStatisticsCard
-              style={{ width: '48%' }}
-              color="green"
-              title="Total Single Payout"
-              percentage={40}
-              value={'\u20A6200000'}
-            />
-            <TransactionStatisticsCard
-              style={{ width: '48%' }}
-              color="rgb(30 136 229)"
-              title="Total Batch Payout"
-              percentage={20}
-              value={'\u20A6350000'}
-            />
-            <TransactionStatisticsCard
-              style={{ width: '48%' }}
-              color="#C9DE00"
-              title="Total Pending Payout"
-              percentage={29.5}
-              value={'\u20A655000'}
-            />
-            <TransactionStatisticsCard
-              style={{ width: '48%' }}
-              color="#B21F00"
-              title="Total Failed Payout"
-              percentage={10.5}
-              value={'\u20A616000'}
-            />
+            {mockPayoutsData.map(({ color, title, percentage, value }, idx) => {
+              return (
+                <TransactionStatisticsCard
+                  key={`${idx}`}
+                  style={{ width: '48%' }}
+                  color={color}
+                  title={title}
+                  percentage={percentage}
+                  value={value}
+                />
+              );
+            }, [])}
           </div>
           <div className="flex" style={{ flex: 4 }}>
             <PieChartAnaytics />
