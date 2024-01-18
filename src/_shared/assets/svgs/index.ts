@@ -12,6 +12,11 @@ import PlusIcon from './plus.svg';
 import ManageBusinessIcon from './manage-business.svg';
 import CloseIcon from './close.svg';
 import CopyIcon from './copy.svg';
+import ArrowLeftDownIcon from './arrow-left-down.svg';
+import ArrowRightUpIcon from './arrow-right-up.svg';
+import CoinIcon from './coin.svg';
+import UserSettingsIcon from './user-settings.svg';
+import EmptyIcon from './empty-state.svg';
 
 export {
   Giro,
@@ -28,4 +33,9 @@ export {
   LogoutIcon,
   CloseIcon,
   CopyIcon,
+  ArrowLeftDownIcon,
+  ArrowRightUpIcon,
+  CoinIcon,
+  UserSettingsIcon,
+  EmptyIcon,
 };

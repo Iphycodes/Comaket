@@ -44,14 +44,14 @@ module.exports = (phase) => {
       return config;
     },
 
-    redirects: async =() => {
-      return [
-        {
-          source: '/login',
-          destination: '/auth/login',
-          permanent: true,
-        }
-      ]
-    },
+    // redirects: async =() => {
+    //   return [
+    //     {
+    //       source: '/login',
+    //       destination: '/auth/login',
+    //       permanent: true,
+    //     }
+    //   ]
+    // },
   };
 };
