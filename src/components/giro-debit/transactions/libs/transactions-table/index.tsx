@@ -1,61 +1,59 @@
 'use client';
 
-import { Table, Tag } from 'antd';
-import React from 'react';
+import { Card, Table, Tag, Tooltip } from 'antd';
+import React, { Dispatch, SetStateAction } from 'react';
 import { TransactionsDataType, transactionsData } from './libs/transactions-data';
 import { ColumnsType } from 'antd/lib/table';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
-import { RiExpandUpDownFill, RiCircleFill } from 'react-icons/ri';
+import TableFooter from './libs/table-footer';
 
 interface TransactionTableProps {
   handleRowClick: (record: any) => void;
+  setTransactionDrawerOpen: () => void;
+  setSelectedRecord: Dispatch<SetStateAction<TransactionsDataType>>;
 }
 
 const TransactionsTable = (props: TransactionTableProps) => {
-  const { handleRowClick } = props;
+  const { handleRowClick, setTransactionDrawerOpen, setSelectedRecord } = props;
   const isMobile = useMediaQuery(mediaSize.mobile);
 
+  const handleAdvancedViewClick = (record: TransactionsDataType) => {
+    setTransactionDrawerOpen();
+
+    setSelectedRecord(record);
+  };
+
   const columns: ColumnsType<TransactionsDataType> = [
-    {
-      title: null,
-      dataIndex: '',
-      key: 'bullet',
-      render: () => <RiCircleFill color="green" size={10} />,
-      width: 30,
-    },
     {
       title: (
         <span className="flex text-[14px] font-semibold text-gray-500 items-center gap-1">
           <span>Date</span>
-          <RiExpandUpDownFill size={15} />
         </span>
       ),
       ellipsis: {
         showTitle: true,
       },
       dataIndex: 'date',
-      key: 'name',
+      key: 'date',
     },
     {
       title: (
         <span className="flex text-[14px] font-semibold text-gray-500 items-center gap-1">
           <span>Type</span>
-          <RiExpandUpDownFill size={15} />
         </span>
       ),
       dataIndex: 'type',
-      key: 'age',
+      key: 'type',
       render: (text) => <span>{text}</span>,
     },
     {
       title: (
         <span className="flex text-[14px] font-semibold text-gray-500 items-center gap-1">
           <span>Session ID</span>
-          <RiExpandUpDownFill size={15} />
         </span>
       ),
       dataIndex: 'sessionId',
-      key: 'age',
+      key: 'sessionId',
       ellipsis: {
         showTitle: true,
       },
@@ -64,11 +62,10 @@ const TransactionsTable = (props: TransactionTableProps) => {
       title: (
         <span className="flex text-[14px] font-semibold text-gray-500 items-center gap-1">
           <span>Reciepient</span>
-          <RiExpandUpDownFill size={15} />
         </span>
       ),
       dataIndex: 'reciepient',
-      key: 'agency',
+      key: 'reciepient',
       ellipsis: {
         showTitle: true,
       },
@@ -78,11 +75,10 @@ const TransactionsTable = (props: TransactionTableProps) => {
       title: (
         <span className="flex text-[14px] font-semibold text-gray-500 items-center gap-1">
           <span>Reciepient Status</span>
-          <RiExpandUpDownFill size={15} />
         </span>
       ),
       dataIndex: 'reciepientAccountStatus',
-      key: 'agency',
+      key: 'reciepientAccountStatus',
       ellipsis: {
         showTitle: true,
       },
@@ -103,11 +99,10 @@ const TransactionsTable = (props: TransactionTableProps) => {
       title: (
         <span className="flex text-[14px] font-semibold text-gray-500 items-center gap-1">
           <span>Reciepient Bank</span>
-          <RiExpandUpDownFill size={15} />
         </span>
       ),
       dataIndex: 'reciepientBank',
-      key: 'agency',
+      key: 'reciepientBank',
       ellipsis: {
         showTitle: true,
       },
@@ -117,32 +112,53 @@ const TransactionsTable = (props: TransactionTableProps) => {
       title: (
         <span className="flex text-[14px] font-semibold text-gray-500 items-center gap-1">
           <span>Amount</span>
-          <RiExpandUpDownFill size={15} />
         </span>
       ),
       dataIndex: 'amount',
-      key: 'agency',
+      key: 'amount',
       ellipsis: {
         showTitle: true,
       },
     },
+    {
+      dataIndex: '',
+      key: 'view',
+      width: 40,
+      onCell: () => ({
+        onClick: (event) => {
+          event.stopPropagation();
+        },
+      }),
+      render: (_: any, record: TransactionsDataType) => (
+        <span>
+          <Tooltip title="view">
+            <i
+              className="ri-eye-line cursor-pointer font-bold hover:text-blue"
+              color="red"
+              onClick={() => handleAdvancedViewClick(record)}
+            ></i>
+          </Tooltip>
+        </span>
+      ),
+    },
   ];
 
-  const rowProps = (record: any) => ({
+  const rowClick = (record: any) => ({
     onClick: () => handleRowClick(record),
   });
   return (
-    <>
+    <Card className="shadow-sm">
       <Table
         size="large"
         columns={columns}
-        pagination={{ pageSize: 10, position: ['bottomCenter'] }}
+        pagination={{ pageSize: 8, position: ['bottomLeft'] }}
         dataSource={transactionsData}
-        scroll={{ y: 350, x: isMobile ? true : 0 }}
+        scroll={{ x: isMobile ? true : 0 }}
         className={'transaction-table'}
-        onRow={rowProps}
+        onRow={rowClick}
+        footer={() => <TableFooter />}
       />
-    </>
+    </Card>
   );
 };
 

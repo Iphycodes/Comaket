@@ -1,4 +1,4 @@
-import { memo, useEffect } from 'react';
+import React, { memo, useEffect } from 'react';
 import { Form, Select } from 'antd';
 import { startCase, isEmpty, pick, toLower } from 'lodash';
 import { VirtualAccountNamespace } from '@grc/_shared/namespace/virtual-account';
@@ -9,9 +9,19 @@ interface ISelectVirtualAcct {
   accounts: VirtualAccountNamespace.Account[];
   isLoadingAccounts: boolean;
   theme?: string;
+  style?: React.CSSProperties;
+  width?: string;
+  className?: string;
 }
 
-const SelectVirtualAcct = ({ setVAccount, accounts, isLoadingAccounts }: ISelectVirtualAcct) => {
+const SelectVirtualAcct = ({
+  setVAccount,
+  accounts,
+  isLoadingAccounts,
+  style,
+  width,
+  className,
+}: ISelectVirtualAcct) => {
   const [form] = Form.useForm();
 
   const pickAcctValue = (acct: any) =>
@@ -34,6 +44,7 @@ const SelectVirtualAcct = ({ setVAccount, accounts, isLoadingAccounts }: ISelect
     <Form layout="vertical" requiredMark={false} form={form} className="select-virtual-account">
       <Form.Item name={'status_filter'} label={<span>Select A Virtual Account</span>}>
         <Select
+          style={{ ...style, width: width, fontWeight: 'bolder' }}
           bordered={true}
           showSearch
           defaultValue={
@@ -43,7 +54,7 @@ const SelectVirtualAcct = ({ setVAccount, accounts, isLoadingAccounts }: ISelect
           }
           loading={isLoadingAccounts}
           disabled={accounts?.length === 0}
-          className={''}
+          className={`${className}`}
           onChange={(value) => setVAccount?.(JSON.parse(value))}
           options={options}
         />

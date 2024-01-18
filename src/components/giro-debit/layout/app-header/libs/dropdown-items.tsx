@@ -13,6 +13,9 @@ export const items: MenuProps['items'] = [
   },
   {
     key: '2',
+    onClick: () => {
+      console.log('logout');
+    },
     label: (
       <Space className="p-1" size={10}>
         <LogoutOutlined />

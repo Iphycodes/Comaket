@@ -1,7 +1,9 @@
 @import 'giro.min.css';
 
 .register-form,
-.reset-password-form, .update-profile-details-form, .update-business-profile-form {
+.reset-password-form,
+.update-profile-details-form,
+.update-business-profile-form {
   .ant-input-number-group-wrapper,
   .ant-input-number-in-form-item {
     width: 100% !important;
@@ -34,18 +36,22 @@
   }
 }
 
-.business-register-form, .update-profile-details-form, .update-business-profile-form{
-  .ant-select-selector,
-  .ant-select-in-form-item,
-  .ant-select-selection-item {
-    height: 3.5rem !important;
-    overflow: hidden;
-    display: flex;
-    align-items: center !important;
+.business-register-form {
+  .business-register-form,
+  .update-profile-details-form,
+  .update-business-profile-form {
+    .ant-select-selector,
+    .ant-select-in-form-item,
+    .ant-select-selection-item {
+      height: 3.5rem !important;
+      overflow: hidden;
+      display: flex;
+      align-items: center !important;
+    }
   }
 }
 
-.select-virtual-account{
+.select-virtual-account {
   .ant-select-selector,
   .ant-select-in-form-item,
   .ant-select-selection-item {
@@ -71,12 +77,13 @@
 }
 
 .transaction-table {
-  .ant-table-body {
+  .ant-table-tbody {
     .ant-table-row {
-      cursor: pointer;
+      cursor: pointer !important;
       .ant-table-cell {
+        cursor: pointer;
         font-size: 15px;
-        font-weight: 400;
+        font-weight: 400 !important;
         padding-top: 20px !important;
         padding-bottom: 20px !important;
       }
@@ -84,7 +91,7 @@
   }
 }
 
-.dash-sider{
+.dash-sider {
   .ant-select-selector {
     // border: 1px solid black !important;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.09);
@@ -99,10 +106,9 @@
   }
 
   .ant-menu-item:last-child {
-    position:absolute;
+    position: absolute;
     bottom: 50px;
   }
-
 }
 
 .live-mode-switch.ant-switch {
@@ -116,13 +122,37 @@
     background-color: rgb(4, 219, 4) !important;
   }
 }
-.dashboard-transaction-list:hover{
+.dashboard-transaction-list:hover {
   background-color: #eee !important;
-
 }
 
-.update-api-key-webhook-form{
-  .ant-input-disabled, .ant-input-affix-wrapper-disabled{
+.dropdown-popover {
+  .ant-popover-inner {
+    padding: 5px 2px !important;
+    margin-top: -2px !important;
+  }
+}
+
+.filter-drawer {
+  .ant-drawer-body {
+    padding: 0 !important;
+
+    .ant-select-selector {
+      border: 1px solid #1677ff !important;
+      border-radius: 2px !important;
+    }
+  }
+}
+
+.advanced-transaction-drawer {
+  .ant-drawer-body {
+    padding: 0 !important;
+  }
+}
+
+.update-api-key-webhook-form {
+  .ant-input-disabled,
+  .ant-input-affix-wrapper-disabled {
     background-color: rgba(255, 255, 255, 1) !important;
   }
 }

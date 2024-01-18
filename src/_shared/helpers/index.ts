@@ -132,7 +132,6 @@ export const getRandomColorByString = (name: string) => {
   name = name?.toUpperCase();
   return _.get(COLOR_LIST_ALPHA, getFirstCharacter(name) ?? 'A') ?? '#7B68ED';
 };
-
 export const getFirstCharacter = (name: string) => {
   return _.capitalize(name?.charAt(0));
 };

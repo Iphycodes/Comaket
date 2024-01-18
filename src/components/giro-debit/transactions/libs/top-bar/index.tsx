@@ -1,27 +1,27 @@
 'use client';
-import { Space } from 'antd';
-import { GrTransaction } from 'react-icons/gr';
-import { FaRegCalendarAlt, FaSearch } from 'react-icons/fa';
 
-const TopBar = () => {
+import { Button, Input } from 'antd';
+
+interface TopBarProps {
+  handleDrawerToggle: () => void;
+}
+
+const TopBar = ({ handleDrawerToggle }: TopBarProps) => {
   return (
-    <div className="w-full flex justify-between px-3 items-center">
-      <div className="flex items-center">
-        <Space className="text-[13px] font-bold cursor-pointer" size={5}>
-          <GrTransaction size={10} />
-          Make a Payment
-        </Space>
-      </div>
-      <div className="flex items-center gap-5">
-        <Space className="text-[13px] font-bold cursor-pointer" size={2}>
-          <FaSearch size={12} />
-          Search
-        </Space>
-        <Space className="text-[13px] font-bold cursor-pointer" size={2}>
-          <FaRegCalendarAlt size={15} />
-          12th Jan, 24
-        </Space>
-      </div>
+    <div className="flex justify-between gap-3 items-center">
+      <Input
+        placeholder={'Search Transaction...'}
+        size="large"
+        className="bg-gray-50 w-80 border-gray-300 rounded-md shadow-sm"
+        style={{ borderRadius: '5px' }}
+      />
+      <Button
+        className="flex justify-center bg-cyan-50 border-blue items-center h-12 w-12"
+        shape="circle"
+        onClick={() => handleDrawerToggle()}
+      >
+        <i className="ri-filter-line text-[22px] text-blue"></i>
+      </Button>
     </div>
   );
 };
