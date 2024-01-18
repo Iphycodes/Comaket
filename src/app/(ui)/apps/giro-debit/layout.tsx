@@ -5,7 +5,7 @@ import { appNav } from '@grc/app/nav';
 import { AppHeader } from '@grc/components/giro-debit/layout/app-header';
 import { SideNav } from '@grc/components/giro-debit/layout/side-nav';
 import { useAuth } from '@grc/hooks/useAuth';
-import { Layout } from 'antd';
+import { Layout, Select, Space } from 'antd';
 import { Footer } from 'antd/es/layout/layout';
 import { usePathname, useRouter } from 'next/navigation';
 import { ReactElement } from 'react';
@@ -53,8 +53,17 @@ const AppsBaseLayout = (props: GiroDebitPageProps) => {
         }}
       >
         <AppHeader />
-        <Content className="main-content" style={{ background: '#ffffff' }}>
-          <div style={{ padding: 40, minHeight: '100vh' }}>
+        <div
+          className="flex w-full items-center justify-end px-10 py-1 border-b bg-cyan-50"
+          style={{ position: 'sticky' }}
+        >
+          <Space size={10}>
+            <span className="font-thin text-[14px]">Switch Virtual Account: </span>
+            <Select placeholder={'Virtual Account'} size="small" className="w-[240px]" />
+          </Space>
+        </div>
+        <Content className="main-content">
+          <div className="bg-gray-50" style={{ padding: 40, minHeight: '100vh' }}>
             {isSettingsPath?.toLowerCase() === 'settings' && (
               <div className="flex border-b border-gray-300 shadow-sm">
                 {' '}
