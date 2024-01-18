@@ -41,10 +41,10 @@ const SelectVirtualAcct = ({
   }));
 
   return (
-    <Form layout="vertical" requiredMark={false} form={form} className="select-virtual-account">
-      <Form.Item name={'status_filter'} label={<span>Select A Virtual Account</span>}>
+    <Form requiredMark={false} form={form}>
+      <Form.Item className="virtual-select-form-item">
         <Select
-          style={{ ...style, width: width, fontWeight: 'bolder' }}
+          style={{ ...style, width: width }}
           bordered={true}
           showSearch
           defaultValue={
@@ -52,6 +52,7 @@ const SelectVirtualAcct = ({
               ? JSON.stringify(pickAcctValue(accounts?.[0]))
               : 'No Virtual Account Created'
           }
+          size="small"
           loading={isLoadingAccounts}
           disabled={accounts?.length === 0}
           className={`${className}`}
