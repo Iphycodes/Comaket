@@ -121,7 +121,6 @@ export const AppHeader = (props: AppHeaderProps) => {
                   backgroundColor: getRandomColorByString(currentAccount?.name ?? ''),
                   verticalAlign: 'middle',
                 }}
-                // size="small"
               >
                 {_.isEmpty('') && getFirstCharacter(currentAccount?.name ?? '')}
               </Avatar>
