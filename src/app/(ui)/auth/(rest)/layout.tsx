@@ -23,7 +23,7 @@ const AppsBaseLayout = (props: LayoutProps) => {
 
   return (
     <main className="h-screen flex flex-col items-center p-2.5 bg-white px-4">
-      <header className="w-[54rem] max-w-full flex bg-white items-center justify-between justify-items-center py-7 px-6 md:flex-wrap">
+      <header className="w-[54rem] max-w-full flex bg-white items-center justify-between justify-items-center py-4 px-6 md:flex-wrap">
         <GiroLogo />
         {/* <h3 className="text-3xl font-extrabold text-blue"> Giro Financial</h3> */}
         {isSignUpPage ? (
@@ -54,8 +54,8 @@ const AppsBaseLayout = (props: LayoutProps) => {
       </header>
       <div
         className={`${
-          !isSignUpPage ? 'w-[40.625rem]' : 'w-[46.875rem]'
-        } mt-24 flex items-center justify-center justify-items-center justify-self-center content-center text-black`}
+          !isSignUpPage ? 'w-[40.625rem] mt-24' : 'w-[46.875rem] mt-[68px]'
+        } flex items-center justify-center justify-items-center justify-self-center content-center text-black`}
       >
         {children}
       </div>
