@@ -35,7 +35,7 @@ const Register = (props: RegisterProps) => {
       transition={{ type: 'spring', duration: 1 }}
       className="w-3/4"
     >
-      <div className="w-full">
+      <div className="w-full mb-10">
         <header className="text-left text-3xl font-bold text-blue pb-3">Register</header>
         <span className="text-gray-400">Fill out the details below to register</span>
         {/* {
@@ -51,7 +51,7 @@ const Register = (props: RegisterProps) => {
             onFinish(value);
           }}
           name="register-form"
-          className="register-form"
+          className="register-form mt-3"
         >
           <Row gutter={[16, 16]}>
             <Col md={12} xs={24}>
