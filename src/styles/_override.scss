@@ -117,6 +117,12 @@
   }
 }
 
+.virtual-select {
+  .ant-select-selector {
+    border: 1px solid rgb(30 136 229) !important;
+  }
+}
+
 .live-mode-switch.ant-switch-checked {
   .ant-switch-inner {
     background-color: rgb(4, 219, 4) !important;
