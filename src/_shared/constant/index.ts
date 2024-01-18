@@ -271,17 +271,90 @@ export const statCardProps = [
 ];
 
 export const mockTransactionAnalyticsData = {
-  labels: [
-    'Pending Transactions',
-    'Processing Transactions',
-    'Successful Transactions',
-    'Failed Transactions',
-  ],
+  labels: ['Failed Payouts', 'Pending Payouts', 'Successful Payouts'],
   datasets: [
     {
-      backgroundColor: ['#B21F00', '#C9DE00', '#2FDE00', '#00A6B4', '#6800B4'],
-      hoverBackgroundColor: ['#501800', '#4B5000', '#175000', '#003350', '#35014F'],
-      data: [300, 50, 430, 223],
+      backgroundColor: ['#B21F00', '#C9DE00', '#2FDE00'],
+      hoverBackgroundColor: ['#501800', '#4B5000', '#175000'],
+      data: [80, 100, 280],
     },
   ],
 };
+
+type SingleDisbursement = {
+  type: 'single';
+  recipient: string;
+  recipientAccount: string;
+  amount: string;
+  status: 'successful' | 'pending' | 'failed';
+};
+
+export type BatchDisbursement = {
+  type: 'Batch';
+  recipients: {
+    recipient: string;
+    recipientAccount: string;
+    amount: string;
+    status: 'successful' | 'pending' | 'failed';
+  }[];
+};
+
+type DisbursementRecord = SingleDisbursement | BatchDisbursement;
+
+export const mockDisbursementRecord: DisbursementRecord[] = [
+  {
+    type: 'single',
+    recipient: 'Ifeanyi Ogbonna',
+    recipientAccount: '0065453363',
+    amount: '\u20A62000',
+    status: 'successful',
+  },
+  {
+    type: 'single',
+    recipient: 'Emmanuel Ogbonna',
+    recipientAccount: '0065453363',
+    amount: '\u20A6100000',
+    status: 'successful',
+  },
+  {
+    type: 'Batch',
+    recipients: [
+      {
+        recipient: 'Adams Oshomole',
+        recipientAccount: '3092301102',
+        amount: '\u20A62000000',
+        status: 'pending',
+      },
+      {
+        recipient: 'Labaran Idris',
+        recipientAccount: '3092322202',
+        amount: '\u20A610000000',
+        status: 'successful',
+      },
+    ],
+  },
+  {
+    type: 'single',
+    recipient: 'Otedola Omotola',
+    recipientAccount: '0065453363',
+    amount: '\u20A6100000',
+    status: 'successful',
+  },
+  {
+    type: 'Batch',
+    recipients: [
+      {
+        recipient: 'Adams Oshomole',
+        recipientAccount: '3092301102',
+        amount: '\u20A62000000',
+        status: 'failed',
+      },
+      {
+        recipient: 'Labaran Idris',
+        recipientAccount: '3092322202',
+        amount: '\u20A610000000',
+        status: 'successful',
+      },
+    ],
+  },
+];

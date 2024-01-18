@@ -156,3 +156,27 @@
     background-color: rgba(255, 255, 255, 1) !important;
   }
 }
+
+.transaction-stat-card {
+  .ant-card-body {
+    padding: 10px 20px !important;
+  }
+}
+
+.recent-disburseent-card,
+.piechart-card {
+  .ant-card-body {
+    padding: 10px 20px !important;
+  }
+}
+
+.send-money-card {
+  .ant-card-body {
+    padding: 0 20px !important;
+  }
+}
+
+canvas.disbursement-pie {
+  width: 200px !important;
+  height: 200px !important;
+}

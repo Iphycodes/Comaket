@@ -53,7 +53,7 @@ const AppsBaseLayout = (props: GiroDebitPageProps) => {
         }}
       >
         <AppHeader />
-        <Content className="main-content" style={{ background: '#ffffff' }}>
+        <Content className="main-content bg-gray-50">
           <div style={{ padding: 40, minHeight: '100vh' }}>
             {isSettingsPath?.toLowerCase() === 'settings' && (
               <div className="flex border-b border-gray-300 shadow-sm">
