@@ -1,4 +1,3 @@
-import React from 'react';
 import { jwtDecode } from 'jwt-decode';
 import Cookie from 'js-cookie';
 import { AUTH_TOKEN_KEY, COLOR_LIST_ALPHA } from '@grc/_shared/constant';
