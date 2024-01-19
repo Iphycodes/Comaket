@@ -8,12 +8,15 @@ import {
   LogoutIcon,
   SettingsIcon,
   TransactionIcon,
+  ProfileIcon,
+  PasswordIcon,
 } from '@grc/_shared/assets/svgs';
 
 type Nav = {
   theme: SiderTheme & string;
   appName: string;
   items: NavItem[];
+  settingsMenuItems: NavItem[];
 };
 
 const menuItems: NavItem[] = [
@@ -44,8 +47,23 @@ const menuItems: NavItem[] = [
   {
     label: 'Logout',
     key: 'logout',
-    destination: 'logout',
+    destination: '/auth/logout',
     icon: <LogoutIcon />,
+  },
+];
+
+const settingsMenuItems: NavItem[] = [
+  {
+    label: 'Profile Details',
+    key: 'profile-details',
+    destination: 'profile-details',
+    icon: <ProfileIcon />,
+  },
+  {
+    label: 'Change Password',
+    key: 'change-password',
+    destination: 'change-password',
+    icon: <PasswordIcon />,
   },
 ];
 
@@ -53,6 +71,7 @@ const appNav: Nav = {
   appName: 'Giro',
   theme: 'light',
   items: menuItems,
+  settingsMenuItems,
 };
 
 export { appNav };

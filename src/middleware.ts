@@ -21,13 +21,18 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(url);
   }
 
-  if (url.pathname === '/apps/giro-debit/settings') {
-    url.pathname = '/apps/giro-debit/settings/profile-details';
+  if (url.pathname === '/apps/giro-pay/settings') {
+    url.pathname = '/apps/giro-pay/settings/business-profile';
+    return NextResponse.redirect(url);
+  }
+
+  if (url.pathname === '/apps/settings') {
+    url.pathname = '/apps/settings/profile-details';
     return NextResponse.redirect(url);
   }
 
   if (basePath === 'apps' && !isLoggedIn) {
-    url.pathname = '/login';
+    url.pathname = '/auth/login';
     return NextResponse.redirect(url);
   }
 

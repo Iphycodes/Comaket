@@ -21,8 +21,8 @@ const Apps = (props: LoginProps) => {
 
   const giroSystems: GiroSystemsProps[] = [
     {
-      title: 'Giro Debit',
-      url: '/apps/giro-debit/dashboard',
+      title: 'Giro Pay',
+      url: '/apps/giro-pay/dashboard',
       logo: '/assets/imgs/debit-logo.png',
     },
     {
@@ -48,9 +48,14 @@ const Apps = (props: LoginProps) => {
                 <div
                   key={idx}
                   className="h-40 w-48 rounded-lg shadow-md hover:border hover:border-cyan-100 shadow-gray-200 hover:shadow-cyan-200 relative flex justify-center items-center cursor-pointer"
-                  onClick={() => push(url)}
+                  onClick={() => {
+                    if (url == '/apps/giro-mandate') {
+                      return;
+                    }
+                    push(url);
+                  }}
                 >
-                  <div className="flex flex-col justify-center items-center font-semibold gap-4">
+                  <div className="flex flex-col justify-center items-center font-semibold gap-4 relative">
                     <Image
                       src={logo}
                       alt="logo"
@@ -58,7 +63,21 @@ const Apps = (props: LoginProps) => {
                       height={60}
                       style={{ width: '50px', height: '50px' }}
                     />
-                    <span style={{}}>{title}</span>
+                    <span style={{}}>
+                      {title === 'Giro Mandate' ? (
+                        <div className="flex flex-col">
+                          <div>{title}</div>
+                          <div
+                            style={{ position: 'absolute', top: '-34px', right: '-45px' }}
+                            className=" font-normal text-sm text-white py-0 px-[2px] bg-blue rounded-tl-lg r"
+                          >
+                            coming soon
+                          </div>
+                        </div>
+                      ) : (
+                        title
+                      )}
+                    </span>
                   </div>
                 </div>
               </Fragment>

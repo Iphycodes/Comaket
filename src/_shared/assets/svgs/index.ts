@@ -17,6 +17,8 @@ import ArrowRightUpIcon from './arrow-right-up.svg';
 import CoinIcon from './coin.svg';
 import UserSettingsIcon from './user-settings.svg';
 import EmptyIcon from './empty-state.svg';
+import ProfileIcon from './profile.svg';
+import PasswordIcon from './password.svg';
 
 export {
   Giro,
@@ -38,4 +40,6 @@ export {
   CoinIcon,
   UserSettingsIcon,
   EmptyIcon,
+  ProfileIcon,
+  PasswordIcon,
 };
