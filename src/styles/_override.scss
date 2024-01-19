@@ -36,7 +36,6 @@
   }
 }
 
-.business-register-form {
   .business-register-form,
   .update-profile-details-form,
   .update-business-profile-form {
@@ -48,8 +47,7 @@
       display: flex;
       align-items: center !important;
     }
-  }
-}
+  };
 
 .select-virtual-account {
   .ant-select-selector,

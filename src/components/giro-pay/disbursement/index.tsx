@@ -1,10 +1,11 @@
 'use client';
 import { Space } from 'antd';
 import { Wallet as WalletIcon } from '@grc/_shared/assets/svgs';
-import TransactionStatisticsCard from '../../giro-pay/disbursement/libs/transaction-statistics-card';
-import PieChartAnaytics from '../../giro-pay/disbursement/libs/pie-chart-analytics';
-import TopButtons from '../../giro-pay/disbursement/libs/top-buttons';
-import RecentDisbursements from '../../giro-pay/disbursement/libs/recent-disbursement-list';
+import TransactionStatisticsCard from './libs/transaction-statistics-card';
+import PieChartAnaytics from './libs/pie-chart-analytics';
+import TopButtons from './libs/top-buttons';
+import RecentDisbursements from '@grc/components/giro-pay/disbursement/libs/recent-disbursement-list';
+// import RecentDisbursements from './libs/recent-disbursement-list';
 
 const Disbursement = () => {
   const mockPayoutsData = [
