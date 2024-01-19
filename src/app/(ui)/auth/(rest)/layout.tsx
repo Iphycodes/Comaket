@@ -24,7 +24,9 @@ const AppsBaseLayout = (props: LayoutProps) => {
   return (
     <main className="h-screen flex flex-col items-center p-2.5 bg-white px-4">
       <header className="w-[54rem] max-w-full flex bg-white items-center justify-between justify-items-center py-4 px-6 md:flex-wrap">
-        <GiroLogo />
+        <span className=" cursor-pointer" onClick={() => onHeaderButtonClicked('login')}>
+          <GiroLogo />
+        </span>
         {/* <h3 className="text-3xl font-extrabold text-blue"> Giro Financial</h3> */}
         {isSignUpPage ? (
           <div className="flex items-center justify-center">

@@ -369,8 +369,8 @@ export const CashFlowAnalytics = [
   { type: 'income', amount: 9000000, count: 60200 },
   { type: 'spendings', amount: 7500000, count: 40 },
 ];
-// export const MockVirtualAccounts = [];
-export const MockVirtualAccounts: any = [
-  { id: '001', accountName: 'The 30th Concept', accountNumber: '004002001', amount: 3300000000 },
-  { id: '002', accountName: 'Jay Doe Biz', accountNumber: '004002003', amount: 52000000 },
-];
+export const MockVirtualAccounts = [];
+// export const MockVirtualAccounts: any = [
+//   { id: '001', accountName: 'The 30th Concept', accountNumber: '004002001', amount: 3300000000 },
+//   { id: '002', accountName: 'Jay Doe Biz', accountNumber: '004002003', amount: 52000000 },
+// ];
