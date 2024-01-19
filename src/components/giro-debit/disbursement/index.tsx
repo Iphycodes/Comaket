@@ -1,11 +1,12 @@
 'use client';
-import { Button, Space } from 'antd';
+import { Space } from 'antd';
 import { Wallet as WalletIcon } from '@grc/_shared/assets/svgs';
 import TransactionStatisticsCard from './libs/transaction-statistics-card';
 import PieChartAnaytics from './libs/pie-chart-analytics';
 import SendMoney from './libs/send-money';
 import DisbursementHistory from './libs/disbursement-records';
 import TopUp from './libs/top-up';
+import TopButtons from './libs/top-buttons';
 
 const Disbursement = () => {
   const mockPayoutsData = [
@@ -46,26 +47,13 @@ const Disbursement = () => {
           <div className="text-3xl font-bold">&#x20A6;2,500,000.00</div>
           <div className="font-thin">Total Balance from all accounts</div>
         </div>
-        <Button
-          className="opacity-100 flex items-center hover:opacity-70 bg-blue text-white rounded-[32px] py-5 px-8"
-          type="primary"
-          disabled={false}
-          loading={false}
-          htmlType="submit"
-        >
-          <div className="flex items-center gap-2">
-            <span>
-              <i className="ri-add-line text-[20px]"></i>
-            </span>
-            <span>Top Up Balance</span>
-          </div>
-        </Button>
+        <TopButtons />
       </div>
       <div className="w-full flex flex-col gap-6">
         {/* <SendMoney />
         <TopUp /> */}
         <div className="flex w-full gap-6 justify-between">
-          <div className="flex gap-5 justify-between flex-wrap" style={{ flex: 6 }}>
+          <div className="flex fle gap-5 justify-between flex-wrap" style={{ flex: 6 }}>
             {mockPayoutsData.map(({ color, title, percentage, value }, idx) => {
               return (
                 <TransactionStatisticsCard

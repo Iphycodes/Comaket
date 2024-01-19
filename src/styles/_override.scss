@@ -139,6 +139,10 @@
   }
 }
 
+.virtual-select-form-item {
+  margin: 0;
+}
+
 .filter-drawer {
   .ant-drawer-body {
     padding: 0 !important;
@@ -163,7 +167,6 @@
   }
 }
 
-<<<<<<< HEAD
 .transaction-stat-card {
   .ant-card-body {
     padding: 10px 20px !important;
@@ -186,8 +189,7 @@
 canvas.disbursement-pie {
   width: 200px !important;
   height: 200px !important;
-=======
-.virtual-select-form-item.ant-form-item {
-  margin: 0 !important;
->>>>>>> 738be11af596fe6ceb13ca975bc328924d872bd0
+  .virtual-select-form-item.ant-form-item {
+    margin: 0 !important;
+  }
 }

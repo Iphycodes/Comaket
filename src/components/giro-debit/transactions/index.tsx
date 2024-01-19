@@ -5,9 +5,9 @@ import { useState } from 'react';
 import { TransactionsDataType } from './libs/transactions-table/libs/transactions-data';
 import TransactionModal from './libs/transactionModal';
 import TopBar from './libs/top-bar';
-import { Card } from 'antd';
 import FilterDrawer from './libs/filter-drawer';
 import AdvancedTransactionDrawer from './libs/advanced-transaction-drawer';
+import TransactionStatisticsCard from '../disbursement/libs/transaction-statistics-card';
 
 const Transactions = () => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
@@ -38,9 +38,27 @@ const Transactions = () => {
           {' '}
           <BalanceCard />
         </div>
-        <Card className="shadow-sm shadow-gray-200" style={{ flex: 2 }}></Card>
-        <Card className="flex shadow-sm shadow-gray-200" style={{ flex: 2 }}></Card>
-        <Card className="flex shadow-sm shadow-gray-200" style={{ flex: 2 }}></Card>
+        <TransactionStatisticsCard
+          style={{ flex: 2 }}
+          color={'green'}
+          title={'Total Successful Disbursements'}
+          percentage={50}
+          value={'\u20A650000'}
+        />
+        <TransactionStatisticsCard
+          style={{ flex: 2 }}
+          color={'yellow'}
+          title={'Total Pending Disbursements'}
+          percentage={30}
+          value={'\u20A620000'}
+        />
+        <TransactionStatisticsCard
+          style={{ flex: 2 }}
+          color={'red'}
+          title={'Total Failed Disbursements'}
+          percentage={20}
+          value={'\u20A65000'}
+        />{' '}
       </div>
       <div className="w-full flex gap-3 items-center justify-end">
         <TopBar handleDrawerToggle={() => handleDrawerToggle(true)} />
