@@ -1,5 +1,5 @@
 'use client';
-import { Space } from 'antd';
+import { Modal, Space } from 'antd';
 import { Wallet as WalletIcon } from '@grc/_shared/assets/svgs';
 import TransactionStatisticsCard from './libs/transaction-statistics-card';
 import PieChartAnaytics from './libs/pie-chart-analytics';
@@ -7,11 +7,18 @@ import TopButtons from './libs/top-buttons';
 import RecentDisbursements from '@grc/components/giro-pay/disbursement/libs/recent-disbursement-list';
 import { useState } from 'react';
 import DisbursementDrawer from './libs/disbursement-drawer';
+import TopUpBalance from './libs/top-up-balance';
+import SinglePayout from './libs/single-payout';
+import BatchPayout from './libs/batch-payout';
 // import RecentDisbursements from './libs/recent-disbursement-list';
 
 const Disbursement = () => {
   const [open, setOpen] = useState<boolean>(false);
   const [selectedRecord, setSelectedRecord] = useState<Record<string, any>>({});
+  const [modalOpen, setModalOpen] = useState<boolean>(false);
+  const [modalElement, setModalElement] = useState<
+    'top-up-balance' | 'single-payout' | 'batch-payout'
+  >('top-up-balance');
   const mockPayoutsData = [
     {
       color: 'green',
@@ -51,7 +58,7 @@ const Disbursement = () => {
             <div className="text-3xl font-bold">&#x20A6;2,500,000.00</div>
             <div className="font-thin">Total Balance from all accounts</div>
           </div>
-          <TopButtons />
+          <TopButtons setModalOpen={setModalOpen} setModalElement={setModalElement} />
         </div>
         <div className="w-full flex flex-col gap-5">
           <div className="flex w-full gap-5 justify-between flex-wrap">
@@ -80,6 +87,11 @@ const Disbursement = () => {
         </div>
       </div>
       <DisbursementDrawer open={open} setOpen={setOpen} selectedRecord={selectedRecord} />
+      <Modal title={``} open={modalOpen} onCancel={() => setModalOpen(false)} footer={null}>
+        {modalElement === 'top-up-balance' && <TopUpBalance />}
+        {modalElement === 'single-payout' && <SinglePayout />}
+        {modalElement === 'batch-payout' && <BatchPayout />}
+      </Modal>
     </>
   );
 };

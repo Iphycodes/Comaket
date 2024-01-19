@@ -1,11 +1,22 @@
 'use client';
 
 import { Button } from 'antd';
+import { Dispatch, SetStateAction } from 'react';
+interface TopButtonsProps {
+  setModalOpen: Dispatch<SetStateAction<boolean>>;
+  setModalElement: Dispatch<SetStateAction<'top-up-balance' | 'single-payout' | 'batch-payout'>>;
+}
 
-const TopButtons = () => {
+const TopButtons = ({ setModalOpen, setModalElement }: TopButtonsProps) => {
+  const handleButtonClick = (key: 'top-up-balance' | 'single-payout' | 'batch-payout') => {
+    setModalOpen(true);
+
+    setModalElement(key);
+  };
   return (
     <div className="flex items-center justify-between gap-3">
       <Button
+        onClick={() => handleButtonClick('top-up-balance')}
         className="opacity-100 flex items-center bg-blue text-white h-12"
         type="primary"
         disabled={false}
@@ -19,6 +30,7 @@ const TopButtons = () => {
         </div>
       </Button>
       <Button
+        onClick={() => handleButtonClick('single-payout')}
         className="opacity-100 hover:opacity-95 font-normal bg-green-600 text-white h-12"
         type="primary"
         disabled={false}
@@ -32,6 +44,7 @@ const TopButtons = () => {
         </div>
       </Button>
       <Button
+        onClick={() => handleButtonClick('batch-payout')}
         className="opacity-100 font-normal bg-gray-800 text-white h-12"
         type="primary"
         disabled={false}
