@@ -3,13 +3,23 @@ import { numberFormat } from '@grc/_shared/helpers';
 import { Card, List, Space, Tag } from 'antd';
 import moment from 'moment';
 import Link from 'next/link';
-import React from 'react';
+import React, { Dispatch, SetStateAction } from 'react';
 
-interface Props {
+interface RecentDisbursementsProps {
   // Add your prop types here
+  setSelectedRecord: Dispatch<SetStateAction<Record<string, any>>>;
+  setOpen: Dispatch<SetStateAction<boolean>>;
 }
 
-const RecentDisbursements: React.FC<Props> = ({}) => {
+const RecentDisbursements: React.FC<RecentDisbursementsProps> = ({
+  setOpen,
+  setSelectedRecord,
+}) => {
+  const handleItemClick = (item: Record<string, any>) => {
+    setSelectedRecord(item);
+    setOpen(true);
+  };
+
   const getBatch = (record: any) => {
     let pendingFlag = 0;
     let color = '';
@@ -82,7 +92,11 @@ const RecentDisbursements: React.FC<Props> = ({}) => {
                 : 0;
 
           return (
-            <List.Item className="px-0" key={index}>
+            <List.Item
+              onClick={() => handleItemClick(item)}
+              className="px-0 cursor-pointer"
+              key={index}
+            >
               <div className="w-full flex justify-between items-center text-left p-2">
                 <List.Item.Meta
                   //   title={startCase(capitalize(item?.recipient))}

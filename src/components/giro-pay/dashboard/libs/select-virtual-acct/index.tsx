@@ -43,7 +43,7 @@ const SelectVirtualAcct = ({
 
   return (
     <Form requiredMark={false} form={form}>
-      <Form.Item className="virtual-select-form-item">
+      <Form.Item className="virtual-select-form-item font-bold">
         <Select
           style={{ ...style, width: width }}
           bordered={true}
@@ -53,10 +53,9 @@ const SelectVirtualAcct = ({
               ? JSON.stringify(pickAcctValue(accounts?.[0]))
               : 'No Virtual Account Created'
           }
-          size="small"
           loading={isLoadingAccounts}
           disabled={accounts?.length === 0}
-          className={`${className}`}
+          className={`${className} font-semibold`}
           onChange={(value) => setVAccount?.(JSON.parse(value))}
           options={options}
         />

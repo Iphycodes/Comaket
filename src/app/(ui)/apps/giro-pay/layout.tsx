@@ -55,19 +55,20 @@ const AppsBaseLayout = (props: GiroDebitPageProps) => {
       >
         <AppHeader />
         <div
-          className="flex w-full items-center justify-end px-10 border-b h-8 bg-cyan-50"
+          className="flex w-full items-center justify-end px-10 border-b h-10 bg-cyan-50"
           style={{ position: 'sticky', minHeight: '32px', top: 64, zIndex: 10 }}
         >
           <Space size={10}>
             <span className="font-thin text-[14px] text-blue">Switch Virtual Account: </span>
             <SelectVirtualAcct
+              width="500px"
               isLoadingAccounts={false}
               vAccount={{} as any}
               accounts={[
                 { accountName: 'John doe', accountNumber: '00000', bankName: 'demo' } as any,
               ]}
               setVAccount={() => {}}
-              className="virtual-select"
+              className="virtual-select font-semibold"
             />
             {/* <Select
               placeholder={'Virtual Account'}
