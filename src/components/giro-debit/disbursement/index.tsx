@@ -3,10 +3,8 @@ import { Space } from 'antd';
 import { Wallet as WalletIcon } from '@grc/_shared/assets/svgs';
 import TransactionStatisticsCard from './libs/transaction-statistics-card';
 import PieChartAnaytics from './libs/pie-chart-analytics';
-import SendMoney from './libs/send-money';
-import DisbursementHistory from './libs/disbursement-records';
-import TopUp from './libs/top-up';
 import TopButtons from './libs/top-buttons';
+import RecentDisbursements from './libs/recent-disbursement-list';
 
 const Disbursement = () => {
   const mockPayoutsData = [
@@ -14,25 +12,25 @@ const Disbursement = () => {
       color: 'green',
       title: 'Total Single Payout',
       percentage: 40,
-      value: '\u20A6200000',
+      value: 200000,
     },
     {
       color: 'rgb(30 136 229)',
       title: 'Total Batch Payout',
       percentage: 20,
-      value: '\u20A6350000',
+      value: 350000,
     },
     {
       color: '#C9DE00',
       title: 'Total Pending Payout',
       percentage: 29.5,
-      value: '\u20A655000',
+      value: 55000,
     },
     {
       color: '#B21F00',
       title: 'Total Failed Payout',
       percentage: 29.5,
-      value: '\u20A616000',
+      value: 16000,
     },
   ];
 
@@ -49,35 +47,28 @@ const Disbursement = () => {
         </div>
         <TopButtons />
       </div>
-      <div className="w-full flex flex-col gap-6">
-        {/* <SendMoney />
-        <TopUp /> */}
-        <div className="flex w-full gap-6 justify-between">
-          <div className="flex fle gap-5 justify-between flex-wrap" style={{ flex: 6 }}>
-            {mockPayoutsData.map(({ color, title, percentage, value }, idx) => {
-              return (
-                <TransactionStatisticsCard
-                  key={`${idx}`}
-                  style={{ width: '48%' }}
-                  color={color}
-                  title={title}
-                  percentage={percentage}
-                  value={value}
-                />
-              );
-            }, [])}
-          </div>
-          <div className="flex" style={{ flex: 4 }}>
-            <PieChartAnaytics />
-          </div>
+      <div className="w-full flex flex-col gap-5">
+        <div className="flex w-full gap-5 justify-between flex-wrap">
+          {mockPayoutsData.map(({ color, title, percentage, value }, idx) => {
+            return (
+              <TransactionStatisticsCard
+                key={`${idx}`}
+                style={{ flex: 1 }}
+                color={color}
+                title={title}
+                percentage={percentage}
+                value={value}
+              />
+            );
+          }, [])}
         </div>
-        <div className="flex w-full gap-6 justify-between">
-          <div className="flex flex-col gap-4" style={{ flex: 6 }}>
-            <SendMoney />
-            <TopUp />
+        <div className="w-full flex gap-5">
+          <div className="recent-disbursement" style={{ flex: 6 }}>
+            {/* <DisbursementHistory /> */}
+            <RecentDisbursements />
           </div>
-          <div className="recent-disbursement" style={{ flex: 4 }}>
-            <DisbursementHistory />
+          <div className="flex h-96" style={{ flex: 5 }}>
+            <PieChartAnaytics />
           </div>
         </div>
       </div>

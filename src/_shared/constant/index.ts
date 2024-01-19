@@ -317,7 +317,7 @@ type SingleDisbursement = {
   type: 'single';
   recipient: string;
   recipientAccount: string;
-  amount: string;
+  amount: number;
   status: 'successful' | 'pending' | 'failed';
 };
 
@@ -326,7 +326,7 @@ export type BatchDisbursement = {
   recipients: {
     recipient: string;
     recipientAccount: string;
-    amount: string;
+    amount: number;
     status: 'successful' | 'pending' | 'failed';
   }[];
 };
@@ -338,14 +338,14 @@ export const mockDisbursementRecord: DisbursementRecord[] = [
     type: 'single',
     recipient: 'Ifeanyi Ogbonna',
     recipientAccount: '0065453363',
-    amount: '\u20A62000',
+    amount: 2000,
     status: 'successful',
   },
   {
     type: 'single',
     recipient: 'Emmanuel Ogbonna',
     recipientAccount: '0065453363',
-    amount: '\u20A6100000',
+    amount: 100000,
     status: 'successful',
   },
   {
@@ -354,13 +354,13 @@ export const mockDisbursementRecord: DisbursementRecord[] = [
       {
         recipient: 'Adams Oshomole',
         recipientAccount: '3092301102',
-        amount: '\u20A62000000',
+        amount: 2000000,
         status: 'pending',
       },
       {
         recipient: 'Labaran Idris',
         recipientAccount: '3092322202',
-        amount: '\u20A610000000',
+        amount: 10000000,
         status: 'successful',
       },
     ],
@@ -369,7 +369,7 @@ export const mockDisbursementRecord: DisbursementRecord[] = [
     type: 'single',
     recipient: 'Otedola Omotola',
     recipientAccount: '0065453363',
-    amount: '\u20A6100000',
+    amount: 100000,
     status: 'successful',
   },
   {
@@ -378,13 +378,13 @@ export const mockDisbursementRecord: DisbursementRecord[] = [
       {
         recipient: 'Adams Oshomole',
         recipientAccount: '3092301102',
-        amount: '\u20A62000000',
+        amount: 2000000,
         status: 'failed',
       },
       {
         recipient: 'Labaran Idris',
         recipientAccount: '3092322202',
-        amount: '\u20A610000000',
+        amount: 10000000,
         status: 'successful',
       },
     ],

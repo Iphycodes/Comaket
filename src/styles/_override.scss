@@ -176,7 +176,7 @@
 .recent-disburseent-card,
 .piechart-card {
   .ant-card-body {
-    padding: 10px 20px !important;
+    padding: 10px 0 !important;
   }
 }
 
@@ -187,9 +187,10 @@
 }
 
 canvas.disbursement-pie {
-  width: 200px !important;
-  height: 200px !important;
-  .virtual-select-form-item.ant-form-item {
-    margin: 0 !important;
-  }
+  width: 300px !important;
+  height: 300px !important;
+}
+
+.virtual-select-form-item.ant-form-item {
+  margin: 0 !important;
 }

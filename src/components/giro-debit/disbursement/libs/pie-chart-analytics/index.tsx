@@ -19,13 +19,13 @@ const PieChartAnaytics = () => {
         options={{
           responsive: true,
           plugins: {
-            // legend: {
-            //   position: 'bottom',
-            //   align: 'center',
-            // },
             legend: {
-              display: false, // Hide legend
+              position: 'bottom',
+              align: 'center',
             },
+            // legend: {
+            //   display: false, // Hide legend
+            // },
           },
 
           animation: {

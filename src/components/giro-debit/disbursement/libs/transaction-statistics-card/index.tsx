@@ -1,11 +1,12 @@
 'use client';
 
+import { formatNumber } from '@grc/_shared/helpers';
 import { Card } from 'antd';
 import Circle from 'react-circle';
 
 interface TransactionStatisticsCardProps {
   title?: string;
-  value?: any;
+  value?: number;
   percentage?: number;
   key?: string;
   style?: React.CSSProperties;
@@ -22,7 +23,7 @@ const TransactionStatisticsCard = (props: TransactionStatisticsCardProps) => {
         <div className="flex justify-between items-center">
           <div className="flex flex-col gap-0">
             <span className="amount font-semibold text-[32px] text-gray-600">
-              {value ?? '\u20A60.00'}
+              {`\u20A6${formatNumber(value ?? 0.0, 0)}` ?? '\u20A60.00'}
             </span>
             <span className="text-blue">view details</span>
           </div>

@@ -43,21 +43,21 @@ const Transactions = () => {
           color={'green'}
           title={'Total Successful Disbursements'}
           percentage={50}
-          value={'\u20A650000'}
+          value={50000}
         />
         <TransactionStatisticsCard
           style={{ flex: 2 }}
           color={'yellow'}
           title={'Total Pending Disbursements'}
           percentage={30}
-          value={'\u20A620000'}
+          value={20000}
         />
         <TransactionStatisticsCard
           style={{ flex: 2 }}
           color={'red'}
           title={'Total Failed Disbursements'}
           percentage={20}
-          value={'\u20A65000'}
+          value={5000}
         />{' '}
       </div>
       <div className="w-full flex gap-3 items-center justify-end">
