@@ -195,6 +195,16 @@ canvas.disbursement-pie {
 
 .disbursement-modal {
   .ant-modal-content {
-    padding-top: 40px;
+    padding-top: 30px;
   }
 }
+
+.single-payout-form {
+  .ant-form-item {
+    margin-bottom: 12px !important;
+  }
+}
+
+// .amount-inp{
+//   margin-bottom: 12px !important;
+// }
