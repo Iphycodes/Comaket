@@ -36,18 +36,18 @@
   }
 }
 
-  .business-register-form,
-  .update-profile-details-form,
-  .update-business-profile-form {
-    .ant-select-selector,
-    .ant-select-in-form-item,
-    .ant-select-selection-item {
-      height: 3.5rem !important;
-      overflow: hidden;
-      display: flex;
-      align-items: center !important;
-    }
-  };
+.business-register-form,
+.update-profile-details-form,
+.update-business-profile-form {
+  .ant-select-selector,
+  .ant-select-in-form-item,
+  .ant-select-selection-item {
+    height: 3.5rem !important;
+    overflow: hidden;
+    display: flex;
+    align-items: center !important;
+  }
+}
 
 .select-virtual-account {
   .ant-select-selector,
@@ -191,4 +191,10 @@ canvas.disbursement-pie {
 
 .virtual-select-form-item.ant-form-item {
   margin: 0 !important;
+}
+
+.disbursement-modal {
+  .ant-modal-content {
+    padding-top: 40px;
+  }
 }

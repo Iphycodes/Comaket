@@ -87,7 +87,13 @@ const Disbursement = () => {
         </div>
       </div>
       <DisbursementDrawer open={open} setOpen={setOpen} selectedRecord={selectedRecord} />
-      <Modal title={``} open={modalOpen} onCancel={() => setModalOpen(false)} footer={null}>
+      <Modal
+        className="disbursement-modal"
+        title={``}
+        open={modalOpen}
+        onCancel={() => setModalOpen(false)}
+        footer={null}
+      >
         {modalElement === 'top-up-balance' && <TopUpBalance />}
         {modalElement === 'single-payout' && <SinglePayout />}
         {modalElement === 'batch-payout' && <BatchPayout />}
