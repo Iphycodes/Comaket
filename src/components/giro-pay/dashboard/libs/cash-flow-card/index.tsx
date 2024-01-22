@@ -1,27 +1,43 @@
 'use client';
 import { formatNumber, numberFormat } from '@grc/_shared/helpers';
 import React from 'react';
-import { ArrowLeftDownIcon, ArrowRightUpIcon } from '@grc/_shared/assets/svgs';
+import { ArrowLeftDownIcon, ArrowRightUpIcon, CoinIcon } from '@grc/_shared/assets/svgs';
 import { capitalize, startCase } from 'lodash';
 
 type CashFlowCardProps = {
   type: string;
   amount: number;
-  count: number;
+  count?: number;
 };
 
 export const CashFlowCard = ({ type, amount, count }: CashFlowCardProps) => {
+  const handleCardIcon = (type: string) => {
+    switch (type.toLowerCase()) {
+      case 'income':
+        return <ArrowLeftDownIcon />;
+
+      case 'disbursements':
+        return <ArrowRightUpIcon />;
+
+      default:
+        return <CoinIcon />;
+    }
+  };
   return (
-    <div className="flex flex-col border shadow-sm hover:shadow-md  shadow-gray-100 rounded-xl p-5">
+    <div className="dark:bg-zinc-800 flex flex-col border dark:border-gray-500 shadow-md hover:border-cyan-100 text-card-foreground rounded-xl p-5">
       <div className="flex justify-between items-center py-1">
-        <span className="font-medium text-gray-500">{startCase(capitalize(type))}</span>
-        <span>
-          {type.toLowerCase() === 'income' ? <ArrowLeftDownIcon /> : <ArrowRightUpIcon />}
-        </span>
+        <h3 className="font-medium text-sm tracking-tight">{startCase(capitalize(type))}</h3>
+        <span>{handleCardIcon(type)}</span>
       </div>
-      <div className="font-semibold text-xl text-black">{numberFormat(amount / 100, '₦ ')}</div>
-      <div className="font-semibold text-sm text-black py-2">
-        {formatNumber(count, 1)} Transactions
+      <div className="font-bold text-2xl text-black dark:text-white">
+        {numberFormat(amount / 100, '₦ ')}
+      </div>
+      <div className="text-sm text-muted-foreground py-2">
+        {['income', 'disbursements'].includes(type) ? (
+          <span>{formatNumber(count ?? 0, 1)} Transactions</span>
+        ) : (
+          <span>{count} Days to deduction</span>
+        )}
       </div>
     </div>
   );

@@ -29,7 +29,7 @@ export const ApiKeysAndWebhooksUrl = (props: ApiKeysAndWebhooksUrlProps) => {
       transition={{ type: 'ease-in-out', duration: 0.4 }}
     >
       <section className=" w-4/5 mt-10 mx-auto">
-        <Card className="shadow-sm hover:border shadow-gray-300">
+        <Card className="dark:bg-zinc-800 text-card-foreground border dark:border-gray-500 shadow-md">
           <Form
             form={form}
             layout="vertical"
@@ -49,7 +49,7 @@ export const ApiKeysAndWebhooksUrl = (props: ApiKeysAndWebhooksUrlProps) => {
               <Col className="flex items-center justify-center text-xs">
                 <div className={'flex items-center justify-center'}>
                   <CopyIcon className=" scale-75" />
-                  <span>Copy</span>
+                  <span className=" text-card-foreground">Copy</span>
                 </div>
               </Col>
             </Row>
@@ -75,7 +75,7 @@ export const ApiKeysAndWebhooksUrl = (props: ApiKeysAndWebhooksUrlProps) => {
               <Col className="flex items-center justify-center text-xs">
                 <div className={'flex items-center justify-center'}>
                   <CopyIcon className=" scale-75" />
-                  <span>Copy</span>
+                  <span className=" text-card-foreground">Copy</span>
                 </div>
               </Col>
             </Row>

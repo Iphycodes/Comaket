@@ -1,7 +1,8 @@
 'use client';
 import React from 'react';
-import { Button, Card, Col, Form, Row, Switch, TimePicker } from 'antd';
+import { Button, Card, Col, DatePicker, Form, Row, Switch, TimePicker } from 'antd';
 import { motion } from 'framer-motion';
+import dayjs from 'dayjs';
 
 type AccountSettingProps = {
   mobileResponsive?: boolean;
@@ -13,6 +14,11 @@ type AccountSettingProps = {
 export const AccountSetting = (props: AccountSettingProps) => {
   const { handleUpdateAccountSetting, isAccountSettingLoading } = props;
   const [form] = Form.useForm();
+
+  const defaultDate = dayjs().date(28);
+  const initialValues = {
+    deductionDate: defaultDate,
+  };
 
   const onFinish = (values: Record<string, any>) => {
     handleUpdateAccountSetting(values);
@@ -26,7 +32,7 @@ export const AccountSetting = (props: AccountSettingProps) => {
       transition={{ type: 'ease-in-out', duration: 0.4 }}
     >
       <section className=" w-4/5 mt-10 mx-auto">
-        <Card className="shadow-sm hover:border shadow-gray-300">
+        <Card className="dark:bg-zinc-800 text-card-foreground border dark:border-gray-500 shadow-md">
           <Form
             form={form}
             layout="vertical"
@@ -34,9 +40,27 @@ export const AccountSetting = (props: AccountSettingProps) => {
             onFinish={(value) => {
               onFinish(value);
             }}
+            initialValues={initialValues}
             name="account-setting-form"
             className="mt-5 account-setting-form"
           >
+            <Row gutter={[16, 16]} className="flex items center justify-center">
+              <Col md={14} xs={24}>
+                <Form.Item
+                  name="deductionDate"
+                  rules={[
+                    { required: true, message: 'Enter accrued service charge deduction date' },
+                  ]}
+                  label={<span>Accrued Service Charge Deduction Date</span>}
+                >
+                  <DatePicker
+                    className="w-full h-14"
+                    disabledDate={(currentDate) => currentDate && currentDate.date() > 28}
+                    showToday={false}
+                  />
+                </Form.Item>
+              </Col>
+            </Row>
             <Row gutter={[16, 16]} className="flex items center justify-center">
               <Col md={14} xs={24}>
                 <Form.Item

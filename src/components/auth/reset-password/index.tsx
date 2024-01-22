@@ -39,7 +39,7 @@ const ResetPassword = (props: ResetPasswordProps) => {
     >
       <div className="w-full">
         <header className="text-left text-3xl font-bold text-blue pb-3">Reset Password</header>
-        <span className="text-gray-400">
+        <span className="text-muted-foreground">
           Enter the OTP sent to your email address and reset your password
         </span>
 
@@ -130,7 +130,7 @@ const ResetPassword = (props: ResetPasswordProps) => {
           </Button>
 
           <div className="flex justify-center mt-5 items-center">
-            {"Didn't get the email? "}{' '}
+            <span className=" dark:text-white">Didn't get the email? </span>
             <Button
               className="font-semibold py-1 px-1.5 text-blue"
               type="text"
@@ -141,7 +141,7 @@ const ResetPassword = (props: ResetPasswordProps) => {
             </Button>
           </div>
 
-          <div className="flex justify-center mt-5">
+          <div className="flex justify-center mt-5 dark:text-white">
             <Link href="/auth/login">&larr; Back to log in</Link>
           </div>
         </Form>

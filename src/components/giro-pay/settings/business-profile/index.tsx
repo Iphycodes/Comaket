@@ -26,7 +26,7 @@ export const BusinessProfile = (props: BusinessProfileProps) => {
       transition={{ type: 'ease-in-out', duration: 0.4 }}
     >
       <section className=" w-4/5 mt-10 mx-auto">
-        <Card className="shadow-sm hover:border shadow-gray-300">
+        <Card className="dark:bg-zinc-800 text-card-foreground border dark:border-gray-500 shadow-md">
           <Form
             form={form}
             layout="vertical"

@@ -37,7 +37,7 @@ const Register = (props: RegisterProps) => {
     >
       <div className="w-full mb-10">
         <header className="text-left text-3xl font-bold text-blue pb-3">Register</header>
-        <span className="text-gray-400">Fill out the details below to register</span>
+        <span className="text-muted-foreground">Fill out the details below to register</span>
         {/* {
           error as string && <h3 className='my-7'>
             <Alert type="error" message={error} showIcon closable={false}></Alert>
@@ -195,26 +195,20 @@ const Register = (props: RegisterProps) => {
                   },
                 ]}
               >
-                <Checkbox>
+                <Checkbox className="dark:text-white">
                   {' '}
                   By clicking <b>Create Account</b> you agree to Giro’s{' '}
-                  <u>
-                    <Link href="#" className="text-sky-950">
-                      Terms & Conditions
-                    </Link>
-                  </u>
+                  <Link href="#" className="text-sky-950 underline hover:no-underline">
+                    Terms & Conditions
+                  </Link>
                   , <br />
-                  <u>
-                    <Link href="#" className="text-sky-950">
-                      Privacy Policy
-                    </Link>
-                  </u>{' '}
-                  &{' '}
-                  <u>
-                    <Link href="#" className="text-sky-950">
-                      License agreement
-                    </Link>
-                  </u>{' '}
+                  <Link href="#" className="text-sky-950 underline hover:no-underline">
+                    Privacy Policy
+                  </Link>{' '}
+                  &nbsp; &{' '}
+                  <Link href="#" className="text-sky-950 underline hover:no-underline">
+                    License agreement
+                  </Link>{' '}
                 </Checkbox>
               </Form.Item>
             </Col>

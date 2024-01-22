@@ -23,7 +23,7 @@ const AppsBaseLayout = (props: GiroDebitPageProps) => {
     <Layout hasSider={true}>
       <SettingsSideNav items={appNav.settingsMenuItems} />
       <Layout
-        className="body-layout"
+        className="body-layout bg-background"
         style={{
           position: 'relative',
           zIndex: 0,
@@ -35,7 +35,7 @@ const AppsBaseLayout = (props: GiroDebitPageProps) => {
       >
         <AppHeader />
         <Content className="main-content">
-          <div className="bg-gray-50" style={{ padding: 40, minHeight: '100vh' }}>
+          <div className="bg-background px-10 pb-10" style={{ padding: 0, minHeight: '100vh' }}>
             {children}
           </div>
         </Content>

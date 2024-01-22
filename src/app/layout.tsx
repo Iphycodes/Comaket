@@ -4,6 +4,7 @@ import 'remixicon/fonts/remixicon.css';
 import React, { ReactElement } from 'react';
 import type { Metadata } from 'next';
 import { Nunito } from 'next/font/google';
+import { ThemeProvider } from '@grc/_shared/components/theme-provider';
 
 const nunito = Nunito({
   subsets: ['latin'],
@@ -24,7 +25,14 @@ export default function RootLayout({ children }: LayoutProps) {
   return (
     <html lang="en">
       <body className={nunito.className} suppressHydrationWarning={true}>
-        {children}
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+        >
+          {children}
+        </ThemeProvider>
       </body>
     </html>
   );

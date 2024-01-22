@@ -21,15 +21,13 @@ export const EmptyVirtualAccount = ({
         <EmptyIcon />
       </div>
       <div className="flex flex-col mt-[2px]">
-        <span className="px-5 py-1 text-center">Your list of virtual accounts is empty</span>
-        <span className="px-5 py-1 text-center font-semibold text-lg">
-          What is a virtual account?
-        </span>
+        <span className="px-5 py-1 text-center">Your list of wallets is empty</span>
+        <span className="px-5 py-1 text-center font-semibold text-lg">What is a wallet?</span>
         <span className="px-5 py-1 text-center leading-6">
-          A virtual accounts allows you embark on seamless financial transactions with our
-          cutting-edge Giro Pay platform! <br />
-          Unlock the power of secure fund transfers and effortless payments by establishing your
-          very own virtual account.
+          A wallet allows you embark on seamless financial transactions with our cutting-edge Giro
+          Pay platform! <br />
+          Unlock the power of secure fund transfers and effortless payments by creating your very
+          own wallet.
           <br /> Elevate your financial experience today
           {isVerified ? (
             <span>.</span>
@@ -44,7 +42,7 @@ export const EmptyVirtualAccount = ({
             className=" py-6 px-10 opacity-100 hover:opacity-70 mt-4 bg-blue text-white rounded-lg flex items-center cursor-pointer"
             onClick={() => (isVerified ? handleCreateVirtualAccount() : push('settings'))}
           >
-            {isVerified ? 'Create A Virtual Account' : 'Verify Profile'}
+            {isVerified ? 'Create A Wallet' : 'Verify Profile'}
           </Button>
         </div>
       </div>
