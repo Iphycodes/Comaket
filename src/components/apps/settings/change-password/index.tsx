@@ -34,7 +34,8 @@ export const ChangePassword = (props: ChangePasswordProps) => {
       transition={{ type: 'ease-in-out', duration: 0.4 }}
     >
       <section className={`${isDashboard ? 'mt-0' : 'w-4/5 mt-10'} mx-auto`}>
-        <Card className="shadow-sm hover:border shadow-gray-300">
+        <div className="my-5 font-bold text-lg">Change Password</div>
+        <Card className="dark:bg-zinc-800 text-card-foreground border dark:border-gray-500 shadow-md mt-10">
           <Form
             form={form}
             layout="vertical"

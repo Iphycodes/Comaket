@@ -14,6 +14,8 @@ import { useRouter } from 'next/navigation';
 import { getFirstCharacter, getRandomColorByString } from '@grc/_shared/helpers';
 import * as _ from 'lodash';
 import { UserOutlined, LogoutOutlined } from '@ant-design/icons';
+import { PasswordIcon } from '@grc/_shared/assets/svgs';
+import { useTheme } from 'next-themes';
 
 const { Header } = Layout;
 
@@ -26,12 +28,12 @@ export const AppHeader = (props: AppHeaderProps) => {
   const isMobile = useMediaQuery(mediaSize.mobile);
   const pathname = usePathname();
   const pathUrl = pathname?.split('/');
-  const theme = 'light';
   const currentPath = `${pathUrl?.[3]}`?.toUpperCase() ?? '';
   const isAppSettingsPath = pathUrl?.[2]?.toLowerCase() === 'settings';
   const { authData } = useContext(AppContext);
   const router = useRouter();
   const { handleLogOut } = useContext(AppContext);
+  const { setTheme, theme } = useTheme();
 
   const handleMenuClick = (key: string) => {
     if (key === 'logout') {
@@ -39,6 +41,8 @@ export const AppHeader = (props: AppHeaderProps) => {
       router.push('/auth/login');
     } else if (key === 'my-profile') {
       router.push('/apps/settings/profile-details');
+    } else if (key === 'change-password') {
+      router.push('/apps/settings/change-password');
     }
   };
 
@@ -46,15 +50,27 @@ export const AppHeader = (props: AppHeaderProps) => {
     return (
       <div>
         {!isAppSettingsPath && (
-          <div
-            className="cursor-pointer rounded-sm px-3 py-1 hover:bg-gray-100"
-            onClick={() => handleMenuClick('my-profile')}
-          >
-            <Space className="p-1" size={15}>
-              <UserOutlined />
-              <span>My Profile</span>
-            </Space>
-          </div>
+          <>
+            <div
+              className="cursor-pointer rounded-sm px-3 py-1 hover:bg-gray-100"
+              onClick={() => handleMenuClick('my-profile')}
+            >
+              <Space className="p-1" size={15}>
+                <UserOutlined />
+                <span>My Profile</span>
+              </Space>
+            </div>
+
+            <div
+              className="cursor-pointer rounded-sm px-3 py-1 hover:bg-gray-100"
+              onClick={() => handleMenuClick('change-password')}
+            >
+              <Space className="p-1" size={15}>
+                <PasswordIcon />
+                <span>Change Password</span>
+              </Space>
+            </div>
+          </>
         )}
 
         <div
@@ -72,7 +88,7 @@ export const AppHeader = (props: AppHeaderProps) => {
 
   return (
     <Header
-      className="layout-header shadow-sm"
+      className="layout-header shadow-sm border-b border-border/100 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:text-white"
       style={{
         position: 'sticky',
         top: 0,
@@ -80,18 +96,24 @@ export const AppHeader = (props: AppHeaderProps) => {
         display: 'flex',
         alignItems: 'center',
         padding: `${isMobile ? '10px' : '0 40px'}`,
-        backgroundColor: '#ffffff',
-        borderBottom: '1px solid #F3F3F3',
         zIndex: 100,
       }}
     >
-      <div className="flex justify-between items-center min-w-full bg-white">
+      <div className="flex justify-between items-center min-w-full dark:text-white">
         {(pathUrl ?? [])?.length <= 2 ? (
           <span className=" cursor-pointer" onClick={() => router.push('/apps')}>
             <Image src={'/assets/svgs/giro-logo.svg'} alt="giro-logo" width={120} height={50} />
           </span>
         ) : isAppSettingsPath ? (
-          <span className="font-bold text-3">Settings</span>
+          <div className="font-bold text-3">
+            <span
+              className=" text-muted-foreground mr-8 cursor-pointer"
+              onClick={() => router.back()}
+            >
+              &larr; Back
+            </span>{' '}
+            <span className="">Settings </span>
+          </div>
         ) : (
           <span className="font-bold text-3">{`${currentPath}`}</span>
         )}
@@ -100,7 +122,7 @@ export const AppHeader = (props: AppHeaderProps) => {
             <>
               {' '}
               <div className="flex gap-2 items-center">
-                <Switch className="live-mode-switch" style={{ color: 'green' }} size="small" />
+                <Switch className="live-mode-switch" size="small" />
                 <span className="font-bold">Live mode</span>
               </div>
               <Link className="underline" href={'/'}>
@@ -113,7 +135,11 @@ export const AppHeader = (props: AppHeaderProps) => {
           )}
 
           <span className="cursor-pointer">
-            {theme === 'light' ? <RiMoonFill size={20} /> : <HiOutlineLightBulb size={20} />}
+            {theme === 'light' ? (
+              <HiOutlineLightBulb size={20} onClick={() => setTheme('dark')} />
+            ) : (
+              <RiMoonFill size={20} onClick={() => setTheme('light')} />
+            )}
           </span>
 
           <Popover

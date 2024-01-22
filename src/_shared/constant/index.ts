@@ -327,9 +327,9 @@ export const mockTransactionAnalyticsData2 = {
     {
       label: 'My First Dataset',
       data: [65, 59, 80, 81, 56, 55, 40],
-      backgroundColor: 'rgba(0, 128, 0, 0.2)',
-      borderColor: 'rgba(0, 128, 0, 1)',
-      borderWidth: 1,
+      backgroundColor: 'rgba(30, 136, 229, 1)',
+      borderColor: 'rgba(30, 136, 229, 0.2)',
+      borderWidth: 2,
       // barThickness: 70,
     },
   ],
@@ -358,8 +358,8 @@ export const smoothLineChartData = {
       label: '',
       data: [50, 60, 55, 73, 65, 90, 75],
       fill: true,
-      backgroundColor: 'rgba(75, 192, 192, 0.2)',
-      borderColor: 'rgba(75, 192, 192, 1)',
+      backgroundColor: 'rgba(30, 136, 229, 0.2)',
+      borderColor: 'rgba(30, 136, 229, 1)',
       borderWidth: 2,
     },
   ],
@@ -367,10 +367,10 @@ export const smoothLineChartData = {
 
 export const CashFlowAnalytics = [
   { type: 'income', amount: 9000000, count: 60200 },
-  { type: 'spendings', amount: 7500000, count: 40 },
+  { type: 'disbursements', amount: 7500000, count: 40 },
 ];
-export const MockVirtualAccounts = [];
-// export const MockVirtualAccounts: any = [
-//   { id: '001', accountName: 'The 30th Concept', accountNumber: '004002001', amount: 3300000000 },
-//   { id: '002', accountName: 'Jay Doe Biz', accountNumber: '004002003', amount: 52000000 },
-// ];
+// export const MockVirtualAccounts = [];
+export const MockVirtualAccounts: any = [
+  { id: '001', accountName: 'The 30th Concept', accountNumber: '004002001', amount: 3300000000 },
+  { id: '002', accountName: 'Jay Doe Biz', accountNumber: '004002003', amount: 52000000 },
+];

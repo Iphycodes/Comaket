@@ -31,7 +31,7 @@ const VerifyEmail = (props: VerifyEmailProps) => {
     >
       <div className="w-full">
         <header className="text-left text-3xl font-bold text-blue pb-3">Email Verification</header>
-        <span className="text-gray-400">
+        <span className=" text-muted-foreground">
           We have sent a verification code to your registered email address ({email ?? ''})
         </span>
         {/* 
@@ -60,7 +60,7 @@ const VerifyEmail = (props: VerifyEmailProps) => {
         </div>
 
         <div className="flex justify-center mt-5 items-center">
-          {"Didn't get the email? "}{' '}
+          <span className="dark:text-white">Didn't get the email</span>
           <Button
             className="font-semibold py-1 px-1.5 text-blue"
             type="link"

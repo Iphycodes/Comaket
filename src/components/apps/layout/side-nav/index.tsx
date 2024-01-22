@@ -24,18 +24,21 @@ export const SettingsSideNav = (props: SettingsSideNavProps) => {
   const urlPath = pathname?.split('/');
 
   const handleMenuClick = ({ key }: { key: React.Key | string }) => {
-    router.push(`/apps/settings/${key}`);
+    if (key === 'apps') {
+      router.push(`/apps`);
+    } else {
+      router.push(`/apps/settings/${key}`);
+    }
   };
 
   return (
     <Sider
       collapsed={false}
       collapsedWidth={isMobile ? 0 : 80}
-      className="text-lg"
+      className="dash-sider text-lg shadow-sm border-r border-border/100"
       width={250}
       style={{
         overflow: 'auto',
-        backgroundColor: '#F3F3F3',
         position: 'fixed',
         padding: '0',
         height: '100vh',
@@ -49,11 +52,9 @@ export const SettingsSideNav = (props: SettingsSideNavProps) => {
     >
       <AppSettingsSiderHeader collapsed={collapse} setCollapsed={setCollapse} />
       <Menu
-        className="sider-menu mt-10"
+        className="sider-menu mt-10 text-card-foreground"
         style={{
           fontSize: '16px',
-          backgroundColor: '#F3F3F3',
-          color: '#666666',
         }}
         mode="inline"
         items={items}

@@ -5,7 +5,7 @@ import Image from 'next/image';
 
 type LoginProps = {
   mobileResponsive: boolean;
-  theme: string;
+  theme: string | undefined;
 };
 
 type GiroSystemsProps = {
@@ -47,7 +47,7 @@ const Apps = (props: LoginProps) => {
               <Fragment key={idx}>
                 <div
                   key={idx}
-                  className="h-40 w-48 rounded-lg shadow-md hover:border hover:border-cyan-100 shadow-gray-200 hover:shadow-cyan-200 relative flex justify-center items-center cursor-pointer"
+                  className="h-40 w-48 rounded-lg dark:bg-zinc-800 shadow-md hover:border hover:border-cyan-100 shadow-gray-200 hover:shadow-cyan-200 relative flex justify-center items-center cursor-pointer"
                   onClick={() => {
                     if (url == '/apps/giro-mandate') {
                       return;

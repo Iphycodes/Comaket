@@ -40,15 +40,10 @@ export const SideNav = (props: SideNavProps) => {
     <Sider
       collapsed={false}
       collapsedWidth={isMobile ? 0 : 80}
-      className="dash-sider text-lg"
+      className="dash-sider text-lg shadow-sm border-r border-border/100"
       width={250}
-      //   theme={'light'}
       style={{
         overflow: 'auto',
-        //   transform: `translateX(${
-        //     (isMobile || isTablet) && collapse ? "-100%" : "0"
-        //   })`,
-        backgroundColor: '#F3F3F3',
         position: 'fixed',
         padding: '0',
         height: '100vh',
@@ -67,11 +62,9 @@ export const SideNav = (props: SideNavProps) => {
         setCollapsed={setCollapse}
       />
       <Menu
-        className="sider-menu"
+        className="sider-menu text-card-foreground"
         style={{
           fontSize: '16px',
-          backgroundColor: '#F3F3F3',
-          color: '#666666',
         }}
         mode="inline"
         items={items}
