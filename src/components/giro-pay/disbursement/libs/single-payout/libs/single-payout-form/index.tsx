@@ -1,4 +1,4 @@
-import { Button, Col, Form, Input, InputNumber, Row, Select, Space } from 'antd';
+import { Button, Col, Form, Input, InputNumber, Row, Select } from 'antd';
 import React from 'react';
 
 export interface IBanks {
@@ -9,33 +9,36 @@ export interface IBanks {
 
 interface SinglePayoutFormProps {
   banks?: IBanks[];
-  handleSetPaymentDetails?: () => void;
+  handleSetPaymentDetails: (details: Record<string, any>) => void;
+  handleSetSinglePayoutSteps: (steps: 'step1' | 'step2' | 'step3' | 'step4') => void;
 }
 
-const SinglePayoutForm = ({ banks }: SinglePayoutFormProps) => {
-  const banksOptions = banks?.map(({ name, bankCode }) => ({
-    Label: (
-      <div style={{ background: 'var(--bg-secondary)' }}>
-        {name} - ({bankCode})
-      </div>
-    ),
-    value: `${name}-${bankCode}`,
-  }));
+const SinglePayoutForm = ({
+  handleSetPaymentDetails,
+  handleSetSinglePayoutSteps,
+}: SinglePayoutFormProps) => {
+  // const banksOptions = banks?.map(({ name, bankCode }) => ({
+  //   Label: (
+  //     <div style={{ background: 'var(--bg-secondary)' }}>
+  //       {name} - ({bankCode})
+  //     </div>
+  //   ),
+  //   value: `${name}-${bankCode}`,
+  // }));
+
+  const banksOptions = [
+    { value: 'Sterling Bank', label: 'Sterling Bank' },
+    { value: 'Keystone Bank', label: 'Keystone Bank' },
+    { value: 'GT Bank', label: 'GT Bank' },
+  ];
+
+  const handleSubmit = (details: Record<string, any>) => {
+    handleSetPaymentDetails(details);
+    handleSetSinglePayoutSteps('step2');
+  };
 
   return (
     <div className="max-h-[450px] overflow-y-scroll">
-      <div className="flex sticky top-0 bg-white z-10 items-center border-b-2 pb-2">
-        <Space className="" size={10}>
-          <span
-            className="text-[16px] flex justify-center items-center h-12 w-12 bg-blue"
-            style={{ borderRadius: '50%' }}
-          >
-            <i className="ri-send-plane-fill text-white text-[18px]"></i>{' '}
-          </span>
-          <span className="font-bold text-[20px]">Single Payout</span>
-        </Space>
-      </div>
-
       <Row className="py-5" style={{}}>
         <Col span={24} className="beneficiary-form">
           <div className="mb-0 text-gray-500">Select Saved Beneficiary</div>
@@ -55,6 +58,7 @@ const SinglePayoutForm = ({ banks }: SinglePayoutFormProps) => {
         className={''}
         data-testid={'dti_form'}
         initialValues={{ saveBeneficiary: false }}
+        onFinish={handleSubmit}
       >
         <Row className="my-0">
           <Col className="my-0" lg={24} xs={24}>
@@ -79,7 +83,7 @@ const SinglePayoutForm = ({ banks }: SinglePayoutFormProps) => {
           <Col lg={24} xs={24}>
             <div className="mb-0 text-gray-500">Bank</div>
             <Form.Item
-              name="bankName"
+              name="reciepient-bank"
               className="mb-3"
               rules={[{ required: true, message: 'Input bank name' }]}
             >
@@ -97,7 +101,7 @@ const SinglePayoutForm = ({ banks }: SinglePayoutFormProps) => {
           <Col className="my-0" lg={24} xs={24}>
             <div className="mb-0 text-gray-500">{`Account Number`}</div>
             <Form.Item
-              name="acct-number"
+              name="account-number"
               className="amount-inp mb-3"
               rules={[{ required: true, message: 'Input Account number' }]}
             >
@@ -113,8 +117,8 @@ const SinglePayoutForm = ({ banks }: SinglePayoutFormProps) => {
         <Row className="my-0">
           <Col className="my-0" lg={24} xs={24}>
             <div className="mb-0 text-gray-500">{`Account Name`}</div>
-            <Form.Item name="acct-number" className="amount-inp mb-3">
-              <Input className="w-full" size="large" disabled />
+            <Form.Item name="name" className="amount-inp mb-3">
+              <Input className="w-full" size="large" />
             </Form.Item>
           </Col>
         </Row>

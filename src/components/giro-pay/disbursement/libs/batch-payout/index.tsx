@@ -12,7 +12,7 @@ const BatchPayout = () => {
   const [batchReciepientsData, setBatchReciepientsData] = useState<ReciepientsDataType[]>([]);
   const [isAddState, setIsAddState] = useState<boolean>(false);
   const [isDone, setIsDone] = useState<boolean>(false);
-  const [steps, setSteps] = useState<'step1' | 'step2' | 'step3' | 'step4'>('step1');
+  const [steps, setSteps] = useState<'step1' | 'step2' | 'step3' | 'step4' | 'step5'>('step1');
   const [currentBatch, setCurrentBatch] = useState<Record<string, any>>({});
 
   const handleAddBatchReciepient = (reciepient: ReciepientsDataType) => {
@@ -25,6 +25,7 @@ const BatchPayout = () => {
 
   const handleConfirmPayment = () => {
     setIsDone(true);
+    setSteps('step5');
   };
 
   const handleSetCurrentBatch = (currentBatchItem: Record<string, any>) => {
@@ -33,7 +34,7 @@ const BatchPayout = () => {
     console.log('currentbatch.....................', currentBatchItem);
   };
 
-  const handleSetSteps = (steps: 'step1' | 'step2' | 'step3' | 'step4') => {
+  const handleSetSteps = (steps: 'step1' | 'step2' | 'step3' | 'step4' | 'step5') => {
     setSteps(steps);
   };
 
@@ -70,7 +71,7 @@ const BatchPayout = () => {
           {steps === 'step3' && (
             <CreateBatchSuccess
               batchName={`${currentBatch?.batchName ?? ''}`}
-              handleSetSteps={(steps: 'step1' | 'step2' | 'step3' | 'step4') =>
+              handleSetSteps={(steps: 'step1' | 'step2' | 'step3' | 'step4' | 'step5') =>
                 handleSetSteps(steps)
               }
             />
@@ -163,6 +164,11 @@ const BatchPayout = () => {
               )}
             </>
           )}
+          {/* {
+            steps === 'step5' && (
+              <ConfirmPayout/>
+            )
+          } */}
         </>
       )}
     </div>

@@ -3,7 +3,7 @@ import React from 'react';
 
 interface Props {
   batchName: string;
-  handleSetSteps: (steps: 'step1' | 'step2' | 'step3' | 'step4') => void;
+  handleSetSteps: (steps: 'step1' | 'step2' | 'step3' | 'step4' | 'step5') => void;
 }
 
 const CreateBatchSuccess: React.FC<Props> = ({ batchName, handleSetSteps }) => {
