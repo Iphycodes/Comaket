@@ -52,7 +52,7 @@ export const AppHeader = (props: AppHeaderProps) => {
         {!isAppSettingsPath && (
           <>
             <div
-              className="cursor-pointer rounded-sm px-3 py-1 hover:bg-gray-100"
+              className="cursor-pointer rounded-sm px-3 py-1 hover:bg-gray-100 dark:hover:bg-zinc-400"
               onClick={() => handleMenuClick('my-profile')}
             >
               <Space className="p-1" size={15}>
@@ -62,7 +62,7 @@ export const AppHeader = (props: AppHeaderProps) => {
             </div>
 
             <div
-              className="cursor-pointer rounded-sm px-3 py-1 hover:bg-gray-100"
+              className="cursor-pointer rounded-sm px-3 py-1 hover:bg-gray-100 dark:hover:bg-zinc-400"
               onClick={() => handleMenuClick('change-password')}
             >
               <Space className="p-1" size={15}>
@@ -74,7 +74,7 @@ export const AppHeader = (props: AppHeaderProps) => {
         )}
 
         <div
-          className="cursor-pointer rounded-sm px-3 py-1 hover:bg-gray-100"
+          className="cursor-pointer rounded-sm px-3 py-1 hover:bg-gray-100 dark:hover:bg-zinc-400"
           onClick={() => handleMenuClick('logout')}
         >
           <Space className="p-1" size={15}>
@@ -102,7 +102,12 @@ export const AppHeader = (props: AppHeaderProps) => {
       <div className="flex justify-between items-center min-w-full dark:text-white">
         {(pathUrl ?? [])?.length <= 2 ? (
           <span className=" cursor-pointer" onClick={() => router.push('/apps')}>
-            <Image src={'/assets/svgs/giro-logo.svg'} alt="giro-logo" width={120} height={50} />
+            <Image
+              src={`/assets/svgs/${theme === 'light' ? 'giro-logo' : 'giro-logo'}.svg`}
+              alt="giro-logo"
+              width={120}
+              height={50}
+            />
           </span>
         ) : isAppSettingsPath ? (
           <div className="font-bold text-3">

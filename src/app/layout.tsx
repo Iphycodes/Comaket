@@ -27,7 +27,7 @@ export default function RootLayout({ children }: LayoutProps) {
       <body className={nunito.className} suppressHydrationWarning={true}>
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
+          defaultTheme="light"
           enableSystem
           disableTransitionOnChange
         >

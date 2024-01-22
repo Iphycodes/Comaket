@@ -119,7 +119,7 @@ const ReactCodeInput = ({
 
   const onInputChange = (event: ChangeEvent<HTMLInputElement>, index: number) => {
     const eventValue = event.target.value;
-    event.target.style.backgroundColor = 'green';
+    event.target.style.backgroundColor = 'transparent';
 
     /**
      * ensure we only display 1 character in the input

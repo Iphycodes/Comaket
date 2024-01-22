@@ -60,7 +60,7 @@ const VerifyEmail = (props: VerifyEmailProps) => {
         </div>
 
         <div className="flex justify-center mt-5 items-center">
-          <span className="dark:text-white">Didn't get the email</span>
+          <span className="dark:text-white">Didn't get the email?</span>
           <Button
             className="font-semibold py-1 px-1.5 text-blue"
             type="link"
