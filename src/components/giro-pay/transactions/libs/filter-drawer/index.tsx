@@ -30,40 +30,40 @@ const FilterDrawer = ({ open, onClose }: FilterDrawerProps) => {
           className="w-full"
         >
           <Form.Item className="w-full" name="date" rules={[{ required: false }]}>
-            <span className="font-semibold text-gray-600">Date Range:</span>
-            <RangePicker size="large" className="bg-gray-50 w-80 border-blue rounded-sm" />
+            <span className="font-semibold text-muted-foreground">Date Range:</span>
+            <RangePicker size="large" className="w-80 rounded-lg" />
           </Form.Item>
           <Form.Item className="w-full" name="sessionId" rules={[{ required: false }]}>
-            <span className="font-semibold text-gray-600">Session Id:</span>
-            <Input size="large" className="bg-gray-50 w-80 border-blue rounded-sm" />
+            <span className="font-semibold text-muted-foreground">Session Id:</span>
+            <Input size="large" className="w-80 rounded-lg" />
           </Form.Item>
           <Form.Item className="w-full" name="min-amount" rules={[{ required: false }]}>
-            <span className="font-semibold text-gray-600">{'Minimum Amount \u20A6:'}</span>
-            <Input size="large" className="bg-gray-50 w-80 border-blue rounded-sm" />
+            <span className="font-semibold text-muted-foreground">{'Minimum Amount \u20A6:'}</span>
+            <Input size="large" className="w-80 rounded-lg" />
           </Form.Item>
           <Form.Item className="w-full" name="max-amount" rules={[{ required: false }]}>
-            <span className="font-semibold text-gray-600">{'Maximum Amount \u20A6:'}</span>
-            <Input size="large" className="bg-gray-50 w-80 border-blue rounded-sm" />
+            <span className="font-semibold text-muted-foreground">{'Maximum Amount \u20A6:'}</span>
+            <Input size="large" className="w-80 rounded-lg" />
           </Form.Item>
           <Form.Item className="w-full" name="type" rules={[{ required: false }]}>
-            <span className="font-semibold text-gray-600">Type:</span>
-            <Select size="large" className="bg-gray-50 w-80 border-blue rounded-sm" />
+            <span className="font-semibold text-muted-foreground">Type:</span>
+            <Select size="large" className="w-80 rounded-lg" />
           </Form.Item>
           <Form.Item className="w-full" name="status" rules={[{ required: false }]}>
-            <span className="font-semibold text-gray-600">Status:</span>
-            <Select size="large" className="bg-gray-50 w-80 border-blue rounded-sm" />
+            <span className="font-semibold text-muted-foreground">Status:</span>
+            <Select size="large" className="w-80 rounded-lg" />
           </Form.Item>
           <Form.Item className="w-full" name="reciepientAccount" rules={[{ required: false }]}>
-            <span className="font-semibold text-gray-600">Reciepient Account</span>
-            <Input size="large" className="bg-gray-50 w-80 border-blue rounded-sm" />
+            <span className="font-semibold text-muted-foreground">Reciepient Account</span>
+            <Input size="large" className="w-80 rounded-lg" />
           </Form.Item>
           <Form.Item className="w-full" name="reciepientBank" rules={[{ required: false }]}>
-            <span className="font-semibold text-gray-600">Reciepient Bank</span>
-            <Input size="large" className="bg-gray-50 w-80 border-blue rounded-sm" />
+            <span className="font-semibold text-muted-foreground">Reciepient Bank</span>
+            <Input size="large" className="w-80 rounded-lg" />
           </Form.Item>
           <Form.Item className="w-full" name="name" rules={[{ required: false }]}>
-            <span className="font-semibold text-gray-600">Name</span>
-            <Input size="large" className="bg-gray-50 w-80 border-blue rounded-sm" />
+            <span className="font-semibold text-muted-foreground">Name</span>
+            <Input size="large" className="w-80 rounded-lg" />
           </Form.Item>
           <Button
             className="opacity-100 hover:opacity-70 mt-3 bg-blue text-white h-12 rounded-lg font-bold px-8"

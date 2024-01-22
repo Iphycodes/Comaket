@@ -1,4 +1,5 @@
 import Giro from './giro-logo.svg';
+import GiroLogoLight from './giro-logo-white.svg';
 import HappyPeople from './happy_announcement.svg';
 import Wallet from './wallet.svg';
 import ArrowUpIcon from './location-arrow.svg';
@@ -44,4 +45,5 @@ export {
   ProfileIcon,
   PasswordIcon,
   AppIcon,
+  GiroLogoLight,
 };

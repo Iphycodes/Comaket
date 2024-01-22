@@ -39,7 +39,7 @@ export const SiderHeader = (props: SiderHeaderProps) => {
         <span className="cursor-pointer" onClick={() => push('/apps')}>
           <Image
             src={'/assets/svgs/giro-logo.svg'}
-            alt="debit-logo"
+            alt="giro-logo"
             width={140}
             height={60}
             // style={{}}

@@ -1,54 +1,46 @@
-
 .register-form,
 .reset-password-form,
 .update-profile-details-form,
 .update-business-profile-form {
+
   .ant-input-number-group-wrapper,
   .ant-input-number-in-form-item {
     width: 100% !important;
   }
+
   .ant-input-number-group {
     height: 100% !important;
   }
+
   .ant-input-number-input-wrap {
     height: 100% !important;
+
     input {
       height: 100% !important;
     }
   }
 }
-.react-code-input {
-  margin: 32px -20px 32px 0;
-  text-align: center;
-  input {
-    margin-right: 20px !important;
-    width: 60px !important;
-    height: 60px !important;
-    border-radius: 8px;
-    background-color: #eeeeee !important;
-    border: 1px solid rgba(27, 28, 30, 0.01) !important;
-    outline: none !important;
-    caret-color: var(--accent) !important;
-    color: var(--accent) !important;
-    text-align: center;
-    font-weight: bold;
+
+
+
+.business-register-form,
+.update-profile-details-form,
+.update-business-profile-form {
+
+  .ant-select-selector,
+  .ant-select-in-form-item,
+  .ant-select-selection-item {
+    height: 3.5rem !important;
+    overflow: hidden;
+    display: flex;
+    align-items: center !important;
   }
 }
 
-  .business-register-form,
-  .update-profile-details-form,
-  .update-business-profile-form {
-    .ant-select-selector,
-    .ant-select-in-form-item,
-    .ant-select-selection-item {
-      height: 3.5rem !important;
-      overflow: hidden;
-      display: flex;
-      align-items: center !important;
-    }
-  };
+;
 
 .select-virtual-account {
+
   .ant-select-selector,
   .ant-select-in-form-item,
   .ant-select-selection-item {
@@ -77,6 +69,7 @@
   .ant-table-tbody {
     .ant-table-row {
       cursor: pointer !important;
+
       .ant-table-cell {
         cursor: pointer;
         font-size: 15px;
@@ -88,11 +81,20 @@
   }
 }
 
+.ant-switch {
+  background-color: hsl(var(--muted-foreground)) !important;
+}
+
+.ant-switch-checked {
+  background-color: #1e88e5 !important;
+}
+
 .dash-sider {
   .ant-select-selector {
     // border: 1px solid black !important;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.09);
   }
+
   .ant-select-selector,
   .ant-select-in-form-item,
   .ant-select-selection-item {
@@ -150,42 +152,116 @@
   }
 }
 
-.update-api-key-webhook-form {
-  .ant-input-disabled,
-  .ant-input-affix-wrapper-disabled {
-    background-color: rgba(255, 255, 255, 1) !important;
-  }
-}
+
 
 .virtual-select-form-item.ant-form-item {
   margin: 0 !important;
 }
 
-.light{
+.light {
   .dashboard-transaction-list:hover {
     background-color: #eee !important;
   }
-  .ant-layout-sider, .ant-menu-light{
+
+  .ant-layout-sider,
+  .ant-menu-light {
     background: #f3f3f3 !important;
     transition: all 0.2s, background 0s;
   }
+
+  .update-api-key-webhook-form {
+
+    .ant-input-disabled,
+    .ant-input-affix-wrapper-disabled {
+      background-color: rgba(255, 255, 255, 1) !important;
+    }
+  }
+
+  .react-code-input {
+    margin: 32px -20px 32px 0;
+    text-align: center;
+
+    input {
+      margin-right: 20px !important;
+      width: 60px !important;
+      height: 60px !important;
+      border-radius: 8px;
+      outline: none !important;
+      caret-color: var(--accent) !important;
+      color: var(--accent) !important;
+      text-align: center;
+      font-weight: bold;
+      background-color: #ffffff;
+      background-image: none;
+      border-width: 1px;
+      border-style: solid;
+      border-color: #d9d9d9;
+      transition: all 0.2s;
+    }
+
+    input:focus, input:hover {
+      border-color: #1668dc !important;
+      // box-shadow: 0 0 0 2px rgba(0, 60, 180, 0.15) !important;
+      outline: 0 !important;
+    }
+  }
 }
 
-.dark, .system {
-  .dashboard-transaction-list{
+.dark {
+  .dashboard-transaction-list {
     border-radius: 4px !important;
   }
+
   .dashboard-transaction-list:hover {
     background-color: hsl(var(--background)) !important;
   }
-  .ant-layout-sider, .ant-menu-light{
+
+  .ant-layout-sider,
+  .ant-menu-light {
     background: hsl(var(--background)) !important;
     transition: all 0.2s, background 0s;
   }
-  .ant-menu-item-active, .ant-menu-item-selected{
+
+  .ant-menu-item-active,
+  .ant-menu-item-selected {
     background-color: rgba(39, 39, 42, 1) !important;
     -tw-text-opacity: 1 !important;
     color: rgb(255 255 255 / var(--tw-text-opacity)) !important;
     transition: all 0.2s, background 0s;
+  }
+
+  .update-api-key-webhook-form {
+
+    .ant-input-disabled,
+    .ant-input-affix-wrapper-disabled {
+      background-color: #141414 !important;
+      color: rgba(255, 255, 255, 0.85) !important;
+    }
+  }
+
+  .react-code-input {
+    margin: 32px -20px 32px 0;
+    text-align: center;
+
+    input {
+      margin-right: 20px !important;
+      width: 60px !important;
+      height: 60px !important;
+      border-radius: 8px;
+      border: 1px solid rgba(27, 28, 30, 0.01) !important;
+      outline: none !important;
+      caret-color: var(--accent) !important;
+      text-align: center;
+      font-weight: bold;
+      background-color: #141414 !important;
+      color: rgba(255, 255, 255, 0.85) !important;
+      border-color: #424242 !important;
+    }
+
+    input:focus, input:hover {
+      border-color: #1668dc !important;
+      box-shadow: 0 0 0 2px rgba(0, 60, 180, 0.15) !important;
+      outline: 0 !important;
+    }
   }
 }
