@@ -319,10 +319,12 @@ type SingleDisbursement = {
   recipientAccount: string;
   amount: number;
   status: 'successful' | 'pending' | 'failed';
+  date?: string;
 };
 
 export type BatchDisbursement = {
   type: 'Batch';
+  date?: string;
   recipients: {
     recipient: string;
     recipientAccount: string;
@@ -331,7 +333,7 @@ export type BatchDisbursement = {
   }[];
 };
 
-type DisbursementRecord = SingleDisbursement | BatchDisbursement;
+export type DisbursementRecord = SingleDisbursement | BatchDisbursement;
 
 export const mockDisbursementRecord: DisbursementRecord[] = [
   {

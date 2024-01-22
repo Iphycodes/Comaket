@@ -10,7 +10,6 @@ import DisbursementDrawer from './libs/disbursement-drawer';
 import TopUpBalance from './libs/top-up-balance';
 import SinglePayout from './libs/single-payout';
 import BatchPayout from './libs/batch-payout';
-// import RecentDisbursements from './libs/recent-disbursement-list';
 
 const Disbursement = () => {
   const [open, setOpen] = useState<boolean>(false);

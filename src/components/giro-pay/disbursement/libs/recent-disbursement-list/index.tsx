@@ -1,4 +1,8 @@
-import { mockDisbursementRecord } from '@grc/_shared/constant';
+import {
+  BatchDisbursement,
+  DisbursementRecord,
+  mockDisbursementRecord,
+} from '@grc/_shared/constant';
 import { numberFormat } from '@grc/_shared/helpers';
 import { Card, List, Space, Tag } from 'antd';
 import moment from 'moment';
@@ -20,10 +24,24 @@ const RecentDisbursements: React.FC<RecentDisbursementsProps> = ({
     setOpen(true);
   };
 
-  const getBatch = (record: any) => {
+  const getBatch = (record: BatchDisbursement) => {
     let pendingFlag = 0;
     let color = '';
     let statusFlag = '';
+
+    let successfulPayouts = 0;
+    let pendingPayouts = 0;
+    let failedPayouts = 0;
+
+    record?.recipients.map(({ status }) => {
+      status === 'successful'
+        ? (successfulPayouts += 1)
+        : status === 'pending'
+          ? (pendingPayouts += 1)
+          : status === 'failed'
+            ? (failedPayouts += 1)
+            : console.log('');
+    });
 
     for (let i = 0; i < record.recipients.length; i++) {
       const { status } = record.recipients[i];
@@ -47,6 +65,9 @@ const RecentDisbursements: React.FC<RecentDisbursementsProps> = ({
     return {
       color: color,
       statusFlag: statusFlag,
+      successfulPayouts,
+      pendingPayouts,
+      failedPayouts,
     };
   };
   return (
@@ -76,7 +97,7 @@ const RecentDisbursements: React.FC<RecentDisbursementsProps> = ({
             </div>
           ),
         }}
-        renderItem={(item: Record<string, any>, index) => {
+        renderItem={(item: DisbursementRecord, index) => {
           const acctName =
             item.type === 'single'
               ? `${item?.recipient}`
@@ -107,7 +128,7 @@ const RecentDisbursements: React.FC<RecentDisbursementsProps> = ({
                       <div className="flex text-black flex-col gap-0">
                         <span className="font-semibold text-black">{acctName}</span>
                         <span className="text-[12px] text-gray-600">
-                          {moment(item?.createdAt).format('MMM DD, YYYY hh:mm A')}
+                          {moment(item?.date ?? '').format('MMM DD, YYYY hh:mm A')}
                         </span>
                         <Space className="font-semibold text-[10px] flex items-center gap-1 text-blue">
                           <span>{item?.type} Payout</span>
@@ -121,22 +142,38 @@ const RecentDisbursements: React.FC<RecentDisbursementsProps> = ({
                 />
                 <div className="flex flex-col items-end">
                   <div className="font-semibold m-0">{numberFormat(amount / 100, '₦')}</div>
-                  <Tag
-                    className="text-center m-0"
-                    color={
-                      item?.type === 'single'
-                        ? item?.status === 'successful'
-                          ? 'success'
-                          : item?.status === 'pending'
-                            ? 'processing'
-                            : 'error'
-                        : item?.type === 'Batch'
-                          ? getBatch(item)?.color
+                  {item.type === 'single' && (
+                    <Tag
+                      className="text-center m-0"
+                      color={
+                        item?.type === 'single'
+                          ? item?.status === 'successful'
+                            ? 'success'
+                            : item?.status === 'pending'
+                              ? 'processing'
+                              : 'error'
                           : 'default'
-                    }
-                  >
-                    {item?.type === 'single' ? item?.status : getBatch(item)?.statusFlag}
-                  </Tag>
+                      }
+                    >
+                      {item?.type === 'single' ? item?.status : getBatch(item)?.statusFlag}
+                    </Tag>
+                  )}
+                  {item.type === 'Batch' && (
+                    <Space size={8} className="flex items-center">
+                      <div className="flex gap-0 font-semibold items-center">
+                        <i className="ri-check-line text-green-500"></i>{' '}
+                        <span className="text-[12px]">{getBatch(item)?.successfulPayouts}</span>
+                      </div>
+                      <div className="flex gap-0 font-semibold items-center">
+                        <i className="ri-arrow-left-right-fill text-orange-400"></i>{' '}
+                        <span className="text-[12px]">{getBatch(item)?.pendingPayouts}</span>
+                      </div>
+                      <div className="flex gap-0 font-semibold items-center">
+                        <i className="ri-close-line text-red-500"></i>
+                        <span className="text-[12px]">{getBatch(item)?.failedPayouts}</span>
+                      </div>
+                    </Space>
+                  )}
                 </div>
               </div>
             </List.Item>
