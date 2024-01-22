@@ -42,14 +42,12 @@ export const SiderHeader = (props: SiderHeaderProps) => {
             alt="debit-logo"
             width={140}
             height={60}
-            style={{}}
+            // style={{}}
           />
         </span>
       )}
       <div className="w-full">
-        <span className="py-2 px-1 text-[15px] font-semibold" style={{ color: '#666666' }}>
-          Business(es)
-        </span>
+        <span className="py-2 px-1 text-[15px] font-medium text-card-foreground">Business(es)</span>
         <Select
           placeholder={'Select a business'}
           size="middle"
@@ -58,7 +56,7 @@ export const SiderHeader = (props: SiderHeaderProps) => {
           options={options}
         />
       </div>
-      <div className="w-full gap-3 flex flex-col items-center justify-center border-b-2 border-gray-300 pb-5 mb-3">
+      <div className="w-full gap-3 flex flex-col items-center justify-center border-b border-border/100 pb-5 mb-3">
         <Button type="primary" className="flex items-center" ghost block icon={<PlusIcon />}>
           Add New Business
         </Button>

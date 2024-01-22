@@ -7,7 +7,7 @@ import { numberFormat } from '@grc/_shared/helpers';
 import { AccountNamespace } from '@grc/_shared/namespace/account';
 import CustomModal from '@grc/_shared/components/custom-modal';
 import { AuthDataType } from '@grc/_shared/namespace/auth';
-import { CoinIcon, UserSettingsIcon } from '@grc/_shared/assets/svgs';
+import { CoinIcon } from '@grc/_shared/assets/svgs';
 import { capitalize, isEmpty, startCase, toLower } from 'lodash';
 import {
   CashFlowAnalytics,
@@ -89,21 +89,21 @@ const DashBoard = (props: DashBoardProps) => {
           <Row gutter={[20, 40]}>
             <Col md={6} xs={24}>
               <div className="flex flex-col gap-1">
-                <span className=" text-4xl font-semibold">
+                <span className=" text-4xl font-bold">
                   {isEmpty(MockVirtualAccounts)
                     ? numberFormat(0, '₦ ')
                     : numberFormat(250000000 / 100, '₦ ')}
                 </span>
-                <span>Total account balance from all accounts</span>
+                <span>Total account balance from all wallets</span>
               </div>
             </Col>
             <Col md={6} xs={24}>
               {!isEmpty(MockVirtualAccounts) && (
-                <div className="flex flex-col gap-1">
-                  <span className=" text-4xl font-semibold">
+                <div className="flex flex-col gap-1 h-full justify-center">
+                  <span className=" text-3xl font-semibold">
                     {numberFormat(250000000 / 100, '₦ ')}
                   </span>
-                  <span>Account balance from virtual acct</span>
+                  <span>Account balance from x-wallet</span>
                 </div>
               )}
             </Col>
@@ -116,7 +116,7 @@ const DashBoard = (props: DashBoardProps) => {
                     block
                     onClick={() => setOpenCreateModal(true)}
                   >
-                    Create A Virtual Account
+                    Create A Wallet
                   </Button>
                 </div>
               )}
@@ -128,9 +128,10 @@ const DashBoard = (props: DashBoardProps) => {
                     className="opacity-100 hover:opacity-70 bg-blue text-white h-14 rounded-lg font-semibold px-8"
                     type="primary"
                     block
+                    ghost
                     onClick={() => setToggleTopUp(true)}
                   >
-                    Fund Account
+                    Top Up Wallet
                   </Button>
                 </div>
               )}
@@ -192,39 +193,38 @@ const DashBoard = (props: DashBoardProps) => {
                   </Row>
                 </Col>
                 <Col md={12} xs={24}>
-                  <Row className="h-full">
-                    <div className="w-full flex flex-col border shadow-sm hover:shadow-md shadow-gray-100 rounded-xl p-5">
-                      <div className="flex flex-col">
-                        <span>Quick Actions</span>
-                        <div className="flex gap-3 mt-3 flex-wrap">
-                          <QuickActionBtn
-                            title="send money"
-                            icon={<CoinIcon />}
-                            handleClick={() => setToggleDisbursement(true)}
-                          />
-                          <QuickActionBtn
-                            title="top up"
-                            icon={<CoinIcon />}
-                            handleClick={() => setToggleTopUp(true)}
-                          />
-                          <QuickActionBtn
-                            title="change password"
-                            icon={<UserSettingsIcon />}
-                            handleClick={() => setToggleChangePassword(true)}
-                          />
+                  <Row gutter={[20, 20]} className="h-full">
+                    <Col md={12} xs={24}>
+                      <CashFlowCard type="Accrued Service Charge" amount={30000} count={5} />
+                    </Col>
+                    <Col md={12} xs={24}>
+                      <div className="dark:bg-zinc-800 text-card-foreground w-full flex flex-col border dark:border-gray-500 shadow-md rounded-xl p-5 h-full">
+                        <div className="flex flex-col">
+                          <h3 className="font-medium text-sm tracking-tight">Quick Actions</h3>
+                          <div className="flex gap-3 mt-3 flex-wrap">
+                            <QuickActionBtn
+                              title="send money"
+                              icon={<CoinIcon />}
+                              handleClick={() => setToggleDisbursement(true)}
+                            />
+                          </div>
                         </div>
                       </div>
-                    </div>
+                    </Col>
                   </Row>
                 </Col>
               </Row>
 
               <Row gutter={[40, 40]} className="mt-3">
                 <Col md={24} xs={24}>
-                  <Card className="w-full border shadow-sm hover:shadow-md shadow-gray-100 h-full">
+                  <Card className="dark:bg-zinc-800 text-card-foreground w-full border dark:border-gray-500 shadow-md h-full">
                     <List
-                      className="overflow-y-auto"
-                      header={<div>Recent transactions</div>}
+                      className="overflow-y-auto dark:text-white"
+                      header={
+                        <h3 className="font-semibold leading-none tracking-tight">
+                          Recent transactions
+                        </h3>
+                      }
                       footer={
                         !isEmpty(transactions) ? (
                           <div className="text-center mt-5">
@@ -242,7 +242,7 @@ const DashBoard = (props: DashBoardProps) => {
                       loading={false}
                       locale={{
                         emptyText: (
-                          <div className="text-gray-500 text-justify">
+                          <div className="text-gray-500 text-justify dark:text-white">
                             <div>No Data Available</div>
                             <div>
                               Transaction insight will be shown here once you create a virtual
@@ -255,9 +255,13 @@ const DashBoard = (props: DashBoardProps) => {
                         <List.Item className="dashboard-transaction-list" key={index}>
                           <div className="w-full flex justify-between items-center text-left px-2 py-0">
                             <List.Item.Meta
-                              title={startCase(capitalize(item?.recipient))}
+                              title={
+                                <span className="text-card-foreground">
+                                  {startCase(capitalize(item?.recipient))}
+                                </span>
+                              }
                               description={
-                                <div className="flex items-center gap-3 ">
+                                <div className="flex items-center gap-3 text-card-foreground">
                                   <span>
                                     {moment(item?.createdAt).format('MMM DD, YYYY hh:mm A')}
                                   </span>
@@ -279,7 +283,7 @@ const DashBoard = (props: DashBoardProps) => {
                                 </div>
                               }
                             />
-                            <div>
+                            <div className="text-card-foreground">
                               {item?.entry === 'debit' ? (
                                 <span className=" text-red-700 font-semibold">- </span>
                               ) : (
@@ -296,7 +300,7 @@ const DashBoard = (props: DashBoardProps) => {
               </Row>
               <Row gutter={[40, 40]} className="mt-3">
                 <Col md={12} xs={24}>
-                  <Card className="border shadow-sm hover:shadow-md shadow-gray-100 h-full w-full">
+                  <Card className="dark:bg-zinc-800 text-card-foreground dark:text-white border dark:border-gray-500 shadow-md  h-full w-full">
                     <header className="flex flex-wrap gap-2 justify-between items-center">
                       <span className="font-bold">Cash Flow</span>
                       <div>
@@ -310,7 +314,7 @@ const DashBoard = (props: DashBoardProps) => {
                         </Space>
                       </div>
                     </header>
-                    <div className="mt-5 flex items-center justify-center">
+                    <div className="mt-5 flex items-center justify-center dark:text-white">
                       <Line
                         height={120}
                         redraw
@@ -374,9 +378,11 @@ const DashBoard = (props: DashBoardProps) => {
                   </Card>
                 </Col>
                 <Col md={12} xs={24}>
-                  <Card className="border shadow-sm hover:shadow-md shadow-gray-100 h-full w-full">
+                  <Card className="dark:bg-zinc-800 text-card-foreground dark:text-white border dark:border-gray-500 shadow-md h-full w-full">
                     <header className="flex flex-wrap gap-2 justify-between items-center">
-                      <span className="font-bold">Transaction Summary</span>
+                      <h3 className="font-semibold leading-none tracking-tight">
+                        Transaction Summary
+                      </h3>
                       <div>
                         <Space size={7}>
                           <Select
@@ -428,9 +434,11 @@ const DashBoard = (props: DashBoardProps) => {
               </Row>
               <Row gutter={[40, 40]} className="mt-3">
                 <Col md={12} xs={24}>
-                  <Card className="border shadow-sm hover:shadow-md shadow-gray-100">
+                  <Card className="dark:bg-zinc-800 text-card-foreground dark:text-white border dark:border-gray-500 shadow-md  hover:border-cyan-100">
                     <header className="flex flex-wrap gap-2 justify-between items-center">
-                      <span className="font-bold">Transaction Summary</span>
+                      <h3 className="font-semibold leading-none tracking-tight">
+                        Transaction Summary
+                      </h3>
                       <div>
                         <Space size={7}>
                           <Select
@@ -490,9 +498,11 @@ const DashBoard = (props: DashBoardProps) => {
                   </Card>
                 </Col>
                 <Col md={12} xs={24}>
-                  <Card className="border shadow-sm hover:shadow-md shadow-gray-100">
+                  <Card className="dark:bg-zinc-800 text-card-foreground dark:text-white border dark:border-gray-500 shadow-md  hover:border-cyan-100">
                     <header className="flex flex-wrap gap-2 justify-between items-center">
-                      <span className="font-bold">Comparative Transaction Summary</span>
+                      <h3 className="font-semibold leading-none tracking-tight">
+                        Comparative Transaction Summary
+                      </h3>
                       <div>
                         <Space size={7}>
                           <Select

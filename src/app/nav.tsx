@@ -10,6 +10,7 @@ import {
   TransactionIcon,
   ProfileIcon,
   PasswordIcon,
+  AppIcon,
 } from '@grc/_shared/assets/svgs';
 
 type Nav = {
@@ -64,6 +65,12 @@ const settingsMenuItems: NavItem[] = [
     key: 'change-password',
     destination: 'change-password',
     icon: <PasswordIcon />,
+  },
+  {
+    label: 'Apps',
+    key: 'apps',
+    destination: '/apps',
+    icon: <AppIcon />,
   },
 ];
 

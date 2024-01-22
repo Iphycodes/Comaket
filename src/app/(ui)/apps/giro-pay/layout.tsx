@@ -43,7 +43,7 @@ const AppsBaseLayout = (props: GiroDebitPageProps) => {
     <Layout hasSider={true}>
       <SideNav authData={authData} items={appNav.items} />
       <Layout
-        className="body-layout"
+        className="body-layout bg-background"
         style={{
           position: 'relative',
           zIndex: 0,
@@ -78,32 +78,32 @@ const AppsBaseLayout = (props: GiroDebitPageProps) => {
           </Space>
         </div>
         <Content className="main-content">
-          <div className="bg-gray-50" style={{ padding: 40, minHeight: '100vh' }}>
+          <div className="dark:text-white" style={{ padding: 40, minHeight: '100vh' }}>
             {isSettingsPath?.toLowerCase() === 'settings' && (
-              <div className="flex border-b border-gray-300 shadow-sm">
+              <div className="flex shadow-sm border-b border-border/100 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60">
                 {' '}
-                {['Business Profile', 'API Keys & Webhook URL', 'Account Setting'].map(
-                  (text, index) => (
-                    <div
-                      onClick={() => push(`/apps/giro-pay/settings/${formatPathText(text)}`)}
-                      key={`setting-tab_${index}`}
-                      className={`text-base tracking-wide ${
-                        formatPathText(text) === currentPage
-                          ? 'text-blue border-b-2 font-medium border-blue'
-                          : 'text-black'
-                      } py-4 px-3 cursor-pointer`}
-                    >
-                      <span>{text}</span>
-                    </div>
-                  )
-                )}
+                {['Business Profile', 'API Keys & Webhook URL', 'Account'].map((text, index) => (
+                  <div
+                    onClick={() => push(`/apps/giro-pay/settings/${formatPathText(text)}`)}
+                    key={`setting-tab_${index}`}
+                    className={`text-base tracking-wide ${
+                      formatPathText(text) === currentPage
+                        ? 'text-blue border-b-2 font-medium border-blue'
+                        : 'text-muted-foreground'
+                    } py-4 px-3 cursor-pointer`}
+                  >
+                    <span>{text}</span>
+                  </div>
+                ))}
               </div>
             )}
             {children}
           </div>
         </Content>
         {/* <AppFooter /> */}
-        <Footer>Footer</Footer>
+        <Footer className="shadow-sm border-t border-border/100 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:text-white">
+          Footer
+        </Footer>
       </Layout>
     </Layout>
   );

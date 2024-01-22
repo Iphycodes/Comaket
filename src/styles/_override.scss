@@ -1,4 +1,3 @@
-@import 'giro.min.css';
 
 .register-form,
 .reset-password-form,
@@ -123,11 +122,8 @@
 
 .live-mode-switch.ant-switch-checked {
   .ant-switch-inner {
-    background-color: rgb(4, 219, 4) !important;
+    background-color: #1e88e5 !important;
   }
-}
-.dashboard-transaction-list:hover {
-  background-color: #eee !important;
 }
 
 .dropdown-popover {
@@ -208,3 +204,31 @@ canvas.disbursement-pie {
 // .amount-inp{
 //   margin-bottom: 12px !important;
 // }
+.light{
+  .dashboard-transaction-list:hover {
+    background-color: #eee !important;
+  }
+  .ant-layout-sider, .ant-menu-light{
+    background: #f3f3f3 !important;
+    transition: all 0.2s, background 0s;
+  }
+}
+
+.dark, .system {
+  .dashboard-transaction-list{
+    border-radius: 4px !important;
+  }
+  .dashboard-transaction-list:hover {
+    background-color: hsl(var(--background)) !important;
+  }
+  .ant-layout-sider, .ant-menu-light{
+    background: hsl(var(--background)) !important;
+    transition: all 0.2s, background 0s;
+  }
+  .ant-menu-item-active, .ant-menu-item-selected{
+    background-color: rgba(39, 39, 42, 1) !important;
+    -tw-text-opacity: 1 !important;
+    color: rgb(255 255 255 / var(--tw-text-opacity)) !important;
+    transition: all 0.2s, background 0s;
+  }
+}

@@ -28,7 +28,6 @@ export const AppContext = createContext<AppContextPropType>({
 export const AppProvider = (props: AppProviderPropType) => {
   const { children } = props;
   const { authData, currentAccount } = useAuth({});
-  // const {} = useTheme();
   const dispatch = useAppDispatch();
   const handleLogOut = () => dispatch(logout());
 
