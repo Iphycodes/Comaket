@@ -32,7 +32,7 @@ const SelectVirtualAcct = ({
 
   const options = accounts?.map((s) => ({
     label: (
-      <div>
+      <div className="font-bold">
         {startCase(toLower(s?.accountName))} <span style={{ padding: '0 8px' }}>|</span>{' '}
         {s?.accountNumber}
         <span style={{ padding: '0 8px' }}>|</span> {s?.bankName}
@@ -55,7 +55,7 @@ const SelectVirtualAcct = ({
           }
           loading={isLoadingAccounts}
           disabled={accounts?.length === 0}
-          className={`${className} font-semibold`}
+          className={`${className} font-bold`}
           onChange={(value) => setVAccount?.(JSON.parse(value))}
           options={options}
         />
