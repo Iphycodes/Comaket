@@ -1,4 +1,5 @@
 import { Col, Row, Space } from 'antd';
+import Image from 'next/image';
 import React from 'react';
 
 const TopUpBalance = () => {
@@ -60,6 +61,15 @@ const TopUpBalance = () => {
           <i className="ri-information-2-line"></i> Please use this reference id for your
           transaction remark
         </span>
+      </div>
+      <div className="flex items-center py-3 justify-end">
+        <Image
+          src={'/assets/svgs/giro-logo.svg'}
+          alt="debit-logo"
+          width={80}
+          height={40}
+          style={{}}
+        />
       </div>
     </div>
   );

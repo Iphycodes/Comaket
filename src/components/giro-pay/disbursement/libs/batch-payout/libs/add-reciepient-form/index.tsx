@@ -1,59 +1,41 @@
-import { Button, Col, Form, Input, InputNumber, Row, Select, Space } from 'antd';
-import React from 'react';
+import { ReciepientsDataType } from '@grc/_shared/constant';
+import { Button, Col, Form, Input, InputNumber, Row, Select } from 'antd';
+import React, { Dispatch, SetStateAction } from 'react';
 
-export interface IBanks {
-  bankCode: string;
-  name: string;
-  nibssBankCode: string;
+interface AddReciepientFormProps {
+  // Add your prop types here
+  setIsAdd: Dispatch<SetStateAction<boolean>>;
+  handleAddBatchReciepient: (reciepient: ReciepientsDataType) => void;
 }
 
-interface SinglePayoutProps {
-  banks?: IBanks[];
-}
+const AddReciepientForm: React.FC<AddReciepientFormProps> = ({
+  setIsAdd,
+  handleAddBatchReciepient,
+}) => {
+  const handleGoBack = () => {
+    setIsAdd(false);
+  };
 
-const SinglePayout = ({ banks }: SinglePayoutProps) => {
-  const banksOptions = banks?.map(({ name, bankCode }) => ({
-    Label: (
-      <div style={{ background: 'var(--bg-secondary)' }}>
-        {name} - ({bankCode})
-      </div>
-    ),
-    value: `${name}-${bankCode}`,
-  }));
+  const handleSubmitForm = (values: ReciepientsDataType) => {
+    handleAddBatchReciepient(values);
+
+    setIsAdd(false);
+  };
 
   return (
-    <div className="max-h-[450px] overflow-y-scroll">
-      <div className="flex sticky top-0 bg-white z-10 items-center border-b-2 pb-2">
-        <Space className="" size={10}>
-          <span
-            className="text-[16px] flex justify-center items-center h-12 w-12 bg-blue"
-            style={{ borderRadius: '50%' }}
-          >
-            <i className="ri-send-plane-fill text-white text-[18px]"></i>{' '}
-          </span>
-          <span className="font-bold text-[20px]">Single Payout</span>
-        </Space>
-      </div>
-
-      <Row className="py-5" style={{}}>
-        <Col span={24} className="beneficiary-form">
-          <div className="mb-0 text-gray-500">Select Saved Beneficiary</div>
-          <Select
-            bordered={true}
-            showSearch
-            size="large"
-            // disabled={true}
-            placeholder={'Select Saved Beneficiary'}
-            options={[]}
-            className={'w-full'}
-          />
-        </Col>
-      </Row>
+    <div className={'mt-4'}>
+      <span
+        onClick={() => handleGoBack()}
+        className="mb-2 flex gap-1 w-20 cursor-pointer text-blue items-center"
+      >
+        <i className="ri-arrow-left-line text-[20px]"></i>
+        <span>Go Back</span>
+      </span>
       <Form
-        name={'single-payout-form'}
-        className={''}
+        name={'batch-add-reciepient-form'}
+        className={'mt-4'}
         data-testid={'dti_form'}
-        initialValues={{ saveBeneficiary: false }}
+        onFinish={handleSubmitForm}
       >
         <Row className="my-0">
           <Col className="my-0" lg={24} xs={24}>
@@ -78,7 +60,7 @@ const SinglePayout = ({ banks }: SinglePayoutProps) => {
           <Col lg={24} xs={24}>
             <div className="mb-0 text-gray-500">Bank</div>
             <Form.Item
-              name="bankName"
+              name="bank"
               className="mb-3"
               rules={[{ required: true, message: 'Input bank name' }]}
             >
@@ -87,7 +69,11 @@ const SinglePayout = ({ banks }: SinglePayoutProps) => {
                 placeholder={'Enter Bank Name'}
                 loading={false}
                 showSearch={true}
-                options={banksOptions}
+                options={[
+                  { value: 'Sterling Bank', label: 'Sterling Bank' },
+                  { value: 'Keystone Bank', label: 'Keystone Bank' },
+                  { value: 'GT Bank', label: 'GT Bank' },
+                ]}
               />
             </Form.Item>
           </Col>
@@ -96,7 +82,7 @@ const SinglePayout = ({ banks }: SinglePayoutProps) => {
           <Col className="my-0" lg={24} xs={24}>
             <div className="mb-0 text-gray-500">{`Account Number`}</div>
             <Form.Item
-              name="acct-number"
+              name="accountNumber"
               className="amount-inp mb-3"
               rules={[{ required: true, message: 'Input Account number' }]}
             >
@@ -112,14 +98,14 @@ const SinglePayout = ({ banks }: SinglePayoutProps) => {
         <Row className="my-0">
           <Col className="my-0" lg={24} xs={24}>
             <div className="mb-0 text-gray-500">{`Account Name`}</div>
-            <Form.Item name="acct-number" className="amount-inp mb-3">
-              <Input className="w-full" size="large" disabled />
+            <Form.Item name="accountName" className="amount-inp mb-3">
+              <Input className="w-full" size="large" />
             </Form.Item>
           </Col>
         </Row>
         <div className="flex items-center justify-end">
           <Button
-            className="opacity-100 hover:opacity-95 font-normal bg-blue text-white h-12"
+            className="opacity-100 hover:opacity-95 font-normal bg-blue text-white flex items-center justify-center py-5"
             type="primary"
             disabled={false}
             loading={false}
@@ -129,7 +115,7 @@ const SinglePayout = ({ banks }: SinglePayoutProps) => {
               <span>
                 <i className="ri-add-line text-[18px]"></i>
               </span>
-              <span>Confirm Payment</span>
+              <span>Add</span>
             </div>
           </Button>
         </div>
@@ -138,4 +124,4 @@ const SinglePayout = ({ banks }: SinglePayoutProps) => {
   );
 };
 
-export default SinglePayout;
+export default AddReciepientForm;

@@ -10,7 +10,6 @@ import DisbursementDrawer from './libs/disbursement-drawer';
 import TopUpBalance from './libs/top-up-balance';
 import SinglePayout from './libs/single-payout';
 import BatchPayout from './libs/batch-payout';
-import Image from 'next/image';
 // import RecentDisbursements from './libs/recent-disbursement-list';
 
 const Disbursement = () => {
@@ -89,21 +88,12 @@ const Disbursement = () => {
       </div>
       <DisbursementDrawer open={open} setOpen={setOpen} selectedRecord={selectedRecord} />
       <Modal
-        className="disbursement-modal"
+        className="disbursement-modal overflow-y-scroll"
         title={``}
         open={modalOpen}
         onCancel={() => setModalOpen(false)}
-        footer={
-          <div className="flex justify-end items-center w-full bg-gray-100">
-            <Image
-              src={'/assets/svgs/giro-logo.svg'}
-              alt="debit-logo"
-              width={80}
-              height={40}
-              style={{}}
-            />
-          </div>
-        }
+        style={{ minWidth: modalElement === 'batch-payout' ? '700px' : '400px' }}
+        footer={null}
       >
         {modalElement === 'top-up-balance' && <TopUpBalance />}
         {modalElement === 'single-payout' && <SinglePayout />}

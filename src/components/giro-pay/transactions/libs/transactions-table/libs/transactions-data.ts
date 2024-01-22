@@ -8,6 +8,7 @@ export interface TransactionsDataType {
   reciepientBank?: string;
   amount?: string;
   key?: string;
+  category?: 'pay-in' | 'pay-out';
 }
 
 export const transactionsData = <TransactionsDataType[]>[
@@ -21,6 +22,7 @@ export const transactionsData = <TransactionsDataType[]>[
     reciepientAccountStatus: 'approved',
     reciepientBank: 'Sterling Bank',
     amount: '\u20A62000',
+    category: 'pay-in',
   },
   {
     key: '1',
@@ -32,6 +34,7 @@ export const transactionsData = <TransactionsDataType[]>[
     reciepientAccountStatus: 'unapproved',
     reciepientBank: 'GT Bank',
     amount: '\u20A62000',
+    category: 'pay-in',
   },
   {
     key: '1',
@@ -43,6 +46,7 @@ export const transactionsData = <TransactionsDataType[]>[
     reciepientBank: 'GT Bank',
     time: '2:30pm',
     amount: '\u20A62000',
+    category: 'pay-out',
   },
   {
     key: '1',
@@ -54,6 +58,7 @@ export const transactionsData = <TransactionsDataType[]>[
     reciepientAccountStatus: 'approved',
     reciepientBank: 'GT Bank',
     amount: '\u20A6 2000',
+    category: 'pay-in',
   },
   {
     key: '1',
@@ -65,6 +70,7 @@ export const transactionsData = <TransactionsDataType[]>[
     reciepientAccountStatus: 'approved',
     reciepientBank: 'GT Bank',
     amount: '\u20A62000',
+    category: 'pay-out',
   },
   {
     key: '1',
@@ -76,6 +82,7 @@ export const transactionsData = <TransactionsDataType[]>[
     reciepientAccountStatus: 'approved',
     reciepientBank: 'GT Bank',
     amount: '\u20A62000',
+    category: 'pay-out',
   },
   {
     key: '1',
@@ -87,6 +94,7 @@ export const transactionsData = <TransactionsDataType[]>[
     reciepientAccountStatus: 'approved',
     reciepientBank: 'GT Bank',
     amount: '\u20A62000',
+    category: 'pay-in',
   },
   {
     key: '1',
@@ -98,6 +106,7 @@ export const transactionsData = <TransactionsDataType[]>[
     reciepientAccountStatus: 'unapproved',
     reciepientBank: 'GT Bank',
     amount: '\u20A62000',
+    category: 'pay-out',
   },
   {
     key: '1',
@@ -109,6 +118,7 @@ export const transactionsData = <TransactionsDataType[]>[
     reciepientAccountStatus: 'approved',
     reciepientBank: 'GT Bank',
     amount: '\u20A62000',
+    category: 'pay-in',
   },
   {
     key: '1',
@@ -120,5 +130,6 @@ export const transactionsData = <TransactionsDataType[]>[
     reciepientAccountStatus: 'approved',
     reciepientBank: 'GT Bank',
     amount: '\u20A62000',
+    category: 'pay-in',
   },
 ];

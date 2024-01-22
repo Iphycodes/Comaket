@@ -25,6 +25,17 @@ const TransactionsTable = (props: TransactionTableProps) => {
 
   const columns: ColumnsType<TransactionsDataType> = [
     {
+      dataIndex: 'category',
+      key: 'category',
+      width: 40,
+      render: (text) => (
+        <span>
+          {text === 'pay-out' && <i className="ri-arrow-left-up-line text-red-600"></i>}
+          {text === 'pay-in' && <i className="ri-arrow-left-up-line text-green-500"></i>}
+        </span>
+      ),
+    },
+    {
       title: (
         <span className="flex text-[14px] font-semibold text-gray-500 items-center gap-1">
           <span>Date</span>
