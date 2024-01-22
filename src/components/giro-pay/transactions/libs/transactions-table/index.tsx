@@ -31,7 +31,7 @@ const TransactionsTable = (props: TransactionTableProps) => {
       render: (text) => (
         <span>
           {text === 'pay-out' && <i className="ri-arrow-left-up-line text-red-600"></i>}
-          {text === 'pay-in' && <i className="ri-arrow-left-up-line text-green-500"></i>}
+          {text === 'pay-in' && <i className="ri-arrow-right-down-line text-green-500"></i>}
         </span>
       ),
     },
