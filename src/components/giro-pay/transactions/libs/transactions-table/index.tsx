@@ -1,6 +1,6 @@
 'use client';
 
-import { Card, Table, Tag, Tooltip } from 'antd';
+import { Table, Tag, Tooltip } from 'antd';
 import React, { Dispatch, SetStateAction } from 'react';
 import { TransactionsDataType, transactionsData } from './libs/transactions-data';
 import { ColumnsType } from 'antd/lib/table';
@@ -158,18 +158,18 @@ const TransactionsTable = (props: TransactionTableProps) => {
     onClick: () => handleRowClick(record),
   });
   return (
-    <Card className="shadow-sm">
+    <div className="shadow-sm border dark:border-gray-500 rounded-xl">
       <Table
         size="large"
         columns={columns}
         pagination={{ pageSize: 8, position: ['bottomLeft'] }}
         dataSource={transactionsData}
         scroll={{ x: isMobile ? true : 0 }}
-        className={'transaction-table'}
+        className={'transaction-table dark:bg-zinc-800 rounded-xl'}
         onRow={rowClick}
         footer={() => <TableFooter />}
       />
-    </Card>
+    </div>
   );
 };
 
