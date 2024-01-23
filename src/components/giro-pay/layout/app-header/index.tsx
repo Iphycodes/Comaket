@@ -21,10 +21,12 @@ const { Header } = Layout;
 
 export interface AppHeaderProps {
   items?: ReactElement[];
+  handleSwitchAccountMode?: (value: boolean) => void;
+  isLiveMode?: boolean;
 }
 
 export const AppHeader = (props: AppHeaderProps) => {
-  const {} = props;
+  const { handleSwitchAccountMode, isLiveMode } = props;
   const isMobile = useMediaQuery(mediaSize.mobile);
   const pathname = usePathname();
   const pathUrl = pathname?.split('/');
@@ -103,10 +105,11 @@ export const AppHeader = (props: AppHeaderProps) => {
         {(pathUrl ?? [])?.length <= 2 ? (
           <span className=" cursor-pointer" onClick={() => router.push('/apps')}>
             <Image
-              src={`/assets/svgs/${theme === 'light' ? 'giro-logo' : 'giro-logo'}.svg`}
+              src={`/assets/svgs/${theme === 'light' ? 'giro-logo' : 'giro-logo-white'}.svg`}
               alt="giro-logo"
               width={120}
               height={50}
+              priority
             />
           </span>
         ) : isAppSettingsPath ? (
@@ -127,7 +130,14 @@ export const AppHeader = (props: AppHeaderProps) => {
             <>
               {' '}
               <div className="flex gap-2 items-center">
-                <Switch className="live-mode-switch" size="small" />
+                <Switch
+                  className="live-mode-switch"
+                  size="small"
+                  checked={isLiveMode}
+                  onChange={(e) => {
+                    handleSwitchAccountMode?.(e);
+                  }}
+                />
                 <span className="font-bold">Live mode</span>
               </div>
               <Link className="underline" href={'/'}>

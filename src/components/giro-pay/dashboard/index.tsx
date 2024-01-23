@@ -30,13 +30,12 @@ import {
   CategoryScale,
   LinearScale,
   LineElement,
+  Filler,
 } from 'chart.js';
 import { Bar, Doughnut, Line } from 'react-chartjs-2';
 import { CashFlowCard } from './libs/cash-flow-card';
 import { QuickActionBtn } from './libs/quick-action-btn';
 import { EmptyVirtualAccount } from './libs/empty-virtual-account';
-import { ChangePassword } from '../../apps/settings/change-password';
-import { usePathname } from 'next/navigation';
 import { motion } from 'framer-motion';
 
 type DashBoardProps = {
@@ -57,18 +56,18 @@ ChartJS.register(
   LinearScale,
   BarElement,
   PointElement,
-  LineElement
+  LineElement,
+  Filler
 );
 
 const DashBoard = (props: DashBoardProps) => {
   const { transactions, authData, handleCreateVirtualAcct, openCreateModal, setOpenCreateModal } =
     props;
   const [toggleTopUp, setToggleTopUp] = useState(false);
-  const [toggleChangePassword, setToggleChangePassword] = useState(false);
   const [toggleDisbursement, setToggleDisbursement] = useState(false);
-  const pathname = usePathname();
-  const pathUrl = pathname?.split('/');
-  const isDashboard = pathUrl?.[3];
+  // const pathname = usePathname();
+  // const pathUrl = pathname?.split('/');
+  // const isDashboard = pathUrl?.[3];
   let delayed: any;
   // const isVerified = !!authData?.bvn && !!authData?.mobile?.phoneNumber;
   const isVerified = true;
@@ -588,17 +587,6 @@ const DashBoard = (props: DashBoardProps) => {
           }
           setOpenModal={() => setToggleTopUp(false)}
           openModal={toggleTopUp}
-        />
-        <CustomModal
-          component={
-            <ChangePassword
-              isDashboard={isDashboard?.toLowerCase() === 'dashboard'}
-              handleChangePassword={() => {}}
-              isChangePasswordLoading={false}
-            />
-          }
-          setOpenModal={() => setToggleChangePassword(false)}
-          openModal={toggleChangePassword}
         />
 
         <CustomModal

@@ -54,7 +54,7 @@ interface UseAuthReturnType {
   appData: AppDataType;
   categories: Record<string, any>[];
   constantsResponse: Record<string, any>;
-  isLiveMode: string | null;
+  isLiveMode: boolean;
   handleCurrentAccount: (currentAccount: string) => void;
   currentAccount: Business | any;
   triggerAcccountsResponse: Record<string, any>;

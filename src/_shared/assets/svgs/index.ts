@@ -13,6 +13,7 @@ import PlusIcon from './plus.svg';
 import ManageBusinessIcon from './manage-business.svg';
 import CloseIcon from './close.svg';
 import CopyIcon from './copy.svg';
+import CopyIconLight from './copy-light.svg';
 import ArrowLeftDownIcon from './arrow-left-down.svg';
 import ArrowRightUpIcon from './arrow-right-up.svg';
 import CoinIcon from './coin.svg';
@@ -46,4 +47,5 @@ export {
   PasswordIcon,
   AppIcon,
   GiroLogoLight,
+  CopyIconLight,
 };

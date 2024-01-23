@@ -1,12 +1,14 @@
 'use client';
-import React from 'react';
+import React, { useEffect } from 'react';
 import { categories, status } from '@grc/_shared/constant';
 import { Button, Card, Col, Form, Input, InputNumber, Row, Select } from 'antd';
 import { motion } from 'framer-motion';
+import { AuthDataType } from '@grc/_shared/namespace/auth';
 
 type BusinessProfileProps = {
   mobileResponsive?: boolean;
   theme?: string;
+  profile: AuthDataType | any;
   handleUpdateBusinessProfile: (payload: Record<string, any>) => void;
   isUpdatingBusinessProfile: boolean;
 };
@@ -15,9 +17,16 @@ export const BusinessProfile = (props: BusinessProfileProps) => {
   const { handleUpdateBusinessProfile, isUpdatingBusinessProfile } = props;
   const [form] = Form.useForm();
 
+  const initialValues = {};
+
   const onFinish = (values: Record<string, any>) => {
     handleUpdateBusinessProfile(values);
   };
+
+  useEffect(() => {
+    form.setFieldsValue(initialValues);
+  }, [form, initialValues]);
+
   return (
     <motion.div
       style={{ backgroundColor: 'transparent' }}

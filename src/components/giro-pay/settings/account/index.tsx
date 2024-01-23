@@ -1,27 +1,36 @@
 'use client';
 import React from 'react';
-import { Button, Card, Col, DatePicker, Form, Row, Switch, TimePicker } from 'antd';
+import { Button, Card, Col, DatePicker, Form, FormInstance, Row, Switch, TimePicker } from 'antd';
 import { motion } from 'framer-motion';
-import dayjs from 'dayjs';
+import dayjs, { Dayjs } from 'dayjs';
 
 type AccountSettingProps = {
   mobileResponsive?: boolean;
   theme?: string;
   handleUpdateAccountSetting: (payload: Record<string, any>) => void;
-  isAccountSettingLoading: boolean;
+  isUpdatingAccountSetting: boolean;
+  form: FormInstance<any>;
 };
 
 export const AccountSetting = (props: AccountSettingProps) => {
-  const { handleUpdateAccountSetting, isAccountSettingLoading } = props;
-  const [form] = Form.useForm();
-
-  const defaultDate = dayjs().date(28);
-  const initialValues = {
-    deductionDate: defaultDate,
-  };
+  const { handleUpdateAccountSetting, isUpdatingAccountSetting, form } = props;
 
   const onFinish = (values: Record<string, any>) => {
     handleUpdateAccountSetting(values);
+  };
+
+  const disabledDate = (currentDate: Dayjs | null) => {
+    if (!currentDate) {
+      return false;
+    }
+
+    const today = dayjs();
+    const selectedDate = dayjs(currentDate);
+    return (
+      selectedDate.isBefore(today.startOf('day')) ||
+      selectedDate.isBefore(today.startOf('month')) ||
+      selectedDate.date() > 28
+    );
   };
 
   return (
@@ -40,14 +49,13 @@ export const AccountSetting = (props: AccountSettingProps) => {
             onFinish={(value) => {
               onFinish(value);
             }}
-            initialValues={initialValues}
             name="account-setting-form"
             className="mt-5 account-setting-form"
           >
             <Row gutter={[16, 16]} className="flex items center justify-center">
               <Col md={14} xs={24}>
                 <Form.Item
-                  name="deductionDate"
+                  name="serviceFeeDeductionDate"
                   rules={[
                     { required: true, message: 'Enter accrued service charge deduction date' },
                   ]}
@@ -55,7 +63,7 @@ export const AccountSetting = (props: AccountSettingProps) => {
                 >
                   <DatePicker
                     className="w-full h-14"
-                    disabledDate={(currentDate) => currentDate && currentDate.date() > 28}
+                    disabledDate={disabledDate}
                     showToday={false}
                   />
                 </Form.Item>
@@ -87,9 +95,9 @@ export const AccountSetting = (props: AccountSettingProps) => {
               <Button
                 className="opacity-100 hover:opacity-70 mt-1.5 bg-blue text-white h-12 rounded-lg px-10 mx-auto"
                 type="primary"
-                disabled={isAccountSettingLoading}
+                disabled={isUpdatingAccountSetting}
                 block={false}
-                loading={isAccountSettingLoading}
+                loading={isUpdatingAccountSetting}
                 htmlType="submit"
               >
                 Update

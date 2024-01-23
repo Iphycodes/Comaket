@@ -1,6 +1,6 @@
 'use client';
 import React from 'react';
-import { Button, Card, Col, Form, Input, Row } from 'antd';
+import { Button, Card, Col, Form, FormInstance, Input, Row } from 'antd';
 import { isValidPassword } from '@grc/_shared/helpers';
 import PasswordInput from '@grc/components/auth/lib/password-input';
 import { motion } from 'framer-motion';
@@ -11,11 +11,11 @@ type ChangePasswordProps = {
   handleChangePassword: (payload: Record<string, any>) => void;
   isChangePasswordLoading: boolean;
   isDashboard?: boolean;
+  form: FormInstance<any>;
 };
 
 export const ChangePassword = (props: ChangePasswordProps) => {
-  const { handleChangePassword, isChangePasswordLoading, isDashboard = false } = props;
-  const [form] = Form.useForm();
+  const { handleChangePassword, isChangePasswordLoading, isDashboard = false, form } = props;
 
   const onFinish = (values: Record<string, any>) => {
     handleChangePassword(values);
