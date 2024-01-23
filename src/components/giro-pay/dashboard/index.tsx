@@ -69,9 +69,8 @@ const DashBoard = (props: DashBoardProps) => {
   // const pathUrl = pathname?.split('/');
   // const isDashboard = pathUrl?.[3];
   let delayed: any;
-  // const isVerified = !!authData?.bvn && !!authData?.mobile?.phoneNumber;
-  const isVerified = true;
-
+  const isVerified = !!authData?.bvn && !!authData?.mobile?.phoneNumber;
+  console.log('isVerified::', isVerified);
   return (
     <>
       <motion.div
@@ -121,7 +120,7 @@ const DashBoard = (props: DashBoardProps) => {
               )}
             </Col>
             <Col md={6} xs={24}>
-              {!isEmpty(MockVirtualAccounts) && (
+              {isVerified && !isEmpty(MockVirtualAccounts) && (
                 <div className="w-full">
                   <Button
                     className="opacity-100 hover:opacity-70 bg-blue text-white h-14 rounded-lg font-semibold px-8"

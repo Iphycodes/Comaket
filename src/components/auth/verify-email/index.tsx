@@ -6,7 +6,6 @@ import ReactCodeInput from '@grc/_shared/components/react-code-input';
 
 type VerifyEmailProps = {
   mobileResponsive: boolean;
-  theme: string;
   handleVerifyEmail: (code: string) => void;
   handleResendPasscode: () => void;
   email: string | null;

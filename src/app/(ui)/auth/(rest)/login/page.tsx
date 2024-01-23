@@ -1,14 +1,12 @@
 'use client';
-import { useContext, useEffect } from 'react';
+import { useEffect } from 'react';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
-import { AppContext } from '@grc/app-context';
 import Login from '@grc/components/auth/login';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@grc/hooks/useAuth';
 
 const LoginPage = () => {
   const mobileResponsive = useMediaQuery(mediaSize.mobile);
-  const { theme } = useContext(AppContext);
   const router = useRouter();
   const { login, loginResponse, sendVerification } = useAuth({});
   const { isLoading } = loginResponse;
@@ -51,7 +49,6 @@ const LoginPage = () => {
   return (
     <Login
       mobileResponsive={mobileResponsive}
-      theme={theme}
       onRememberMe={onRememberMe}
       handleLogin={handleLogin}
       isLoading={isLoading}

@@ -1,43 +1,55 @@
 'use client';
 import { BusinessProfile } from '@grc/components/giro-pay/settings/business-profile';
 import { useBusinessProfile } from '@grc/hooks/useBusinessProfile';
+import { Form } from 'antd';
+import { omit } from 'lodash';
 // import { omit } from 'lodash';
-import React from 'react';
+import React, { useEffect } from 'react';
 
 const BusinessProfilePage = () => {
-  const { businessProfile, updateBusinessProfileResponse } = useBusinessProfile({
-    callAllBusinessProfile: true,
-  });
-
+  const [form] = Form.useForm();
+  const { businessProfile, updateBusinessProfileResponse, updateBusinessProfile } =
+    useBusinessProfile({
+      callAllBusinessProfile: true,
+    });
   const { isLoading: isUpdatingBusinessProfile } = updateBusinessProfileResponse;
 
-  console.log('businessProfile:::', businessProfile);
-
   const handleUpdateBusinessProfile = (payload: Record<string, any>) => {
-    console.log('handleUpdateBusinessProfile values::', payload);
-    // updateBusinessProfile({
-    //   payload: {
-    //     ...omit(payload, ['mobile', 'addressLine_1', 'name', 'status', 'category', 'email']),
-    //     name: String(payload?.name),
-    //     email: String(payload?.email),
-    //     mobile: {
-    //       phoneNumber: `234${payload.mobile}`,
-    //       isoCode: 'NG',
-    //     },
-    //     address: payload?.adress?.addressLine_1,
-    //     category: String(payload?.category),
-    //     status: String(payload?.status),
-    //   },
-    //   id: businessProfile?._id,
-    //   options: { successMessage: `Profile update successful` },
-    // });
+    updateBusinessProfile({
+      payload: {
+        ...omit(payload, ['phone', 'addressLine_1']),
+        mobile: {
+          phoneNumber: payload.phone,
+          isoCode: 'NG',
+        },
+        address: {
+          addressLine_1: payload?.addressLine_1,
+        },
+      },
+      id: businessProfile?._id,
+      options: { successMessage: `Profile successfully updated` },
+    });
   };
+
+  const initialValues = {
+    name: businessProfile?.name,
+    email: businessProfile?.email,
+    phone: businessProfile?.mobile?.phoneNumber,
+    addressLine_1: businessProfile?.address?.addressLine_1,
+    category: businessProfile?.category,
+    status: businessProfile?.status,
+  };
+
+  useEffect(() => {
+    form.setFieldsValue(initialValues);
+  }, [form, initialValues]);
 
   return (
     <BusinessProfile
       profile={businessProfile}
       handleUpdateBusinessProfile={handleUpdateBusinessProfile}
       isUpdatingBusinessProfile={isUpdatingBusinessProfile}
+      form={form}
     />
   );
 };

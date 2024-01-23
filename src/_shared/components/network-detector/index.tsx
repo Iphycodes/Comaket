@@ -1,6 +1,6 @@
 import { Detector } from 'react-detect-offline';
 import { ReactNode } from 'react';
-import { notification } from 'antd';
+import { App } from 'antd';
 import styled from 'styled-components';
 
 type NetWorkDetectorType = {
@@ -9,6 +9,7 @@ type NetWorkDetectorType = {
 
 const NetWorkDetector = (props: NetWorkDetectorType) => {
   const { children } = props;
+  const { notification } = App.useApp();
 
   const onNetWorkChange = (online: boolean) => {
     if (!online) {

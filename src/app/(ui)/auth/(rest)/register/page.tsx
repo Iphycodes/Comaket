@@ -1,7 +1,6 @@
 'use client';
-import { useContext, useEffect } from 'react';
+import { useEffect } from 'react';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
-import { AppContext } from '@grc/app-context';
 import Register from '@grc/components/auth/register';
 import { useRouter } from 'next/navigation';
 import { omit } from 'lodash';
@@ -10,7 +9,6 @@ import { Form } from 'antd';
 
 const RegisterPage = () => {
   const mobileResponsive = useMediaQuery(mediaSize.mobile);
-  const { theme } = useContext(AppContext);
   const router = useRouter();
   const [form] = Form.useForm();
   const { register, registerResponse } = useAuth({});
@@ -18,12 +16,21 @@ const RegisterPage = () => {
 
   const handleRegisterUser = (values: Record<string, any>) => {
     const payload = {
-      ...omit(values, ['confirm-password', 'phone']),
+      ...omit(values, ['confirmPassword', 'phone', 'agreement']),
       mobile: {
-        phoneNumber: values?.phone,
+        phoneNumber: `0${values?.phone}`,
         isoCode: 'NG',
       },
+      business: {
+        name: values?.name,
+        email: values?.email,
+        mobile: {
+          phoneNumber: `0${values?.phone}`,
+          isoCode: 'NG',
+        },
+      },
     };
+
     register({
       payload,
       options: {
@@ -41,7 +48,6 @@ const RegisterPage = () => {
   return (
     <Register
       mobileResponsive={mobileResponsive}
-      theme={theme}
       handleRegisterUser={handleRegisterUser}
       isRegisterLoading={isLoading}
       form={form}
