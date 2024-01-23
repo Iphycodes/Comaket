@@ -94,7 +94,15 @@ const Disbursement = () => {
         style={{ minWidth: modalElement === 'batch-payout' ? '700px' : '400px' }}
         footer={null}
       >
-        {modalElement === 'top-up-balance' && <TopUpBalance />}
+        {modalElement === 'top-up-balance' && (
+          <TopUpBalance
+            account={{
+              accountName: 'Ifeanyi Emmanuel Ifeanyi',
+              accountNumber: '0065453363',
+              bankName: 'Sterling Bank',
+            }}
+          />
+        )}
         {modalElement === 'single-payout' && <SinglePayout />}
         {modalElement === 'batch-payout' && <BatchPayout />}
       </Modal>

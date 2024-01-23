@@ -2,13 +2,12 @@
 
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 import { appNav } from '@grc/app/nav';
-import SelectVirtualAcct from '@grc/components/giro-pay/dashboard/libs/select-virtual-acct';
 import { AppHeader } from '@grc/components/giro-pay/layout/app-header';
 import { SideNav } from '@grc/components/giro-pay/layout/side-nav';
-// import SwitchAccountHeader from '@grc/components/giro-pay/layout/switch-account-header';
+import SwitchAccountHeader from '@grc/components/giro-pay/layout/switch-account-header';
 import { useAccountSetting } from '@grc/hooks/useAccountSetting';
 import { useAuth } from '@grc/hooks/useAuth';
-import { Layout, Space } from 'antd';
+import { Layout } from 'antd';
 import { Footer } from 'antd/es/layout/layout';
 import { usePathname, useRouter } from 'next/navigation';
 import { ReactElement } from 'react';
@@ -65,28 +64,7 @@ const AppsBaseLayout = (props: GiroPayPageProps) => {
         }}
       >
         <AppHeader isLiveMode={isLiveMode} handleSwitchAccountMode={handleSwitchAccountMode} />
-        <div
-          className="flex w-full items-center justify-end px-10 border-b h-8 bg-cyan-50"
-          style={{ position: 'sticky', minHeight: '32px', top: 64, zIndex: 10 }}
-        >
-          <Space size={10}>
-            <span className="font-thin text-[14px] text-blue">Switch Virtual Account: </span>
-            <SelectVirtualAcct
-              isLoadingAccounts={false}
-              vAccount={{} as any}
-              accounts={[
-                { accountName: 'John doe', accountNumber: '00000', bankName: 'demo' } as any,
-              ]}
-              setVAccount={() => {}}
-              className="virtual-select"
-            />
-            {/* <Select
-              placeholder={'Virtual Account'}
-              size="small"
-              className="w-[240px] virtual-select"
-            /> */}
-          </Space>
-        </div>
+        <SwitchAccountHeader />
         <Content className="main-content">
           <div className="dark:text-white" style={{ padding: 40, minHeight: '100vh' }}>
             {isSettingsPath?.toLowerCase() === 'settings' && (

@@ -1,10 +1,35 @@
-import { Col, Row, Space } from 'antd';
+import { Col, Row, Space, message } from 'antd';
+import { upperCase } from 'lodash';
 import Image from 'next/image';
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 
-const TopUpBalance = () => {
+interface accountType {
+  accountName: string;
+  accountNumber: string;
+  bankName: string;
+}
+
+interface TopUpBalanceProps {
+  account: accountType;
+}
+
+const TopUpBalance = ({ account }: TopUpBalanceProps) => {
+  const [textInput, setTextInput] = useState('');
+
+  useEffect(() => {
+    if (account?.accountNumber) setTextInput(account?.accountNumber);
+  }, [account?.accountNumber]);
+
+  const onCopy: () => void = () =>
+    textInput && message.success({ content: 'Account Number Copied' });
+
+  // const acctDetails = `Account Number: ${account?.accountNumber} \nAccount Name: ${account?.accountName} \nBank Name: ${account?.bankName}`;
+
+  // const onCopyAll: () => void = () =>
+  //   acctDetails && message.success({ content: 'Account Details Copied' });
+
   return (
-    <div className="flex flex-col">
+    <div className="flex flex-col justify-start">
       <div className="flex items-center border-b-2 pb-3">
         <Space size={5}>
           <span
@@ -26,8 +51,11 @@ const TopUpBalance = () => {
             <span className=" text-gray-500 font-semibold">Account Number: </span>
           </Col>
           <Col className="flex gap-1 items-start" span={16}>
-            <span className="text-2xl font-bold">0065453363</span>
-            <i className="ri-file-copy-line mb-1 text-[20px]"></i>
+            <span className="text-2xl font-bold">{account?.accountNumber}</span>
+            <i
+              className="ri-file-copy-line mb-1 text-[20px] hover:text-blue cursor-pointer"
+              onClick={() => navigator.clipboard.writeText(textInput).then(onCopy)}
+            ></i>
           </Col>
         </Row>
         <Row className="flex items-center">
@@ -35,7 +63,7 @@ const TopUpBalance = () => {
             <span className=" text-gray-500 font-semibold">Bank: </span>
           </Col>
           <Col span={16}>
-            <span className="text-lg font-semibold">STERLING BANK</span>
+            <span className="text-lg font-semibold">{account?.bankName?.toUpperCase()}</span>
           </Col>
         </Row>
         <Row className="flex items-center">
@@ -43,7 +71,7 @@ const TopUpBalance = () => {
             <span className=" text-gray-500 font-semibold">Account Name: </span>
           </Col>
           <Col span={16}>
-            <span className="text-lg font-semibold">GIRO-PAY MAIN ACCOUNT</span>
+            <span className="text-lg font-semibold">{upperCase(account?.accountName)}</span>
           </Col>
         </Row>
         <Row className="flex items-center">

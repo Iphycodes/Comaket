@@ -448,10 +448,6 @@ export const MockVirtualAccounts: any = [
   { id: '001', accountName: 'The 30th Concept', accountNumber: '004002001', amount: 3300000000 },
   { id: '002', accountName: 'Jay Doe Biz', accountNumber: '004002003', amount: 52000000 },
 ];
-// export const MockVirtualAccounts: any = [
-//   { id: '001', accountName: 'The 30th Concept', accountNumber: '004002001', amount: 3300000000 },
-//   { id: '002', accountName: 'Jay Doe Biz', accountNumber: '004002003', amount: 52000000 },
-// ];
 
 export interface ReciepientsDataType {
   accountNumber?: number;
