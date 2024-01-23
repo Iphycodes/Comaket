@@ -6,4 +6,11 @@ export const changePasswordTag = 'change-password';
 export const businessProfileTag = 'business-profile';
 export const accountSettingTag = 'account-setting';
 
-export default [loggedInUserTag, virtualAccountTag, updateUserTag];
+export default [
+  loggedInUserTag,
+  virtualAccountTag,
+  updateUserTag,
+  businessProfileTag,
+  changePasswordTag,
+  bankAccountsTag,
+];

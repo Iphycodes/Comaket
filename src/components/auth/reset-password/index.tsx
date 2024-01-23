@@ -7,7 +7,6 @@ import PasswordInput from '../lib/password-input';
 
 type ResetPasswordProps = {
   mobileResponsive: boolean;
-  theme: string;
   handleResetPasswordSubmit: (payload: Record<string, any>) => void;
   handleResendPasscode: () => void;
   isLoading: {

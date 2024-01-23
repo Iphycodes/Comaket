@@ -1,14 +1,14 @@
 'use client';
-import { useContext, useEffect } from 'react';
+import { useEffect } from 'react';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
-import { AppContext } from '@grc/app-context';
 import ForgotPassword from '@grc/components/auth/forgot-password';
 import { useRouter } from 'next/navigation';
 import { useAuth } from '@grc/hooks/useAuth';
+import { useTheme } from 'next-themes';
 
 const ForgotPasswordPage = () => {
   const mobileResponsive = useMediaQuery(mediaSize.mobile);
-  const { theme } = useContext(AppContext);
+  const { theme } = useTheme();
   const router = useRouter();
   const { forgotPassword, forgotPasswordResponse } = useAuth({});
   const { isSuccess, isLoading } = forgotPasswordResponse;

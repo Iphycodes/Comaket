@@ -9,12 +9,12 @@ export const initialState = {
   authData: null,
   sessionToken: null,
   currentAccount: null,
-  isLiveMode: 'true',
+  isLiveMode: false,
 } as {
   authData: AuthDataType | null;
   sessionToken: string | null;
   currentAccount: AccountNamespace.Account | null;
-  isLiveMode: string;
+  isLiveMode: boolean;
 };
 
 const AUTH_KEY = 'auth';

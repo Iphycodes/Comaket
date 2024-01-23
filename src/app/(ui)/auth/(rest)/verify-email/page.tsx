@@ -1,14 +1,12 @@
 'use client';
-import { useContext, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
-import { AppContext } from '@grc/app-context';
 import { useRouter, useSearchParams } from 'next/navigation';
 import VerifyEmail from '@grc/components/auth/verify-email';
 import { useAuth } from '@grc/hooks/useAuth';
 
 const VerifyEmailPage = () => {
   const mobileResponsive = useMediaQuery(mediaSize.mobile);
-  const { theme } = useContext(AppContext);
   const [email, setEmail] = useState<string | null>('');
   const params = useSearchParams();
   const router = useRouter();
@@ -50,7 +48,7 @@ const VerifyEmailPage = () => {
 
   useEffect(() => {
     if (isSuccess) {
-      router.push(`/app`);
+      router.push(`/apps`);
     }
   }, [verifyEmailResponse]);
 
@@ -58,7 +56,6 @@ const VerifyEmailPage = () => {
     <VerifyEmail
       email={email}
       mobileResponsive={mobileResponsive}
-      theme={theme}
       handleVerifyEmail={handleVerifyEmail}
       isLoading={{ verifyEmailLoading, isSendVerificationCodeLoading }}
       handleResendPasscode={handleResendPasscode}

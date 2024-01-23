@@ -61,9 +61,10 @@ const Apps = (props: LoginProps) => {
                       alt="logo"
                       width={60}
                       height={60}
+                      priority
                       style={{ width: '50px', height: '50px' }}
                     />
-                    <span style={{}}>
+                    <span>
                       {title === 'Giro Mandate' ? (
                         <div className="flex flex-col">
                           <div>{title}</div>

@@ -3,7 +3,18 @@ import React from 'react';
 import moment from 'moment';
 import CustomToolTip from '@grc/_shared/components/custom-tooltip';
 import { countries, gender } from '@grc/_shared/constant';
-import { Button, Card, Col, DatePicker, Form, Input, InputNumber, Row, Select } from 'antd';
+import {
+  Button,
+  Card,
+  Col,
+  DatePicker,
+  Form,
+  FormInstance,
+  Input,
+  InputNumber,
+  Row,
+  Select,
+} from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
 
@@ -12,11 +23,11 @@ type ProfileDetailsProps = {
   theme?: string;
   handleUpdateProfileDetails: (payload: Record<string, any>) => void;
   isUpdatingProfile: boolean;
+  form: FormInstance<any>;
 };
 
 export const ProfileDetails = (props: ProfileDetailsProps) => {
-  const { handleUpdateProfileDetails, isUpdatingProfile } = props;
-  const [form] = Form.useForm();
+  const { handleUpdateProfileDetails, isUpdatingProfile, form } = props;
 
   const onFinish = (values: Record<string, any>) => {
     handleUpdateProfileDetails(values);
