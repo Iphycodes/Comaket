@@ -46,7 +46,7 @@ export const scrollOption: ScrollIntoViewOptions = {
 };
 
 export const status = [
-  { label: 'All', value: '' },
+  { label: 'All', value: 'all' },
   { label: 'Success', value: 'successful' },
   { label: 'Failed', value: 'failed' },
 ];
@@ -431,7 +431,7 @@ export const smoothLineChartData = {
     {
       label: '',
       data: [50, 60, 55, 73, 65, 90, 75],
-      fill: true,
+      fill: false,
       backgroundColor: 'rgba(30, 136, 229, 0.2)',
       borderColor: 'rgba(30, 136, 229, 1)',
       borderWidth: 2,

@@ -1,25 +1,90 @@
 'use client';
-import React from 'react';
-import { Button, Card, Col, Form, Input, Row, Spin, Tooltip } from 'antd';
-import { CopyIcon } from '@grc/_shared/assets/svgs';
+import React, { useEffect, useState } from 'react';
+import { Button, Card, Col, Form, FormInstance, Input, Row, Spin, Tooltip, message } from 'antd';
+import { CopyIcon, CopyIconLight } from '@grc/_shared/assets/svgs';
 import { motion } from 'framer-motion';
+import CustomModal from '@grc/_shared/components/custom-modal';
 
 type ApiKeysAndWebhooksUrlProps = {
   mobileResponsive?: boolean;
   theme?: string;
-  handleUpdateApiKeysAndWebhooksUrl: (payload: Record<string, any>) => void;
-  isUpdatingApiKeysAndWebhooksUrl: boolean;
-  isSecretKeyLoading: boolean;
+  handleUpdateWebhooksUrl: (payload: Record<string, any>) => void;
+  handleGetSecretKey: (values: Record<string, any>) => void;
+  isLoading: {
+    isSecretKeyLoading: boolean;
+    isUpdatingWebhooksUrl: boolean;
+  };
+  form: FormInstance<any>;
+  isLiveMode: boolean;
+  isGettingSecretKeySuccessful: boolean;
 };
 
 export const ApiKeysAndWebhooksUrl = (props: ApiKeysAndWebhooksUrlProps) => {
-  const { handleUpdateApiKeysAndWebhooksUrl, isUpdatingApiKeysAndWebhooksUrl, isSecretKeyLoading } =
-    props;
-  const [form] = Form.useForm();
+  const {
+    handleUpdateWebhooksUrl,
+    theme,
+    form,
+    isLiveMode,
+    isLoading: { isSecretKeyLoading, isUpdatingWebhooksUrl },
+    handleGetSecretKey,
+    isGettingSecretKeySuccessful,
+  } = props;
+  const [openModal, setOpenModal] = useState(false);
+
+  const handleAuthenticateGetSecretKey = (values: Record<string, any>) => {
+    handleGetSecretKey(values);
+  };
 
   const onFinish = (values: Record<string, any>) => {
-    handleUpdateApiKeysAndWebhooksUrl(values);
+    handleUpdateWebhooksUrl(values);
   };
+
+  const onCopy: (text: string) => void = (text) =>
+    (form.getFieldsValue() as any)?.[text] &&
+    message.success({
+      content:
+        (text === 'pubKey'
+          ? 'Public key'
+          : text === 'secKey'
+            ? 'Secret key'
+            : text === 'webhooks'
+              ? 'Webhooks url'
+              : '') + ' copied.',
+      icon: <></>,
+    });
+
+  const ConfirmModal = () => (
+    <Form
+      onFinish={handleAuthenticateGetSecretKey}
+      layout="vertical"
+      requiredMark={false}
+      className="text-left"
+    >
+      <Form.Item
+        name="password"
+        rules={[{ required: true, message: 'Please enter your password' }]}
+        label={<span>Password</span>}
+      >
+        <Input.Password placeholder="Enter Password" className="h-14" visibilityToggle />
+      </Form.Item>
+      <Button
+        className="opacity-100 hover:opacity-70 mt-2 bg-blue text-white h-14 rounded-lg"
+        type="primary"
+        disabled={isSecretKeyLoading}
+        block
+        loading={isSecretKeyLoading}
+        htmlType="submit"
+      >
+        Continue
+      </Button>
+    </Form>
+  );
+
+  useEffect(() => {
+    if (isGettingSecretKeySuccessful) {
+      setOpenModal(false);
+    }
+  }, [isGettingSecretKeySuccessful]);
 
   return (
     <motion.section
@@ -42,20 +107,37 @@ export const ApiKeysAndWebhooksUrl = (props: ApiKeysAndWebhooksUrlProps) => {
           >
             <Row gutter={[16, 16]} className="flex items center justify-center">
               <Col md={14} xs={24}>
-                <Form.Item name="pubKey" label={<span>Live API Public Key</span>}>
+                <Form.Item
+                  name="pubKey"
+                  label={<span>{isLiveMode ? 'Live' : 'Test'} API Public Key</span>}
+                >
                   <Input placeholder="" className="h-14" disabled />
                 </Form.Item>
               </Col>
               <Col className="flex items-center justify-center text-xs">
-                <div className={'flex items-center justify-center'}>
-                  <CopyIcon className=" scale-75" />
+                <div
+                  className={'flex items-center justify-center cursor-pointer'}
+                  onClick={() =>
+                    navigator.clipboard
+                      .writeText(form.getFieldsValue()?.pubKey || '')
+                      .then(() => onCopy('pubKey'))
+                  }
+                >
+                  {theme === 'light' ? (
+                    <CopyIcon className=" scale-75" />
+                  ) : (
+                    <CopyIconLight className=" scale-75" />
+                  )}
                   <span className=" text-card-foreground">Copy</span>
                 </div>
               </Col>
             </Row>
-            <Row gutter={[16, 16]} className="flex items center justify-center">
+            <Row gutter={[16, 16]} className="flex items center justify-center cursor-pointer">
               <Col md={14} xs={24}>
-                <Form.Item name="secKey" label={<span>Live API Secret Key</span>}>
+                <Form.Item
+                  name="secKey"
+                  label={<span>{isLiveMode ? 'Live' : 'Test'} API Secret Key</span>}
+                >
                   <Input
                     placeholder=""
                     className="h-14"
@@ -65,7 +147,10 @@ export const ApiKeysAndWebhooksUrl = (props: ApiKeysAndWebhooksUrlProps) => {
                         {isSecretKeyLoading == true ? (
                           <Spin size="small" />
                         ) : (
-                          <i className="ri-eye-2-line cursor-pointer" />
+                          <i
+                            className="ri-eye-2-line cursor-pointer"
+                            onClick={() => setOpenModal(true)}
+                          />
                         )}
                       </Tooltip>
                     }
@@ -73,8 +158,19 @@ export const ApiKeysAndWebhooksUrl = (props: ApiKeysAndWebhooksUrlProps) => {
                 </Form.Item>
               </Col>
               <Col className="flex items-center justify-center text-xs">
-                <div className={'flex items-center justify-center'}>
-                  <CopyIcon className=" scale-75" />
+                <div
+                  className={'flex items-center justify-center cursor-pointer'}
+                  onClick={() =>
+                    navigator.clipboard
+                      .writeText(form.getFieldsValue()?.secKey || '')
+                      .then(() => onCopy('secKey'))
+                  }
+                >
+                  {theme === 'light' ? (
+                    <CopyIcon className=" scale-75" />
+                  ) : (
+                    <CopyIconLight className=" scale-75" />
+                  )}
                   <span className=" text-card-foreground">Copy</span>
                 </div>
               </Col>
@@ -97,9 +193,9 @@ export const ApiKeysAndWebhooksUrl = (props: ApiKeysAndWebhooksUrlProps) => {
               <Button
                 className="opacity-100 hover:opacity-70 mt-1.5 bg-blue text-white h-12 rounded-lg px-10 mx-auto"
                 type="primary"
-                disabled={isUpdatingApiKeysAndWebhooksUrl}
+                disabled={isUpdatingWebhooksUrl}
                 block={false}
-                loading={isUpdatingApiKeysAndWebhooksUrl}
+                loading={isUpdatingWebhooksUrl}
                 htmlType="submit"
               >
                 Update
@@ -107,6 +203,12 @@ export const ApiKeysAndWebhooksUrl = (props: ApiKeysAndWebhooksUrlProps) => {
             </div>
           </Form>
         </Card>
+
+        <CustomModal
+          setOpenModal={() => setOpenModal(!openModal)}
+          openModal={openModal}
+          component={<ConfirmModal />}
+        />
       </section>
     </motion.section>
   );

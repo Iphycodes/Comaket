@@ -7,7 +7,7 @@ import { AppLoader } from '@grc/_shared/components/app-loader';
 import NetWorkDetector from '@grc/_shared/components/network-detector';
 import { persistor, store } from '@grc/redux/store';
 import { AppProvider } from '@grc/app-context';
-import { ConfigProvider, theme as AntDTheme } from 'antd';
+import { ConfigProvider, theme as AntDTheme, App } from 'antd';
 import { useTheme } from 'next-themes';
 
 export interface LayoutProps {
@@ -22,26 +22,28 @@ const BaseLayout = ({ children }: LayoutProps) => {
     <Provider store={store}>
       <PersistGate loading={null} persistor={persistor}>
         <Suspense fallback={<AppLoader use={Rings} theme={''} />}>
-          <NetWorkDetector>
-            <ConfigProvider
-              theme={{
-                algorithm: theme === 'dark' ? darkAlgorithm : defaultAlgorithm,
-                components: {
-                  Button: {
-                    colorPrimary: 'rgba(30, 136, 229, 1)',
-                    algorithm: true,
-                  },
-                  Input: {
-                    colorBgContainerDisabled: 'transparent',
-                    algorithm: true,
-                  },
-                  Switch: {},
+          <ConfigProvider
+            theme={{
+              algorithm: theme === 'dark' ? darkAlgorithm : defaultAlgorithm,
+              components: {
+                Button: {
+                  colorPrimary: 'rgba(30, 136, 229, 1)',
+                  algorithm: true,
                 },
-              }}
-            >
-              <AppProvider>{children}</AppProvider>
-            </ConfigProvider>
-          </NetWorkDetector>
+                Input: {
+                  colorBgContainerDisabled: 'transparent',
+                  algorithm: true,
+                },
+                Switch: {},
+              },
+            }}
+          >
+            <AppProvider>
+              <App>
+                <NetWorkDetector>{children}</NetWorkDetector>
+              </App>
+            </AppProvider>
+          </ConfigProvider>
         </Suspense>
       </PersistGate>
     </Provider>

@@ -9,7 +9,7 @@ import CustomToolTip from '@grc/_shared/components/custom-tooltip';
 
 type RegisterProps = {
   mobileResponsive: boolean;
-  theme: string;
+  theme?: string;
   handleRegisterUser: (payload: Record<string, any>) => void;
   isRegisterLoading: boolean;
   form: FormInstance<any>;

@@ -6,7 +6,6 @@ import { useState } from 'react';
 
 type LoginProps = {
   mobileResponsive: boolean;
-  theme: string;
   onRememberMe: (value: any, email: string) => void;
   handleLogin: (payload: Record<string, any>) => void;
   isLoading: boolean;

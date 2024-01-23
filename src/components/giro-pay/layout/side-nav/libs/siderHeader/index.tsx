@@ -42,7 +42,7 @@ export const SiderHeader = (props: SiderHeaderProps) => {
             alt="giro-logo"
             width={140}
             height={60}
-            // style={{}}
+            priority
           />
         </span>
       )}

@@ -5,7 +5,6 @@ import { categories, countries } from '@grc/_shared/constant';
 
 type BuisnessRegisterProps = {
   mobileResponsive: boolean;
-  theme: string;
   handleBusinessRegister: (payload: Record<string, any>) => void;
   categoriesLoading: boolean;
 };

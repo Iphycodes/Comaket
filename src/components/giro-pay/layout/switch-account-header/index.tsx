@@ -8,10 +8,7 @@ interface Props {
 
 const SwitchAccountHeader: React.FC<Props> = ({}) => {
   return (
-    <div
-      className="flex w-full items-center justify-end px-10 border-b h-10 bg-cyan-50 dark:bg-gray-800"
-      style={{ position: 'sticky', minHeight: '32px', top: 64, zIndex: 10 }}
-    >
+    <div className="flex w-full sticky min-h-8 z-10 top-16 items-center justify-end px-10 border-b h-10 bg-blue dark:bg-gray-800">
       <Space size={10}>
         <span className="font-bold text-[14px] text-blue dark:text-white">
           Switch Virtual Account:{' '}

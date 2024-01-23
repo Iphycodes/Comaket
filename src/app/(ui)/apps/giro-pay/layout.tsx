@@ -2,26 +2,24 @@
 
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 import { appNav } from '@grc/app/nav';
+import SelectVirtualAcct from '@grc/components/giro-pay/dashboard/libs/select-virtual-acct';
 import { AppHeader } from '@grc/components/giro-pay/layout/app-header';
 import { SideNav } from '@grc/components/giro-pay/layout/side-nav';
-import SwitchAccountHeader from '@grc/components/giro-pay/layout/switch-account-header';
+// import SwitchAccountHeader from '@grc/components/giro-pay/layout/switch-account-header';
+import { useAccountSetting } from '@grc/hooks/useAccountSetting';
 import { useAuth } from '@grc/hooks/useAuth';
-import { Layout } from 'antd';
+import { Layout, Space } from 'antd';
 import { Footer } from 'antd/es/layout/layout';
 import { usePathname, useRouter } from 'next/navigation';
 import { ReactElement } from 'react';
 
 const { Content } = Layout;
 
-// import { useContext } from 'react';
-// import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
-// import { AppContext } from '@grc/app-context';
-
-type GiroDebitPageProps = {
+type GiroPayPageProps = {
   children?: ReactElement | ReactElement[];
 };
 
-const AppsBaseLayout = (props: GiroDebitPageProps) => {
+const AppsBaseLayout = (props: GiroPayPageProps) => {
   const { children } = props;
   const mobileResponsive = useMediaQuery(mediaSize.mobile);
   const tabletResponsive = useMediaQuery(mediaSize.tablet);
@@ -31,11 +29,24 @@ const AppsBaseLayout = (props: GiroDebitPageProps) => {
   const isSettingsPath = pathUrl?.[3];
   const currentPage = pathUrl?.[4];
 
-  const { authData } = useAuth({
+  const { authData, isLiveMode } = useAuth({
     callAccounts: false,
     callCurrentAccount: false,
     callUser: true,
   });
+  const { updateAccount } = useAccountSetting({
+    callAllAccountSetting: true,
+  });
+
+  const handleSwitchAccountMode = (value: boolean) => {
+    updateAccount({
+      payload: { live: value },
+      id: authData?.currentAccount?.id,
+      options: {
+        successMessage: `Account successfully updated`,
+      },
+    });
+  };
   const formatPathText = (value: string) => value.replace(/\s+/g, '-').toLowerCase();
   const collapse = false;
 
@@ -53,8 +64,29 @@ const AppsBaseLayout = (props: GiroDebitPageProps) => {
           transition: 'margin-left 0.3s ease',
         }}
       >
-        <AppHeader />
-        <SwitchAccountHeader />
+        <AppHeader isLiveMode={isLiveMode} handleSwitchAccountMode={handleSwitchAccountMode} />
+        <div
+          className="flex w-full items-center justify-end px-10 border-b h-8 bg-cyan-50"
+          style={{ position: 'sticky', minHeight: '32px', top: 64, zIndex: 10 }}
+        >
+          <Space size={10}>
+            <span className="font-thin text-[14px] text-blue">Switch Virtual Account: </span>
+            <SelectVirtualAcct
+              isLoadingAccounts={false}
+              vAccount={{} as any}
+              accounts={[
+                { accountName: 'John doe', accountNumber: '00000', bankName: 'demo' } as any,
+              ]}
+              setVAccount={() => {}}
+              className="virtual-select"
+            />
+            {/* <Select
+              placeholder={'Virtual Account'}
+              size="small"
+              className="w-[240px] virtual-select"
+            /> */}
+          </Space>
+        </div>
         <Content className="main-content">
           <div className="dark:text-white" style={{ padding: 40, minHeight: '100vh' }}>
             {isSettingsPath?.toLowerCase() === 'settings' && (

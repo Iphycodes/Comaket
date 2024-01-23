@@ -4,7 +4,7 @@ import { motion } from 'framer-motion';
 
 type ForgotPasswordProps = {
   mobileResponsive: boolean;
-  theme: string;
+  theme: string | undefined;
   handleForgotPassword: (payload: Record<string, any>) => void;
   isLoading: boolean;
 };

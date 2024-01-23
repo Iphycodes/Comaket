@@ -23,7 +23,6 @@ const FilterDrawer = ({ open, onClose }: FilterDrawerProps) => {
       <div className="w-full p-5 flex flex-col gap-3">
         <Form
           name="filter-form"
-          style={{}}
           initialValues={{ remember: false }}
           onFinish={onFinish}
           autoComplete="off"

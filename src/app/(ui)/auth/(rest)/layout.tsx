@@ -27,7 +27,13 @@ const AppsBaseLayout = (props: LayoutProps) => {
       <header className="w-[54rem] max-w-full flex shadow-sm border-b border-border/100 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:text-white items-center justify-between justify-items-center py-4 px-6 md:flex-wrap">
         <span className=" cursor-pointer" onClick={() => onHeaderButtonClicked('login')}>
           {/* <GiroLogo /> */}
-          <Image src={'/assets/svgs/giro-logo.svg'} alt="giro-logo" width={150} height={50} />
+          <Image
+            src={'/assets/svgs/giro-logo.svg'}
+            alt="giro-logo"
+            priority
+            width={150}
+            height={50}
+          />
         </span>
         {isSignUpPage ? (
           <div className="flex items-center justify-center">

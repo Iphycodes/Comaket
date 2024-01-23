@@ -16,7 +16,13 @@ export const AppSettingsSiderHeader = (props: AppSettingsSiderHeaderProps) => {
     <div className="flex flex-col justify-start items-start gap-10 py-2 mt-2 px-5">
       {!collapsed && (
         <span className="cursor-pointer" onClick={() => push('/apps')}>
-          <Image src={'/assets/svgs/giro-logo.svg'} alt="giro-logo" width={140} height={60} />
+          <Image
+            priority
+            src={'/assets/svgs/giro-logo.svg'}
+            alt="giro-logo"
+            width={140}
+            height={60}
+          />
         </span>
       )}
     </div>

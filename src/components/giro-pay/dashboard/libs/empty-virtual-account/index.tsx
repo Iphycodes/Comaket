@@ -40,7 +40,7 @@ export const EmptyVirtualAccount = ({
           <Button
             type="primary"
             className=" py-6 px-10 opacity-100 hover:opacity-70 mt-4 bg-blue text-white rounded-lg flex items-center cursor-pointer"
-            onClick={() => (isVerified ? handleCreateVirtualAccount() : push('settings'))}
+            onClick={() => (isVerified ? handleCreateVirtualAccount() : push('/apps/settings'))}
           >
             {isVerified ? 'Create A Wallet' : 'Verify Profile'}
           </Button>
