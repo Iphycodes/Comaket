@@ -125,9 +125,11 @@ const RecentDisbursements: React.FC<RecentDisbursementsProps> = ({
                     <Space size={5}>
                       {item?.type === 'single' && <i className="ri-user-line text-[24px]"></i>}
                       {item?.type === 'Batch' && <i className="ri-group-line text-[24px]"></i>}
-                      <div className="flex text-black flex-col gap-0">
-                        <span className="font-semibold text-black">{acctName}</span>
-                        <span className="text-[12px] text-gray-600">
+                      <div className="flex flex-col gap-0">
+                        <span className="font-semibold text-black dark:text-gray-100">
+                          {acctName}
+                        </span>
+                        <span className="text-[12px] text-gray-500">
                           {moment(item?.date ?? '').format('MMM DD, YYYY hh:mm A')}
                         </span>
                         <Space className="font-semibold text-[10px] flex items-center gap-1 text-blue">

@@ -17,12 +17,15 @@ const TransactionStatisticsCard = (props: TransactionStatisticsCardProps) => {
   const { style, color, value, title, percentage } = props;
 
   return (
-    <Card className="transaction-stat-card shadow-sm shadow-gray-100" style={{ ...style }}>
+    <Card
+      className="transaction-stat-card dark:border-gray-500 shadow-sm shadow-gray-100"
+      style={{ ...style }}
+    >
       <div className="flex flex-col gap-6 justify-between">
-        <div className="text-gray-500">{title}</div>
+        <div className="text-gray-500 dark:text-gray-100">{title}</div>
         <div className="flex justify-between items-center">
           <div className="flex flex-col gap-0">
-            <span className="amount font-semibold text-[32px] text-gray-600">
+            <span className="amount font-semibold text-[32px] text-gray-600 dark:text-gray-100">
               {`\u20A6${formatNumber(value ?? 0.0, 0)}` ?? '\u20A60.00'}
             </span>
             <span className="text-blue">view details</span>

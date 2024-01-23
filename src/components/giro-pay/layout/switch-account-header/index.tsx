@@ -9,11 +9,13 @@ interface Props {
 const SwitchAccountHeader: React.FC<Props> = ({}) => {
   return (
     <div
-      className="flex w-full items-center justify-end px-10 border-b h-10 bg-cyan-50"
+      className="flex w-full items-center justify-end px-10 border-b h-10 bg-cyan-50 dark:bg-gray-800"
       style={{ position: 'sticky', minHeight: '32px', top: 64, zIndex: 10 }}
     >
       <Space size={10}>
-        <span className="font-bold text-[14px] text-blue">Switch Virtual Account: </span>
+        <span className="font-bold text-[14px] text-blue dark:text-white">
+          Switch Virtual Account:{' '}
+        </span>
         <SelectVirtualAcct
           width="500px"
           isLoadingAccounts={false}

@@ -12,7 +12,7 @@ const BalanceCard = () => {
           setVAccount={() => {}}
           className="font-bold"
         /> */}
-        <div className="border p-3 px-2 text-blue font-semibold border-blue bg-cyan-50 rounded-lg shadow-sm">
+        <div className="border p-3 px-2 text-blue font-semibold border-blue dark:text-gray-100 bg-cyan-50 dark:bg-gray-800 rounded-lg shadow-sm">
           Ifeanyi Emmanuel | 0065453363 | Demo
         </div>
         <div className="flex flex-col gap-2">
