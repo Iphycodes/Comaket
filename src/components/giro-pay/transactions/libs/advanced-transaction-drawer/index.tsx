@@ -27,7 +27,7 @@ const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTr
         {Object.entries(selectedRecord).map(([key, value]) => {
           return (
             <div key={key} className="flex justify-between items-center">
-              <div className="flex items-center gap-1 text-gray-500">
+              <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
                 <span>
                   {(() => {
                     switch (key) {

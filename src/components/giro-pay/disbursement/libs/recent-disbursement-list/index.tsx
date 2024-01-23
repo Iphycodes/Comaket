@@ -4,7 +4,7 @@ import {
   mockDisbursementRecord,
 } from '@grc/_shared/constant';
 import { numberFormat } from '@grc/_shared/helpers';
-import { Card, List, Space, Tag } from 'antd';
+import { List, Space, Tag } from 'antd';
 import moment from 'moment';
 import Link from 'next/link';
 import React, { Dispatch, SetStateAction } from 'react';
@@ -71,7 +71,7 @@ const RecentDisbursements: React.FC<RecentDisbursementsProps> = ({
     };
   };
   return (
-    <Card className="w-full border shadow-sm hover:shadow-md shadow-gray-100 h-full">
+    <div className="w-full border shadow-sm p-5 dark:bg-zinc-800 rounded-xl dark:border-gray-500 h-full">
       <List
         className="overflow-y-auto"
         header={<div className="font-semibold">Recent Disbursements</div>}
@@ -182,7 +182,7 @@ const RecentDisbursements: React.FC<RecentDisbursementsProps> = ({
           );
         }}
       />
-    </Card>
+    </div>
   );
 };
 

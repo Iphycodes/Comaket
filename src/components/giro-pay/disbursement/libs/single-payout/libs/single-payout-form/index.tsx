@@ -41,7 +41,7 @@ const SinglePayoutForm = ({
     <div className="max-h-[450px] overflow-y-scroll">
       <Row className="py-5" style={{}}>
         <Col span={24} className="beneficiary-form">
-          <div className="mb-0 text-gray-500">Select Saved Beneficiary</div>
+          <div className="mb-0 text-gray-500 dark:text-gray-300">Select Saved Beneficiary</div>
           <Select
             bordered={true}
             showSearch
@@ -62,7 +62,7 @@ const SinglePayoutForm = ({
       >
         <Row className="my-0">
           <Col className="my-0" lg={24} xs={24}>
-            <div className="mb-0 text-gray-500">{`Amount (\u20A6)`}</div>
+            <div className="mb-0 text-gray-500 dark:text-gray-300">{`Amount (\u20A6)`}</div>
             <Form.Item
               name="amount"
               className="amount-inp mb-3"
@@ -81,7 +81,7 @@ const SinglePayoutForm = ({
         </Row>
         <Row>
           <Col lg={24} xs={24}>
-            <div className="mb-0 text-gray-500">Bank</div>
+            <div className="mb-0 text-gray-500 dark:text-gray-300">Bank</div>
             <Form.Item
               name="reciepient-bank"
               className="mb-3"
@@ -99,7 +99,7 @@ const SinglePayoutForm = ({
         </Row>
         <Row className="my-0">
           <Col className="my-0" lg={24} xs={24}>
-            <div className="mb-0 text-gray-500">{`Account Number`}</div>
+            <div className="mb-0 text-gray-500 dark:text-gray-300">{`Account Number`}</div>
             <Form.Item
               name="account-number"
               className="amount-inp mb-3"
@@ -116,7 +116,7 @@ const SinglePayoutForm = ({
         </Row>
         <Row className="my-0">
           <Col className="my-0" lg={24} xs={24}>
-            <div className="mb-0 text-gray-500">{`Account Name`}</div>
+            <div className="mb-0 text-gray-500 dark:text-gray-300">{`Account Name`}</div>
             <Form.Item name="name" className="amount-inp mb-3">
               <Input className="w-full" size="large" />
             </Form.Item>

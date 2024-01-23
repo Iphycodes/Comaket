@@ -40,7 +40,7 @@ const SinglePayout = ({}: SinglePayoutProps) => {
 
   return (
     <>
-      <div className="flex sticky top-0 bg-white z-10 items-center border-b-2 pb-2">
+      <div className="flex sticky top-0 bg-white dark:bg-[#1f1f1f] z-10 items-center border-b-2 pb-2">
         <Space className="" size={10}>
           <span
             className="text-[16px] flex justify-center items-center h-12 w-12 bg-blue"

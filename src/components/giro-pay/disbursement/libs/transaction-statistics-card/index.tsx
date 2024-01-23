@@ -1,7 +1,6 @@
 'use client';
 
 import { formatNumber } from '@grc/_shared/helpers';
-import { Card } from 'antd';
 import Circle from 'react-circle';
 
 interface TransactionStatisticsCardProps {
@@ -17,8 +16,8 @@ const TransactionStatisticsCard = (props: TransactionStatisticsCardProps) => {
   const { style, color, value, title, percentage } = props;
 
   return (
-    <Card
-      className="transaction-stat-card dark:border-gray-500 shadow-sm shadow-gray-100"
+    <div
+      className="transaction-stat-card dark:bg-zinc-800 border dark:border-gray-500 rounded-xl shadow-sm p-5"
       style={{ ...style }}
     >
       <div className="flex flex-col gap-6 justify-between">
@@ -45,7 +44,7 @@ const TransactionStatisticsCard = (props: TransactionStatisticsCardProps) => {
           </div>
         </div>
       </div>
-    </Card>
+    </div>
   );
 };
 

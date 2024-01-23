@@ -1,7 +1,6 @@
 'use client';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
 import { mockTransactionAnalyticsData } from '@grc/_shared/constant';
-import { Card } from 'antd';
 import { Doughnut } from 'react-chartjs-2';
 
 ChartJS.register(ArcElement, Tooltip, Legend);
@@ -9,7 +8,7 @@ ChartJS.register(ArcElement, Tooltip, Legend);
 const PieChartAnaytics = () => {
   let delayed: any;
   return (
-    <Card className="piechart-card shadow-sm shadow-gray-100 w-full flex items-center justify-center">
+    <div className="piechart-card shadow-sm dark:bg-zinc-800 border dark:border-gray-500 w-full flex flex-col rounded-xl items-center justify-center">
       <div className="text-center w-full mb-5 text-md font-semibold">
         Total Number of Disbursements Made : <span className="font-bold">500</span>
       </div>
@@ -42,7 +41,7 @@ const PieChartAnaytics = () => {
           },
         }}
       />
-    </Card>
+    </div>
   );
 };
 
