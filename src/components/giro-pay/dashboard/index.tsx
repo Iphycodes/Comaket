@@ -18,7 +18,6 @@ import {
   smoothLineChartData,
   statisticsFilter,
 } from '@grc/_shared/constant';
-import AcctDetails from './libs/acct-details';
 import CreateVirtualAcctForm from './libs/create-virtual-acct-form';
 import {
   Chart as ChartJS,
@@ -37,6 +36,7 @@ import { CashFlowCard } from './libs/cash-flow-card';
 import { QuickActionBtn } from './libs/quick-action-btn';
 import { EmptyVirtualAccount } from './libs/empty-virtual-account';
 import { motion } from 'framer-motion';
+import TopUpBalance from '../disbursement/libs/top-up-balance';
 
 type DashBoardProps = {
   authData?: AuthDataType | null;
@@ -575,12 +575,11 @@ const DashBoard = (props: DashBoardProps) => {
         />
         <CustomModal
           component={
-            <AcctDetails
+            <TopUpBalance
               account={{
-                id: '001',
-                accountName: 'The 30th Concept',
-                accountNumber: '001002003004',
-                bankName: 'Test Bank',
+                accountName: 'Ogbonna Emmanuel Ifeanyi',
+                accountNumber: '0065453363',
+                bankName: 'Sterling Bank',
               }}
             />
           }

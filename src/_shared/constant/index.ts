@@ -303,21 +303,95 @@ export const statCardProps = [
 ];
 
 export const mockTransactionAnalyticsData = {
-  labels: [
-    'Pending Transactions',
-    'Processing Transactions',
-    'Successful Transactions',
-    'Failed Transactions',
-  ],
+  labels: ['Failed Payouts', 'Pending Payouts', 'Successful Payouts'],
   datasets: [
     {
-      backgroundColor: ['#B21F00', '#C9DE00', '#2FDE00', '#00A6B4', '#6800B4'],
-      hoverBackgroundColor: ['#501800', '#4B5000', '#175000', '#003350', '#35014F'],
-      data: [300, 50, 430, 223],
+      backgroundColor: ['#B21F00', '#C9DE00', '#2FDE00'],
+      hoverBackgroundColor: ['#501800', '#4B5000', '#175000'],
+      data: [80, 100, 280],
     },
   ],
 };
 
+type SingleDisbursement = {
+  type: 'single';
+  recipient: string;
+  recipientAccount: string;
+  amount: number;
+  status: 'successful' | 'pending' | 'failed';
+  date?: string;
+};
+
+export type BatchDisbursement = {
+  type: 'Batch';
+  date?: string;
+  recipients: {
+    recipient: string;
+    recipientAccount: string;
+    amount: number;
+    status: 'successful' | 'pending' | 'failed';
+  }[];
+};
+
+export type DisbursementRecord = SingleDisbursement | BatchDisbursement;
+
+export const mockDisbursementRecord: DisbursementRecord[] = [
+  {
+    type: 'single',
+    recipient: 'Ifeanyi Ogbonna',
+    recipientAccount: '0065453363',
+    amount: 2000,
+    status: 'successful',
+  },
+  {
+    type: 'single',
+    recipient: 'Emmanuel Ogbonna',
+    recipientAccount: '0065453363',
+    amount: 100000,
+    status: 'successful',
+  },
+  {
+    type: 'Batch',
+    recipients: [
+      {
+        recipient: 'Adams Oshomole',
+        recipientAccount: '3092301102',
+        amount: 2000000,
+        status: 'pending',
+      },
+      {
+        recipient: 'Labaran Idris',
+        recipientAccount: '3092322202',
+        amount: 10000000,
+        status: 'successful',
+      },
+    ],
+  },
+  {
+    type: 'single',
+    recipient: 'Otedola Omotola',
+    recipientAccount: '0065453363',
+    amount: 100000,
+    status: 'successful',
+  },
+  {
+    type: 'Batch',
+    recipients: [
+      {
+        recipient: 'Adams Oshomole',
+        recipientAccount: '3092301102',
+        amount: 2000000,
+        status: 'failed',
+      },
+      {
+        recipient: 'Labaran Idris',
+        recipientAccount: '3092322202',
+        amount: 10000000,
+        status: 'successful',
+      },
+    ],
+  },
+];
 const labels = Array.from({ length: 9 }, (_, index) =>
   moment().subtract(index, 'months').format('MMMM')
 );
@@ -369,8 +443,15 @@ export const CashFlowAnalytics = [
   { type: 'income', amount: 9000000, count: 60200 },
   { type: 'disbursements', amount: 7500000, count: 40 },
 ];
-export const MockVirtualAccounts = [];
-// export const MockVirtualAccounts: any = [
-//   { id: '001', accountName: 'The 30th Concept', accountNumber: '004002001', amount: 3300000000 },
-//   { id: '002', accountName: 'Jay Doe Biz', accountNumber: '004002003', amount: 52000000 },
-// ];
+// export const MockVirtualAccounts = [];
+export const MockVirtualAccounts: any = [
+  { id: '001', accountName: 'The 30th Concept', accountNumber: '004002001', amount: 3300000000 },
+  { id: '002', accountName: 'Jay Doe Biz', accountNumber: '004002003', amount: 52000000 },
+];
+
+export interface ReciepientsDataType {
+  accountNumber?: number;
+  accountName?: string;
+  bank?: string;
+  amount?: number;
+}

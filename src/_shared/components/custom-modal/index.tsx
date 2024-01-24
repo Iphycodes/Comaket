@@ -18,7 +18,7 @@ const CustomModal = (props: CustomModalProps) => {
       footer={null}
       width={520}
       styles={{ body: { paddingTop: 45, paddingLeft: 24, paddingRight: 24, paddingBottom: 24 } }}
-      className="text-center"
+      className=""
       closeIcon={false}
     >
       <div className="relative">

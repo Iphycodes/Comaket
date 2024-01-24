@@ -37,6 +37,18 @@
   }
 }
 
+.business-register-form,
+.update-profile-details-form,
+.update-business-profile-form {
+  .ant-select-selector,
+  .ant-select-in-form-item,
+  .ant-select-selection-item {
+    height: 3.5rem !important;
+    overflow: hidden;
+    display: flex;
+    align-items: center !important;
+  }
+}
 ;
 
 .select-virtual-account {
@@ -135,6 +147,10 @@
   }
 }
 
+.virtual-select-form-item {
+  margin: 0;
+}
+
 .filter-drawer {
   .ant-drawer-body {
     padding: 0 !important;
@@ -154,10 +170,49 @@
 
 
 
+.transaction-stat-card {
+  .ant-card-body {
+    padding: 10px 20px !important;
+  }
+}
+
+.recent-disburseent-card,
+.piechart-card {
+  .ant-card-body {
+    padding: 10px 0 !important;
+  }
+}
+
+.send-money-card {
+  .ant-card-body {
+    padding: 0 20px !important;
+  }
+}
+
+canvas.disbursement-pie {
+  width: 300px !important;
+  height: 300px !important;
+}
+
 .virtual-select-form-item.ant-form-item {
   margin: 0 !important;
 }
 
+.disbursement-modal {
+  .ant-modal-content {
+    padding-top: 30px;
+  }
+}
+
+.single-payout-form {
+  .ant-form-item {
+    margin-bottom: 12px !important;
+  }
+}
+
+// .amount-inp{
+//   margin-bottom: 12px !important;
+// }
 .light {
   .dashboard-transaction-list:hover {
     background-color: #eee !important;
