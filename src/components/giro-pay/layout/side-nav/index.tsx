@@ -62,10 +62,7 @@ export const SideNav = (props: SideNavProps) => {
         setCollapsed={setCollapse}
       />
       <Menu
-        className="sider-menu text-card-foreground"
-        style={{
-          fontSize: '16px',
-        }}
+        className="sider-menu text-card-foreground text-base"
         mode="inline"
         items={items}
         defaultSelectedKeys={['1']}

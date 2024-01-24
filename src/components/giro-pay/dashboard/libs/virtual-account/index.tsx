@@ -1,7 +1,7 @@
 'use client';
 import React, { Dispatch, SetStateAction } from 'react';
 import { Avatar, Col, Row, Space } from 'antd';
-import { VirtualAccountNamespace } from '@grc/_shared/namespace/virtual-account';
+import { VirtualAccountNamespace } from '@grc/_shared/namespace/wallet';
 import { getFirstCharacter, getRandomColorByString, numberFormat } from '@grc/_shared/helpers';
 import { capitalize, startCase } from 'lodash';
 

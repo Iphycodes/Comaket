@@ -52,10 +52,7 @@ export const SettingsSideNav = (props: SettingsSideNavProps) => {
     >
       <AppSettingsSiderHeader collapsed={collapse} setCollapsed={setCollapse} />
       <Menu
-        className="sider-menu mt-10 text-card-foreground"
-        style={{
-          fontSize: '16px',
-        }}
+        className="sider-menu mt-10 text-card-foreground text-base"
         mode="inline"
         items={items}
         defaultSelectedKeys={['1']}

@@ -4,13 +4,14 @@ import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness
 import { appNav } from '@grc/app/nav';
 import { AppHeader } from '@grc/components/giro-pay/layout/app-header';
 import { SideNav } from '@grc/components/giro-pay/layout/side-nav';
-import SwitchAccountHeader from '@grc/components/giro-pay/layout/switch-account-header';
+import SwitchWalletHeader from '@grc/components/giro-pay/layout/switch-wallet';
 import { useAccountSetting } from '@grc/hooks/useAccountSetting';
 import { useAuth } from '@grc/hooks/useAuth';
+import { useWallet } from '@grc/hooks/useWallet';
 import { Layout } from 'antd';
 import { Footer } from 'antd/es/layout/layout';
 import { usePathname, useRouter } from 'next/navigation';
-import { ReactElement } from 'react';
+import { ReactElement, useEffect } from 'react';
 
 const { Content } = Layout;
 
@@ -33,9 +34,19 @@ const AppsBaseLayout = (props: GiroPayPageProps) => {
     callCurrentAccount: false,
     callUser: true,
   });
-  const { updateAccount } = useAccountSetting({
+  const { updateAccount, updateAccountResponse } = useAccountSetting({
     callAllAccountSetting: true,
   });
+
+  const { wallets, walletsResponse, handleWallets } = useWallet({
+    callAllWallets: true,
+    callAccountTransaction: true,
+    callTotalBalance: true,
+    callBalance: true,
+  });
+
+  const { isLoading: isLoadingWallets, isSuccess: isSuccessfulFetchingWallets } = walletsResponse;
+  const { isSuccess: isSuccessfulupdatingAccount } = updateAccountResponse;
 
   const handleSwitchAccountMode = (value: boolean) => {
     updateAccount({
@@ -46,6 +57,17 @@ const AppsBaseLayout = (props: GiroPayPageProps) => {
       },
     });
   };
+
+  useEffect(() => {
+    if (isSuccessfulupdatingAccount && isSuccessfulFetchingWallets) {
+      handleWallets(walletsResponse?.data?.data[0]);
+    }
+  }, [
+    isSuccessfulupdatingAccount,
+    isSuccessfulFetchingWallets,
+    walletsResponse?.fulfilledTimeStamp,
+  ]);
+
   const formatPathText = (value: string) => value.replace(/\s+/g, '-').toLowerCase();
   const collapse = false;
 
@@ -64,7 +86,11 @@ const AppsBaseLayout = (props: GiroPayPageProps) => {
         }}
       >
         <AppHeader isLiveMode={isLiveMode} handleSwitchAccountMode={handleSwitchAccountMode} />
-        <SwitchAccountHeader />
+        <SwitchWalletHeader
+          setWallet={handleWallets}
+          isLoadingWallets={isLoadingWallets}
+          wallets={wallets}
+        />
         <Content className="main-content">
           <div className="dark:text-white" style={{ padding: 40, minHeight: '100vh' }}>
             {isSettingsPath?.toLowerCase() === 'settings' && (
@@ -88,7 +114,6 @@ const AppsBaseLayout = (props: GiroPayPageProps) => {
             {children}
           </div>
         </Content>
-        {/* <AppFooter /> */}
         <Footer className="shadow-sm border-t border-border/100 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:text-white">
           Footer
         </Footer>

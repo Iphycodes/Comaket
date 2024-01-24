@@ -18,11 +18,11 @@ import Cookies from 'js-cookie';
 import { AUTH_TOKEN_KEY } from '@grc/_shared/constant';
 import type { AuthDataType } from '@grc/_shared/namespace/auth';
 import { useEffect } from 'react';
-import { selectAppData, selectConstants } from '@grc/redux/selectors/auth';
+import { selectAppData, selectAccountData, selectConstants } from '@grc/redux/selectors/auth';
 import { AppDataType } from '@grc/_shared/namespace/auth';
 import { AccountNamespace } from '@grc/_shared/namespace/account';
 
-type Business = AccountNamespace.Account;
+type Account = AccountNamespace.Account;
 
 interface useAuthProps {
   key?: string;
@@ -56,8 +56,9 @@ interface UseAuthReturnType {
   constantsResponse: Record<string, any>;
   isLiveMode: boolean;
   handleCurrentAccount: (currentAccount: string) => void;
-  currentAccount: Business | any;
+  currentAccount: Account | any;
   triggerAcccountsResponse: Record<string, any>;
+  accounts: Array<Account | null>;
 }
 
 export const useAuth = ({
@@ -83,6 +84,7 @@ export const useAuth = ({
   const [triggerApp] = useLazyGetAppQuery();
   const [triggerConstants, constantsResponse] = useLazyGetConstantsQuery();
   const { authData, isLiveMode, currentAccount } = useAppSelector((state) => state.auth);
+  const accounts = useAppSelector((state) => selectAccountData(state, {}));
   const appData = useAppSelector((state) => selectAppData(state, {}));
   const constants = useAppSelector((state) => selectConstants(state, {}));
 
@@ -90,9 +92,9 @@ export const useAuth = ({
     dispatch(logout());
   };
 
-  const handleCurrentAccount = (currentAccount: Business | string) => {
-    const business = currentAccount === 'string' ? JSON.parse(currentAccount) : currentAccount;
-    dispatch(setCurrentAccount(business));
+  const handleCurrentAccount = (currentAccount: Account | string) => {
+    const account = currentAccount === 'string' ? JSON.parse(currentAccount) : currentAccount;
+    dispatch(setCurrentAccount(account));
   };
   useEffect(() => {
     if (callAccounts) triggerAccounts({});
@@ -142,6 +144,7 @@ export const useAuth = ({
     isLiveMode,
     handleCurrentAccount,
     currentAccount,
+    accounts,
     triggerAcccountsResponse,
   };
 };

@@ -5,7 +5,7 @@ import {
 } from '@grc/services/settings/business-profile';
 import { useAppSelector } from '@grc/redux/store';
 import { selectBusinessAccountData } from '@grc/redux/selectors/business-profile';
-import { VirtualAccountNamespace } from '@grc/_shared/namespace/virtual-account';
+import { WalletNamespace } from '@grc/_shared/namespace/wallet';
 import { MutationTrigger } from '@reduxjs/toolkit/dist/query/react/buildHooks';
 
 interface useBusinessProfileProps {
@@ -15,7 +15,7 @@ interface useBusinessProfileProps {
 
 interface useBusinessProfileReturnProps {
   getBusinessProfileResponse: Record<string, any>;
-  businessProfile: VirtualAccountNamespace.Account[] | any;
+  businessProfile: WalletNamespace.Wallet[] | any;
   updateBusinessProfile: MutationTrigger<any>;
   updateBusinessProfileResponse: Record<string, any>;
 }

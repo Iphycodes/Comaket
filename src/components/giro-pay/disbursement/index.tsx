@@ -10,6 +10,7 @@ import DisbursementDrawer from './libs/disbursement-drawer';
 import TopUpBalance from './libs/top-up-balance';
 import SinglePayout from './libs/single-payout';
 import BatchPayout from './libs/batch-payout';
+import { CloseIcon } from '@grc/_shared/assets/svgs';
 
 const Disbursement = () => {
   const [open, setOpen] = useState<boolean>(false);
@@ -93,10 +94,18 @@ const Disbursement = () => {
         onCancel={() => setModalOpen(false)}
         style={{ minWidth: modalElement === 'batch-payout' ? '700px' : '400px' }}
         footer={null}
+        closeIcon={false}
       >
+        <div className="relative">
+          <CloseIcon
+            className="absolute cursor-pointer z-40"
+            style={{ top: '-20px', right: '-15px' }}
+            onClick={() => setModalOpen(false)}
+          />
+        </div>
         {modalElement === 'top-up-balance' && (
           <TopUpBalance
-            account={{
+            wallet={{
               accountName: 'Ifeanyi Emmanuel Ifeanyi',
               accountNumber: '0065453363',
               bankName: 'Sterling Bank',

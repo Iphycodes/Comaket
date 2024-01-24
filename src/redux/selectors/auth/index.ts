@@ -3,11 +3,11 @@ import { RootState } from '../../store';
 import type { QueryArgs } from '@grc/_shared/namespace';
 import { getAccounts, getApp, getConstants } from '@grc/services/auth';
 
-export const selectBusiness = (state: RootState, params: QueryArgs | string) =>
+export const selectAccount = (state: RootState, params: QueryArgs | string) =>
   getAccounts.select(params)(state);
 
-export const selectBusinessData = createSelector(selectBusiness, (business) => {
-  return business.data?.data;
+export const selectAccountData = createSelector(selectAccount, (account) => {
+  return account.data?.data;
 });
 
 export const selectApp = (state: RootState, params: QueryArgs | string) =>
