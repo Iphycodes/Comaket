@@ -1,29 +1,22 @@
+import { WalletNamespace } from '@grc/_shared/namespace/wallet';
 import { Col, Row, Space, message } from 'antd';
 import { upperCase } from 'lodash';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 
-interface accountType {
-  accountName: string;
-  accountNumber: string;
-  bankName: string;
-}
-
 interface TopUpBalanceProps {
-  account: accountType;
+  wallet: WalletNamespace.Wallet | null;
 }
 
-const TopUpBalance = ({ account }: TopUpBalanceProps) => {
+const TopUpBalance = ({ wallet }: TopUpBalanceProps) => {
   const [textInput, setTextInput] = useState('');
 
   useEffect(() => {
-    if (account?.accountNumber) setTextInput(account?.accountNumber);
-  }, [account?.accountNumber]);
+    if (wallet?.accountNumber) setTextInput(wallet?.accountNumber);
+  }, [wallet?.accountNumber]);
 
   const onCopy: () => void = () =>
     textInput && message.success({ content: 'Account Number Copied' });
-
-  // const acctDetails = `Account Number: ${account?.accountNumber} \nAccount Name: ${account?.accountName} \nBank Name: ${account?.bankName}`;
 
   // const onCopyAll: () => void = () =>
   //   acctDetails && message.success({ content: 'Account Details Copied' });
@@ -41,17 +34,17 @@ const TopUpBalance = ({ account }: TopUpBalanceProps) => {
           <span className="font-bold text-[20px]">Top Up Balance</span>
         </Space>
       </div>
-      <div className="py-4 text-gray-500 font-semibold">
+      <div className="py-4 text-muted-foreground font-semibold">
         Transfer Funds to the account below to Top Up your Balance. Please use the Reference Id for
         transaction remark.
       </div>
       <div className="flex flex-col gap-2 py-3 border-y-2">
         <Row className="flex items-center">
           <Col span={8}>
-            <span className=" text-gray-500 font-semibold">Account Number: </span>
+            <span className="text-muted-foreground font-semibold">Account Number: </span>
           </Col>
           <Col className="flex gap-1 items-start" span={16}>
-            <span className="text-2xl font-bold">{account?.accountNumber}</span>
+            <span className=" text-lg font-semibold">{wallet?.accountNumber}</span>
             <i
               className="ri-file-copy-line mb-1 text-[20px] hover:text-blue cursor-pointer"
               onClick={() => navigator.clipboard.writeText(textInput).then(onCopy)}
@@ -60,23 +53,23 @@ const TopUpBalance = ({ account }: TopUpBalanceProps) => {
         </Row>
         <Row className="flex items-center">
           <Col span={8}>
-            <span className=" text-gray-500 font-semibold">Bank: </span>
+            <span className=" text-muted-foreground font-semibold">Bank: </span>
           </Col>
           <Col span={16}>
-            <span className="text-lg font-semibold">{account?.bankName?.toUpperCase()}</span>
+            <span className="text-base font-semibold">{wallet?.bankName?.toUpperCase()}</span>
           </Col>
         </Row>
         <Row className="flex items-center">
           <Col span={8}>
-            <span className=" text-gray-500 font-semibold">Account Name: </span>
+            <span className=" text-muted-foreground font-semibold">Account Name: </span>
           </Col>
           <Col span={16}>
-            <span className="text-lg font-semibold">{upperCase(account?.accountName)}</span>
+            <span className="text-base font-semibold">{upperCase(wallet?.accountName)}</span>
           </Col>
         </Row>
-        <Row className="flex items-center">
+        {/* <Row className="flex items-center">
           <Col span={8}>
-            <span className=" text-gray-500 font-semibold">Reference ID: </span>
+            <span className=" text-muted-foreground font-semibold">Reference ID: </span>
           </Col>
           <Col span={16} className="">
             <Space size={4}>
@@ -84,11 +77,11 @@ const TopUpBalance = ({ account }: TopUpBalanceProps) => {
               <i className="ri-file-copy-line mb-1 text-[14px]"></i>
             </Space>
           </Col>
-        </Row>
-        <span className="text-[12px]" style={{ bottom: '-15px' }}>
+        </Row> */}
+        {/* <span className="text-[12px]" style={{ bottom: '-15px' }}>
           <i className="ri-information-2-line"></i> Please use this reference id for your
           transaction remark
-        </span>
+        </span> */}
       </div>
       <div className="flex items-center py-3 justify-end">
         <Image

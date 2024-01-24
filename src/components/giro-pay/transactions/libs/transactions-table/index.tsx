@@ -158,14 +158,14 @@ const TransactionsTable = (props: TransactionTableProps) => {
     onClick: () => handleRowClick(record),
   });
   return (
-    <div className="shadow-sm border dark:border-gray-500 rounded-xl">
+    <div className="shadow-sm border dark:border-gray-500 rounded-lg">
       <Table
         size="large"
         columns={columns}
         pagination={{ pageSize: 8, position: ['bottomLeft'] }}
         dataSource={transactionsData}
         scroll={{ x: isMobile ? true : 0 }}
-        className={'transaction-table dark:bg-zinc-800 rounded-xl'}
+        className={'transaction-table dark:bg-zinc-800 rounded-lg'}
         onRow={rowClick}
         footer={() => <TableFooter />}
       />

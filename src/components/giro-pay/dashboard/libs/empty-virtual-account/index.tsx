@@ -5,12 +5,12 @@ import { EmptyIcon } from '@grc/_shared/assets/svgs';
 import { useRouter } from 'next/navigation';
 
 type EmptyVirtualAccountProps = {
-  handleCreateVirtualAccount: () => void;
+  handleCreateWallet: () => void;
   isVerified: boolean;
 };
 
 export const EmptyVirtualAccount = ({
-  handleCreateVirtualAccount,
+  handleCreateWallet,
   isVerified,
 }: EmptyVirtualAccountProps) => {
   const { push } = useRouter();
@@ -40,7 +40,7 @@ export const EmptyVirtualAccount = ({
           <Button
             type="primary"
             className=" py-6 px-10 opacity-100 hover:opacity-70 mt-4 bg-blue text-white rounded-lg flex items-center cursor-pointer"
-            onClick={() => (isVerified ? handleCreateVirtualAccount() : push('/apps/settings'))}
+            onClick={() => (isVerified ? handleCreateWallet() : push('/apps/settings'))}
           >
             {isVerified ? 'Create A Wallet' : 'Verify Profile'}
           </Button>

@@ -15,6 +15,7 @@ interface AppContextPropType {
   authData: AuthDataType | null;
   currentAccount: AccountNamespace.Account | null;
   isLiveMode: boolean;
+  accounts: Array<AccountNamespace.Account | null>;
 }
 
 export const AppContext = createContext<AppContextPropType>({
@@ -22,11 +23,12 @@ export const AppContext = createContext<AppContextPropType>({
   authData: null,
   currentAccount: null,
   isLiveMode: false,
+  accounts: [],
 });
 
 export const AppProvider = (props: AppProviderPropType) => {
   const { children } = props;
-  const { authData, currentAccount, isLiveMode } = useAuth({});
+  const { authData, currentAccount, isLiveMode, accounts } = useAuth({});
   const dispatch = useAppDispatch();
   const handleLogOut = () => dispatch(logout());
 
@@ -35,6 +37,7 @@ export const AppProvider = (props: AppProviderPropType) => {
     handleLogOut,
     authData,
     currentAccount,
+    accounts,
   };
 
   return <AppContext.Provider value={values}>{children}</AppContext.Provider>;

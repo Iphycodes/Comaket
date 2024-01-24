@@ -3,17 +3,20 @@ import { authApi } from '@grc/services/auth';
 import { AppCookie } from '@grc/_shared/helpers';
 import { AuthDataType } from '@grc/_shared/namespace/auth';
 import { persistor } from '@grc/redux/store';
+import { WalletNamespace } from '@grc/_shared/namespace/wallet';
 import { AccountNamespace } from '@grc/_shared/namespace/account';
 
 export const initialState = {
   authData: null,
   sessionToken: null,
   currentAccount: null,
+  wallet: null,
   isLiveMode: false,
 } as {
   authData: AuthDataType | null;
   sessionToken: string | null;
   currentAccount: AccountNamespace.Account | null;
+  wallet: WalletNamespace.Wallet | null;
   isLiveMode: boolean;
 };
 
@@ -30,6 +33,13 @@ export const authSlice = createSlice({
       return {
         ...state,
         currentAccount: payload,
+      };
+    },
+
+    setWallet: (state, { payload }) => {
+      return {
+        ...state,
+        wallet: payload,
       };
     },
   },
@@ -60,6 +70,6 @@ export const logoutMiddleware = (store: any) => (next: any) => async (action: an
   return next(action);
 };
 
-export const { logout, setCurrentAccount } = authSlice.actions;
+export const { logout, setCurrentAccount, setWallet } = authSlice.actions;
 
 export default authSlice.reducer;

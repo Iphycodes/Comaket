@@ -5,20 +5,20 @@ import moment from 'moment';
 import { Button, Card, Col, List, Row, Select, Space, Tag } from 'antd';
 import { numberFormat } from '@grc/_shared/helpers';
 import { AccountNamespace } from '@grc/_shared/namespace/account';
+import { IBalance, WalletNamespace } from '@grc/_shared/namespace/wallet';
 import CustomModal from '@grc/_shared/components/custom-modal';
 import { AuthDataType } from '@grc/_shared/namespace/auth';
 import { CoinIcon } from '@grc/_shared/assets/svgs';
 import { capitalize, isEmpty, startCase, toLower } from 'lodash';
 import {
   CashFlowAnalytics,
-  MockVirtualAccounts,
   comparativeAnalysisData,
   mockTransactionAnalyticsData,
   mockTransactionAnalyticsData2,
   smoothLineChartData,
   statisticsFilter,
 } from '@grc/_shared/constant';
-import CreateVirtualAcctForm from './libs/create-virtual-acct-form';
+import CreateWalletForm from './libs/create-wallet-form';
 import {
   Chart as ChartJS,
   ArcElement,
@@ -37,15 +37,27 @@ import { QuickActionBtn } from './libs/quick-action-btn';
 import { EmptyVirtualAccount } from './libs/empty-virtual-account';
 import { motion } from 'framer-motion';
 import TopUpBalance from '../disbursement/libs/top-up-balance';
+import { Pagination } from '@grc/_shared/namespace';
 
 type DashBoardProps = {
   authData?: AuthDataType | null;
   transactions: Record<string, any>[];
   setFilter: Dispatch<SetStateAction<string>>;
   currentAccount: AccountNamespace.Account | null;
-  handleCreateVirtualAcct: (payload: Record<string, any>) => void;
+  handleCreateWallet: (payload: Record<string, any>) => void;
   openCreateModal: boolean;
   setOpenCreateModal: Dispatch<SetStateAction<boolean>>;
+  wallets: WalletNamespace.Wallet[];
+  wallet: WalletNamespace.Wallet | null;
+  loading: {
+    isCreatingWallet: boolean;
+    isLoadingWallets: boolean;
+    isLoadingTotalBalance: boolean;
+    isLoadingTransaction: boolean;
+  };
+  totalBalance: number | undefined;
+  balance: IBalance;
+  pagination: Pagination;
 };
 
 ChartJS.register(
@@ -61,8 +73,19 @@ ChartJS.register(
 );
 
 const DashBoard = (props: DashBoardProps) => {
-  const { transactions, authData, handleCreateVirtualAcct, openCreateModal, setOpenCreateModal } =
-    props;
+  const {
+    transactions,
+    authData,
+    handleCreateWallet,
+    openCreateModal,
+    setOpenCreateModal,
+    wallets,
+    wallet,
+    currentAccount,
+    totalBalance,
+    balance,
+    loading,
+  } = props;
   const [toggleTopUp, setToggleTopUp] = useState(false);
   const [toggleDisbursement, setToggleDisbursement] = useState(false);
   // const pathname = usePathname();
@@ -70,7 +93,6 @@ const DashBoard = (props: DashBoardProps) => {
   // const isDashboard = pathUrl?.[3];
   let delayed: any;
   const isVerified = !!authData?.bvn && !!authData?.mobile?.phoneNumber;
-  console.log('isVerified::', isVerified);
   return (
     <>
       <motion.div
@@ -82,31 +104,31 @@ const DashBoard = (props: DashBoardProps) => {
       >
         <div className="w-full min-h-screen flex flex-col gap-5">
           <div>
-            <div className="text-2xl">Hello 👋, {startCase(toLower(authData?.firstName))}</div>
+            <div className="text-2xl">Hello 👋, {startCase(toLower(currentAccount?.name))}</div>
           </div>
           <Row gutter={[20, 40]}>
             <Col md={6} xs={24}>
               <div className="flex flex-col gap-1">
                 <span className=" text-4xl font-bold">
-                  {isEmpty(MockVirtualAccounts)
-                    ? numberFormat(0, '₦ ')
-                    : numberFormat(250000000 / 100, '₦ ')}
+                  {totalBalance ? numberFormat(totalBalance / 100, '₦ ') : '₦ 0.00'}
                 </span>
                 <span>Total account balance from all wallets</span>
               </div>
             </Col>
             <Col md={6} xs={24}>
-              {!isEmpty(MockVirtualAccounts) && (
+              {!isEmpty(wallets) && (
                 <div className="flex flex-col gap-1 h-full justify-center">
                   <span className=" text-3xl font-semibold">
-                    {numberFormat(250000000 / 100, '₦ ')}
+                    {balance?.availableAmount
+                      ? numberFormat(balance.availableAmount / 100, '₦ ')
+                      : '₦ 0.00'}
                   </span>
-                  <span>Account balance from x-wallet</span>
+                  <span>Account balance from {startCase(toLower(wallet?.accountName))}</span>
                 </div>
               )}
             </Col>
             <Col md={6} xs={24}>
-              {isVerified && !isEmpty(MockVirtualAccounts) && (
+              {isVerified && !isEmpty(wallets) && (
                 <div className="w-full">
                   <Button
                     className="opacity-100 hover:opacity-70 bg-blue text-white h-14 rounded-lg font-semibold px-8"
@@ -120,7 +142,7 @@ const DashBoard = (props: DashBoardProps) => {
               )}
             </Col>
             <Col md={6} xs={24}>
-              {isVerified && !isEmpty(MockVirtualAccounts) && (
+              {isVerified && !isEmpty(wallets) && (
                 <div className="w-full">
                   <Button
                     className="opacity-100 hover:opacity-70 bg-blue text-white h-14 rounded-lg font-semibold px-8"
@@ -134,49 +156,12 @@ const DashBoard = (props: DashBoardProps) => {
                 </div>
               )}
             </Col>
-            {/* <Col md={6} xs={24}>
-            <div className="w-full flex flex-col border shadow-sm hover:shadow-md shadow-gray-100 rounded-xl p-5">
-              <div className="flex flex-col">
-                <span>Virtual Accounts</span>
-                <div className="flex gap-3 mt-3 flex-wrap">
-                  {MockVirtualAccounts.length >= 1 ? (
-                    MockVirtualAccounts.map((vaccount: Record<string, any>, index: any) => (
-                      <Fragment key={`${vaccount?.accountNumber}-${index}`}>
-                        <VirtualAccount
-                          active={activeVAccount === vaccount?.id}
-                          setActiveVAccount={setActiveVAccount}
-                          virtualAccount={vaccount}
-                        />
-                      </Fragment>
-                    ))
-                  ) : (
-                    <EmptyVirtualAccount
-                      isVerified={isVerified}
-                      handleCreateVirtualAccount={() => setOpenCreateModal(true)}
-                    />
-                  )}
-                  {MockVirtualAccounts.length >= 1 && (
-                    <div className="w-full">
-                      <Button
-                        className="opacity-100 hover:opacity-70 mt-3 bg-blue text-white h-10 rounded-lg font-semibold px-8"
-                        type="primary"
-                        block
-                        onClick={() => setOpenCreateModal(true)}
-                      >
-                        Create Virtual Account
-                      </Button>
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-          </Col> */}
           </Row>
 
-          {isEmpty(MockVirtualAccounts) ? (
+          {isEmpty(wallets) ? (
             <EmptyVirtualAccount
               isVerified={isVerified}
-              handleCreateVirtualAccount={() => setOpenCreateModal(true)}
+              handleCreateWallet={() => setOpenCreateModal(true)}
             />
           ) : (
             <>
@@ -243,8 +228,8 @@ const DashBoard = (props: DashBoardProps) => {
                           <div className="text-gray-500 text-justify dark:text-white">
                             <div>No Data Available</div>
                             <div>
-                              Transaction insight will be shown here once you create a virtual
-                              account and commence pay-ins and pay-outs
+                              Transaction insight will be shown here once you create a wallet and
+                              commence pay-ins and pay-outs
                             </div>
                           </div>
                         ),
@@ -565,24 +550,16 @@ const DashBoard = (props: DashBoardProps) => {
         </div>
         <CustomModal
           component={
-            <CreateVirtualAcctForm
-              isLoadingCreateVirtualAccount={false}
-              handleCreateVirtualAcct={handleCreateVirtualAcct}
+            <CreateWalletForm
+              isLoadingCreateWallet={loading.isCreatingWallet}
+              handleCreateWallet={handleCreateWallet}
             />
           }
           setOpenModal={() => setOpenCreateModal(false)}
           openModal={openCreateModal}
         />
         <CustomModal
-          component={
-            <TopUpBalance
-              account={{
-                accountName: 'Ogbonna Emmanuel Ifeanyi',
-                accountNumber: '0065453363',
-                bankName: 'Sterling Bank',
-              }}
-            />
-          }
+          component={<TopUpBalance wallet={wallet} />}
           setOpenModal={() => setToggleTopUp(false)}
           openModal={toggleTopUp}
         />

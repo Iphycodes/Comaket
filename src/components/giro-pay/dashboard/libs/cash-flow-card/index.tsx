@@ -34,9 +34,17 @@ export const CashFlowCard = ({ type, amount, count }: CashFlowCardProps) => {
       </div>
       <div className="text-sm text-muted-foreground py-2">
         {['income', 'disbursements'].includes(type) ? (
-          <span>{formatNumber(count ?? 0, 1)} Transactions</span>
+          <span>
+            <span className="text-black dark:text-white font-semibold">
+              {formatNumber(count ?? 0, 1)}
+            </span>{' '}
+            Transactions
+          </span>
         ) : (
-          <span>{count} Days to deduction</span>
+          <span>
+            <span className="text-black dark:text-white font-semibold">{count} </span>Days to
+            deduction
+          </span>
         )}
       </div>
     </div>

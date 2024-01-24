@@ -1,5 +1,5 @@
 'use client';
-import SelectVirtualAcct from '@grc/components/giro-pay/dashboard/libs/select-virtual-acct';
+import SelectWallet from '@grc/components/giro-pay/dashboard/libs/select-wallet';
 import { Button, Card } from 'antd';
 
 const TopUp = () => {
@@ -7,13 +7,10 @@ const TopUp = () => {
     <Card className="w-full shadow-sm shadow-gray-100">
       <div className="flex justify-between items-center">
         <div className="flex flex-col gap-4" style={{ flex: 1 }}>
-          <SelectVirtualAcct
-            isLoadingAccounts={false}
-            vAccount={{} as any}
-            accounts={[
-              { accountName: 'john doe', accountNumber: '00000', bankName: 'demo' } as any,
-            ]}
-            setVAccount={() => {}}
+          <SelectWallet
+            isLoadingWallets={false}
+            wallets={[{ accountName: 'john doe', accountNumber: '00000', bankName: 'demo' } as any]}
+            setWallet={() => {}}
           />
           <Button
             className="opacity-100 hover:opacity-95 mt-1.5 font-normal bg-blue text-white h-12"
