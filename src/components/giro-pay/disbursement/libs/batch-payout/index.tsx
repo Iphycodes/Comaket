@@ -141,15 +141,29 @@ const BatchPayout = () => {
                     ) : (
                       <div>
                         <ReciepientsTable batchReciepientsData={batchReciepientsData} />
-                        <div className="flex items-center justify-end">
+                        <div className="flex items-center gap-2 justify-end">
                           <Button
-                            className="opacity-100 w-[160px] flex justify-center text-center hover:opacity-95 font-normal bg-green-500 text-white h-10"
+                            className="opacity-100 flex items-center justify-center text-center hover:opacity-95 font-normal bg-blue text-white h-12"
                             type="primary"
                             disabled={false}
                             loading={false}
                             onClick={() => handleConfirmPayment()}
                           >
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center font-semibold gap-2">
+                              <span>
+                                <i className="ri-save-line text-[18px]"></i>
+                              </span>
+                              <span>Save Batch Members</span>
+                            </div>
+                          </Button>
+                          <Button
+                            className="opacity-100 flex justify-center items-center text-center hover:opacity-95 font-normal bg-green-500 text-white h-12"
+                            type="primary"
+                            disabled={false}
+                            loading={false}
+                            onClick={() => handleConfirmPayment()}
+                          >
+                            <div className="flex items-center font-semibold gap-2">
                               <span>
                                 <i className="ri-send-plane-fill text-[18px]"></i>
                               </span>

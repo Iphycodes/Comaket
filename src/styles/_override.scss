@@ -2,7 +2,6 @@
 .reset-password-form,
 .update-profile-details-form,
 .update-business-profile-form {
-
   .ant-input-number-group-wrapper,
   .ant-input-number-in-form-item {
     width: 100% !important;
@@ -21,22 +20,6 @@
   }
 }
 
-
-
-.business-register-form,
-.update-profile-details-form,
-.update-business-profile-form {
-
-  .ant-select-selector,
-  .ant-select-in-form-item,
-  .ant-select-selection-item {
-    height: 3.5rem !important;
-    overflow: hidden;
-    display: flex;
-    align-items: center !important;
-  }
-}
-
 .business-register-form,
 .update-profile-details-form,
 .update-business-profile-form {
@@ -49,10 +32,20 @@
     align-items: center !important;
   }
 }
-;
 
+.business-register-form,
+.update-profile-details-form,
+.update-business-profile-form {
+  .ant-select-selector,
+  .ant-select-in-form-item,
+  .ant-select-selection-item {
+    height: 3.5rem !important;
+    overflow: hidden;
+    display: flex;
+    align-items: center !important;
+  }
+}
 .select-virtual-account {
-
   .ant-select-selector,
   .ant-select-in-form-item,
   .ant-select-selection-item {
@@ -168,8 +161,6 @@
   }
 }
 
-
-
 .transaction-stat-card {
   .ant-card-body {
     padding: 10px 20px !important;
@@ -221,11 +212,12 @@ canvas.disbursement-pie {
   .ant-layout-sider,
   .ant-menu-light {
     background: #f3f3f3 !important;
-    transition: all 0.2s, background 0s;
+    transition:
+      all 0.2s,
+      background 0s;
   }
 
   .update-api-key-webhook-form {
-
     .ant-input-disabled,
     .ant-input-affix-wrapper-disabled {
       background-color: rgba(255, 255, 255, 1) !important;
@@ -255,7 +247,8 @@ canvas.disbursement-pie {
       transition: all 0.2s;
     }
 
-    input:focus, input:hover {
+    input:focus,
+    input:hover {
       border-color: #1668dc !important;
       // box-shadow: 0 0 0 2px rgba(0, 60, 180, 0.15) !important;
       outline: 0 !important;
@@ -275,7 +268,9 @@ canvas.disbursement-pie {
   .ant-layout-sider,
   .ant-menu-light {
     background: hsl(var(--background)) !important;
-    transition: all 0.2s, background 0s;
+    transition:
+      all 0.2s,
+      background 0s;
   }
 
   .ant-menu-item-active,
@@ -283,11 +278,12 @@ canvas.disbursement-pie {
     background-color: rgba(39, 39, 42, 1) !important;
     -tw-text-opacity: 1 !important;
     color: rgb(255 255 255 / var(--tw-text-opacity)) !important;
-    transition: all 0.2s, background 0s;
+    transition:
+      all 0.2s,
+      background 0s;
   }
 
   .update-api-key-webhook-form {
-
     .ant-input-disabled,
     .ant-input-affix-wrapper-disabled {
       background-color: #141414 !important;
@@ -314,7 +310,14 @@ canvas.disbursement-pie {
       border-color: #424242 !important;
     }
 
-    input:focus, input:hover {
+    textarea {
+      background-color: #141414 !important;
+      color: rgba(255, 255, 255, 0.85) !important;
+      border-color: #424242 !important;
+    }
+
+    input:focus,
+    input:hover {
       border-color: #1668dc !important;
       box-shadow: 0 0 0 2px rgba(0, 60, 180, 0.15) !important;
       outline: 0 !important;
