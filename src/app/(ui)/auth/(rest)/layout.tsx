@@ -24,8 +24,11 @@ const AppsBaseLayout = (props: LayoutProps) => {
 
   return (
     <main className="min-h-screen flex flex-col items-center p-2.5 bg-background px-4">
-      <header className="w-[54rem] max-w-full flex shadow-sm border-b border-border/100 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:text-white items-center justify-between justify-items-center py-4 px-6 md:flex-wrap">
-        <span className=" cursor-pointer" onClick={() => onHeaderButtonClicked('login')}>
+      <header className="w-[54rem] max-w-full flex shadow-sm border-b border-border/100 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:text-white items-center justify-between justify-items-center py-4 px-6 flex-wrap gap-7">
+        <span
+          className=" cursor-pointer w-full md:w-auto flex items-center justify-center"
+          onClick={() => onHeaderButtonClicked('login')}
+        >
           {/* <GiroLogo /> */}
           <Image
             src={'/assets/svgs/giro-logo.svg'}
@@ -36,7 +39,7 @@ const AppsBaseLayout = (props: LayoutProps) => {
           />
         </span>
         {isSignUpPage ? (
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center w-full md:w-auto">
             <div>{`Already have an account?`}</div>
             <Button
               type="primary"
@@ -48,11 +51,11 @@ const AppsBaseLayout = (props: LayoutProps) => {
             </Button>
           </div>
         ) : (
-          <div className="flex items-center justify-center">
+          <div className="flex items-center justify-center flex-wrap gap-3 w-full md:w-auto">
             <div>{`Don't have an account?`}</div>
             <Button
               type="primary"
-              className="ml-5 border-blue text-blue"
+              className="md:ml-5 sm:ml-0 border-blue text-blue"
               ghost
               onClick={() => onHeaderButtonClicked('register')}
             >
@@ -64,7 +67,7 @@ const AppsBaseLayout = (props: LayoutProps) => {
       <div
         className={`${
           !isSignUpPage ? 'w-[40.625rem] mt-24' : 'w-[46.875rem] mt-[68px]'
-        } flex items-center justify-center justify-items-center justify-self-center content-center text-black`}
+        } max-w-full flex items-center justify-center justify-items-center justify-self-center content-center text-black`}
       >
         {children}
       </div>

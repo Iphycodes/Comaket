@@ -25,7 +25,7 @@ const ForgotPassword = (props: ForgotPasswordProps) => {
       className="w-3/4"
     >
       <div className="w-full">
-        <header className="text-left text-3xl font-bold text-blue pb-4">Forgot Password</header>
+        <header className="text-left text-3xl font-bold text-blue pb-4">Forgot Password?</header>
         <span className="py-4 text-muted-foreground">
           Enter your registered email to recover your account
         </span>

@@ -40,6 +40,7 @@
 .business-register-form,
 .update-profile-details-form,
 .update-business-profile-form {
+
   .ant-select-selector,
   .ant-select-in-form-item,
   .ant-select-selection-item {
@@ -49,6 +50,7 @@
     align-items: center !important;
   }
 }
+
 ;
 
 .select-virtual-account {
@@ -121,7 +123,7 @@
     bottom: 50px;
   }
 
-  .ant-menu-light.ant-menu-root.ant-menu-inline{
+  .ant-menu-light.ant-menu-root.ant-menu-inline {
     border-inline-end: none !important;
 
   }
@@ -258,11 +260,13 @@ canvas.disbursement-pie {
       transition: all 0.2s;
     }
 
-    input:focus, input:hover {
+    input:focus,
+    input:hover {
       border-color: #1668dc !important;
       // box-shadow: 0 0 0 2px rgba(0, 60, 180, 0.15) !important;
       outline: 0 !important;
     }
+
   }
 }
 
@@ -317,13 +321,15 @@ canvas.disbursement-pie {
       border-color: #424242 !important;
     }
 
-    input:focus, input:hover {
+    input:focus,
+    input:hover {
       border-color: #1668dc !important;
       box-shadow: 0 0 0 2px rgba(0, 60, 180, 0.15) !important;
       outline: 0 !important;
     }
   }
-  #batch-add-reciepient-form_description{
+
+  #batch-add-reciepient-form_description {
     background-color: #141414 !important;
     border-color: #424242 !important;
     color: rgba(255, 255, 255, 0.85) !important;

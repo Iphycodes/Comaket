@@ -34,7 +34,6 @@ const BaseLayout = ({ children }: LayoutProps) => {
                   colorBgContainerDisabled: 'transparent',
                   algorithm: true,
                 },
-                Switch: {},
               },
             }}
           >
