@@ -47,7 +47,7 @@ const VerifyEmail = (props: VerifyEmailProps) => {
               disabled: isLoading.verifyEmailLoading || isLoading.isSendVerificationCodeLoading,
             }}
             onCompleted={handleVerifyEmail}
-            className="react-code-input"
+            className="react-code-input flex flex-wrap md:gap-0 gap-3"
           />
           {isLoading.verifyEmailLoading && (
             <div
@@ -58,7 +58,7 @@ const VerifyEmail = (props: VerifyEmailProps) => {
           )}
         </div>
 
-        <div className="flex justify-center mt-5 items-center">
+        <div className="flex flex-wrap justify-start md:justify-center mt-5 items-center">
           <span className="dark:text-white">Didn't get the email?</span>
           <Button
             className="font-semibold py-1 px-1.5 text-blue"

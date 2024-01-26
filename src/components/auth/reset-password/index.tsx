@@ -53,7 +53,7 @@ const ResetPassword = (props: ResetPasswordProps) => {
             onFinish(value);
           }}
           name="reset-password-form"
-          className="mt-5 reset-password-form"
+          className="mt-5 reset-password-form pb-10"
         >
           <Form.Item
             name="verificationCode"
