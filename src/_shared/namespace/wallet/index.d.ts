@@ -3,6 +3,7 @@ import { AppObject } from '@/_shared/namespace';
 export namespace WalletNamespace {
   export interface Wallet extends AppObject {
     id: string;
+    _id: string;
     accountName: string;
     accountNumber: string;
     bankName: string;

@@ -84,7 +84,7 @@ export const useWallet = ({
     key: 'getWalletTransaction',
   });
   const [createWallet, createWalletResponse] = useCreateWalletMutation();
-  const [triggerCreateWallets, walletsResponse] = useLazyGetWalletsQuery();
+  const [triggerGetWallets, walletsResponse] = useLazyGetWalletsQuery();
   const [triggerAccountTransaction, accountTransactionResponse] =
     useLazyGetAccountTransactionQuery();
   const [triggerTotalBalance, totalBalanceResponse] = useLazyGetTotalBalanceQuery();
@@ -102,7 +102,7 @@ export const useWallet = ({
   const allTotalBalance = useAppSelector((state) => selectTotalBalanceData(state, {}));
   const banks = useAppSelector((state) => selectBanksData(state, {}));
   const { wallet } = useAppSelector((state) => state.auth);
-  const walletId = wallet?.id;
+  const walletId = wallet?._id;
   // const walletId = wallets?.[0]?._id;
 
   const transParams: Record<string, any> = {
@@ -120,6 +120,7 @@ export const useWallet = ({
   const balance = useAppSelector((state) => selectBalanceData(state, { id: walletId }));
 
   const handleWallets = (wallet: WalletNamespace.Wallet | null) => {
+    console.log('I dispatched:::', wallet);
     dispatch(setWallet(wallet));
   };
   const mailParams = {
@@ -143,7 +144,7 @@ export const useWallet = ({
     });
   };
   useEffect(() => {
-    if (callAllWallets) triggerCreateWallets(params);
+    if (callAllWallets) triggerGetWallets(params);
   }, [callAllWallets]);
 
   useEffect(() => {
