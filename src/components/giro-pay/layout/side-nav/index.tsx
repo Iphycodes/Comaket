@@ -1,7 +1,7 @@
 'use client';
-import React, { useContext, useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Layout, Menu } from 'antd';
-// import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
+import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 import { SiderHeader } from './libs/siderHeader';
 import { MenuItem } from '@grc/_shared/helpers';
 import { AppContext } from '@grc/app-context';
@@ -19,11 +19,12 @@ export interface SideNavProps {
 export const SideNav = (props: SideNavProps) => {
   const { items, authData } = props;
   const [collapse, setCollapse] = useState<boolean>(false);
-  const { toggleSider } = useContext(AppContext);
+  const { toggleSider, setToggleSider } = useContext(AppContext);
   const { handleLogOut } = useContext(AppContext);
   const router = useRouter();
   const pathname = usePathname();
   const urlPath = pathname?.split('/');
+  const isMobile = useMediaQuery(mediaSize.mobile);
 
   const handleMenuClick = ({ key }: { key: React.Key | string }) => {
     if (key === 'logout') {
@@ -33,6 +34,10 @@ export const SideNav = (props: SideNavProps) => {
       router.push(`/apps/giro-pay/${key}`);
     }
   };
+
+  useEffect(() => {
+    !isMobile && setToggleSider(false);
+  }, [isMobile]);
 
   return (
     <Sider
