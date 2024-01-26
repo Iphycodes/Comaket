@@ -27,15 +27,17 @@ const SelectWallet = ({
   const pickAcctValue = (acct: any) =>
     pick(acct, ['_id', 'accountName', 'accountNumber', 'accountNumber']);
 
-  const initialValues = {
-    selectWallet: !isEmpty(wallets)
-      ? JSON.stringify(pickAcctValue(wallets?.[0]))
-      : 'No Wallet Created',
-  };
+  // const initialValues = {
+  //   selectWallet: !isEmpty(wallets)
+  //     ? JSON.stringify(pickAcctValue(wallets?.[0]))
+  //     : 'No Wallet Created',
+  // };
 
-  useEffect(() => {
-    form.setFieldsValue(initialValues);
-  }, [form, initialValues]);
+  // useEffect(() => {
+  //   form.setFieldsValue(initialValues);
+  // }, [form, initialValues]);
+
+  useEffect(() => form.resetFields(), [wallets?.[0]]);
 
   const options = wallets?.map((w) => ({
     label: (
@@ -55,11 +57,9 @@ const SelectWallet = ({
           style={{ ...style, width: width }}
           bordered={true}
           showSearch
-          // defaultValue={
-          //   !isEmpty(wallets)
-          //     ? JSON.stringify(pickAcctValue(wallets?.[0]))
-          //     : 'No Wallet Created'
-          // }
+          defaultValue={
+            !isEmpty(wallets) ? JSON.stringify(pickAcctValue(wallets?.[0])) : 'No Wallet Created'
+          }
           loading={isLoadingWallets}
           disabled={wallets?.length === 0}
           className={`${className} font-bold`}
