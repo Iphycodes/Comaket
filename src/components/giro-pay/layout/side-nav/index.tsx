@@ -44,7 +44,7 @@ export const SideNav = (props: SideNavProps) => {
       collapsed={toggleSider}
       collapsedWidth={0}
       className="dash-sider text-lg shadow-sm border-r border-border/100"
-      width={250}
+      width={isMobile ? 300 : 250}
       style={{
         overflow: 'auto',
         transform: `translateX(${toggleSider ? '-100%' : '0'})`,

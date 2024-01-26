@@ -149,7 +149,7 @@ export const AppHeader = (props: AppHeaderProps) => {
           </>
         )}
 
-        <div className={`flex items-center ${isMobile ? 'gap-3' : 'gap-10'}`}>
+        <div className={`flex items-center ${isMobile ? 'gap-5' : 'gap-10'}`}>
           {!isAppSettingsPath && (
             <>
               <div className="flex gap-2 p-0 m-0 items-center">
