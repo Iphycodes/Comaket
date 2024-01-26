@@ -1,7 +1,7 @@
 'use client';
 import React, { useContext, useState } from 'react';
 import { Layout, Menu } from 'antd';
-import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
+// import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 import { SiderHeader } from './libs/siderHeader';
 import { MenuItem } from '@grc/_shared/helpers';
 import { AppContext } from '@grc/app-context';
@@ -18,10 +18,8 @@ export interface SideNavProps {
 
 export const SideNav = (props: SideNavProps) => {
   const { items, authData } = props;
-  const isMobile = useMediaQuery(mediaSize.mobile);
   const [collapse, setCollapse] = useState<boolean>(false);
-  //   const { collapse, setCollapse } = useContext(AppContext);
-  //   const isTablet = useMediaQuery(mediaSize.tablet);
+  const { toggleSider } = useContext(AppContext);
   const { handleLogOut } = useContext(AppContext);
   const router = useRouter();
   const pathname = usePathname();
@@ -38,17 +36,16 @@ export const SideNav = (props: SideNavProps) => {
 
   return (
     <Sider
-      collapsed={false}
-      collapsedWidth={isMobile ? 0 : 80}
+      collapsed={toggleSider}
+      collapsedWidth={0}
       className="dash-sider text-lg shadow-sm border-r border-border/100"
       width={250}
       style={{
         overflow: 'auto',
+        transform: `translateX(${toggleSider ? '-100%' : '0'})`,
         position: 'fixed',
         padding: '0',
         height: '100vh',
-        scrollbarWidth: 'none',
-        scrollbarColor: 'red',
         left: 0,
         top: 0,
         bottom: 0,

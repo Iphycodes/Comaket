@@ -69,7 +69,6 @@ const AppsBaseLayout = (props: GiroPayPageProps) => {
   ]);
 
   const formatPathText = (value: string) => value.replace(/\s+/g, '-').toLowerCase();
-  const collapse = false;
 
   return (
     <Layout hasSider={true}>
@@ -79,9 +78,7 @@ const AppsBaseLayout = (props: GiroPayPageProps) => {
         style={{
           position: 'relative',
           zIndex: 0,
-          marginLeft: `${
-            mobileResponsive ? 0 : tabletResponsive ? 0 : collapse ? '80px' : '250px'
-          }`,
+          marginLeft: `${mobileResponsive ? 0 : tabletResponsive ? 0 : '250px'}`,
           transition: 'margin-left 0.3s ease',
         }}
       >

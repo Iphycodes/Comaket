@@ -1,10 +1,11 @@
 'use client';
-import { createContext, ReactNode } from 'react';
+import { createContext, Dispatch, ReactNode, SetStateAction, useEffect, useState } from 'react';
 import { useAppDispatch } from '@grc/redux/store';
 import { logout } from '@grc/redux/slices/auth';
 import { useAuth } from '@grc/hooks/useAuth';
 import { AuthDataType } from '@grc/_shared/namespace/auth';
 import { AccountNamespace } from '@grc/_shared/namespace/account';
+import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 
 type AppProviderPropType = {
   children: ReactNode;
@@ -16,6 +17,8 @@ interface AppContextPropType {
   currentAccount: AccountNamespace.Account | null;
   isLiveMode: boolean;
   accounts: Array<AccountNamespace.Account | null>;
+  toggleSider: boolean;
+  setToggleSider: Dispatch<SetStateAction<boolean>>;
 }
 
 export const AppContext = createContext<AppContextPropType>({
@@ -24,13 +27,21 @@ export const AppContext = createContext<AppContextPropType>({
   currentAccount: null,
   isLiveMode: false,
   accounts: [],
+  toggleSider: false,
+  setToggleSider: () => {},
 });
 
 export const AppProvider = (props: AppProviderPropType) => {
   const { children } = props;
+  const isMobile = useMediaQuery(mediaSize.mobile);
   const { authData, currentAccount, isLiveMode, accounts } = useAuth({});
   const dispatch = useAppDispatch();
   const handleLogOut = () => dispatch(logout());
+  const [toggleSider, setToggleSider] = useState(false);
+
+  useEffect(() => {
+    isMobile && setToggleSider(true);
+  }, [isMobile]);
 
   const values: any = {
     isLiveMode,
@@ -38,6 +49,8 @@ export const AppProvider = (props: AppProviderPropType) => {
     authData,
     currentAccount,
     accounts,
+    setToggleSider,
+    toggleSider,
   };
 
   return <AppContext.Provider value={values}>{children}</AppContext.Provider>;

@@ -33,6 +33,7 @@ export const AppHeader = (props: AppHeaderProps) => {
   const currentPath = `${pathUrl?.[3]}`?.toUpperCase() ?? '';
   const isAppSettingsPath = pathUrl?.[2]?.toLowerCase() === 'settings';
   const { authData } = useContext(AppContext);
+  const { setToggleSider } = useContext(AppContext);
   const router = useRouter();
   const { handleLogOut } = useContext(AppContext);
   const { setTheme, theme } = useTheme();
@@ -112,7 +113,10 @@ export const AppHeader = (props: AppHeaderProps) => {
               </div>
             ) : (
               <div>
-                <i className="ri-menu-line"></i>
+                <i
+                  className="ri-menu-line text-[24px] cursor-pointer"
+                  onClick={() => setToggleSider(false)}
+                ></i>
               </div>
             )}
           </>
@@ -189,7 +193,7 @@ export const AppHeader = (props: AppHeaderProps) => {
             arrow={false}
             overlayStyle={{ zIndex: 500, marginTop: '510px' }}
           >
-            <div className="cursor-pointer flex items-center gap-2">
+            <div className="cursor-pointer flex items-center gap-1">
               <Avatar
                 style={{
                   backgroundColor: getRandomColorByString(authData?.firstName ?? ''),
