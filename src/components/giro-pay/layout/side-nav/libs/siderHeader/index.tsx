@@ -6,6 +6,7 @@ import { PlusIcon, ManageBusinessIcon } from '@grc/_shared/assets/svgs';
 import { useRouter } from 'next/navigation';
 import { AccountNamespace } from '@grc/_shared/namespace/account';
 import { isEmpty } from 'lodash';
+import { useTheme } from 'next-themes';
 // import { MenuFoldOutlined, CloseOutlined } from '@ant-design/icons';
 
 export interface SiderHeaderProps {
@@ -18,6 +19,7 @@ export interface SiderHeaderProps {
 export const SiderHeader = (props: SiderHeaderProps) => {
   const { collapsed, accounts, currentAccount } = props;
   const { push } = useRouter();
+  const { theme } = useTheme();
 
   const options = (accounts || []).map((account) => ({
     label: <div>{account?.name ?? ''}</div>,
@@ -38,7 +40,7 @@ export const SiderHeader = (props: SiderHeaderProps) => {
       {!collapsed && (
         <span className="cursor-pointer" onClick={() => push('/apps')}>
           <Image
-            src={'/assets/svgs/giro-logo.svg'}
+            src={`/assets/svgs/${theme === 'light' ? 'giro-logo' : 'giro-logo-white'}.svg`}
             alt="giro-logo"
             width={140}
             height={60}

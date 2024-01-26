@@ -4,15 +4,17 @@ import { useRouter, usePathname } from 'next/navigation';
 import { Button } from 'antd';
 // import { Giro as GiroLogo } from '@grc/_shared/assets/svgs';
 import Image from 'next/image';
+import { useTheme } from 'next-themes';
 
 export interface LayoutProps {
   children?: ReactElement | ReactElement[];
 }
 
 const AppsBaseLayout = (props: LayoutProps) => {
+  const { children } = props;
   const router = useRouter();
   const pathname = usePathname();
-  const { children } = props;
+  const { theme } = useTheme();
 
   const onHeaderButtonClicked = (destination: string) => {
     router.push(`/auth/${destination}`);
@@ -31,7 +33,7 @@ const AppsBaseLayout = (props: LayoutProps) => {
         >
           {/* <GiroLogo /> */}
           <Image
-            src={'/assets/svgs/giro-logo.svg'}
+            src={`/assets/svgs/${theme === 'light' ? 'giro-logo' : 'giro-logo-white'}.svg`}
             alt="giro-logo"
             priority
             width={150}

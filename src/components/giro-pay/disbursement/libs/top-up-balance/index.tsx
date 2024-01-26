@@ -1,6 +1,7 @@
 import { WalletNamespace } from '@grc/_shared/namespace/wallet';
 import { Col, Row, Space, message } from 'antd';
 import { upperCase } from 'lodash';
+import { useTheme } from 'next-themes';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
 
@@ -10,6 +11,7 @@ interface TopUpBalanceProps {
 
 const TopUpBalance = ({ wallet }: TopUpBalanceProps) => {
   const [textInput, setTextInput] = useState('');
+  const { theme } = useTheme();
 
   useEffect(() => {
     if (wallet?.accountNumber) setTextInput(wallet?.accountNumber);
@@ -85,7 +87,7 @@ const TopUpBalance = ({ wallet }: TopUpBalanceProps) => {
       </div>
       <div className="flex items-center py-3 justify-end">
         <Image
-          src={'/assets/svgs/giro-logo.svg'}
+          src={`/assets/svgs/${theme === 'light' ? 'giro-logo' : 'giro-logo-white'}.svg`}
           alt="debit-logo"
           width={80}
           height={40}
