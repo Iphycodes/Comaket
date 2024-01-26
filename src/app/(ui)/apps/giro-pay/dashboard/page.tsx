@@ -1,34 +1,87 @@
 'use client';
-import { transactionData } from '@grc/_shared/constant';
+import React, { useContext, useEffect, useState } from 'react';
 import { AppContext } from '@grc/app-context';
 import DashBoard from '@grc/components/giro-pay/dashboard';
-import React, { useContext, useState } from 'react';
+import { useWallet } from '@grc/hooks/useWallet';
+import { isEmpty } from 'lodash';
+import { transactionBal } from '@grc/_shared/helpers';
+import { WithLoaderRender } from '@grc/_shared/components/with-app-loder';
+import { useTheme } from 'next-themes';
+import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 
 const DashboardPage = () => {
   const { authData, currentAccount } = useContext(AppContext);
-  const [filter, setFilter] = useState('');
+  const { theme } = useTheme();
+  const mobileResponsive = useMediaQuery(mediaSize.mobile);
+  const [, setFilter] = useState('');
   const [openCreateModal, setOpenCreateModal] = useState(false);
-  console.log('filter::', filter);
+  const {
+    createWallet,
+    createWalletResponse,
+    walletsResponse,
+    allTotalBalance,
+    totalBalanceResponse,
+    wallets,
+    transactions,
+    accountTransactionResponse,
+    pagination,
+    balance,
+    handleWallets,
+    wallet,
+  } = useWallet({
+    callAllWallets: true,
+    callAccountTransaction: true,
+    callTotalBalance: true,
+    callBalance: true,
+  });
 
-  const handleCreateVirtualAcct = (values: Record<string, any>) => {
+  const isCreatingWallet = createWalletResponse.isLoading;
+  const isLoadingWallets = walletsResponse.isLoading;
+  const isLoadingTotalBalance = totalBalanceResponse.isLoading;
+  const isLoadingTransaction = accountTransactionResponse.isFetching;
+  const totalBalance = !isEmpty(allTotalBalance) && transactionBal(allTotalBalance);
+
+  const handleCreateWallet = (values: Record<string, any>) => {
     const payload = {
       ...values,
       country: 'NG',
     };
-    console.log('handleCreateVirtualAcct::', payload);
-    setOpenCreateModal(false);
+
+    createWallet({
+      payload,
+      option: { successMessage: 'Wallet successfully created' },
+    }).then(() => setOpenCreateModal(false));
   };
 
+  useEffect(() => {
+    if (isEmpty(wallet) && !isEmpty(wallets)) {
+      handleWallets(wallets?.[0]);
+    }
+  }, [wallets, wallet]);
+
   return (
-    <DashBoard
-      authData={authData}
-      transactions={transactionData}
-      setFilter={setFilter}
-      currentAccount={currentAccount}
-      handleCreateVirtualAcct={handleCreateVirtualAcct}
-      openCreateModal={openCreateModal}
-      setOpenCreateModal={setOpenCreateModal}
-    />
+    <WithLoaderRender loading={isLoadingWallets} mobileResponsive={mobileResponsive} theme={theme}>
+      <DashBoard
+        authData={authData}
+        transactions={transactions}
+        setFilter={setFilter}
+        currentAccount={currentAccount}
+        handleCreateWallet={handleCreateWallet}
+        openCreateModal={openCreateModal}
+        setOpenCreateModal={setOpenCreateModal}
+        wallets={wallets}
+        wallet={wallet}
+        loading={{
+          isCreatingWallet,
+          isLoadingWallets,
+          isLoadingTotalBalance,
+          isLoadingTransaction,
+        }}
+        totalBalance={totalBalance}
+        pagination={pagination}
+        balance={balance}
+      />
+    </WithLoaderRender>
   );
 };
 

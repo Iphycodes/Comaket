@@ -14,11 +14,11 @@ export const AppLoader = (props: {
       use={use || Audio}
       size={size}
       strokeWidth={8}
-      strokeColor={theme === 'light' ? 'var(--accent)' : 'var(--foreground)'}
+      strokeColor={theme === 'light' ? '#1e88e5' : 'rgba(31, 41, 55, 1)'}
       style={{
         position: 'absolute',
-        top: '40vh',
-        left: '36vw',
+        top: '30vh',
+        left: '50vw',
         zIndex: 10,
         ...style,
       }}

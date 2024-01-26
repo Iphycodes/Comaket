@@ -44,7 +44,7 @@ const BatchPayout = () => {
 
   return (
     <div className="max-h-[600px] overflow-y-scroll">
-      <div className="flex sticky top-0 bg-white dark:bg-[#1f1f1f] z-10 justify-between items-center border-b-2 pb-2">
+      <div className="flex sticky top-0 bg-white dark:bg-[#1f1f1f] z-10 justify-between items-center border-b pb-2">
         <Space className="" size={10}>
           <span
             className="text-[16px] flex justify-center items-center h-12 w-12 bg-blue"
@@ -85,7 +85,7 @@ const BatchPayout = () => {
                 />
               ) : (
                 <>
-                  <Row className="py-2 items-center border-b" style={{}}>
+                  <Row className="py-2 items-center border-b">
                     <Col span={10} className="beneficiary-form">
                       {/* <div className="mb-0 text-gray-500">Batch Name</div> */}
                       <span className="font-semibold text-[20px]">{`${

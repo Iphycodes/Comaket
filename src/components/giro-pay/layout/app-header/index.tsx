@@ -33,6 +33,7 @@ export const AppHeader = (props: AppHeaderProps) => {
   const currentPath = `${pathUrl?.[3]}`?.toUpperCase() ?? '';
   const isAppSettingsPath = pathUrl?.[2]?.toLowerCase() === 'settings';
   const { authData } = useContext(AppContext);
+  const { setToggleSider } = useContext(AppContext);
   const router = useRouter();
   const { handleLogOut } = useContext(AppContext);
   const { setTheme, theme } = useTheme();
@@ -90,46 +91,68 @@ export const AppHeader = (props: AppHeaderProps) => {
 
   return (
     <Header
-      className="layout-header shadow-sm border-b border-border/100 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:text-white"
+      className="layout-header sticky z-[100] top-0 h-auto flex items-center shadow-sm border-b border-border/100 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:text-white"
       style={{
-        position: 'sticky',
-        top: 0,
-        height: 'auto',
-        display: 'flex',
-        alignItems: 'center',
-        padding: `${isMobile ? '10px' : '0 40px'}`,
-        zIndex: 100,
+        padding: `${isMobile ? '0 10px' : '0 40px'}`,
       }}
     >
       <div className="flex justify-between items-center min-w-full dark:text-white">
-        {(pathUrl ?? [])?.length <= 2 ? (
-          <span className=" cursor-pointer" onClick={() => router.push('/apps')}>
-            <Image
-              src={`/assets/svgs/${theme === 'light' ? 'giro-logo' : 'giro-logo-white'}.svg`}
-              alt="giro-logo"
-              width={120}
-              height={50}
-              priority
-            />
-          </span>
-        ) : isAppSettingsPath ? (
-          <div className="font-bold text-3">
-            <span
-              className=" text-muted-foreground mr-8 cursor-pointer"
-              onClick={() => router.back()}
-            >
-              &larr; Back
-            </span>{' '}
-            <span className="">Settings </span>
-          </div>
-        ) : (
-          <span className="font-bold text-3">{`${currentPath}`}</span>
+        {isMobile && (
+          <>
+            {(pathUrl ?? [])?.length <= 2 ? (
+              <div>
+                <span className=" cursor-pointer" onClick={() => router.push('/apps')}>
+                  <Image
+                    src={`/assets/svgs/${theme === 'light' ? 'giro-logo' : 'giro-logo-white'}.svg`}
+                    alt="giro-logo"
+                    width={90}
+                    height={40}
+                    priority
+                  />
+                </span>
+              </div>
+            ) : (
+              <div>
+                <i
+                  className="ri-menu-line text-[24px] cursor-pointer"
+                  onClick={() => setToggleSider(false)}
+                ></i>
+              </div>
+            )}
+          </>
         )}
-        <div className="flex items-center gap-10">
+        {!isMobile && (
+          <>
+            {(pathUrl ?? [])?.length <= 2 ? (
+              <span className=" cursor-pointer" onClick={() => router.push('/apps')}>
+                <Image
+                  src={`/assets/svgs/${theme === 'light' ? 'giro-logo' : 'giro-logo-white'}.svg`}
+                  alt="giro-logo"
+                  width={120}
+                  height={50}
+                  priority
+                />
+              </span>
+            ) : isAppSettingsPath ? (
+              <div className="font-bold text-3">
+                <span
+                  className=" text-muted-foreground mr-8 cursor-pointer"
+                  onClick={() => router.back()}
+                >
+                  &larr; Back
+                </span>{' '}
+                <span className="">Settings </span>
+              </div>
+            ) : (
+              <span className="font-bold text-3">{`${currentPath}`}</span>
+            )}
+          </>
+        )}
+
+        <div className={`flex items-center ${isMobile ? 'gap-3' : 'gap-10'}`}>
           {!isAppSettingsPath && (
             <>
-              {' '}
-              <div className="flex gap-2 items-center">
+              <div className="flex gap-2 p-0 m-0 items-center">
                 <Switch
                   className="live-mode-switch"
                   size="small"
@@ -138,14 +161,18 @@ export const AppHeader = (props: AppHeaderProps) => {
                     handleSwitchAccountMode?.(e);
                   }}
                 />
-                <span className="font-bold">Live mode</span>
-              </div>
-              <Link className="underline" href={'/'}>
-                API Documentation
-              </Link>
-              <Link className="underline" href={'/'}>
-                For Developers
-              </Link>
+                <span className="font-bold p-0 m-0">Live mode</span>
+              </div>{' '}
+              {!isMobile && (
+                <>
+                  <Link className="underline" href={'/'}>
+                    API Documentation
+                  </Link>
+                  <Link className="underline" href={'/'}>
+                    For Developers
+                  </Link>
+                </>
+              )}
             </>
           )}
 
@@ -166,7 +193,7 @@ export const AppHeader = (props: AppHeaderProps) => {
             arrow={false}
             overlayStyle={{ zIndex: 500, marginTop: '510px' }}
           >
-            <div className="cursor-pointer flex items-center gap-2">
+            <div className="cursor-pointer flex items-center gap-1">
               <Avatar
                 style={{
                   backgroundColor: getRandomColorByString(authData?.firstName ?? ''),
@@ -175,7 +202,7 @@ export const AppHeader = (props: AppHeaderProps) => {
               >
                 {_.isEmpty('') && getFirstCharacter(authData?.firstName ?? '')}
               </Avatar>
-              <span className="font-bold">{authData?.firstName}</span>
+              {!isMobile && <span className="font-bold">{authData?.firstName}</span>}
               <CaretDownOutlined size={10} />
             </div>
           </Popover>

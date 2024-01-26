@@ -78,7 +78,7 @@ const RecentDisbursements: React.FC<RecentDisbursementsProps> = ({
         footer={
           mockDisbursementRecord && (
             <div className="text-center mt-5">
-              <Link prefetch className="text-blue" href={'/apps/giro-debit/transactions'}>
+              <Link prefetch className="text-blue" href={'/apps/giro-pay/transactions'}>
                 See all &rarr;
               </Link>
             </div>

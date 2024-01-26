@@ -113,6 +113,11 @@
     position: absolute;
     bottom: 50px;
   }
+
+  .ant-menu-light.ant-menu-root.ant-menu-inline{
+    border-inline-end: none !important;
+
+  }
 }
 
 .live-mode-switch.ant-switch {
@@ -161,6 +166,9 @@
   }
 }
 
+
+
+
 .transaction-stat-card {
   .ant-card-body {
     padding: 10px 20px !important;
@@ -201,9 +209,6 @@ canvas.disbursement-pie {
   }
 }
 
-// .amount-inp{
-//   margin-bottom: 12px !important;
-// }
 .light {
   .dashboard-transaction-list:hover {
     background-color: #eee !important;
@@ -322,5 +327,10 @@ canvas.disbursement-pie {
       box-shadow: 0 0 0 2px rgba(0, 60, 180, 0.15) !important;
       outline: 0 !important;
     }
+  }
+  #batch-add-reciepient-form_description{
+    background-color: #141414 !important;
+    border-color: #424242 !important;
+    color: rgba(255, 255, 255, 0.85) !important;
   }
 }

@@ -1,7 +1,7 @@
 import { AppObject } from '@/_shared/namespace';
 
-export namespace VirtualAccountNamespace {
-  export interface Account extends AppObject {
+export namespace WalletNamespace {
+  export interface Wallet extends AppObject {
     id: string;
     accountName: string;
     accountNumber: string;

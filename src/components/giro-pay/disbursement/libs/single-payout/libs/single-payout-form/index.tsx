@@ -38,10 +38,10 @@ const SinglePayoutForm = ({
   };
 
   return (
-    <div className="max-h-[450px] overflow-y-scroll">
+    <div className="max-h-[550px] overflow-y-scroll">
       <Row className="py-5" style={{}}>
         <Col span={24} className="beneficiary-form">
-          <div className="mb-0 text-gray-500 dark:text-gray-300">Select Saved Beneficiary</div>
+          <div className="mb-0 text-muted-foreground">Select Saved Beneficiary</div>
           <Select
             bordered={true}
             showSearch
@@ -59,21 +59,23 @@ const SinglePayoutForm = ({
         data-testid={'dti_form'}
         initialValues={{ saveBeneficiary: false }}
         onFinish={handleSubmit}
+        layout="vertical"
+        requiredMark={false}
       >
         <Row className="my-0">
           <Col className="my-0" lg={24} xs={24}>
-            <div className="mb-0 text-gray-500 dark:text-gray-300">{`Amount (\u20A6)`}</div>
             <Form.Item
               name="amount"
               className="amount-inp mb-3"
               rules={[{ required: true, message: 'Input amount' }]}
+              label={<div className="mb-0 text-muted-foreground">{`Amount (\u20A6)`}</div>}
             >
               <InputNumber
                 className="w-full"
                 size="large"
                 controls={false}
                 min={100}
-                prefix={<span>&#8358; </span>}
+                prefix={<span className="text-muted-foreground">&#8358; </span>}
                 placeholder="Enter Amount"
               />
             </Form.Item>
@@ -81,11 +83,11 @@ const SinglePayoutForm = ({
         </Row>
         <Row>
           <Col lg={24} xs={24}>
-            <div className="mb-0 text-gray-500 dark:text-gray-300">Bank</div>
             <Form.Item
               name="reciepient-bank"
               className="mb-3"
               rules={[{ required: true, message: 'Input bank name' }]}
+              label={<div className="mb-0 text-muted-foreground">Bank</div>}
             >
               <Select
                 size="large"
@@ -99,11 +101,11 @@ const SinglePayoutForm = ({
         </Row>
         <Row className="my-0">
           <Col className="my-0" lg={24} xs={24}>
-            <div className="mb-0 text-gray-500 dark:text-gray-300">{`Account Number`}</div>
             <Form.Item
               name="account-number"
               className="amount-inp mb-3"
               rules={[{ required: true, message: 'Input Account number' }]}
+              label={<div className="mb-0 text-muted-foreground">{`Account Number`}</div>}
             >
               <InputNumber
                 className="w-full"
@@ -116,8 +118,11 @@ const SinglePayoutForm = ({
         </Row>
         <Row className="my-0">
           <Col className="my-0" lg={24} xs={24}>
-            <div className="mb-0 text-gray-500 dark:text-gray-300">{`Account Name`}</div>
-            <Form.Item name="name" className="amount-inp mb-3">
+            <Form.Item
+              name="name"
+              className="amount-inp mb-3"
+              label={<div className="mb-0 text-muted-foreground">{`Account Name`}</div>}
+            >
               <Input className="w-full" size="large" />
             </Form.Item>
           </Col>
