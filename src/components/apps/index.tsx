@@ -69,8 +69,8 @@ const Apps = (props: LoginProps) => {
                         <div className="flex flex-col">
                           <div>{title}</div>
                           <div
-                            style={{ position: 'absolute', top: '-34px', right: '-45px' }}
-                            className=" font-normal text-sm text-white py-0 px-[2px] bg-blue rounded-tl-lg r"
+                            style={{ position: 'absolute', top: '-34px', right: '-50px' }}
+                            className=" font-normal text-sm text-white py-0 px-[2px] bg-blue  rounded-tr-lg"
                           >
                             coming soon
                           </div>

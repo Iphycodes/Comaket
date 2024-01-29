@@ -110,7 +110,7 @@ export const useWallet = ({
     ...filter?.filterData,
     // date: filter?.filterData?.createdAt,
     amount: filter?.filterData?.amount ? filter?.filterData?.amount * 100 : undefined,
-    wallet: walletId,
+    virtualAccount: walletId,
     search: searchValue,
   };
 

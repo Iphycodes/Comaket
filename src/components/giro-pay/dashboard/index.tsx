@@ -2,7 +2,7 @@
 import { Dispatch, SetStateAction, useState } from 'react';
 import Link from 'next/link';
 import moment from 'moment';
-import { Button, Card, Col, List, Row, Select, Space, Tag } from 'antd';
+import { Button, Card, Col, List, Row, Tag } from 'antd';
 import { numberFormat } from '@grc/_shared/helpers';
 import { AccountNamespace } from '@grc/_shared/namespace/account';
 import { IBalance, WalletNamespace } from '@grc/_shared/namespace/wallet';
@@ -10,12 +10,7 @@ import CustomModal from '@grc/_shared/components/custom-modal';
 import { AuthDataType } from '@grc/_shared/namespace/auth';
 import { CoinIcon } from '@grc/_shared/assets/svgs';
 import { capitalize, isEmpty, startCase, toLower } from 'lodash';
-import {
-  CashFlowAnalytics,
-  mockTransactionAnalyticsData,
-  smoothLineChartData,
-  statisticsFilter,
-} from '@grc/_shared/constant';
+import { generateChartData, generateDisbursementData } from '@grc/_shared/constant';
 import CreateWalletForm from './libs/create-wallet-form';
 import {
   Chart as ChartJS,
@@ -38,10 +33,10 @@ import TopUpBalance from '../disbursement/libs/top-up-balance';
 import { Pagination } from '@grc/_shared/namespace';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 import SinglePayoutForm from '../disbursement/libs/single-payout/libs/single-payout-form';
+import { DashboardAnalyticsNamespace } from '@grc/_shared/namespace/dashboard-analytics';
 
 type DashBoardProps = {
   authData?: AuthDataType | null;
-  transactions: Record<string, any>[];
   setFilter: Dispatch<SetStateAction<string>>;
   currentAccount: AccountNamespace.Account | null;
   handleCreateWallet: (payload: Record<string, any>) => void;
@@ -58,6 +53,8 @@ type DashBoardProps = {
   totalBalance: number | undefined;
   balance: IBalance;
   pagination: Pagination;
+  dashboardAnalyticsData: DashboardAnalyticsNamespace.DashboardAnalytics;
+  transactions: WalletNamespace.Wallet[];
 };
 
 ChartJS.register(
@@ -74,7 +71,6 @@ ChartJS.register(
 
 const DashBoard = (props: DashBoardProps) => {
   const {
-    transactions,
     authData,
     handleCreateWallet,
     openCreateModal,
@@ -85,10 +81,18 @@ const DashBoard = (props: DashBoardProps) => {
     totalBalance,
     balance,
     loading,
+    dashboardAnalyticsData,
   } = props;
   const [toggleTopUp, setToggleTopUp] = useState(false);
   const [toggleDisbursement, setToggleDisbursement] = useState(false);
   const isMobile = useMediaQuery(mediaSize.mobile);
+  const {
+    accruedFees,
+    incomeAndDisbursements,
+    recentTransactions,
+    cashFlowBreakdown,
+    disbursementSummary,
+  } = dashboardAnalyticsData ?? {};
 
   let delayed: any;
   const isVerified = !!authData?.bvn && !!authData?.mobile?.phoneNumber;
@@ -167,9 +171,13 @@ const DashBoard = (props: DashBoardProps) => {
               <Row gutter={[40, 40]} className="mt-3">
                 <Col md={12} xs={24}>
                   <Row gutter={[isMobile ? 10 : 30, 30]}>
-                    {CashFlowAnalytics?.map((data, index) => (
-                      <Col key={`${data?.type}-${index}`} md={12} xs={12}>
-                        <CashFlowCard type={data?.type} amount={data?.amount} count={data?.count} />
+                    {incomeAndDisbursements?.map((data, index) => (
+                      <Col key={`${data?.label}-${index}`} md={12} xs={12}>
+                        <CashFlowCard
+                          type={data?.label}
+                          amount={data?.totalAmount ?? 0}
+                          count={data?.value ?? 0}
+                        />
                       </Col>
                     ))}
                   </Row>
@@ -177,7 +185,11 @@ const DashBoard = (props: DashBoardProps) => {
                 <Col md={12} xs={24}>
                   <Row gutter={[20, 20]} className="h-full">
                     <Col md={12} xs={24}>
-                      <CashFlowCard type="Accrued Service Fee" amount={30000} count={5} />
+                      <CashFlowCard
+                        type="Accrued Service Fee"
+                        amount={accruedFees?.totalAmount ?? 0}
+                        count={accruedFees?.countdown ?? 0}
+                      />
                     </Col>
                     <Col md={12} xs={12}>
                       <div className="dark:bg-zinc-800 text-card-foreground w-full flex flex-col border dark:border-gray-500 shadow-md rounded-xl p-5 h-full">
@@ -208,7 +220,7 @@ const DashBoard = (props: DashBoardProps) => {
                         </h3>
                       }
                       footer={
-                        !isEmpty(transactions) ? (
+                        !isEmpty(recentTransactions) ? (
                           <div className="text-center mt-5">
                             <Link
                               prefetch
@@ -220,7 +232,7 @@ const DashBoard = (props: DashBoardProps) => {
                           </div>
                         ) : undefined
                       }
-                      dataSource={transactions}
+                      dataSource={recentTransactions}
                       loading={false}
                       locale={{
                         emptyText: (
@@ -239,7 +251,7 @@ const DashBoard = (props: DashBoardProps) => {
                             <List.Item.Meta
                               title={
                                 <span className="text-card-foreground">
-                                  {startCase(capitalize(item?.recipient))}
+                                  {startCase(capitalize(item?.beneficiary?.accountName))}
                                 </span>
                               }
                               description={
@@ -284,9 +296,9 @@ const DashBoard = (props: DashBoardProps) => {
                 <Col md={12} xs={24}>
                   <Card className="dark:bg-zinc-800 text-card-foreground dark:text-white border dark:border-gray-500 shadow-md  h-full w-full">
                     <header className="flex flex-wrap gap-2 justify-between items-center">
-                      <span className="font-bold">Cash Flow</span>
+                      <span className="font-bold">Cash Flow Breakdown</span>
                       <div>
-                        <Space size={7}>
+                        {/* <Space size={7}>
                           <Select
                             loading={false}
                             style={{ width: '80px' }}
@@ -294,13 +306,10 @@ const DashBoard = (props: DashBoardProps) => {
                             defaultValue={statisticsFilter[0]}
                             placeholder="Select a filter"
                           />
-                        </Space>
+                        </Space> */}
                       </div>
                     </header>
-                    <div
-                      className="mt-5 flex items-center justify-center dark:text-white overflow-x-scroll"
-                      style={{ overflowX: 'scroll' }}
-                    >
+                    <div className="mt-5 flex items-center justify-center dark:text-white">
                       <Line
                         height={120}
                         redraw
@@ -313,15 +322,6 @@ const DashBoard = (props: DashBoardProps) => {
                                 display: false,
                               },
                               type: 'category',
-                              // labels: [
-                              //   'January',
-                              //   'February',
-                              //   'March',
-                              //   'April',
-                              //   'May',
-                              //   'June',
-                              //   'July',
-                              // ],
                             },
                             y: {
                               grid: {
@@ -338,6 +338,18 @@ const DashBoard = (props: DashBoardProps) => {
                           plugins: {
                             legend: {
                               display: false,
+                            },
+                            tooltip: {
+                              callbacks: {
+                                label: (tooltipItem) => {
+                                  let label = tooltipItem.dataset.label || '';
+                                  if (label) {
+                                    label += ': ';
+                                  }
+                                  label += `₦${tooltipItem.formattedValue}`;
+                                  return label;
+                                },
+                              },
                             },
                           },
 
@@ -358,7 +370,7 @@ const DashBoard = (props: DashBoardProps) => {
                             },
                           },
                         }}
-                        data={smoothLineChartData}
+                        data={generateChartData(cashFlowBreakdown ?? [])}
                       />
                     </div>
                   </Card>
@@ -367,10 +379,10 @@ const DashBoard = (props: DashBoardProps) => {
                   <Card className="dark:bg-zinc-800 text-card-foreground dark:text-white border dark:border-gray-500 shadow-md h-full w-full">
                     <header className="flex flex-wrap gap-2 justify-between items-center">
                       <h3 className="font-semibold leading-none tracking-tight">
-                        Transaction Summary
+                        Disbursements Summary
                       </h3>
                       <div>
-                        <Space size={7}>
+                        {/* <Space size={7}>
                           <Select
                             loading={false}
                             style={{ width: '80px' }}
@@ -378,12 +390,12 @@ const DashBoard = (props: DashBoardProps) => {
                             defaultValue={statisticsFilter[0]}
                             placeholder="Select a filter"
                           />
-                        </Space>
+                        </Space> */}
                       </div>
                     </header>
                     <div className="mt-5 flex items-center justify-center">
                       <Doughnut
-                        data={mockTransactionAnalyticsData}
+                        data={generateDisbursementData(disbursementSummary ?? [])}
                         redraw
                         width={400}
                         height={200}
@@ -394,6 +406,18 @@ const DashBoard = (props: DashBoardProps) => {
                             legend: {
                               position: 'bottom',
                               align: 'center',
+                            },
+                            tooltip: {
+                              callbacks: {
+                                label: (tooltipItem) => {
+                                  let label = tooltipItem.dataset.label || '';
+                                  if (label) {
+                                    label += ': ';
+                                  }
+                                  label += `: ${tooltipItem.formattedValue}`;
+                                  return label;
+                                },
+                              },
                             },
                           },
 

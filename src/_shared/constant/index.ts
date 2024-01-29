@@ -34,6 +34,8 @@ export const businessProfileUrl = 'businesses';
 export const accountSettingUrl = 'accounts';
 export const mailTransactionUrl = 'transactions/summary/email';
 export const transactionAnalyticsUrl = 'analytics/transactions';
+export const dashboardAnalyticsUrl = 'analytics/dashboard';
+
 /**Token**/
 
 export const AUTH_TOKEN_KEY = process.env.NEXT_PUBLIC_TOKEN_STORAGE_KEY as string;
@@ -240,16 +242,6 @@ export const transactionData = [
     recipient: 'sinzu money',
     status: 'successful',
   },
-  // {
-  //   entry: 'credit',
-  //   id: '00004',
-  //   createdAt: '12/06/23',
-  //   time: '00:34:12',
-  //   amount: 45023400,
-  //   currency: 'NGN',
-  //   recipient: 'sinzu money',
-  //   status: 'successful',
-  // },
   {
     entry: 'debit',
     id: '00005',
@@ -477,3 +469,61 @@ export interface ReciepientsDataType {
   bank?: string;
   amount?: number;
 }
+
+export const generateChartData = (cashFlowBreakdown: {
+  income: { month: string; totalAmount: number }[];
+  disbursements: { month: string; totalAmount: number }[];
+}) => {
+  const labels = (cashFlowBreakdown.income ?? []).map((entry) => entry.month);
+  const incomeData = (cashFlowBreakdown.income ?? []).map((entry) => entry.totalAmount / 100);
+  const disbursementsData = (cashFlowBreakdown.disbursements ?? []).map(
+    (entry) => entry.totalAmount / 100
+  );
+
+  const chartData = {
+    labels,
+    datasets: [
+      {
+        label: 'Income',
+        data: incomeData,
+        fill: false,
+        backgroundColor: 'rgba(30, 136, 229, 0.2)',
+        borderColor: 'rgba(30, 136, 229, 1)',
+        borderWidth: 2,
+      },
+      {
+        label: 'Disbursements',
+        data: disbursementsData,
+        fill: false,
+        borderColor: 'rgb(255, 99, 132)',
+        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+        borderWidth: 2,
+      },
+    ],
+  };
+
+  return chartData;
+};
+
+export const generateDisbursementData = (data: { label: string; value: number }[]) => {
+  const transformedLabel: Record<string, any> = {
+    totalSuccessfulDisbursements: 'Successful Disbursements',
+    totalProcessingDisbursements: 'Processing Disbursements',
+    totalFailedDisbursements: 'Failed Disbursements',
+  };
+  const labels = data.map(({ label }) => transformedLabel[label]);
+  const disBursementData = data.map(({ value }) => value);
+
+  const formattedData = {
+    labels,
+    datasets: [
+      {
+        backgroundColor: ['#2FDE00', '#C9DE00', '#B21F00'],
+        hoverBackgroundColor: ['#175000', '#4B5000', '#501800'],
+        data: disBursementData,
+      },
+    ],
+  };
+
+  return formattedData;
+};
