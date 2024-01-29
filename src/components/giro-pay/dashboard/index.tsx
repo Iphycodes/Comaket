@@ -12,9 +12,7 @@ import { CoinIcon } from '@grc/_shared/assets/svgs';
 import { capitalize, isEmpty, startCase, toLower } from 'lodash';
 import {
   CashFlowAnalytics,
-  comparativeAnalysisData,
   mockTransactionAnalyticsData,
-  mockTransactionAnalyticsData2,
   smoothLineChartData,
   statisticsFilter,
 } from '@grc/_shared/constant';
@@ -31,7 +29,7 @@ import {
   LineElement,
   Filler,
 } from 'chart.js';
-import { Bar, Doughnut, Line } from 'react-chartjs-2';
+import { Doughnut, Line } from 'react-chartjs-2';
 import { CashFlowCard } from './libs/cash-flow-card';
 import { QuickActionBtn } from './libs/quick-action-btn';
 import { EmptyVirtualAccount } from './libs/empty-virtual-account';
@@ -179,7 +177,7 @@ const DashBoard = (props: DashBoardProps) => {
                 <Col md={12} xs={24}>
                   <Row gutter={[20, 20]} className="h-full">
                     <Col md={12} xs={24}>
-                      <CashFlowCard type="Accrued Service Charge" amount={30000} count={5} />
+                      <CashFlowCard type="Accrued Service Fee" amount={30000} count={5} />
                     </Col>
                     <Col md={12} xs={24}>
                       <div className="dark:bg-zinc-800 text-card-foreground w-full flex flex-col border dark:border-gray-500 shadow-md rounded-xl p-5 h-full">
@@ -291,6 +289,7 @@ const DashBoard = (props: DashBoardProps) => {
                         <Space size={7}>
                           <Select
                             loading={false}
+                            style={{ width: '80px' }}
                             options={statisticsFilter}
                             defaultValue={statisticsFilter[0]}
                             placeholder="Select a filter"
@@ -298,11 +297,14 @@ const DashBoard = (props: DashBoardProps) => {
                         </Space>
                       </div>
                     </header>
-                    <div className="mt-5 flex items-center justify-center dark:text-white">
+                    <div
+                      className="mt-5 flex items-center justify-center dark:text-white overflow-x-scroll"
+                      style={{ overflowX: 'scroll' }}
+                    >
                       <Line
                         height={120}
                         redraw
-                        className="w-full"
+                        className="w-full overflow-x-scroll"
                         options={{
                           responsive: true,
                           scales: {
@@ -311,15 +313,15 @@ const DashBoard = (props: DashBoardProps) => {
                                 display: false,
                               },
                               type: 'category',
-                              labels: [
-                                'January',
-                                'February',
-                                'March',
-                                'April',
-                                'May',
-                                'June',
-                                'July',
-                              ],
+                              // labels: [
+                              //   'January',
+                              //   'February',
+                              //   'March',
+                              //   'April',
+                              //   'May',
+                              //   'June',
+                              //   'July',
+                              // ],
                             },
                             y: {
                               grid: {
@@ -371,6 +373,7 @@ const DashBoard = (props: DashBoardProps) => {
                         <Space size={7}>
                           <Select
                             loading={false}
+                            style={{ width: '80px' }}
                             options={statisticsFilter}
                             defaultValue={statisticsFilter[0]}
                             placeholder="Select a filter"
@@ -416,7 +419,7 @@ const DashBoard = (props: DashBoardProps) => {
                   </Card>
                 </Col>
               </Row>
-              <Row gutter={[40, 40]} className="mt-3">
+              {/* <Row gutter={[40, 40]} className="mt-3">
                 <Col md={12} xs={24}>
                   <Card className="dark:bg-zinc-800 text-card-foreground dark:text-white border dark:border-gray-500 shadow-md  hover:border-cyan-100">
                     <header className="flex flex-wrap gap-2 justify-between items-center">
@@ -427,6 +430,7 @@ const DashBoard = (props: DashBoardProps) => {
                         <Space size={7}>
                           <Select
                             loading={false}
+                            style={{width:'20px'}}
                             options={statisticsFilter}
                             defaultValue={statisticsFilter[0]}
                             placeholder="Select a filter"
@@ -491,6 +495,7 @@ const DashBoard = (props: DashBoardProps) => {
                         <Space size={7}>
                           <Select
                             loading={false}
+                            style={{width:'20px'}}
                             options={statisticsFilter}
                             defaultValue={statisticsFilter[0]}
                             placeholder="Select a filter"
@@ -545,7 +550,7 @@ const DashBoard = (props: DashBoardProps) => {
                     </div>
                   </Card>
                 </Col>
-              </Row>
+              </Row> */}
             </>
           )}
         </div>

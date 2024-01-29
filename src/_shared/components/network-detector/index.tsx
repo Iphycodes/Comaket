@@ -15,7 +15,7 @@ const NetWorkDetector = (props: NetWorkDetectorType) => {
     if (!online) {
       notification.open({
         message: (
-          <span>
+          <span className="underline">
             You're currently offline. Check your connections.{' '}
             <a style={{ margin: 0 }} onClick={() => window.location.reload()}>
               Refresh Page
