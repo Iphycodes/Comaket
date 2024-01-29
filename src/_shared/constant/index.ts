@@ -393,7 +393,7 @@ export const mockDisbursementRecord: DisbursementRecord[] = [
     ],
   },
 ];
-const labels = Array.from({ length: 9 }, (_, index) =>
+const labels = Array.from({ length: 12 }, (_, index) =>
   moment().subtract(index, 'months').format('MMMM')
 );
 export const mockTransactionAnalyticsData2 = {
@@ -427,14 +427,35 @@ export const comparativeAnalysisData = {
 };
 
 export const smoothLineChartData = {
-  labels: ['January', 'February', 'March', 'April', 'May', 'June', 'July'],
+  labels: [
+    'January',
+    'February',
+    'March',
+    'April',
+    'May',
+    'June',
+    'July',
+    'August',
+    'September',
+    'October',
+    'November',
+    'December',
+  ],
   datasets: [
     {
-      label: '',
-      data: [50, 60, 55, 73, 65, 90, 75],
+      label: 'income',
+      data: [50, 60, 55, 73, 65, 90, 75, 50, 33, 67, 11, 70],
       fill: false,
       backgroundColor: 'rgba(30, 136, 229, 0.2)',
       borderColor: 'rgba(30, 136, 229, 1)',
+      borderWidth: 2,
+    },
+    {
+      label: 'disbursements',
+      data: [60, 50, 55, 44, 45, 90, 75],
+      fill: false,
+      borderColor: 'rgb(255, 99, 132)',
+      backgroundColor: 'rgba(255, 99, 132, 0.5)',
       borderWidth: 2,
     },
   ],
