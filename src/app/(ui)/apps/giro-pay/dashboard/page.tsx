@@ -8,6 +8,7 @@ import { transactionBal } from '@grc/_shared/helpers';
 import { WithLoaderRender } from '@grc/_shared/components/with-app-loder';
 import { useTheme } from 'next-themes';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
+import { useDashboard } from '@grc/hooks/useDashboard';
 
 const DashboardPage = () => {
   const { authData, currentAccount } = useContext(AppContext);
@@ -34,6 +35,7 @@ const DashboardPage = () => {
     callTotalBalance: true,
     callBalance: true,
   });
+  const { dashboardAnalyticsData } = useDashboard({ callDashboardAnalytics: true });
 
   const isCreatingWallet = createWalletResponse.isLoading;
   const isLoadingWallets = walletsResponse.isLoading;
@@ -80,6 +82,7 @@ const DashboardPage = () => {
         totalBalance={totalBalance}
         pagination={pagination}
         balance={balance}
+        dashboardAnalyticsData={dashboardAnalyticsData}
       />
     </WithLoaderRender>
   );
