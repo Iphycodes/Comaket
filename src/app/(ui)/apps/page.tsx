@@ -45,10 +45,13 @@ const AppsPage = () => {
     isSuccessfulFetchingWallets,
     walletsResponse?.fulfilledTimeStamp,
   ]);
+  const isMobile = useMediaQuery(mediaSize.mobile);
 
   return (
-    <main className="h-screen flex flex-col items-center bg-background px-4">
-      <header className="w-full max-w-full px-6">
+    <main
+      className={`h-screen flex flex-col items-center bg-background ${isMobile ? 'px-0' : 'px-4'}`}
+    >
+      <header className={`w-full max-w-full ${isMobile ? 'px-2' : 'px-6'}`}>
         <AppHeader isLiveMode={isLiveMode} handleSwitchAccountMode={handleSwitchAccountMode} />
       </header>
       <div className="mt-24 flex items-center justify-center justify-items-center justify-self-center content-center text-black dark:text-white">

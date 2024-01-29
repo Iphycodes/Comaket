@@ -2,7 +2,6 @@
 .reset-password-form,
 .update-profile-details-form,
 .update-business-profile-form {
-
   .ant-input-number-group-wrapper,
   .ant-input-number-in-form-item {
     width: 100% !important;
@@ -21,12 +20,9 @@
   }
 }
 
-
-
 .business-register-form,
 .update-profile-details-form,
 .update-business-profile-form {
-
   .ant-select-selector,
   .ant-select-in-form-item,
   .ant-select-selection-item {
@@ -50,11 +46,8 @@
     align-items: center !important;
   }
 }
-
-;
 
 .select-virtual-account {
-
   .ant-select-selector,
   .ant-select-in-form-item,
   .ant-select-selection-item {
@@ -226,11 +219,12 @@ canvas.disbursement-pie {
   .ant-layout-sider,
   .ant-menu-light {
     background: #f3f3f3 !important;
-    transition: all 0.2s, background 0s;
+    transition:
+      all 0.2s,
+      background 0s;
   }
 
   .update-api-key-webhook-form {
-
     .ant-input-disabled,
     .ant-input-affix-wrapper-disabled {
       background-color: rgba(255, 255, 255, 1) !important;
@@ -282,7 +276,9 @@ canvas.disbursement-pie {
   .ant-layout-sider,
   .ant-menu-light {
     background: hsl(var(--background)) !important;
-    transition: all 0.2s, background 0s;
+    transition:
+      all 0.2s,
+      background 0s;
   }
 
   .ant-menu-item-active,
@@ -290,11 +286,12 @@ canvas.disbursement-pie {
     background-color: rgba(39, 39, 42, 1) !important;
     -tw-text-opacity: 1 !important;
     color: rgb(255 255 255 / var(--tw-text-opacity)) !important;
-    transition: all 0.2s, background 0s;
+    transition:
+      all 0.2s,
+      background 0s;
   }
 
   .update-api-key-webhook-form {
-
     .ant-input-disabled,
     .ant-input-affix-wrapper-disabled {
       background-color: #141414 !important;
@@ -316,6 +313,12 @@ canvas.disbursement-pie {
       caret-color: var(--accent) !important;
       text-align: center;
       font-weight: bold;
+      background-color: #141414 !important;
+      color: rgba(255, 255, 255, 0.85) !important;
+      border-color: #424242 !important;
+    }
+
+    textarea {
       background-color: #141414 !important;
       color: rgba(255, 255, 255, 0.85) !important;
       border-color: #424242 !important;

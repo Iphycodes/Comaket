@@ -52,6 +52,7 @@ export interface QueryArgs {
   year?: number;
   status?: string;
   id?: string | number | null;
+  filter?: string;
 }
 
 export interface ApiRequest {
