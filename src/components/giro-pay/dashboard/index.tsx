@@ -36,6 +36,7 @@ import { EmptyVirtualAccount } from './libs/empty-virtual-account';
 import { motion } from 'framer-motion';
 import TopUpBalance from '../disbursement/libs/top-up-balance';
 import { Pagination } from '@grc/_shared/namespace';
+import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 import SinglePayoutForm from '../disbursement/libs/single-payout/libs/single-payout-form';
 
 type DashBoardProps = {
@@ -87,9 +88,8 @@ const DashBoard = (props: DashBoardProps) => {
   } = props;
   const [toggleTopUp, setToggleTopUp] = useState(false);
   const [toggleDisbursement, setToggleDisbursement] = useState(false);
-  // const pathname = usePathname();
-  // const pathUrl = pathname?.split('/');
-  // const isDashboard = pathUrl?.[3];
+  const isMobile = useMediaQuery(mediaSize.mobile);
+
   let delayed: any;
   const isVerified = !!authData?.bvn && !!authData?.mobile?.phoneNumber;
   return (
@@ -105,7 +105,7 @@ const DashBoard = (props: DashBoardProps) => {
           <div>
             <div className="text-2xl">Hello 👋, {startCase(toLower(currentAccount?.name))}</div>
           </div>
-          <Row gutter={[20, 40]}>
+          <Row gutter={[isMobile ? 10 : 20, 40]}>
             <Col md={6} xs={24}>
               <div className="flex flex-col gap-1">
                 <span className=" text-4xl font-bold">
@@ -126,7 +126,7 @@ const DashBoard = (props: DashBoardProps) => {
                 </div>
               )}
             </Col>
-            <Col md={6} xs={24}>
+            <Col md={6} xs={12}>
               {isVerified && !isEmpty(wallets) && (
                 <div className="w-full">
                   <Button
@@ -140,7 +140,7 @@ const DashBoard = (props: DashBoardProps) => {
                 </div>
               )}
             </Col>
-            <Col md={6} xs={24}>
+            <Col md={6} xs={12}>
               {isVerified && !isEmpty(wallets) && (
                 <div className="w-full">
                   <Button
@@ -166,9 +166,9 @@ const DashBoard = (props: DashBoardProps) => {
             <>
               <Row gutter={[40, 40]} className="mt-3">
                 <Col md={12} xs={24}>
-                  <Row gutter={[30, 30]}>
+                  <Row gutter={[isMobile ? 10 : 30, 30]}>
                     {CashFlowAnalytics?.map((data, index) => (
-                      <Col key={`${data?.type}-${index}`} md={12} xs={24}>
+                      <Col key={`${data?.type}-${index}`} md={12} xs={12}>
                         <CashFlowCard type={data?.type} amount={data?.amount} count={data?.count} />
                       </Col>
                     ))}
@@ -179,7 +179,7 @@ const DashBoard = (props: DashBoardProps) => {
                     <Col md={12} xs={24}>
                       <CashFlowCard type="Accrued Service Fee" amount={30000} count={5} />
                     </Col>
-                    <Col md={12} xs={24}>
+                    <Col md={12} xs={12}>
                       <div className="dark:bg-zinc-800 text-card-foreground w-full flex flex-col border dark:border-gray-500 shadow-md rounded-xl p-5 h-full">
                         <div className="flex flex-col">
                           <h3 className="font-medium text-sm tracking-tight">Quick Actions</h3>

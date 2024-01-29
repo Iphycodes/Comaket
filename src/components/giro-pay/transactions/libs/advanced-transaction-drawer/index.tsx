@@ -1,6 +1,6 @@
 'use client';
 
-import { Drawer } from 'antd';
+import { Button, Drawer } from 'antd';
 import { TransactionsDataType } from '../transactions-table/libs/transactions-data';
 
 interface AdvancedTransactionProps {
@@ -13,7 +13,7 @@ const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTr
   return (
     <Drawer
       closeIcon={false}
-      className="advanced-transaction-drawer p-0"
+      className="advanced-transaction-drawer p-0 min-h-screen relative"
       onClose={onClose}
       open={open}
     >
@@ -60,6 +60,20 @@ const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTr
             </div>
           );
         })}
+      </div>
+      <div className="w-full absolute bottom-0 p-3">
+        <Button
+          className="opacity-100 flex w-full items-center justify-center bg-blue hover:opacity-95 font-semibold mt-3 text-white h-14"
+          type="primary"
+          disabled={false}
+          loading={false}
+          htmlType="submit"
+        >
+          <div className="flex items-center mx-auto gap-2 justify-center">
+            <i className="ri-download-line text-[18px]"></i>
+            <span>Download Reciept</span>
+          </div>
+        </Button>
       </div>
     </Drawer>
   );

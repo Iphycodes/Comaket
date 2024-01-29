@@ -1,8 +1,17 @@
+'use client';
+
 import Transactions from '@grc/components/giro-pay/transactions';
-import React from 'react';
+import { useTransaction } from '@grc/hooks/useTransaction';
+import React, { useEffect } from 'react';
 
 const TransactionPage = () => {
-  return <Transactions />;
+  const { transactionAnalyticsData } = useTransaction({ callAllTransaction: true });
+
+  useEffect(() => {
+    console.log('transactionDataaaaaaaaaaaaaaaa:::', transactionAnalyticsData);
+  }, [transactionAnalyticsData]);
+
+  return <Transactions transactionAnalyticsData={transactionAnalyticsData} />;
 };
 
 export default TransactionPage;

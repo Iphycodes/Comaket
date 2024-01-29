@@ -45,7 +45,7 @@ const TopButtons = ({ setModalOpen, setModalElement }: TopButtonsProps) => {
       </Button>
       <Button
         onClick={() => handleButtonClick('batch-payout')}
-        className="opacity-100 font-normal bg-gray-800 text-white h-12"
+        className="opacity-100 font-normal dark:border dark:border-gray-500 bg-gray-800 text-white h-12"
         type="primary"
         disabled={false}
         loading={false}
