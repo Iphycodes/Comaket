@@ -9,7 +9,11 @@ import FilterDrawer from './libs/filter-drawer';
 import AdvancedTransactionDrawer from './libs/advanced-transaction-drawer';
 import TransactionStatisticsCard from '../disbursement/libs/transaction-statistics-card';
 
-const Transactions = () => {
+interface transactionProps {
+  transactionAnalyticsData: Record<string, any>[];
+}
+
+const Transactions = ({ transactionAnalyticsData }: transactionProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedRecord, setSelectedRecord] = useState<TransactionsDataType>({});
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
@@ -22,6 +26,7 @@ const Transactions = () => {
   const handleRowClick = (record: any) => {
     setIsModalOpen(true);
     setSelectedRecord(record);
+    console.log('transaction Dataaaaaaaaaaaaaaaaaaa:::::::', transactionAnalyticsData);
   };
 
   const handleCancel = () => {
@@ -31,6 +36,47 @@ const Transactions = () => {
   const handleTransactionDrawerOpen = (toggle: boolean) => {
     setTransactionDrawerOpen(toggle);
   };
+
+  function camelCaseToSentence(camelCaseString: string) {
+    const words = camelCaseString.split(/(?=[A-Z])/);
+    const capitalizedWords = words.map((word) => word.charAt(0).toUpperCase() + word.slice(1));
+    const sentence = capitalizedWords.join(' ');
+    return sentence;
+  }
+
+  const getAnalyticColor = (key: string) => {
+    let color = '';
+    if (key === 'totalDisbursements') {
+      color = 'skyblue';
+    } else if (key === 'totalSuccessfulDisbursements') {
+      color = 'green';
+    } else if (key === 'totalPendingDisbursements') {
+      color = 'orange';
+    } else if (key === 'totalFailedDisbursements') {
+      color = 'red';
+    } else {
+      color = 'green';
+    }
+    // switch (key) {
+    //   case 'totalDisbursements':
+    //     color = 'skyblue';
+    //     break;
+    //   case 'totalSuccessfulDisbursements':
+    //     color = 'green';
+    //     break;
+    //   case 'totalPendingDisbursements':
+    //     color = 'orange';
+    //     break;
+    //   case 'totalFailedDisbursements':
+    //     color = 'red';
+    //     break;
+    //   default:
+    //     color = 'green';
+    // }
+
+    return color;
+  };
+
   return (
     <div className="w-full flex flex-col gap-5">
       <div className="w-full flex gap-5">
@@ -38,27 +84,18 @@ const Transactions = () => {
           {' '}
           <BalanceCard />
         </div>
-        <TransactionStatisticsCard
-          style={{ flex: 2 }}
-          color={'green'}
-          title={'Total Successful Disbursements'}
-          percentage={50}
-          value={50000}
-        />
-        <TransactionStatisticsCard
-          style={{ flex: 2 }}
-          color={'yellow'}
-          title={'Total Pending Disbursements'}
-          percentage={30}
-          value={20000}
-        />
-        <TransactionStatisticsCard
-          style={{ flex: 2 }}
-          color={'red'}
-          title={'Total Failed Disbursements'}
-          percentage={20}
-          value={5000}
-        />{' '}
+        {transactionAnalyticsData?.map((transactionAnalyticsItem, idx) => {
+          return (
+            <TransactionStatisticsCard
+              key={`${idx}`}
+              style={{ flex: 2 }}
+              color={getAnalyticColor(transactionAnalyticsItem?.label)}
+              title={camelCaseToSentence(transactionAnalyticsItem?.label)}
+              percentage={transactionAnalyticsItem?.percent}
+              value={transactionAnalyticsItem?.value}
+            />
+          );
+        })}
       </div>
       <div className="w-full flex gap-3 items-center justify-end">
         <TopBar handleDrawerToggle={() => handleDrawerToggle(true)} />

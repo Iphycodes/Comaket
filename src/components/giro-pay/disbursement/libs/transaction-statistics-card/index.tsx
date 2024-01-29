@@ -25,9 +25,9 @@ const TransactionStatisticsCard = (props: TransactionStatisticsCardProps) => {
         <div className="flex justify-between items-center">
           <div className="flex flex-col gap-0">
             <span className="amount font-semibold text-[32px] text-gray-600 dark:text-gray-100">
-              {`\u20A6${formatNumber(value ?? 0.0, 0)}` ?? '\u20A60.00'}
+              {formatNumber(value ?? 0) ?? ''}
             </span>
-            <span className="text-blue">view details</span>
+            {/* <span className="text-blue">view details</span> */}
           </div>
           <div className="text-blue">
             <Circle

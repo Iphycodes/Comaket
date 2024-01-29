@@ -39,6 +39,7 @@ import { motion } from 'framer-motion';
 import TopUpBalance from '../disbursement/libs/top-up-balance';
 import { Pagination } from '@grc/_shared/namespace';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
+import SinglePayoutForm from '../disbursement/libs/single-payout/libs/single-payout-form';
 
 type DashBoardProps = {
   authData?: AuthDataType | null;
@@ -565,7 +566,12 @@ const DashBoard = (props: DashBoardProps) => {
         />
 
         <CustomModal
-          component={<div>Single Payout</div>}
+          component={
+            <SinglePayoutForm
+              handleSetPaymentDetails={() => {}}
+              handleSetSinglePayoutSteps={() => {}}
+            />
+          }
           setOpenModal={() => setToggleDisbursement(false)}
           openModal={toggleDisbursement}
         />
