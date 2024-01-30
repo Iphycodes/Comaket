@@ -133,7 +133,7 @@ const TransactionsTable = (props: TransactionTableProps) => {
           <span>Status</span>
         </span>
       ),
-      dataIndex: 'meta',
+      dataIndex: 'status',
       key: 'status',
       ellipsis: {
         showTitle: true,
@@ -141,12 +141,12 @@ const TransactionsTable = (props: TransactionTableProps) => {
       render: (text) => {
         return (
           <div className="w-full">
-            {text?.providerResponse?.status === 'successful' && (
+            {text === 'successful' && (
               <Tag className="mx-auto" color="success">
                 successful
               </Tag>
             )}
-            {text?.providerResponse?.status === 'failed' && <Tag color="error">Failed</Tag>}
+            {text === 'failed' && <Tag color="error">Failed</Tag>}
           </div>
         );
       },

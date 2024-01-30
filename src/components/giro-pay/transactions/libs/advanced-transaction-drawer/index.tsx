@@ -30,22 +30,48 @@ const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTr
           if (typeof value === 'object') {
             return (
               <>
-                <div className="flex items-center gap-1 font-bold">
-                  <span className="text-[18px]">{capitalize(key)}</span>
+                <div className="mt-4">
+                  <span className="text-[18px]">{capitalize(key).toUpperCase()}</span>
                 </div>
+                <hr />
                 <div className="flex flex-col gap-2">
                   {Object.entries(value).map(([ky, val]) => {
-                    return (
-                      <div key={key} className="flex justify-between gap-5 items-center">
-                        <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
-                          <span>
-                            <i className="ri-circle-fill text-[8px]"></i>
-                          </span>
-                          <span className="text-[16px]">{ky}</span>
+                    if (typeof val === 'object') {
+                      return (
+                        <>
+                          <div className="mt-1">
+                            <span className="text-[16px]">{capitalize(ky)}</span>
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            {Object.entries(value).map(([ky3, val3]) => {
+                              return (
+                                <div key={ky3} className="flex justify-between gap-5 items-center">
+                                  <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
+                                    <span>
+                                      <i className="ri-circle-fill text-[8px]"></i>
+                                    </span>
+                                    <span className="text-[16px]">{ky3}</span>
+                                  </div>
+                                  <span className="font-semibold">{`${val3}`}</span>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </>
+                      );
+                    } else {
+                      return (
+                        <div key={ky} className="flex justify-between gap-5 items-center">
+                          <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
+                            <span>
+                              <i className="ri-circle-fill text-[8px]"></i>
+                            </span>
+                            <span className="text-[16px]">{ky}</span>
+                          </div>
+                          <span className="font-semibold">{`${val}`}</span>
                         </div>
-                        <span className="font-semibold">{`${val}`}</span>
-                      </div>
-                    );
+                      );
+                    }
                   })}
                 </div>
               </>
@@ -60,7 +86,9 @@ const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTr
                   </span>
                   <span className="text-[16px]">{key}</span>
                 </div>
-                <span className="font-semibold">{value}</span>
+                <div className="flex justify-end">
+                  <span className="font-semibold text-right">{value}</span>
+                </div>
               </div>
             );
           }
