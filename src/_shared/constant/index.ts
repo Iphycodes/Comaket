@@ -1,5 +1,6 @@
 import moment from 'moment';
 import { faker } from '@faker-js/faker';
+import { isEmpty } from 'lodash';
 
 export const POST = 'POST';
 export const PUT = 'PUT';
@@ -502,6 +503,23 @@ export const generateChartData = (cashFlowBreakdown: {
     ],
   };
 
+  const emptyLineChartData = {
+    labels: ['No Data Available'],
+    datasets: [
+      {
+        label: 'No Data Available',
+        data: [0],
+        fill: false,
+        borderColor: 'gray',
+        borderWidth: 2,
+        pointRadius: 0,
+      },
+    ],
+  };
+  if (isEmpty(incomeData) && isEmpty(disbursementsData)) {
+    return emptyLineChartData;
+  }
+
   return chartData;
 };
 
@@ -514,6 +532,16 @@ export const generateDisbursementData = (data: { label: string; value: number }[
   const labels = data.map(({ label }) => transformedLabel[label]);
   const disBursementData = data.map(({ value }) => value);
 
+  const emptyDoughnutChartData = {
+    labels: ['No Data Available'],
+    datasets: [
+      {
+        data: [1],
+        backgroundColor: ['gray'],
+      },
+    ],
+  };
+
   const formattedData = {
     labels,
     datasets: [
@@ -524,6 +552,14 @@ export const generateDisbursementData = (data: { label: string; value: number }[
       },
     ],
   };
+  if (
+    formattedData.datasets &&
+    formattedData.datasets[0].data[0] === 0 &&
+    formattedData.datasets[0].data[1] === 0 &&
+    formattedData.datasets[0].data[2] === 0
+  ) {
+    return emptyDoughnutChartData;
+  }
 
   return formattedData;
 };
