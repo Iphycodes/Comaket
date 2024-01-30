@@ -327,6 +327,9 @@ const DashBoard = (props: DashBoardProps) => {
                               grid: {
                                 display: false,
                               },
+                              ticks: {
+                                padding: 18,
+                              },
                               beginAtZero: true,
                             },
                           },
