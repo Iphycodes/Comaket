@@ -79,14 +79,12 @@ const TransactionModal = (props: TransactionModalProps) => {
         <div className="flex justify-between items-center">
           <span className="text-[16px] text-gray-500">Transaction Status:</span>
           <span>
-            {transactionItem?.meta?.providerResponse?.status === 'successful' && (
+            {transactionItem?.status === 'successful' && (
               <Tag className="mx-auto text-[14px] px-2" color="success">
                 Successful
               </Tag>
             )}
-            {transactionItem?.meta?.providerResponse?.status === 'failed' && (
-              <Tag color="error">Failed</Tag>
-            )}
+            {transactionItem?.status === 'failed' && <Tag color="error">Failed</Tag>}
           </span>
         </div>
 
