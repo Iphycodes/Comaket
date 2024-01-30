@@ -2,7 +2,7 @@
 
 import { Button, Drawer } from 'antd';
 import { TransactionsDataType } from '../transactions-table/libs/transactions-data';
-import { capitalize } from 'lodash';
+import { capitalize, pick } from 'lodash';
 
 interface AdvancedTransactionProps {
   open: boolean;
@@ -11,6 +11,12 @@ interface AdvancedTransactionProps {
 }
 
 const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTransactionProps) => {
+  function convertCamelCaseToSentence(camelCaseText: string) {
+    const sentence = camelCaseText.replace(/([a-z])([A-Z])/g, '$1 $2');
+
+    return sentence.charAt(0).toUpperCase() + sentence.slice(1);
+  }
+
   return (
     <Drawer
       closeIcon={false}
@@ -35,7 +41,13 @@ const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTr
                 </div>
                 <hr />
                 <div className="flex flex-col gap-2">
-                  {Object.entries(value).map(([ky, val]) => {
+                  {Object.entries(
+                    key === 'beneficiary'
+                      ? pick(value, ['accountNumber', 'accountName', 'bankName'])
+                      : key === 'source'
+                        ? pick(value, ['accountNumber', 'accountName', 'bankName'])
+                        : {}
+                  ).map(([ky, val]) => {
                     if (typeof val === 'object') {
                       return (
                         <>
@@ -50,9 +62,13 @@ const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTr
                                     <span>
                                       <i className="ri-circle-fill text-[8px]"></i>
                                     </span>
-                                    <span className="text-[16px]">{ky3}</span>
+                                    <span className="text-[16px]">
+                                      {convertCamelCaseToSentence(ky3)}
+                                    </span>
                                   </div>
-                                  <span className="font-semibold">{`${val3}`}</span>
+                                  <span className="font-semibold">
+                                    {convertCamelCaseToSentence(`${val3}`)}
+                                  </span>
                                 </div>
                               );
                             })}
@@ -66,9 +82,11 @@ const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTr
                             <span>
                               <i className="ri-circle-fill text-[8px]"></i>
                             </span>
-                            <span className="text-[16px]">{ky}</span>
+                            <span className="text-[16px]">{convertCamelCaseToSentence(ky)}</span>
                           </div>
-                          <span className="font-semibold">{`${val}`}</span>
+                          <span className="font-semibold">
+                            {convertCamelCaseToSentence(`${val}`)}
+                          </span>
                         </div>
                       );
                     }
@@ -84,10 +102,12 @@ const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTr
                   <span>
                     <i className="ri-circle-fill text-[8px]"></i>
                   </span>
-                  <span className="text-[16px]">{key}</span>
+                  <span className="text-[16px]">{convertCamelCaseToSentence(key)}</span>
                 </div>
                 <div className="flex justify-end">
-                  <span className="font-semibold text-right">{value}</span>
+                  <span className="font-semibold text-right">
+                    {convertCamelCaseToSentence(`${value}`)}
+                  </span>
                 </div>
               </div>
             );
