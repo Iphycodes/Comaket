@@ -35,9 +35,12 @@ const DashboardPage = () => {
     callTotalBalance: true,
     callBalance: true,
   });
-  const { dashboardAnalyticsData } = useDashboard({ callDashboardAnalytics: true });
+  const { dashboardAnalyticsData, getDashboardAnalyticsResponse } = useDashboard({
+    callDashboardAnalytics: true,
+  });
 
   const isCreatingWallet = createWalletResponse.isLoading;
+  const isLoadingDashboardAnalytics = getDashboardAnalyticsResponse.isLoading;
   const isLoadingWallets = walletsResponse.isLoading;
   const isLoadingTotalBalance = totalBalanceResponse.isLoading;
   const isLoadingTransaction = accountTransactionResponse.isFetching;
@@ -62,7 +65,11 @@ const DashboardPage = () => {
   }, [wallets, wallet]);
 
   return (
-    <WithLoaderRender loading={isLoadingWallets} mobileResponsive={mobileResponsive} theme={theme}>
+    <WithLoaderRender
+      loading={isLoadingWallets || isLoadingDashboardAnalytics}
+      mobileResponsive={mobileResponsive}
+      theme={theme}
+    >
       <DashBoard
         authData={authData}
         transactions={transactions}

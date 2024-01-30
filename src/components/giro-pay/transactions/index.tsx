@@ -87,7 +87,7 @@ const Transactions = ({
             walletDetails={walletDetails}
           />
         </div>
-        {transactionAnalyticsData?.map((transactionAnalyticsItem, idx) => {
+        {(transactionAnalyticsData ?? []).map((transactionAnalyticsItem, idx) => {
           return (
             <TransactionStatisticsCard
               key={`${idx}`}

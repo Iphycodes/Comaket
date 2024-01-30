@@ -177,10 +177,10 @@ export const AppHeader = (props: AppHeaderProps) => {
           )}
 
           <span className="cursor-pointer">
-            {theme === 'light' ? (
-              <HiOutlineLightBulb size={20} onClick={() => setTheme('dark')} />
+            {theme === 'dark' ? (
+              <HiOutlineLightBulb size={20} onClick={() => setTheme('light')} />
             ) : (
-              <RiMoonFill size={20} onClick={() => setTheme('light')} />
+              <RiMoonFill size={20} onClick={() => setTheme('dark')} />
             )}
           </span>
 
