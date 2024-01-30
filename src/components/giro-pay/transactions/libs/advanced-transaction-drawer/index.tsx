@@ -2,6 +2,7 @@
 
 import { Button, Drawer } from 'antd';
 import { TransactionsDataType } from '../transactions-table/libs/transactions-data';
+import { capitalize } from 'lodash';
 
 interface AdvancedTransactionProps {
   open: boolean;
@@ -16,6 +17,7 @@ const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTr
       className="advanced-transaction-drawer p-0 min-h-screen relative"
       onClose={onClose}
       open={open}
+      width={500}
     >
       <div className="w-full sticky top-0 z-10 bg-blue text-white flex p-5 justify-between items-center gap-3">
         <span className="text-lg">Transaction Details</span>
@@ -23,47 +25,50 @@ const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTr
           <i className="ri-close-fill cursor-pointer text-[22px]"></i>
         </span>
       </div>
-      <div className="w-full p-5 flex flex-col gap-3">
+      <div className="w-full p-5 mb-14 flex flex-col gap-3">
         {Object.entries(selectedRecord).map(([key, value]) => {
-          return (
-            <div key={key} className="flex justify-between items-center">
-              <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
-                <span>
-                  {(() => {
-                    switch (key) {
-                      case 'type':
-                        return <i className="ri-exchange-funds-line text-[20px]"></i>;
-                      case 'reciepient':
-                        return <i className="ri-user-line text-[20px]"></i>;
-                      case 'sessionId':
-                        return <i className="ri-timeline-view text-[20px]"></i>;
-                      case 'date':
-                        return <i className="ri-calendar-schedule-line text-[20px]"></i>;
-                      case 'key':
-                        return <i className="ri-key-2-fill text-[20px]"></i>;
-                      case 'reciepientBank':
-                        return <i className="ri-bank-line text-[20px]"></i>;
-                      case 'reciepientAccountStatus':
-                        return <i className="ri-bard-line text-[20px]"></i>;
-                      case 'amount':
-                        return <i className="ri-wallet-2-line text-[20px]"></i>;
-                      case 'time':
-                        return <i className="ri-time-line text-[20px]"></i>;
-                      default:
-                        return <i className="ri-rest-time-line text-[20px]"></i>;
-                    }
-                  })()}
-                </span>
-                <span className="text-[16px]">{key}</span>
+          if (typeof value === 'object') {
+            return (
+              <>
+                <div className="flex items-center gap-1 font-bold">
+                  <span className="text-[18px]">{capitalize(key)}</span>
+                </div>
+                <div className="flex flex-col gap-2">
+                  {Object.entries(value).map(([ky, val]) => {
+                    return (
+                      <div key={key} className="flex justify-between gap-5 items-center">
+                        <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
+                          <span>
+                            <i className="ri-circle-fill text-[8px]"></i>
+                          </span>
+                          <span className="text-[16px]">{ky}</span>
+                        </div>
+                        <span className="font-semibold">{`${val}`}</span>
+                      </div>
+                    );
+                  })}
+                </div>
+              </>
+            );
+          } else if (Array.isArray(value)) {
+          } else {
+            return (
+              <div key={key} className="flex justify-between gap-5 items-center">
+                <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
+                  <span>
+                    <i className="ri-circle-fill text-[8px]"></i>
+                  </span>
+                  <span className="text-[16px]">{key}</span>
+                </div>
+                <span className="font-semibold">{value}</span>
               </div>
-              <span className="font-semibold">{value}</span>
-            </div>
-          );
+            );
+          }
         })}
       </div>
-      <div className="w-full absolute bottom-0 p-3">
+      <div className="w-full absolute bottom-0 px-3">
         <Button
-          className="opacity-100 flex w-full items-center justify-center bg-blue hover:opacity-95 font-semibold mt-3 text-white h-14"
+          className="opacity-100 flex w-full items-center justify-center bg-blue hover:opacity-95 font-semibold mt-2 text-white h-14"
           type="primary"
           disabled={false}
           loading={false}

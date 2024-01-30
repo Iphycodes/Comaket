@@ -8,16 +8,32 @@ import TopBar from './libs/top-bar';
 import FilterDrawer from './libs/filter-drawer';
 import AdvancedTransactionDrawer from './libs/advanced-transaction-drawer';
 import TransactionStatisticsCard from '../disbursement/libs/transaction-statistics-card';
+import { WalletNamespace } from '@grc/_shared/namespace/wallet';
+
+interface balanceProps {
+  availableAmount: number;
+  withdrawableAmount: number;
+}
 
 interface transactionProps {
   transactionAnalyticsData: Record<string, any>[];
+  balance: balanceProps;
+  wallet: WalletNamespace.Wallet | null;
+  transactionsData: Record<string, any>[];
 }
 
-const Transactions = ({ transactionAnalyticsData }: transactionProps) => {
+const Transactions = ({
+  transactionAnalyticsData,
+  balance,
+  wallet,
+  transactionsData,
+}: transactionProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedRecord, setSelectedRecord] = useState<TransactionsDataType>({});
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
   const [transactionDrawerOpen, setTransactionDrawerOpen] = useState<boolean>(false);
+
+  const walletDetails = `${wallet?.accountName} | ${wallet?.accountNumber} | ${wallet?.bankName}`;
 
   const handleDrawerToggle = (toggle: boolean) => {
     setDrawerOpen(toggle);
@@ -46,33 +62,17 @@ const Transactions = ({ transactionAnalyticsData }: transactionProps) => {
 
   const getAnalyticColor = (key: string) => {
     let color = '';
-    if (key === 'totalDisbursements') {
+    if (key === 'totalTransactions') {
       color = 'skyblue';
-    } else if (key === 'totalSuccessfulDisbursements') {
+    } else if (key === 'totalSuccessfulTransactions') {
       color = 'green';
-    } else if (key === 'totalPendingDisbursements') {
+    } else if (key === 'totalPendingTransactions') {
       color = 'orange';
-    } else if (key === 'totalFailedDisbursements') {
+    } else if (key === 'totalFailedTransactions') {
       color = 'red';
     } else {
       color = 'green';
     }
-    // switch (key) {
-    //   case 'totalDisbursements':
-    //     color = 'skyblue';
-    //     break;
-    //   case 'totalSuccessfulDisbursements':
-    //     color = 'green';
-    //     break;
-    //   case 'totalPendingDisbursements':
-    //     color = 'orange';
-    //     break;
-    //   case 'totalFailedDisbursements':
-    //     color = 'red';
-    //     break;
-    //   default:
-    //     color = 'green';
-    // }
 
     return color;
   };
@@ -82,7 +82,10 @@ const Transactions = ({ transactionAnalyticsData }: transactionProps) => {
       <div className="w-full flex gap-5">
         <div style={{ flex: 3 }}>
           {' '}
-          <BalanceCard />
+          <BalanceCard
+            availableBalance={balance?.availableAmount ?? 0}
+            walletDetails={walletDetails}
+          />
         </div>
         {transactionAnalyticsData?.map((transactionAnalyticsItem, idx) => {
           return (
@@ -104,6 +107,7 @@ const Transactions = ({ transactionAnalyticsData }: transactionProps) => {
         handleRowClick={handleRowClick}
         setTransactionDrawerOpen={() => handleTransactionDrawerOpen(true)}
         setSelectedRecord={setSelectedRecord}
+        transactionsData={transactionsData}
       />
       <TransactionModal
         isModalOpen={isModalOpen}
@@ -116,6 +120,7 @@ const Transactions = ({ transactionAnalyticsData }: transactionProps) => {
         open={transactionDrawerOpen}
         onClose={() => handleTransactionDrawerOpen(false)}
       />
+      {/* {JSON.stringify(transactionsData)} */}
     </div>
   );
 };

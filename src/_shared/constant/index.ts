@@ -34,6 +34,7 @@ export const businessProfileUrl = 'businesses';
 export const accountSettingUrl = 'accounts';
 export const mailTransactionUrl = 'transactions/summary/email';
 export const transactionAnalyticsUrl = 'analytics/transactions';
+export const transactionsUrl = 'transactions';
 /**Token**/
 
 export const AUTH_TOKEN_KEY = process.env.NEXT_PUBLIC_TOKEN_STORAGE_KEY as string;

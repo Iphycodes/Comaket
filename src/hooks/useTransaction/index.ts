@@ -1,11 +1,16 @@
 import { selectTransactionAnalyticsData } from '@grc/redux/selectors/transaction-analytics';
+import { selectAllTransactionsData } from '@grc/redux/selectors/transactions';
 import { useAppSelector } from '@grc/redux/store';
-import { useLazyGetTransactionAnalyticsQuery } from '@grc/services/transactions';
+import {
+  useLazyGetAllTransactionsQuery,
+  useLazyGetTransactionAnalyticsQuery,
+} from '@grc/services/transactions';
 import { useEffect } from 'react';
 
 interface useTransactionProps {
   key?: string;
-  callAllTransaction?: boolean;
+  callAllTransactions?: boolean;
+  callTransactionAnalytics?: boolean;
   callSecreteKey?: boolean;
   filter?: Record<string, any>;
 }
@@ -13,13 +18,17 @@ interface useTransactionProps {
 interface useTransactionReturnProps {
   transactionAnalyticsData: Record<any, string> | any;
   getTransactionAnalyticsResponse: Record<string, any>;
+  transactionsData: Record<any, string> | any;
+  getAllTransactionsResponse: Record<string, any>;
 }
 
 export const useTransaction = ({
-  callAllTransaction,
+  callTransactionAnalytics,
+  callAllTransactions,
 }: useTransactionProps): useTransactionReturnProps => {
   const [triggerTransactionAnalytics, getTransactionAnalyticsResponse] =
     useLazyGetTransactionAnalyticsQuery();
+  const [triggerAllTransactions, getAllTransactionsResponse] = useLazyGetAllTransactionsQuery();
   const { wallet } = useAppSelector((state) => state.auth);
   const walletId = wallet?.id;
 
@@ -31,12 +40,20 @@ export const useTransaction = ({
     selectTransactionAnalyticsData(state, params)
   );
 
+  const transactionsData = useAppSelector((state) => selectAllTransactionsData(state, {}));
+
   useEffect(() => {
-    if (callAllTransaction) triggerTransactionAnalytics(params);
-  }, [callAllTransaction]);
+    if (callTransactionAnalytics) triggerTransactionAnalytics(params);
+  }, [callTransactionAnalytics]);
+
+  useEffect(() => {
+    if (callAllTransactions) triggerAllTransactions({});
+  }, [callAllTransactions]);
 
   return {
     transactionAnalyticsData,
     getTransactionAnalyticsResponse,
+    transactionsData,
+    getAllTransactionsResponse,
   };
 };
