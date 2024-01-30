@@ -35,12 +35,15 @@ const DashboardPage = () => {
     callTotalBalance: true,
     callBalance: true,
   });
-  const { dashboardAnalyticsData } = useDashboard({ callDashboardAnalytics: true });
+  const { dashboardAnalyticsData, getDashboardAnalyticsResponse } = useDashboard({
+    callDashboardAnalytics: true,
+  });
 
   const isCreatingWallet = createWalletResponse.isLoading;
   const isLoadingWallets = walletsResponse.isLoading;
   const isLoadingTotalBalance = totalBalanceResponse.isLoading;
   const isLoadingTransaction = accountTransactionResponse.isFetching;
+  const isLoadingDashboardAnalytics = getDashboardAnalyticsResponse.isLoading;
   const totalBalance = !isEmpty(allTotalBalance) && transactionBal(allTotalBalance);
 
   const handleCreateWallet = (values: Record<string, any>) => {
@@ -62,7 +65,11 @@ const DashboardPage = () => {
   }, [wallets, wallet]);
 
   return (
-    <WithLoaderRender loading={isLoadingWallets} mobileResponsive={mobileResponsive} theme={theme}>
+    <WithLoaderRender
+      loading={isLoadingWallets || isLoadingDashboardAnalytics || isLoadingTotalBalance}
+      mobileResponsive={mobileResponsive}
+      theme={theme}
+    >
       <DashBoard
         authData={authData}
         transactions={transactions}
@@ -78,6 +85,7 @@ const DashboardPage = () => {
           isLoadingWallets,
           isLoadingTotalBalance,
           isLoadingTransaction,
+          isLoadingDashboardAnalytics,
         }}
         totalBalance={totalBalance}
         pagination={pagination}

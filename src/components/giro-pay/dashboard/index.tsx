@@ -1,5 +1,5 @@
 'use client';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction, memo, useState } from 'react';
 import Link from 'next/link';
 import moment from 'moment';
 import { Button, Card, Col, List, Row, Tag } from 'antd';
@@ -49,6 +49,7 @@ type DashBoardProps = {
     isLoadingWallets: boolean;
     isLoadingTotalBalance: boolean;
     isLoadingTransaction: boolean;
+    isLoadingDashboardAnalytics: boolean;
   };
   totalBalance: number | undefined;
   balance: IBalance;
@@ -96,6 +97,7 @@ const DashBoard = (props: DashBoardProps) => {
 
   let delayed: any;
   const isVerified = !!authData?.bvn && !!authData?.mobile?.phoneNumber;
+
   return (
     <>
       <motion.div
@@ -161,7 +163,14 @@ const DashBoard = (props: DashBoardProps) => {
             </Col>
           </Row>
 
-          {isEmpty(wallets) ? (
+          {[
+            loading.isLoadingWallets,
+            loading.isLoadingTotalBalance,
+            loading.isLoadingTransaction,
+            loading.isLoadingDashboardAnalytics,
+          ].includes(true) ? (
+            <span></span>
+          ) : isEmpty(wallets) ? (
             <EmptyVirtualAccount
               isVerified={isVerified}
               handleCreateWallet={() => setOpenCreateModal(true)}
@@ -396,7 +405,7 @@ const DashBoard = (props: DashBoardProps) => {
                         </Space> */}
                       </div>
                     </header>
-                    <div className="mt-5 flex items-center justify-center">
+                    <div className="mt-5 flex items-center justify-center text-gray-500">
                       <Doughnut
                         data={generateDisbursementData(disbursementSummary ?? [])}
                         redraw
@@ -408,7 +417,7 @@ const DashBoard = (props: DashBoardProps) => {
                           plugins: {
                             legend: {
                               position: 'bottom',
-                              align: 'center',
+                              align: 'start',
                             },
                             tooltip: {
                               callbacks: {
@@ -612,4 +621,4 @@ const DashBoard = (props: DashBoardProps) => {
   );
 };
 
-export default DashBoard;
+export default memo(DashBoard);
