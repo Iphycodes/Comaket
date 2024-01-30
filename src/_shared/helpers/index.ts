@@ -94,6 +94,10 @@ export const formatNumber = (num: number, precision: number = 2): string | numbe
   const found = map.find((x) => Math.abs(num) >= x.threshold);
 
   if (found) {
+    if (num < 1000) {
+      const formatted = (num / found.threshold).toFixed(0) + found.suffix;
+      return formatted;
+    }
     const formatted = (num / found.threshold).toFixed(precision) + found.suffix;
     return formatted;
   }

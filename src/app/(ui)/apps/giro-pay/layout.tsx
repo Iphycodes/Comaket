@@ -115,7 +115,7 @@ const AppsBaseLayout = (props: GiroPayPageProps) => {
           </div>
         </Content>
         <Footer className="shadow-sm border-t border-border/100 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:text-white">
-          Footer
+          {/* Footer */}
         </Footer>
       </Layout>
     </Layout>

@@ -17,7 +17,7 @@ const NetWorkDetector = (props: NetWorkDetectorType) => {
         message: (
           <span>
             You're currently offline. Check your connections.{' '}
-            <a style={{ margin: 0 }} onClick={() => window.location.reload()}>
+            <a className="underline" style={{ margin: 0 }} onClick={() => window.location.reload()}>
               Refresh Page
             </a>
           </span>

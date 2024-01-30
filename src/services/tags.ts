@@ -6,6 +6,7 @@ export const changePasswordTag = 'change-password';
 export const businessProfileTag = 'business-profile';
 export const accountSettingTag = 'account-setting';
 export const transactionsTag = 'transactions';
+export const dashboardAnalyticsTag = 'dashboard-analytics';
 
 export default [
   loggedInUserTag,
@@ -15,4 +16,5 @@ export default [
   changePasswordTag,
   bankAccountsTag,
   transactionsTag,
+  dashboardAnalyticsTag,
 ];
