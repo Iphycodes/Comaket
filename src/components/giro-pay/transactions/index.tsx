@@ -9,6 +9,7 @@ import FilterDrawer from './libs/filter-drawer';
 import AdvancedTransactionDrawer from './libs/advanced-transaction-drawer';
 import TransactionStatisticsCard from '../disbursement/libs/transaction-statistics-card';
 import { WalletNamespace } from '@grc/_shared/namespace/wallet';
+import { Col, Row } from 'antd';
 
 interface balanceProps {
   availableAmount: number;
@@ -79,27 +80,29 @@ const Transactions = ({
 
   return (
     <div className="w-full flex flex-col gap-5">
-      <div className="w-full flex gap-5">
-        <div style={{ flex: 3 }}>
+      <Row gutter={[10, 10]}>
+        <Col md={8} lg={8} xs={24}>
           {' '}
           <BalanceCard
             availableBalance={balance?.availableAmount ?? 0}
             walletDetails={walletDetails}
           />
-        </div>
+        </Col>
         {(transactionAnalyticsData ?? []).map((transactionAnalyticsItem, idx) => {
           return (
-            <TransactionStatisticsCard
-              key={`${idx}`}
-              style={{ flex: 2 }}
-              color={getAnalyticColor(transactionAnalyticsItem?.label)}
-              title={camelCaseToSentence(transactionAnalyticsItem?.label)}
-              percentage={transactionAnalyticsItem?.percent}
-              value={transactionAnalyticsItem?.value}
-            />
+            <Col key={idx} md={4} lg={4} xs={12}>
+              <TransactionStatisticsCard
+                key={`${idx}`}
+                style={{ flex: 2 }}
+                color={getAnalyticColor(transactionAnalyticsItem?.label)}
+                title={camelCaseToSentence(transactionAnalyticsItem?.label)}
+                percentage={transactionAnalyticsItem?.percent}
+                value={transactionAnalyticsItem?.value}
+              />
+            </Col>
           );
         })}
-      </div>
+      </Row>
       <div className="w-full flex gap-3 items-center justify-end">
         <TopBar handleDrawerToggle={() => handleDrawerToggle(true)} />
       </div>

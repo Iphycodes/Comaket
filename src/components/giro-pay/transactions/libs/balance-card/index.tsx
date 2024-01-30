@@ -9,7 +9,7 @@ interface BalanceCardProps {
 
 const BalanceCard = ({ availableBalance, walletDetails }: BalanceCardProps) => {
   return (
-    <div className="border shadow-sm dark:bg-zinc-800 rounded-xl dark:border-gray-500 p-5 w-full">
+    <div className="border shadow-md dark:bg-zinc-800 rounded-xl dark:border-gray-500 p-5 w-full">
       <div className="flex flex-col-reverse gap-5">
         <div className="border p-2 px-2 text-blue font-semibold border-blue dark:text-gray-100 bg-cyan-50 dark:bg-gray-800 rounded-lg shadow-sm">
           {walletDetails}
