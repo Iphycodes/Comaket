@@ -1,13 +1,13 @@
 import { CSSProperties } from 'react';
-import { Nunito } from '@next/font/google';
+// import { Nunito } from '@next/fonts/';
 import { startCase, lowerCase, capitalize } from 'lodash';
 import dayjs from 'dayjs';
-import { numberFormat } from '@/_shared/helpers';
+import { numberFormat } from '@grc/_shared/helpers';
 
-const nunito = Nunito({
-  subsets: ['latin'],
-  display: 'swap',
-});
+// const nunito = Nunito({
+//   subsets: ['latin'],
+//   display: 'swap',
+// });
 
 interface TeplateProps {
   successData: Record<string, any>;
@@ -32,7 +32,7 @@ export const Template = ({ successData }: TeplateProps) => {
       width: '500px',
       height: '590px',
       position: 'relative',
-      fontFamily: `${nunito.className}`,
+      // fontFamily: `${nunito.className}`,
       color: 'black',
     } as CSSProperties,
     contentContainer: {

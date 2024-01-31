@@ -4,6 +4,8 @@ import { capitalize } from 'lodash';
 import { Button, Modal, Space, Tag } from 'antd';
 import { GrTransaction } from 'react-icons/gr';
 import { DownloadOutlined } from '@ant-design/icons';
+import { TransactionReceipt } from '@grc/_shared/components/transaction-receipt';
+import { omit } from 'lodash';
 
 interface TransactionModalProps {
   transactionItem: Record<string, any>;
@@ -98,7 +100,27 @@ const TransactionModal = (props: TransactionModalProps) => {
           type="primary"
           disabled={false}
           loading={false}
-          htmlType="submit"
+          onClick={() =>
+            TransactionReceipt({
+              successData: {
+                ...omit(transactionItem, ['source', 'beneficiary']),
+                accountName:
+                  transactionItem?.entry === 'debit'
+                    ? transactionItem?.beneficiary?.accountName
+                    : transactionItem?.source?.accountName,
+                accountNumber:
+                  transactionItem?.entry === 'debit'
+                    ? transactionItem?.beneficiary?.accountNumber
+                    : transactionItem?.source?.accountNumber,
+                bankName:
+                  transactionItem?.entry === 'debit'
+                    ? transactionItem?.beneficiary?.bankName
+                    : transactionItem?.source?.bankName,
+                entry: transactionItem?.entry,
+              },
+              // setLoading,
+            })
+          }
         >
           <div className="flex items-center gap-2 justify-center">
             <DownloadOutlined className="text-[18px]" />
