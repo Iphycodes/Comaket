@@ -1,5 +1,9 @@
 import { api } from '../api';
-import { transactionAnalyticsUrl, transactionsUrl } from '@grc/_shared/constant';
+import {
+  mailTransactionUrl,
+  transactionAnalyticsUrl,
+  transactionsUrl,
+} from '@grc/_shared/constant';
 import { transactionsTag } from '../tags';
 
 export const transactionsApi = api?.injectEndpoints({
@@ -17,11 +21,18 @@ export const transactionsApi = api?.injectEndpoints({
       }),
       providesTags: [transactionsTag],
     }),
+    mailTransaction: builder.query({
+      query: (params) => ({
+        url: `${mailTransactionUrl}`,
+        params,
+      }),
+    }),
   }),
 });
 
 export const {
   useLazyGetTransactionAnalyticsQuery,
   useLazyGetAllTransactionsQuery,
-  endpoints: { getTransactionAnalytics, getAllTransactions },
+  useLazyMailTransactionQuery,
+  endpoints: { getTransactionAnalytics, getAllTransactions, mailTransaction },
 } = transactionsApi;

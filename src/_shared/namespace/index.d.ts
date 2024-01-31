@@ -53,6 +53,8 @@ export interface QueryArgs {
   status?: string;
   id?: string | number | null;
   filter?: string;
+  amount?: number;
+  searcH?: string | number;
 }
 
 export interface ApiRequest {

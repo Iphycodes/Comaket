@@ -1,21 +1,33 @@
 'use client';
 
-import { Table, Tag, Tooltip } from 'antd';
-import React, { Dispatch, SetStateAction } from 'react';
+import { Skeleton, Table, Tag, Tooltip } from 'antd';
+import React, { Dispatch, SetStateAction, useEffect } from 'react';
 import { TransactionsDataType } from './libs/transactions-data';
 import { ColumnsType } from 'antd/lib/table';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 import TableFooter from './libs/table-footer';
+import { isEmpty } from 'lodash';
 
 interface TransactionTableProps {
   handleRowClick: (record: any) => void;
   setTransactionDrawerOpen: () => void;
   setSelectedRecord: Dispatch<SetStateAction<TransactionsDataType>>;
   transactionsData?: Record<string, any>[];
+  filter: { filterData: Record<string, any> };
+  isLoadingTransactions: boolean;
+  handleSendMail: () => void;
 }
 
 const TransactionsTable = (props: TransactionTableProps) => {
-  const { handleRowClick, setTransactionDrawerOpen, setSelectedRecord, transactionsData } = props;
+  const {
+    handleRowClick,
+    setTransactionDrawerOpen,
+    setSelectedRecord,
+    transactionsData,
+    filter,
+    isLoadingTransactions,
+    handleSendMail,
+  } = props;
   const isMobile = useMediaQuery(mediaSize.mobile);
 
   const handleAdvancedViewClick = (record: TransactionsDataType) => {
@@ -174,21 +186,30 @@ const TransactionsTable = (props: TransactionTableProps) => {
     },
   ];
 
+  useEffect(() => {
+    console.log('tansacccccccccccccccccccccc');
+  }, [isLoadingTransactions]);
+
   const rowClick = (record: any) => ({
     onClick: () => handleRowClick(record),
   });
   return (
     <div className="shadow-sm border dark:border-gray-500 rounded-lg">
-      <Table
-        size="large"
-        columns={columns}
-        pagination={{ pageSize: 8, position: ['bottomLeft'] }}
-        dataSource={transactionsData}
-        scroll={{ x: isMobile ? true : 0 }}
-        className={'transaction-table dark:bg-zinc-800 rounded-lg'}
-        onRow={rowClick}
-        footer={() => <TableFooter />}
-      />
+      <Skeleton active loading={isLoadingTransactions} paragraph={{ rows: 8 }}>
+        <Table
+          size="large"
+          columns={columns}
+          pagination={{ pageSize: 8, position: ['bottomLeft'] }}
+          dataSource={transactionsData}
+          scroll={{ x: isMobile ? true : 0 }}
+          className={'transaction-table dark:bg-zinc-800 rounded-lg'}
+          onRow={rowClick}
+          footer={() =>
+            !isEmpty(filter?.filterData) ? <TableFooter handleSendMail={handleSendMail} /> : null
+          }
+          loading={isLoadingTransactions}
+        />
+      </Skeleton>
     </div>
   );
 };

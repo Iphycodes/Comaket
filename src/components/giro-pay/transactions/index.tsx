@@ -1,7 +1,7 @@
 'use client';
 import TransactionsTable from './libs/transactions-table';
 import BalanceCard from './libs/balance-card';
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 import { TransactionsDataType } from './libs/transactions-table/libs/transactions-data';
 import TransactionModal from './libs/transactionModal';
 import TopBar from './libs/top-bar';
@@ -21,6 +21,11 @@ interface transactionProps {
   balance: balanceProps;
   wallet: WalletNamespace.Wallet | null;
   transactionsData: Record<string, any>[];
+  filter: { filterData: Record<string, any> };
+  setFilter: Dispatch<SetStateAction<{ filterData: Record<string, any> }>> | any;
+  setSearchValue: Dispatch<SetStateAction<string>>;
+  isLoadingTransactions: boolean;
+  handleSendMail: () => void;
 }
 
 const Transactions = ({
@@ -28,6 +33,11 @@ const Transactions = ({
   balance,
   wallet,
   transactionsData,
+  filter,
+  setFilter,
+  setSearchValue,
+  isLoadingTransactions,
+  handleSendMail,
 }: transactionProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedRecord, setSelectedRecord] = useState<TransactionsDataType>({});
@@ -43,7 +53,6 @@ const Transactions = ({
   const handleRowClick = (record: any) => {
     setIsModalOpen(true);
     setSelectedRecord(record);
-    console.log('transaction Dataaaaaaaaaaaaaaaaaaa:::::::', transactionAnalyticsData);
   };
 
   const handleCancel = () => {
@@ -104,20 +113,31 @@ const Transactions = ({
         })}
       </Row>
       <div className="w-full flex gap-3 items-center justify-end">
-        <TopBar handleDrawerToggle={() => handleDrawerToggle(true)} />
+        <TopBar
+          setSearchValue={setSearchValue}
+          handleDrawerToggle={() => handleDrawerToggle(true)}
+        />
       </div>
       <TransactionsTable
+        handleSendMail={handleSendMail}
+        isLoadingTransactions={isLoadingTransactions}
         handleRowClick={handleRowClick}
         setTransactionDrawerOpen={() => handleTransactionDrawerOpen(true)}
         setSelectedRecord={setSelectedRecord}
         transactionsData={transactionsData}
+        filter={filter}
       />
       <TransactionModal
         isModalOpen={isModalOpen}
         handleCancel={handleCancel}
         transactionItem={selectedRecord}
       />
-      <FilterDrawer open={drawerOpen} onClose={() => handleDrawerToggle(false)} />
+      <FilterDrawer
+        advancedFilter={filter}
+        setAdvancedFilter={setFilter}
+        open={drawerOpen}
+        onClose={() => handleDrawerToggle(false)}
+      />
       <AdvancedTransactionDrawer
         selectedRecord={selectedRecord}
         open={transactionDrawerOpen}
