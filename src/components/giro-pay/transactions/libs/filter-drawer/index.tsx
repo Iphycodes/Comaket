@@ -20,8 +20,6 @@ const FilterDrawer = (props: FilterDrawerProps) => {
   const [form] = useForm();
 
   const handleSubmitFilter = (values: Record<string, any>) => {
-    console.log('filteeeeeeeerrrrrrrrrrrrrrrrrrrrrrrrrrrr', values);
-
     const startDate = dayjs(values?.date?.[0])
       .startOf('day')
       .format(format);
@@ -32,7 +30,7 @@ const FilterDrawer = (props: FilterDrawerProps) => {
     const filterWithDate = {
       ...omit(values, ['date']),
       ...values,
-      createdAt: values?.date ? JSON.stringify({ startDate, endDate }) : undefined,
+      date: values?.date ? JSON.stringify({ startDate, endDate }) : undefined,
     };
     const filterData = pickBy(filterWithDate, identity);
     setAdvancedFilter({ filterData: filterData });

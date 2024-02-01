@@ -7,6 +7,8 @@ import { ColumnsType } from 'antd/lib/table';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 import TableFooter from './libs/table-footer';
 import { isEmpty } from 'lodash';
+import { numberFormat } from '@grc/_shared/helpers';
+import { Pagination } from '@grc/_shared/namespace';
 
 interface TransactionTableProps {
   handleRowClick: (record: any) => void;
@@ -15,7 +17,9 @@ interface TransactionTableProps {
   transactionsData?: Record<string, any>[];
   filter: { filterData: Record<string, any> };
   isLoadingTransactions: boolean;
+  isTransactionFetching?: boolean;
   handleSendMail: () => void;
+  pagination: Pagination;
 }
 
 const TransactionsTable = (props: TransactionTableProps) => {
@@ -27,6 +31,8 @@ const TransactionsTable = (props: TransactionTableProps) => {
     filter,
     isLoadingTransactions,
     handleSendMail,
+    pagination,
+    isTransactionFetching,
   } = props;
   const isMobile = useMediaQuery(mediaSize.mobile);
 
@@ -135,9 +141,7 @@ const TransactionsTable = (props: TransactionTableProps) => {
         showTitle: true,
       },
       width: '150px',
-      render: (value, record) => (
-        <span>{`${record?.currency === 'NGN' && '\u20A6'} ${value}`}</span>
-      ),
+      render: (value) => <span>{numberFormat(value / 100, '₦ ')}</span>,
     },
     {
       title: (
@@ -199,7 +203,7 @@ const TransactionsTable = (props: TransactionTableProps) => {
         <Table
           size="large"
           columns={columns}
-          pagination={{ pageSize: 8, position: ['bottomLeft'] }}
+          pagination={pagination}
           dataSource={transactionsData}
           scroll={{ x: isMobile ? true : 0 }}
           className={'transaction-table dark:bg-zinc-800 rounded-lg'}
@@ -207,7 +211,7 @@ const TransactionsTable = (props: TransactionTableProps) => {
           footer={() =>
             !isEmpty(filter?.filterData) ? <TableFooter handleSendMail={handleSendMail} /> : null
           }
-          loading={isLoadingTransactions}
+          loading={isLoadingTransactions || isTransactionFetching}
         />
       </Skeleton>
     </div>

@@ -9,6 +9,8 @@ import {
 import { message } from 'antd';
 import { useEffect } from 'react';
 import { useAuth } from '../useAuth';
+import { usePagination } from '../usePagination';
+import { Pagination } from '@grc/_shared/namespace';
 
 interface useTransactionProps {
   key?: string;
@@ -26,6 +28,7 @@ interface useTransactionReturnProps {
   getAllTransactionsResponse: Record<string, any>;
   handleSendMail: () => void;
   mailTransactionsResponse: Record<string, any>;
+  pagination: Pagination;
 }
 
 export const useTransaction = ({
@@ -38,6 +41,11 @@ export const useTransaction = ({
     useLazyGetTransactionAnalyticsQuery();
   const [triggerAllTransactions, getAllTransactionsResponse] = useLazyGetAllTransactionsQuery();
   const [triggerMailTransactions, mailTransactionsResponse] = useLazyMailTransactionQuery();
+
+  const { pagination: TransactionPagination, paginate: paginateTransaction } = usePagination({
+    key: 'getAllTransactions',
+  });
+
   const { wallet } = useAppSelector((state) => state.auth);
   const walletId = wallet?.id;
   const { authData } = useAuth({ callUser: true });
@@ -51,6 +59,7 @@ export const useTransaction = ({
   };
 
   const transParams = {
+    ...paginateTransaction,
     ...filter?.filterData,
     amount: filter?.filterData?.amount ? filter?.filterData?.amount * 100 : undefined,
     search: searchValue !== '' ? searchValue : undefined,
@@ -91,5 +100,6 @@ export const useTransaction = ({
     getAllTransactionsResponse,
     mailTransactionsResponse,
     handleSendMail,
+    pagination: TransactionPagination,
   };
 };

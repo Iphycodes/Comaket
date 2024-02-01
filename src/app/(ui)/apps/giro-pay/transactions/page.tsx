@@ -18,6 +18,7 @@ const TransactionPage = () => {
     getTransactionAnalyticsResponse,
     getAllTransactionsResponse,
     handleSendMail,
+    pagination,
   } = useTransaction({
     callTransactionAnalytics: true,
     callAllTransactions: true,
@@ -28,6 +29,7 @@ const TransactionPage = () => {
   const mobileResponsive = useMediaQuery(mediaSize.mobile);
   const isTransactionAnalyticsLoading = getTransactionAnalyticsResponse?.isLoading;
   const isTransactionsLoading = getAllTransactionsResponse?.isLoading;
+  const isTransactionFetching = getAllTransactionsResponse?.isFetching;
   const { theme } = useTheme();
 
   useEffect(() => {
@@ -45,6 +47,7 @@ const TransactionPage = () => {
       theme={theme}
     >
       <Transactions
+        isFetchingTransaction={isTransactionFetching}
         handleSendMail={handleSendMail}
         isLoadingTransactions={isTransactionsLoading}
         setFilter={setFilter}
@@ -54,6 +57,7 @@ const TransactionPage = () => {
         wallet={wallet}
         transactionsData={transactionsData}
         setSearchValue={setSearchValue}
+        pagination={pagination}
       />
     </WithLoaderRender>
   );

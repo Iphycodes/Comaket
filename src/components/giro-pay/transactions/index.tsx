@@ -9,6 +9,7 @@ import AdvancedTransactionDrawer from './libs/advanced-transaction-drawer';
 import TransactionStatisticsCard from '../disbursement/libs/transaction-statistics-card';
 import { WalletNamespace } from '@grc/_shared/namespace/wallet';
 import { Col, Row } from 'antd';
+import { Pagination } from '@grc/_shared/namespace';
 
 interface balanceProps {
   availableAmount: number;
@@ -24,7 +25,9 @@ interface transactionProps {
   setFilter: Dispatch<SetStateAction<{ filterData: Record<string, any> }>> | any;
   setSearchValue: Dispatch<SetStateAction<string>>;
   isLoadingTransactions: boolean;
+  isFetchingTransaction: boolean;
   handleSendMail: () => void;
+  pagination: Pagination;
 }
 
 const Transactions = ({
@@ -36,7 +39,9 @@ const Transactions = ({
   setFilter,
   setSearchValue,
   isLoadingTransactions,
+  isFetchingTransaction,
   handleSendMail,
+  pagination,
 }: transactionProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
   const [selectedRecord, setSelectedRecord] = useState<Record<string, any>>({});
@@ -123,6 +128,7 @@ const Transactions = ({
         />
       </div>
       <TransactionsTable
+        isTransactionFetching={isFetchingTransaction}
         handleSendMail={handleSendMail}
         isLoadingTransactions={isLoadingTransactions}
         handleRowClick={handleRowClick}
@@ -130,6 +136,7 @@ const Transactions = ({
         setSelectedRecord={setSelectedRecord}
         transactionsData={transactionsData}
         filter={filter}
+        pagination={pagination}
       />
       <TransactionModal
         isModalOpen={isModalOpen}

@@ -4,7 +4,7 @@ import { Button, Drawer } from 'antd';
 import { capitalize, pick } from 'lodash';
 import { TransactionReceipt } from '@grc/_shared/components/transaction-receipt';
 import { omit } from 'lodash';
-import { getDate } from '@grc/_shared/helpers';
+import { getDate, numberFormat } from '@grc/_shared/helpers';
 
 interface AdvancedTransactionProps {
   open: boolean;
@@ -114,9 +114,17 @@ const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTr
                   {key === 'date' ? (
                     <span className="font-semibold">{getDate(`${value}`)}</span>
                   ) : (
-                    <span className="font-semibold text-right">
-                      {convertCamelCaseToSentence(`${value}`)}
-                    </span>
+                    <>
+                      {key === 'amount' ? (
+                        <span className="font-semibold text-right">
+                          {numberFormat(value / 100, '₦ ')}
+                        </span>
+                      ) : (
+                        <span className="font-semibold text-right">
+                          {convertCamelCaseToSentence(`${value}`)}
+                        </span>
+                      )}
+                    </>
                   )}
                 </div>
               </div>
