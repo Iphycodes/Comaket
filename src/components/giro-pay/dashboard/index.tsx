@@ -1,8 +1,8 @@
 'use client';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, SetStateAction, memo, useState } from 'react';
 import Link from 'next/link';
 import moment from 'moment';
-import { Button, Card, Col, List, Row, Tag } from 'antd';
+import { Button, Card, Col, Form, List, Row, Tag } from 'antd';
 import { numberFormat } from '@grc/_shared/helpers';
 import { AccountNamespace } from '@grc/_shared/namespace/account';
 import { IBalance, WalletNamespace } from '@grc/_shared/namespace/wallet';
@@ -10,7 +10,7 @@ import CustomModal from '@grc/_shared/components/custom-modal';
 import { AuthDataType } from '@grc/_shared/namespace/auth';
 import { CoinIcon } from '@grc/_shared/assets/svgs';
 import { capitalize, isEmpty, startCase, toLower } from 'lodash';
-import { generateChartData, generateDisbursementData } from '@grc/_shared/constant';
+import { generateChartData, generateDisbursementData } from '@grc/_shared/helpers';
 import CreateWalletForm from './libs/create-wallet-form';
 import {
   Chart as ChartJS,
@@ -49,6 +49,7 @@ type DashBoardProps = {
     isLoadingWallets: boolean;
     isLoadingTotalBalance: boolean;
     isLoadingTransaction: boolean;
+    isLoadingDashboardAnalytics: boolean;
   };
   totalBalance: number | undefined;
   balance: IBalance;
@@ -86,6 +87,7 @@ const DashBoard = (props: DashBoardProps) => {
   const [toggleTopUp, setToggleTopUp] = useState(false);
   const [toggleDisbursement, setToggleDisbursement] = useState(false);
   const isMobile = useMediaQuery(mediaSize.mobile);
+  const [form] = Form.useForm();
   const {
     accruedFees,
     incomeAndDisbursements,
@@ -96,6 +98,7 @@ const DashBoard = (props: DashBoardProps) => {
 
   let delayed: any;
   const isVerified = !!authData?.bvn && !!authData?.mobile?.phoneNumber;
+
   return (
     <>
       <motion.div
@@ -161,7 +164,14 @@ const DashBoard = (props: DashBoardProps) => {
             </Col>
           </Row>
 
-          {isEmpty(wallets) ? (
+          {[
+            loading.isLoadingWallets,
+            loading.isLoadingTotalBalance,
+            loading.isLoadingTransaction,
+            loading.isLoadingDashboardAnalytics,
+          ].includes(true) ? (
+            <span></span>
+          ) : isEmpty(wallets) ? (
             <EmptyVirtualAccount
               isVerified={isVerified}
               handleCreateWallet={() => setOpenCreateModal(true)}
@@ -396,7 +406,7 @@ const DashBoard = (props: DashBoardProps) => {
                         </Space> */}
                       </div>
                     </header>
-                    <div className="mt-5 flex items-center justify-center">
+                    <div className="mt-5 flex items-center justify-center text-gray-500">
                       <Doughnut
                         data={generateDisbursementData(disbursementSummary ?? [])}
                         redraw
@@ -408,7 +418,7 @@ const DashBoard = (props: DashBoardProps) => {
                           plugins: {
                             legend: {
                               position: 'bottom',
-                              align: 'center',
+                              align: 'start',
                             },
                             tooltip: {
                               callbacks: {
@@ -602,6 +612,13 @@ const DashBoard = (props: DashBoardProps) => {
             <SinglePayoutForm
               handleSetPaymentDetails={() => {}}
               handleSetSinglePayoutSteps={() => {}}
+              form={form}
+              loading={{ isLoadingBanks: false, isLoadingBankDetails: false }}
+              banks={[]}
+              setBankCode={() => {}}
+              debouncedChangeHandler={() => {}}
+              balance={{ availableAmount: 0, withdrawableAmount: 0 }}
+              beneficiaryAccounts={[]}
             />
           }
           setOpenModal={() => setToggleDisbursement(false)}
@@ -612,4 +629,4 @@ const DashBoard = (props: DashBoardProps) => {
   );
 };
 
-export default DashBoard;
+export default memo(DashBoard);

@@ -1,6 +1,6 @@
 import { WalletNamespace } from '@grc/_shared/namespace/wallet';
 import { Col, Row, Space, message } from 'antd';
-import { upperCase } from 'lodash';
+import { capitalize, startCase } from 'lodash';
 import { useTheme } from 'next-themes';
 import Image from 'next/image';
 import React, { useEffect, useState } from 'react';
@@ -20,9 +20,6 @@ const TopUpBalance = ({ wallet }: TopUpBalanceProps) => {
   const onCopy: () => void = () =>
     textInput && message.success({ content: 'Account Number Copied' });
 
-  // const onCopyAll: () => void = () =>
-  //   acctDetails && message.success({ content: 'Account Details Copied' });
-
   return (
     <div className="flex flex-col justify-start">
       <div className="flex items-center border-b-2 pb-3">
@@ -37,16 +34,15 @@ const TopUpBalance = ({ wallet }: TopUpBalanceProps) => {
         </Space>
       </div>
       <div className="py-4 text-muted-foreground font-semibold">
-        Transfer Funds to the account below to Top Up your Balance. Please use the Reference Id for
-        transaction remark.
+        Transfer Funds to the wallet below, to top up your balance.
       </div>
       <div className="flex flex-col gap-2 py-3 border-y-2">
         <Row className="flex items-center">
           <Col span={8}>
             <span className="text-muted-foreground font-semibold">Account Number: </span>
           </Col>
-          <Col className="flex gap-1 items-start" span={16}>
-            <span className=" text-lg font-semibold">{wallet?.accountNumber}</span>
+          <Col className="flex gap-1 items-center" span={16}>
+            <span className=" text-base font-semibold">{wallet?.accountNumber}</span>
             <i
               className="ri-file-copy-line mb-1 text-[20px] hover:text-blue cursor-pointer"
               onClick={() => navigator.clipboard.writeText(textInput).then(onCopy)}
@@ -58,7 +54,9 @@ const TopUpBalance = ({ wallet }: TopUpBalanceProps) => {
             <span className=" text-muted-foreground font-semibold">Bank: </span>
           </Col>
           <Col span={16}>
-            <span className="text-base font-semibold">{wallet?.bankName?.toUpperCase()}</span>
+            <span className="text-base font-semibold">
+              {startCase(capitalize(wallet?.bankName))}
+            </span>
           </Col>
         </Row>
         <Row className="flex items-center">
@@ -66,7 +64,9 @@ const TopUpBalance = ({ wallet }: TopUpBalanceProps) => {
             <span className=" text-muted-foreground font-semibold">Account Name: </span>
           </Col>
           <Col span={16}>
-            <span className="text-base font-semibold">{upperCase(wallet?.accountName)}</span>
+            <span className="text-base font-semibold">
+              {startCase(capitalize(wallet?.accountName))}
+            </span>
           </Col>
         </Row>
         {/* <Row className="flex items-center">

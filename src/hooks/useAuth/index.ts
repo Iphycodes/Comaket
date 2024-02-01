@@ -12,6 +12,7 @@ import {
   useSendVerificationMutation,
   useUpdateLoggedInUserMutation,
   useVerifyEmailMutation,
+  useVerifyUserMutation,
 } from '@grc/services/auth';
 import { MutationTrigger } from '@reduxjs/toolkit/dist/query/react/buildHooks';
 import Cookies from 'js-cookie';
@@ -39,6 +40,7 @@ interface UseAuthReturnType {
   verifyEmail: MutationTrigger<any>;
   forgotPassword: MutationTrigger<any>;
   sendVerification: MutationTrigger<any>;
+  verifyUser: MutationTrigger<any>;
   resetPassword: MutationTrigger<any>;
   updateUser: MutationTrigger<any>;
   loginResponse: Record<string, any>;
@@ -48,6 +50,7 @@ interface UseAuthReturnType {
   forgotPasswordResponse: Record<string, any>;
   sendVerificationResponse: Record<string, any>;
   resetPasswordResponse: Record<string, any>;
+  verifyUserResponse: Record<string, any>;
   sessionToken: string | undefined;
   handleLogOut: () => void;
   authData: AuthDataType | null;
@@ -77,6 +80,7 @@ export const useAuth = ({
   const [triggerUser] = useLazyGetLoggedInUserQuery();
   const [updateUser, updateUserResponse] = useUpdateLoggedInUserMutation();
   const [verifyEmail, verifyEmailResponse] = useVerifyEmailMutation();
+  const [verifyUser, verifyUserResponse] = useVerifyUserMutation();
   const [sendVerification, sendVerificationResponse] = useSendVerificationMutation();
   const [forgotPassword, forgotPasswordResponse] = useForgotPasswordMutation();
   const [resetPassword, resetPasswordResponse] = useResetPasswordMutation();
@@ -146,5 +150,7 @@ export const useAuth = ({
     currentAccount,
     accounts,
     triggerAcccountsResponse,
+    verifyUser,
+    verifyUserResponse,
   };
 };

@@ -66,7 +66,7 @@ const DashboardPage = () => {
 
   return (
     <WithLoaderRender
-      loading={isLoadingWallets || isLoadingDashboardAnalytics}
+      loading={isLoadingWallets || isLoadingDashboardAnalytics || isLoadingTotalBalance}
       mobileResponsive={mobileResponsive}
       theme={theme}
     >
@@ -85,6 +85,7 @@ const DashboardPage = () => {
           isLoadingWallets,
           isLoadingTotalBalance,
           isLoadingTransaction,
+          isLoadingDashboardAnalytics,
         }}
         totalBalance={totalBalance}
         pagination={pagination}

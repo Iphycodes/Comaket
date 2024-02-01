@@ -3,6 +3,7 @@ import Cookie from 'js-cookie';
 import { AUTH_TOKEN_KEY, COLOR_LIST_ALPHA } from '@grc/_shared/constant';
 import { MenuProps } from 'antd';
 import * as _ from 'lodash';
+import { isEmpty } from 'lodash';
 
 export const numberFormat = (value: number | bigint, currency?: string) => {
   const formatter = new Intl.NumberFormat();
@@ -154,4 +155,97 @@ export const getDate = (datestring: string) => {
   // Create the formatted date string
   const formattedDate = `${day}-${month}-${year} ${hours}:${minutes}${period}`;
   return formattedDate;
+};
+
+export const generateChartData = (cashFlowBreakdown: {
+  income: { month: string; totalAmount: number }[];
+  disbursements: { month: string; totalAmount: number }[];
+}) => {
+  const labels = (cashFlowBreakdown.income ?? []).map((entry) => entry.month);
+  const incomeData = (cashFlowBreakdown.income ?? []).map((entry) => entry.totalAmount / 100);
+  const disbursementsData = (cashFlowBreakdown.disbursements ?? []).map(
+    (entry) => entry.totalAmount / 100
+  );
+
+  const chartData = {
+    labels,
+    datasets: [
+      {
+        label: 'Income',
+        data: incomeData,
+        fill: false,
+        backgroundColor: 'rgba(30, 136, 229, 0.2)',
+        borderColor: 'rgba(30, 136, 229, 1)',
+        borderWidth: 2,
+      },
+      {
+        label: 'Disbursements',
+        data: disbursementsData,
+        fill: false,
+        borderColor: 'rgb(255, 99, 132)',
+        backgroundColor: 'rgba(255, 99, 132, 0.5)',
+        borderWidth: 2,
+      },
+    ],
+  };
+
+  const emptyLineChartData = {
+    labels: ['No Data Available'],
+    datasets: [
+      {
+        label: 'No Data Available',
+        data: [0],
+        fill: false,
+        borderColor: 'gray',
+        borderWidth: 2,
+        pointRadius: 0,
+      },
+    ],
+  };
+  if (isEmpty(incomeData) && isEmpty(disbursementsData)) {
+    return emptyLineChartData;
+  }
+
+  return chartData;
+};
+
+export const generateDisbursementData = (data: { label: string; value: number }[]) => {
+  const transformedLabel: Record<string, any> = {
+    totalSuccessfulDisbursements: 'Successful Disbursements',
+    totalProcessingDisbursements: 'Processing Disbursements',
+    totalFailedDisbursements: 'Failed Disbursements',
+  };
+  const labels = data.map(({ label }) => transformedLabel[label]);
+  const disBursementData = data.map(({ value }) => value);
+
+  const emptyDoughnutChartData = {
+    labels: ['No Data Available'],
+    datasets: [
+      {
+        data: [1],
+        backgroundColor: ['gray'],
+      },
+    ],
+  };
+
+  const formattedData = {
+    labels,
+    datasets: [
+      {
+        backgroundColor: ['#2FDE00', '#C9DE00', '#B21F00'],
+        hoverBackgroundColor: ['#175000', '#4B5000', '#501800'],
+        data: disBursementData,
+      },
+    ],
+  };
+  if (
+    formattedData.datasets &&
+    formattedData.datasets[0].data[0] === 0 &&
+    formattedData.datasets[0].data[1] === 0 &&
+    formattedData.datasets[0].data[2] === 0
+  ) {
+    return emptyDoughnutChartData;
+  }
+
+  return formattedData;
 };

@@ -16,6 +16,7 @@ export const verifyEmailUrl = 'auth/verify-email';
 export const sendVerificationUrl = 'auth/send-verification';
 export const forgotPasswordUrl = 'auth/password-reset';
 export const resetPasswordUrl = 'auth/reset-password';
+export const verifyUserUrl = 'auth/verify-user';
 export const projectUrl = 'project';
 export const licenceUrl = 'licenses';
 export const employeeUrl = 'employee';
@@ -470,61 +471,3 @@ export interface ReciepientsDataType {
   bank?: string;
   amount?: number;
 }
-
-export const generateChartData = (cashFlowBreakdown: {
-  income: { month: string; totalAmount: number }[];
-  disbursements: { month: string; totalAmount: number }[];
-}) => {
-  const labels = (cashFlowBreakdown.income ?? []).map((entry) => entry.month);
-  const incomeData = (cashFlowBreakdown.income ?? []).map((entry) => entry.totalAmount / 100);
-  const disbursementsData = (cashFlowBreakdown.disbursements ?? []).map(
-    (entry) => entry.totalAmount / 100
-  );
-
-  const chartData = {
-    labels,
-    datasets: [
-      {
-        label: 'Income',
-        data: incomeData,
-        fill: false,
-        backgroundColor: 'rgba(30, 136, 229, 0.2)',
-        borderColor: 'rgba(30, 136, 229, 1)',
-        borderWidth: 2,
-      },
-      {
-        label: 'Disbursements',
-        data: disbursementsData,
-        fill: false,
-        borderColor: 'rgb(255, 99, 132)',
-        backgroundColor: 'rgba(255, 99, 132, 0.5)',
-        borderWidth: 2,
-      },
-    ],
-  };
-
-  return chartData;
-};
-
-export const generateDisbursementData = (data: { label: string; value: number }[]) => {
-  const transformedLabel: Record<string, any> = {
-    totalSuccessfulDisbursements: 'Successful Disbursements',
-    totalProcessingDisbursements: 'Processing Disbursements',
-    totalFailedDisbursements: 'Failed Disbursements',
-  };
-  const labels = data.map(({ label }) => transformedLabel[label]);
-  const disBursementData = data.map(({ value }) => value);
-
-  const formattedData = {
-    labels,
-    datasets: [
-      {
-        backgroundColor: ['#2FDE00', '#C9DE00', '#B21F00'],
-        hoverBackgroundColor: ['#175000', '#4B5000', '#501800'],
-        data: disBursementData,
-      },
-    ],
-  };
-
-  return formattedData;
-};
