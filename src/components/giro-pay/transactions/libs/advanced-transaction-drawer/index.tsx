@@ -4,7 +4,7 @@ import { Button, Drawer } from 'antd';
 import { capitalize, pick } from 'lodash';
 import { TransactionReceipt } from '@grc/_shared/components/transaction-receipt';
 import { omit } from 'lodash';
-import { getDate, numberFormat } from '@grc/_shared/helpers';
+import { getDate, numberFormat, truncate } from '@grc/_shared/helpers';
 
 interface AdvancedTransactionProps {
   open: boolean;
@@ -122,7 +122,7 @@ const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTr
                       ) : (
                         <>
                           {key === 'reference' ? (
-                            <div>{'...'}</div>
+                            <div>{truncate(`${value}`, 10)}</div>
                           ) : (
                             <span className="font-semibold text-right">
                               {convertCamelCaseToSentence(`${value}`)}
