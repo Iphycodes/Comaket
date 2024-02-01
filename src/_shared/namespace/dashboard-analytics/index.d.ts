@@ -4,6 +4,7 @@ export namespace DashboardAnalyticsNamespace {
     accruedFees: {
       countdown: number;
       totalAmount: number;
+      count: number;
     };
     recentTransactions: WalletNamespace.Wallet[];
     incomeAndDisbursements: {

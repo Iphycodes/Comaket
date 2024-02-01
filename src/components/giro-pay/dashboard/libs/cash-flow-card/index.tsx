@@ -42,8 +42,7 @@ export const CashFlowCard = ({ type, amount, count }: CashFlowCardProps) => {
           </span>
         ) : (
           <span>
-            <span className="text-black dark:text-white font-semibold">{count} </span>Days to
-            deduction
+            <span className="text-black dark:text-white font-semibold">{count} </span>Transactions
           </span>
         )}
       </div>

@@ -165,10 +165,14 @@ export const AppHeader = (props: AppHeaderProps) => {
               </div>{' '}
               {!isMobile && (
                 <>
-                  <Link className="underline" href={'/'}>
+                  <Link
+                    className="underline cursor-pointer"
+                    target="_blank"
+                    href={'https://documenter.getpostman.com/view/28379669/2s9YsFFF1i'}
+                  >
                     API Documentation
                   </Link>
-                  <Link className="underline" href={'/'}>
+                  <Link className="underline cursor-pointer" href={'#'}>
                     For Developers
                   </Link>
                 </>
