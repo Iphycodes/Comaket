@@ -3,7 +3,7 @@ import { IBalance } from '@grc/_shared/namespace/wallet';
 import { AppContext } from '@grc/app-context';
 import { Button, Checkbox, Col, Form, Input, InputNumber, FormInstance, Row, Select } from 'antd';
 import { isEmpty } from 'lodash';
-import React, { Dispatch, SetStateAction, memo, useContext } from 'react';
+import React, { Dispatch, SetStateAction, memo, useContext, useState } from 'react';
 import { TailSpin } from 'react-preloader-icon';
 
 export interface IBanks {
@@ -41,6 +41,7 @@ const SinglePayoutForm = ({
   beneficiaryAccounts,
 }: SinglePayoutFormProps) => {
   const { setPayoutdetails } = useContext(AppContext);
+  const [showSaveBeneficiary, setShowBeneficiary] = useState(true);
 
   const options = banks?.map(({ name, bankCode }) => ({
     label: (
@@ -77,6 +78,9 @@ const SinglePayoutForm = ({
         accountNumber: values[1],
         bankName: ` ${values[2]}-${values[3]}`,
       }));
+      setShowBeneficiary(false);
+    } else {
+      setShowBeneficiary(true);
     }
   };
 
@@ -216,13 +220,16 @@ const SinglePayoutForm = ({
             </Form.Item>
           </Col>
         </Row>
-        <Row className="my-0">
-          <Col className="my-0" lg={24} xs={24}>
-            <Form.Item name="saveBeneficiary" valuePropName="checked">
-              <Checkbox defaultChecked={false}>Save as Beneficiary</Checkbox>
-            </Form.Item>
-          </Col>
-        </Row>
+        {showSaveBeneficiary && (
+          <Row className="my-0">
+            <Col className="my-0" lg={24} xs={24}>
+              <Form.Item name="saveBeneficiary" valuePropName="checked">
+                <Checkbox defaultChecked={false}>Save as Beneficiary</Checkbox>
+              </Form.Item>
+            </Col>
+          </Row>
+        )}
+
         <div className="flex items-center justify-end sticky bottom-0">
           <Button
             className="opacity-100 hover:opacity-95 font-normal bg-blue text-white h-12"

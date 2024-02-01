@@ -8,7 +8,7 @@ import { AccountNamespace } from '@grc/_shared/namespace/account';
 import { IBalance, WalletNamespace } from '@grc/_shared/namespace/wallet';
 import CustomModal from '@grc/_shared/components/custom-modal';
 import { AuthDataType } from '@grc/_shared/namespace/auth';
-import { CoinIcon } from '@grc/_shared/assets/svgs';
+import { CoinIcon, ArrowLeftDownIcon, ArrowRightUpIcon } from '@grc/_shared/assets/svgs';
 import { capitalize, isEmpty, startCase, toLower } from 'lodash';
 import { generateChartData, generateDisbursementData } from '@grc/_shared/helpers';
 import CreateWalletForm from './libs/create-wallet-form';
@@ -198,7 +198,7 @@ const DashBoard = (props: DashBoardProps) => {
                       <CashFlowCard
                         type="Accrued Service Fee"
                         amount={accruedFees?.totalAmount ?? 0}
-                        count={accruedFees?.countdown ?? 0}
+                        count={accruedFees?.count ?? 0}
                       />
                     </Col>
                     <Col md={12} xs={12}>
@@ -287,11 +287,11 @@ const DashBoard = (props: DashBoardProps) => {
                                 </div>
                               }
                             />
-                            <div className="text-card-foreground">
+                            <div className="text-card-foreground flex items-center gap-1">
                               {item?.entry === 'debit' ? (
-                                <span className=" text-red-700 font-semibold">- </span>
+                                <ArrowRightUpIcon />
                               ) : (
-                                <span className=" text-green-700 font-semibold">+ </span>
+                                <ArrowLeftDownIcon />
                               )}
                               {numberFormat(item?.amount / 100, '₦ ')}
                             </div>
