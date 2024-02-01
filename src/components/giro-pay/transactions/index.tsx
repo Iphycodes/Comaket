@@ -99,18 +99,19 @@ const Transactions = ({
         {(transactionAnalyticsData ?? []).map((transactionAnalyticsItem, idx) => {
           return (
             <>
-              {transactionAnalyticsItem?.label !== 'totalTransactions' && (
-                <Col key={idx} md={5} lg={5} xs={12}>
-                  <TransactionStatisticsCard
-                    key={`${idx}`}
-                    style={{ flex: 2 }}
-                    color={getAnalyticColor(transactionAnalyticsItem?.label)}
-                    title={camelCaseToSentence(transactionAnalyticsItem?.label)}
-                    percentage={transactionAnalyticsItem?.percent}
-                    value={transactionAnalyticsItem?.value}
-                  />
-                </Col>
-              )}
+              {transactionAnalyticsItem?.label !== 'totalDisbursements' &&
+                transactionAnalyticsItem?.label !== 'totalTransactions' && (
+                  <Col key={idx} md={5} lg={5} xs={12}>
+                    <TransactionStatisticsCard
+                      key={`${idx}`}
+                      style={{ flex: 2 }}
+                      color={getAnalyticColor(transactionAnalyticsItem?.label)}
+                      title={camelCaseToSentence(transactionAnalyticsItem?.label)}
+                      percentage={transactionAnalyticsItem?.percent}
+                      value={transactionAnalyticsItem?.value}
+                    />
+                  </Col>
+                )}
             </>
           );
         })}
