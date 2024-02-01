@@ -11,6 +11,7 @@ import {
   userUrl,
   verifyEmailUrl,
   resetPasswordUrl,
+  verifyUserUrl,
 } from '@grc/_shared/constant';
 import type {
   authResponseType,
@@ -120,6 +121,17 @@ export const authApi = api?.injectEndpoints({
         url: constantUrl,
       }),
     }),
+
+    verifyUser: builder.mutation({
+      query: ({ payload }) => {
+        return {
+          url: verifyUserUrl,
+          method: POST,
+          body: payload,
+        };
+      },
+      invalidatesTags: [updateUserTag],
+    }),
   }),
 });
 
@@ -136,5 +148,6 @@ export const {
   useLazyGetConstantsQuery,
   useLazyGetLoggedInUserQuery,
   useUpdateLoggedInUserMutation,
+  useVerifyUserMutation,
   endpoints: { login, getAccounts, getApp, getConstants },
 } = authApi;

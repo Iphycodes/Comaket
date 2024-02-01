@@ -2,7 +2,7 @@
 import { Dispatch, SetStateAction, memo, useState } from 'react';
 import Link from 'next/link';
 import moment from 'moment';
-import { Button, Card, Col, List, Row, Tag } from 'antd';
+import { Button, Card, Col, Form, List, Row, Tag } from 'antd';
 import { numberFormat } from '@grc/_shared/helpers';
 import { AccountNamespace } from '@grc/_shared/namespace/account';
 import { IBalance, WalletNamespace } from '@grc/_shared/namespace/wallet';
@@ -10,7 +10,7 @@ import CustomModal from '@grc/_shared/components/custom-modal';
 import { AuthDataType } from '@grc/_shared/namespace/auth';
 import { CoinIcon } from '@grc/_shared/assets/svgs';
 import { capitalize, isEmpty, startCase, toLower } from 'lodash';
-import { generateChartData, generateDisbursementData } from '@grc/_shared/constant';
+import { generateChartData, generateDisbursementData } from '@grc/_shared/helpers';
 import CreateWalletForm from './libs/create-wallet-form';
 import {
   Chart as ChartJS,
@@ -87,6 +87,7 @@ const DashBoard = (props: DashBoardProps) => {
   const [toggleTopUp, setToggleTopUp] = useState(false);
   const [toggleDisbursement, setToggleDisbursement] = useState(false);
   const isMobile = useMediaQuery(mediaSize.mobile);
+  const [form] = Form.useForm();
   const {
     accruedFees,
     incomeAndDisbursements,
@@ -611,6 +612,13 @@ const DashBoard = (props: DashBoardProps) => {
             <SinglePayoutForm
               handleSetPaymentDetails={() => {}}
               handleSetSinglePayoutSteps={() => {}}
+              form={form}
+              loading={{ isLoadingBanks: false, isLoadingBankDetails: false }}
+              banks={[]}
+              setBankCode={() => {}}
+              debouncedChangeHandler={() => {}}
+              balance={{ availableAmount: 0, withdrawableAmount: 0 }}
+              beneficiaryAccounts={[]}
             />
           }
           setOpenModal={() => setToggleDisbursement(false)}

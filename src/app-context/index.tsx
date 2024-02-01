@@ -19,6 +19,8 @@ interface AppContextPropType {
   accounts: Array<AccountNamespace.Account | null>;
   toggleSider: boolean;
   setToggleSider: Dispatch<SetStateAction<boolean>>;
+  payoutDetails: Record<string, any>;
+  setPayoutdetails: Dispatch<SetStateAction<Record<string, any>>>;
 }
 
 export const AppContext = createContext<AppContextPropType>({
@@ -29,6 +31,8 @@ export const AppContext = createContext<AppContextPropType>({
   accounts: [],
   toggleSider: false,
   setToggleSider: () => {},
+  payoutDetails: {},
+  setPayoutdetails: () => {},
 });
 
 export const AppProvider = (props: AppProviderPropType) => {
@@ -38,6 +42,7 @@ export const AppProvider = (props: AppProviderPropType) => {
   const dispatch = useAppDispatch();
   const handleLogOut = () => dispatch(logout());
   const [toggleSider, setToggleSider] = useState(false);
+  const [payoutDetails, setPayoutdetails] = useState({});
 
   useEffect(() => {
     isMobile && setToggleSider(true);
@@ -51,6 +56,8 @@ export const AppProvider = (props: AppProviderPropType) => {
     accounts,
     setToggleSider,
     toggleSider,
+    payoutDetails,
+    setPayoutdetails,
   };
 
   return <AppContext.Provider value={values}>{children}</AppContext.Provider>;

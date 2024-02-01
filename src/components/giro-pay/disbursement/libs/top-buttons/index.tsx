@@ -4,7 +4,9 @@ import { Button } from 'antd';
 import { Dispatch, SetStateAction } from 'react';
 interface TopButtonsProps {
   setModalOpen: Dispatch<SetStateAction<boolean>>;
-  setModalElement: Dispatch<SetStateAction<'top-up-balance' | 'single-payout' | 'batch-payout'>>;
+  setModalElement: Dispatch<
+    SetStateAction<'top-up-balance' | 'single-payout' | 'batch-payout' | ''>
+  >;
 }
 
 const TopButtons = ({ setModalOpen, setModalElement }: TopButtonsProps) => {
