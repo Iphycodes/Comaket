@@ -103,34 +103,26 @@ export const useWallet = ({
   const banks = useAppSelector((state) => selectBanksData(state, {}));
   const { wallet } = useAppSelector((state) => state.auth);
   const walletId = wallet?._id;
-  // const walletId = wallets?.[0]?._id;
 
   const transParams: Record<string, any> = {
     ...paginateTransaction,
     ...filter?.filterData,
-    // date: filter?.filterData?.createdAt,
     amount: filter?.filterData?.amount ? filter?.filterData?.amount * 100 : undefined,
     virtualAccount: walletId,
     search: searchValue,
   };
 
-  // delete transParams?.createdAt;
-
   const transactions = useAppSelector((state) => selectWalletTransactionData(state, transParams));
   const balance = useAppSelector((state) => selectBalanceData(state, { id: walletId }));
 
   const handleWallets = (wallet: WalletNamespace.Wallet | null) => {
-    console.log('I dispatched:::', wallet);
     dispatch(setWallet(wallet));
   };
   const mailParams = {
     ...filter?.filterData,
-    // date: filter?.filterData?.createdAt,
     amount: filter?.filterData?.amount ? filter?.filterData?.amount * 100 : undefined,
     wallet: walletId,
   };
-
-  // delete mailParams?.createdAt;
 
   const handleSendMail = () => {
     triggerMailTransaction(mailParams).then(() => {

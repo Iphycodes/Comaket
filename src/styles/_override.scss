@@ -224,7 +224,7 @@ canvas.disbursement-pie {
       background 0s;
   }
 
-  .update-api-key-webhook-form {
+  .update-api-key-webhook-form, .single-payout-form {
     .ant-input-disabled,
     .ant-input-affix-wrapper-disabled {
       background-color: rgba(255, 255, 255, 1) !important;
@@ -291,7 +291,7 @@ canvas.disbursement-pie {
       background 0s;
   }
 
-  .update-api-key-webhook-form {
+  .update-api-key-webhook-form, .single-payout-form {
     .ant-input-disabled,
     .ant-input-affix-wrapper-disabled {
       background-color: #141414 !important;
