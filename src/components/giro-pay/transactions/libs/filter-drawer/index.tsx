@@ -48,16 +48,16 @@ const FilterDrawer = (props: FilterDrawerProps) => {
     },
   ];
 
-  const currencyOptions = [
-    {
-      label: 'NGN',
-      value: 'NGN',
-    },
-    {
-      label: 'USD',
-      value: 'USD',
-    },
-  ];
+  // const currencyOptions = [
+  //   {
+  //     label: 'NGN',
+  //     value: 'NGN',
+  //   },
+  //   {
+  //     label: 'USD',
+  //     value: 'USD',
+  //   },
+  // ];
 
   const entryOptions = [
     {
@@ -118,7 +118,7 @@ const FilterDrawer = (props: FilterDrawerProps) => {
               />
             </Form.Item>
 
-            <span className="font-semibold text-muted-foreground">Currency:</span>
+            {/* <span className="font-semibold text-muted-foreground">Currency:</span>
             <Form.Item className="w-full" name="currency" rules={[{ required: false }]}>
               <Select
                 mode="multiple"
@@ -126,7 +126,7 @@ const FilterDrawer = (props: FilterDrawerProps) => {
                 className="w-full rounded-lg"
                 options={currencyOptions}
               />
-            </Form.Item>
+            </Form.Item> */}
 
             <span className="font-semibold text-muted-foreground">Entry Mode:</span>
             <Form.Item className="w-full" name="entry" rules={[{ required: false }]}>

@@ -120,9 +120,15 @@ const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTr
                           {numberFormat(value / 100, '₦ ')}
                         </span>
                       ) : (
-                        <span className="font-semibold text-right">
-                          {convertCamelCaseToSentence(`${value}`)}
-                        </span>
+                        <>
+                          {key === 'reference' ? (
+                            <div>{'...'}</div>
+                          ) : (
+                            <span className="font-semibold text-right">
+                              {convertCamelCaseToSentence(`${value}`)}
+                            </span>
+                          )}
+                        </>
                       )}
                     </>
                   )}
