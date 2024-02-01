@@ -15,7 +15,7 @@ interface usePaginationReturnProps {
 export const usePagination = ({ key = '' }: usePaginationType): usePaginationReturnProps => {
   const [paginate, setPaginate] = useState({
     page: 1,
-    perPage: 5,
+    perPage: 7,
   });
 
   const { pagination: _pagination } = useAppSelector((state) => state.ui);

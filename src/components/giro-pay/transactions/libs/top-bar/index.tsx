@@ -1,12 +1,19 @@
 'use client';
 
 import { Button, Input } from 'antd';
+import { ChangeEvent, Dispatch, SetStateAction } from 'react';
 
 interface TopBarProps {
   handleDrawerToggle: () => void;
+  setSearchValue: Dispatch<SetStateAction<string>>;
 }
 
-const TopBar = ({ handleDrawerToggle }: TopBarProps) => {
+const TopBar = ({ handleDrawerToggle, setSearchValue }: TopBarProps) => {
+  const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
+    const inputValue = event.target.value;
+    setSearchValue(inputValue);
+  };
+
   return (
     <div className="flex justify-between gap-3 items-center">
       <Input
@@ -14,6 +21,7 @@ const TopBar = ({ handleDrawerToggle }: TopBarProps) => {
         size="large"
         className="bg-gray-50 dark:bg-gray-800 w-80 border-gray-300 rounded-md shadow-sm"
         style={{ borderRadius: '5px' }}
+        onChange={handleSearch}
       />
       <Button
         className="flex justify-center bg-cyan-50 dark:bg-gray-800 border-blue dark:border-gray-300 items-center h-12 w-12"

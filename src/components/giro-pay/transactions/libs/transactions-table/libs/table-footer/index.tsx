@@ -1,6 +1,11 @@
 import { Button } from 'antd';
 
-const TableFooter = () => {
+interface TableFooterProps {
+  // filter: {filterData: Record<string, any>}
+  handleSendMail: () => void;
+}
+
+const TableFooter = ({ handleSendMail }: TableFooterProps) => {
   return (
     <div className="footer flex justify-end gap-5 items-center">
       <Button
@@ -8,7 +13,7 @@ const TableFooter = () => {
         type="primary"
         disabled={false}
         loading={false}
-        htmlType="submit"
+        onClick={() => handleSendMail()}
       >
         <div className="flex items-center gap-2 justify-center">
           <i className="ri-upload-2-line"></i>

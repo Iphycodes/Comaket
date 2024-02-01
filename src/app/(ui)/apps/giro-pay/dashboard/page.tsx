@@ -40,10 +40,10 @@ const DashboardPage = () => {
   });
 
   const isCreatingWallet = createWalletResponse.isLoading;
+  const isLoadingDashboardAnalytics = getDashboardAnalyticsResponse.isLoading;
   const isLoadingWallets = walletsResponse.isLoading;
   const isLoadingTotalBalance = totalBalanceResponse.isLoading;
   const isLoadingTransaction = accountTransactionResponse.isFetching;
-  const isLoadingDashboardAnalytics = getDashboardAnalyticsResponse.isLoading;
   const totalBalance = !isEmpty(allTotalBalance) && transactionBal(allTotalBalance);
 
   const handleCreateWallet = (values: Record<string, any>) => {

@@ -1,20 +1,39 @@
 'use client';
 
-import { Table, Tag, Tooltip } from 'antd';
-import React, { Dispatch, SetStateAction } from 'react';
-import { TransactionsDataType, transactionsData } from './libs/transactions-data';
+import { Skeleton, Table, Tag, Tooltip } from 'antd';
+import React, { Dispatch, SetStateAction, useEffect } from 'react';
+import { TransactionsDataType } from './libs/transactions-data';
 import { ColumnsType } from 'antd/lib/table';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 import TableFooter from './libs/table-footer';
+import { isEmpty } from 'lodash';
+import { numberFormat } from '@grc/_shared/helpers';
+import { Pagination } from '@grc/_shared/namespace';
 
 interface TransactionTableProps {
   handleRowClick: (record: any) => void;
   setTransactionDrawerOpen: () => void;
   setSelectedRecord: Dispatch<SetStateAction<TransactionsDataType>>;
+  transactionsData?: Record<string, any>[];
+  filter: { filterData: Record<string, any> };
+  isLoadingTransactions: boolean;
+  isTransactionFetching?: boolean;
+  handleSendMail: () => void;
+  pagination: Pagination;
 }
 
 const TransactionsTable = (props: TransactionTableProps) => {
-  const { handleRowClick, setTransactionDrawerOpen, setSelectedRecord } = props;
+  const {
+    handleRowClick,
+    setTransactionDrawerOpen,
+    setSelectedRecord,
+    transactionsData,
+    filter,
+    isLoadingTransactions,
+    handleSendMail,
+    pagination,
+    isTransactionFetching,
+  } = props;
   const isMobile = useMediaQuery(mediaSize.mobile);
 
   const handleAdvancedViewClick = (record: TransactionsDataType) => {
@@ -23,15 +42,15 @@ const TransactionsTable = (props: TransactionTableProps) => {
     setSelectedRecord(record);
   };
 
-  const columns: ColumnsType<TransactionsDataType> = [
+  const columns: ColumnsType<any> = [
     {
-      dataIndex: 'category',
-      key: 'category',
+      dataIndex: 'entry',
+      key: 'entry',
       width: 40,
       render: (text) => (
         <span>
-          {text === 'pay-out' && <i className="ri-arrow-left-up-line text-red-600"></i>}
-          {text === 'pay-in' && <i className="ri-arrow-right-down-line text-green-500"></i>}
+          {text === 'debit' && <i className="ri-arrow-left-up-line text-red-600"></i>}
+          {text === 'credit' && <i className="ri-arrow-right-down-line text-green-500"></i>}
         </span>
       ),
     },
@@ -46,6 +65,20 @@ const TransactionsTable = (props: TransactionTableProps) => {
       },
       dataIndex: 'date',
       key: 'date',
+      render: (text) => {
+        const originalDate = new Date(text);
+
+        const day = originalDate.getDate().toString().padStart(2, '0');
+        const month = (originalDate.getMonth() + 1).toString().padStart(2, '0');
+        const year = originalDate.getFullYear().toString().slice(2);
+        const hours = originalDate.getHours() % 12 || 12; // Convert 24-hour format to 12-hour format
+        const minutes = originalDate.getMinutes().toString().padStart(2, '0');
+        const period = originalDate.getHours() < 12 ? 'am' : 'pm';
+
+        // Create the formatted date string
+        const formattedDate = `${day}-${month}-${year} ${hours}:${minutes}${period}`;
+        return <span>{`${formattedDate}`}</span>;
+      },
     },
     {
       title: (
@@ -53,18 +86,19 @@ const TransactionsTable = (props: TransactionTableProps) => {
           <span>Type</span>
         </span>
       ),
-      dataIndex: 'type',
-      key: 'type',
+      dataIndex: 'transactionType',
+      key: 'transactionType',
+      width: '150px',
       render: (text) => <span>{text}</span>,
     },
     {
       title: (
         <span className="flex text-[14px] font-semibold text-gray-500 items-center gap-1">
-          <span>Session ID</span>
+          <span>Reference</span>
         </span>
       ),
-      dataIndex: 'sessionId',
-      key: 'sessionId',
+      dataIndex: 'reference',
+      key: 'reference',
       ellipsis: {
         showTitle: true,
       },
@@ -75,36 +109,12 @@ const TransactionsTable = (props: TransactionTableProps) => {
           <span>Reciepient</span>
         </span>
       ),
-      dataIndex: 'reciepient',
+      dataIndex: 'beneficiary',
       key: 'reciepient',
       ellipsis: {
         showTitle: true,
       },
-      render: (text) => <span>{text}</span>,
-    },
-    {
-      title: (
-        <span className="flex text-[14px] font-semibold text-gray-500 items-center gap-1">
-          <span>Reciepient Status</span>
-        </span>
-      ),
-      dataIndex: 'reciepientAccountStatus',
-      key: 'reciepientAccountStatus',
-      ellipsis: {
-        showTitle: true,
-      },
-      render: (text) => {
-        return (
-          <div className="w-full">
-            {text === 'approved' && (
-              <Tag className="mx-auto" color="success">
-                Approved
-              </Tag>
-            )}
-            {text === 'unapproved' && <Tag color="error">Unapproved</Tag>}
-          </div>
-        );
-      },
+      render: (text) => <span>{text?.accountName ?? ''}</span>,
     },
     {
       title: (
@@ -112,12 +122,12 @@ const TransactionsTable = (props: TransactionTableProps) => {
           <span>Reciepient Bank</span>
         </span>
       ),
-      dataIndex: 'reciepientBank',
+      dataIndex: 'beneficiary',
       key: 'reciepientBank',
       ellipsis: {
         showTitle: true,
       },
-      render: (text) => <span>{text}</span>,
+      render: (text) => <span>{text?.bankName}</span>,
     },
     {
       title: (
@@ -129,6 +139,32 @@ const TransactionsTable = (props: TransactionTableProps) => {
       key: 'amount',
       ellipsis: {
         showTitle: true,
+      },
+      width: '150px',
+      render: (value) => <span>{numberFormat(value / 100, '₦ ')}</span>,
+    },
+    {
+      title: (
+        <span className="flex text-[14px] font-semibold text-gray-500 items-center gap-1">
+          <span>Status</span>
+        </span>
+      ),
+      dataIndex: 'status',
+      key: 'status',
+      ellipsis: {
+        showTitle: true,
+      },
+      render: (text) => {
+        return (
+          <div className="w-full">
+            {text === 'successful' && (
+              <Tag className="mx-auto" color="success">
+                successful
+              </Tag>
+            )}
+            {text === 'failed' && <Tag color="error">Failed</Tag>}
+          </div>
+        );
       },
     },
     {
@@ -154,21 +190,30 @@ const TransactionsTable = (props: TransactionTableProps) => {
     },
   ];
 
+  useEffect(() => {
+    console.log('tansacccccccccccccccccccccc');
+  }, [isLoadingTransactions]);
+
   const rowClick = (record: any) => ({
     onClick: () => handleRowClick(record),
   });
   return (
     <div className="shadow-sm border dark:border-gray-500 rounded-lg">
-      <Table
-        size="large"
-        columns={columns}
-        pagination={{ pageSize: 8, position: ['bottomLeft'] }}
-        dataSource={transactionsData}
-        scroll={{ x: isMobile ? true : 0 }}
-        className={'transaction-table dark:bg-zinc-800 rounded-lg'}
-        onRow={rowClick}
-        footer={() => <TableFooter />}
-      />
+      <Skeleton active loading={isLoadingTransactions} paragraph={{ rows: 8 }}>
+        <Table
+          size="large"
+          columns={columns}
+          pagination={pagination}
+          dataSource={transactionsData}
+          scroll={{ x: isMobile ? true : 0 }}
+          className={'transaction-table dark:bg-zinc-800 rounded-lg'}
+          onRow={rowClick}
+          footer={() =>
+            !isEmpty(filter?.filterData) ? <TableFooter handleSendMail={handleSendMail} /> : null
+          }
+          loading={isLoadingTransactions || isTransactionFetching}
+        />
+      </Skeleton>
     </div>
   );
 };

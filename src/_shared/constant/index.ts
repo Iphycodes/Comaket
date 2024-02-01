@@ -35,6 +35,7 @@ export const businessProfileUrl = 'businesses';
 export const accountSettingUrl = 'accounts';
 export const mailTransactionUrl = 'transactions/summary/email';
 export const transactionAnalyticsUrl = 'analytics/transactions';
+export const transactionsUrl = 'transactions';
 export const dashboardAnalyticsUrl = 'analytics/dashboard';
 
 /**Token**/

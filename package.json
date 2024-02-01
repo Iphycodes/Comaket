@@ -32,6 +32,7 @@
     "dayjs": "^1.11.10",
     "framer-motion": "^10.17.9",
     "js-cookie": "^3.0.5",
+    "jspdf": "^2.5.1",
     "jwt-decode": "^4.0.0",
     "lodash": "^4.17.21",
     "moment": "^2.30.1",

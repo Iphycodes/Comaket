@@ -230,7 +230,7 @@ const SinglePayoutForm = ({
           </Row>
         )}
 
-        <div className="flex items-center justify-end sticky bottom-0">
+        <div className="flex items-center justify-end bottom-0">
           <Button
             className="opacity-100 hover:opacity-95 font-normal bg-blue text-white h-12"
             type="primary"
