@@ -5,6 +5,7 @@ import { WithLoaderRender } from '@grc/_shared/components/with-app-loder';
 import Transactions from '@grc/components/giro-pay/transactions';
 import { useTransaction } from '@grc/hooks/useTransaction';
 import { useWallet } from '@grc/hooks/useWallet';
+import { useTheme } from 'next-themes';
 import React, { useEffect, useState } from 'react';
 
 const TransactionPage = () => {
@@ -27,6 +28,7 @@ const TransactionPage = () => {
   const mobileResponsive = useMediaQuery(mediaSize.mobile);
   const isTransactionAnalyticsLoading = getTransactionAnalyticsResponse?.isLoading;
   const isTransactionsLoading = getAllTransactionsResponse?.isLoading;
+  const { theme } = useTheme();
 
   useEffect(() => {
     console.log('transactionDataaaaaaaaaaaaaaaa:::', transactionsData);
@@ -40,6 +42,7 @@ const TransactionPage = () => {
     <WithLoaderRender
       loading={isTransactionAnalyticsLoading || isTransactionsLoading}
       mobileResponsive={mobileResponsive}
+      theme={theme}
     >
       <Transactions
         handleSendMail={handleSendMail}

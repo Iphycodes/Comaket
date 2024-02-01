@@ -77,14 +77,10 @@ export const useTransaction = ({
 
   const handleSendMail = () => {
     triggerMailTransactions(mailParams).then(() => {
-      // {
-      //   contextHolder;
-      // }
       message.open({
         type: 'success',
-        content: `Transaction details sent ${authData?.email} successfully`,
+        content: `Transaction details sent to ${authData?.email} successfully`,
       });
-      // message.success('Sent Successfully');
     });
   };
 

@@ -140,3 +140,18 @@ export const getRandomColorByString = (name: string) => {
 export const getFirstCharacter = (name: string) => {
   return _.capitalize(name?.charAt(0));
 };
+
+export const getDate = (datestring: string) => {
+  const originalDate = new Date(datestring);
+
+  const day = originalDate.getDate().toString().padStart(2, '0');
+  const month = (originalDate.getMonth() + 1).toString().padStart(2, '0');
+  const year = originalDate.getFullYear().toString().slice(2);
+  const hours = originalDate.getHours() % 12 || 12; // Convert 24-hour format to 12-hour format
+  const minutes = originalDate.getMinutes().toString().padStart(2, '0');
+  const period = originalDate.getHours() < 12 ? 'am' : 'pm';
+
+  // Create the formatted date string
+  const formattedDate = `${day}-${month}-${year} ${hours}:${minutes}${period}`;
+  return formattedDate;
+};

@@ -1,13 +1,15 @@
 'use client';
 
 import { Button, Drawer } from 'antd';
-import { TransactionsDataType } from '../transactions-table/libs/transactions-data';
 import { capitalize, pick } from 'lodash';
+import { TransactionReceipt } from '@grc/_shared/components/transaction-receipt';
+import { omit } from 'lodash';
+import { getDate } from '@grc/_shared/helpers';
 
 interface AdvancedTransactionProps {
   open: boolean;
   onClose: () => void;
-  selectedRecord: TransactionsDataType;
+  selectedRecord: Record<string, any>;
 }
 
 const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTransactionProps) => {
@@ -84,9 +86,13 @@ const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTr
                             </span>
                             <span className="text-[16px]">{convertCamelCaseToSentence(ky)}</span>
                           </div>
-                          <span className="font-semibold">
-                            {convertCamelCaseToSentence(`${val}`)}
-                          </span>
+                          {ky === 'date' ? (
+                            <span className="font-semibold">{getDate(`${val}`)}</span>
+                          ) : (
+                            <span className="font-semibold">
+                              {convertCamelCaseToSentence(`${val}`)}
+                            </span>
+                          )}
                         </div>
                       );
                     }
@@ -104,10 +110,14 @@ const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTr
                   </span>
                   <span className="text-[16px]">{convertCamelCaseToSentence(key)}</span>
                 </div>
-                <div className="flex justify-end">
-                  <span className="font-semibold text-right">
-                    {convertCamelCaseToSentence(`${value}`)}
-                  </span>
+                <div className="flex text-right justify-end">
+                  {key === 'date' ? (
+                    <span className="font-semibold">{getDate(`${value}`)}</span>
+                  ) : (
+                    <span className="font-semibold text-right">
+                      {convertCamelCaseToSentence(`${value}`)}
+                    </span>
+                  )}
                 </div>
               </div>
             );
@@ -120,7 +130,27 @@ const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTr
           type="primary"
           disabled={false}
           loading={false}
-          htmlType="submit"
+          onClick={() =>
+            TransactionReceipt({
+              successData: {
+                ...omit(selectedRecord, ['source', 'beneficiary']),
+                accountName:
+                  selectedRecord?.entry === 'debit'
+                    ? selectedRecord?.beneficiary?.accountName
+                    : selectedRecord?.source?.accountName,
+                accountNumber:
+                  selectedRecord?.entry === 'debit'
+                    ? selectedRecord?.beneficiary?.accountNumber
+                    : selectedRecord?.source?.accountNumber,
+                bankName:
+                  selectedRecord?.entry === 'debit'
+                    ? selectedRecord?.beneficiary?.bankName
+                    : selectedRecord?.source?.bankName,
+                entry: selectedRecord?.entry,
+              },
+              // setLoading,
+            })
+          }
         >
           <div className="flex items-center mx-auto gap-2 justify-center">
             <i className="ri-download-line text-[18px]"></i>

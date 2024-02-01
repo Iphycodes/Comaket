@@ -2,7 +2,6 @@
 import TransactionsTable from './libs/transactions-table';
 import BalanceCard from './libs/balance-card';
 import { Dispatch, SetStateAction, useState } from 'react';
-import { TransactionsDataType } from './libs/transactions-table/libs/transactions-data';
 import TransactionModal from './libs/transactionModal';
 import TopBar from './libs/top-bar';
 import FilterDrawer from './libs/filter-drawer';
@@ -40,7 +39,7 @@ const Transactions = ({
   handleSendMail,
 }: transactionProps) => {
   const [isModalOpen, setIsModalOpen] = useState<boolean>(false);
-  const [selectedRecord, setSelectedRecord] = useState<TransactionsDataType>({});
+  const [selectedRecord, setSelectedRecord] = useState<Record<string, any>>({});
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
   const [transactionDrawerOpen, setTransactionDrawerOpen] = useState<boolean>(false);
 
@@ -90,7 +89,7 @@ const Transactions = ({
   return (
     <div className="w-full flex flex-col gap-5">
       <Row gutter={[10, 10]}>
-        <Col md={8} lg={8} xs={24}>
+        <Col md={9} lg={9} xs={24}>
           {' '}
           <BalanceCard
             availableBalance={balance?.availableAmount ?? 0}
@@ -99,16 +98,20 @@ const Transactions = ({
         </Col>
         {(transactionAnalyticsData ?? []).map((transactionAnalyticsItem, idx) => {
           return (
-            <Col key={idx} md={4} lg={4} xs={12}>
-              <TransactionStatisticsCard
-                key={`${idx}`}
-                style={{ flex: 2 }}
-                color={getAnalyticColor(transactionAnalyticsItem?.label)}
-                title={camelCaseToSentence(transactionAnalyticsItem?.label)}
-                percentage={transactionAnalyticsItem?.percent}
-                value={transactionAnalyticsItem?.value}
-              />
-            </Col>
+            <>
+              {transactionAnalyticsItem?.label !== 'totalTransactions' && (
+                <Col key={idx} md={5} lg={5} xs={12}>
+                  <TransactionStatisticsCard
+                    key={`${idx}`}
+                    style={{ flex: 2 }}
+                    color={getAnalyticColor(transactionAnalyticsItem?.label)}
+                    title={camelCaseToSentence(transactionAnalyticsItem?.label)}
+                    percentage={transactionAnalyticsItem?.percent}
+                    value={transactionAnalyticsItem?.value}
+                  />
+                </Col>
+              )}
+            </>
           );
         })}
       </Row>

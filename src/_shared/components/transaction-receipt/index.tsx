@@ -1,8 +1,6 @@
 import jsPDF from 'jspdf';
 import React, { Dispatch, SetStateAction } from 'react';
 import { Template } from './Template';
-// import { createRoot } from 'react-dom/client';
-// import { render } from 'react-dom';
 import { createRoot } from 'react-dom/client';
 import { flushSync } from 'react-dom';
 
@@ -23,11 +21,6 @@ export const TransactionReceipt = ({
   });
 
   const htmlElement = container.firstElementChild as HTMLElement;
-  // const htmlContent = ReactDOMServer.renderToString(<Template successData={successData} />);
-
-  // const container = document.createElement('div');
-  // createRoot(container).render(<Template successData={successData} />);
-  // const htmlElement = container.firstElementChild as HTMLElement;
 
   setLoading?.(true);
   const doc = new jsPDF({
