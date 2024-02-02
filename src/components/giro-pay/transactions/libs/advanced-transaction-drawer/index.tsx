@@ -5,6 +5,7 @@ import { capitalize, pick } from 'lodash';
 import { TransactionReceipt } from '@grc/_shared/components/transaction-receipt';
 import { omit } from 'lodash';
 import { getDate, numberFormat, truncate } from '@grc/_shared/helpers';
+import { Fragment } from 'react';
 
 interface AdvancedTransactionProps {
   open: boolean;
@@ -34,10 +35,10 @@ const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTr
         </span>
       </div>
       <div className="w-full p-5 mb-14 flex flex-col gap-3">
-        {Object.entries(selectedRecord).map(([key, value]) => {
+        {Object.entries(selectedRecord).map(([key, value], index) => {
           if (typeof value === 'object') {
             return (
-              <>
+              <Fragment key={`${key}-${value}-${index}`}>
                 <div className="mt-4">
                   <span className="text-[18px]">{capitalize(key).toUpperCase()}</span>
                 </div>
@@ -52,14 +53,17 @@ const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTr
                   ).map(([ky, val]) => {
                     if (typeof val === 'object') {
                       return (
-                        <>
+                        <Fragment key={`${ky}-${val}-${index}`}>
                           <div className="mt-1">
                             <span className="text-[16px]">{capitalize(ky)}</span>
                           </div>
                           <div className="flex flex-col gap-2">
-                            {Object.entries(value).map(([ky3, val3]) => {
+                            {Object.entries(value).map(([ky3, val3], index) => {
                               return (
-                                <div key={ky3} className="flex justify-between gap-5 items-center">
+                                <div
+                                  key={`${ky3}-${val3}-${index}`}
+                                  className="flex justify-between gap-5 items-center"
+                                >
                                   <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
                                     <span>
                                       <i className="ri-circle-fill text-[8px]"></i>
@@ -75,7 +79,7 @@ const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTr
                               );
                             })}
                           </div>
-                        </>
+                        </Fragment>
                       );
                     } else {
                       return (
@@ -98,7 +102,7 @@ const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTr
                     }
                   })}
                 </div>
-              </>
+              </Fragment>
             );
           } else if (Array.isArray(value)) {
           } else {
@@ -108,7 +112,9 @@ const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTr
                   <span>
                     <i className="ri-circle-fill text-[8px]"></i>
                   </span>
-                  <span className="text-[16px]">{convertCamelCaseToSentence(key)}</span>
+                  <span className="text-[16px]">
+                    {key == 'createdAt' ? 'Date' : convertCamelCaseToSentence(key)}
+                  </span>
                 </div>
                 <div className="flex text-right justify-end">
                   {key === 'date' ? (

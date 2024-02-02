@@ -1,7 +1,7 @@
 'use client';
 import TransactionsTable from './libs/transactions-table';
 import BalanceCard from './libs/balance-card';
-import { Dispatch, SetStateAction, useState } from 'react';
+import { Dispatch, Fragment, SetStateAction, useContext, useEffect, useState } from 'react';
 import TransactionModal from './libs/transactionModal';
 import TopBar from './libs/top-bar';
 import FilterDrawer from './libs/filter-drawer';
@@ -10,6 +10,8 @@ import TransactionStatisticsCard from '../disbursement/libs/transaction-statisti
 import { WalletNamespace } from '@grc/_shared/namespace/wallet';
 import { Col, Row } from 'antd';
 import { Pagination } from '@grc/_shared/namespace';
+import { AppContext } from '@grc/app-context';
+import { isEmpty } from 'lodash';
 
 interface balanceProps {
   availableAmount: number;
@@ -47,6 +49,7 @@ const Transactions = ({
   const [selectedRecord, setSelectedRecord] = useState<Record<string, any>>({});
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
   const [transactionDrawerOpen, setTransactionDrawerOpen] = useState<boolean>(false);
+  const { selectedDashboardTransaction, setSelectedDashboardTransaction } = useContext(AppContext);
 
   const walletDetails = `${wallet?.accountName} | ${wallet?.accountNumber} | ${wallet?.bankName}`;
 
@@ -65,6 +68,9 @@ const Transactions = ({
 
   const handleTransactionDrawerOpen = (toggle: boolean) => {
     setTransactionDrawerOpen(toggle);
+    if (!toggle) {
+      setSelectedDashboardTransaction({});
+    }
   };
 
   function camelCaseToSentence(camelCaseString: string) {
@@ -91,6 +97,12 @@ const Transactions = ({
     return color;
   };
 
+  useEffect(() => {
+    if (!isEmpty(selectedDashboardTransaction)) {
+      handleTransactionDrawerOpen(true);
+    }
+  }, [selectedDashboardTransaction?._id]);
+
   return (
     <div className="w-full flex flex-col gap-5">
       <Row gutter={[10, 10]}>
@@ -103,7 +115,7 @@ const Transactions = ({
         </Col>
         {(transactionAnalyticsData ?? []).map((transactionAnalyticsItem, idx) => {
           return (
-            <>
+            <Fragment key={`${transactionAnalyticsItem}-${idx}`}>
               {transactionAnalyticsItem?.label !== 'totalDisbursements' &&
                 transactionAnalyticsItem?.label !== 'totalTransactions' && (
                   <Col key={idx} md={5} lg={5} xs={12}>
@@ -117,7 +129,7 @@ const Transactions = ({
                     />
                   </Col>
                 )}
-            </>
+            </Fragment>
           );
         })}
       </Row>
@@ -150,7 +162,7 @@ const Transactions = ({
         onClose={() => handleDrawerToggle(false)}
       />
       <AdvancedTransactionDrawer
-        selectedRecord={selectedRecord}
+        selectedRecord={!isEmpty(selectedRecord) ? selectedRecord : selectedDashboardTransaction}
         open={transactionDrawerOpen}
         onClose={() => handleTransactionDrawerOpen(false)}
       />

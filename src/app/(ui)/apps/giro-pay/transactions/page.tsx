@@ -6,7 +6,7 @@ import Transactions from '@grc/components/giro-pay/transactions';
 import { useTransaction } from '@grc/hooks/useTransaction';
 import { useWallet } from '@grc/hooks/useWallet';
 import { useTheme } from 'next-themes';
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 
 const TransactionPage = () => {
   const [filter, setFilter] = useState<{ filterData: Record<string, any> }>({ filterData: {} });
@@ -32,13 +32,13 @@ const TransactionPage = () => {
   const isTransactionFetching = getAllTransactionsResponse?.isFetching;
   const { theme } = useTheme();
 
-  useEffect(() => {
-    console.log('transactionDataaaaaaaaaaaaaaaa:::', transactionsData);
-  }, [transactionAnalyticsData, transactionsData]);
+  // useEffect(() => {
+  //   console.log('transactionDataaaaaaaaaaaaaaaa:::', transactionsData);
+  // }, [transactionAnalyticsData, transactionsData]);
 
-  useEffect(() => {
-    console.log('isLoadinggggggggggggg', isTransactionsLoading);
-  }, [isTransactionsLoading]);
+  // useEffect(() => {
+  //   console.log('isLoadinggggggggggggg', isTransactionsLoading);
+  // }, [isTransactionsLoading]);
 
   return (
     <WithLoaderRender
