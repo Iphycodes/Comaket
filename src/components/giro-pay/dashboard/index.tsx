@@ -1,15 +1,21 @@
 'use client';
-import { Dispatch, SetStateAction, memo, useState } from 'react';
+import { Dispatch, SetStateAction, memo, useContext, useState } from 'react';
 import Link from 'next/link';
 import moment from 'moment';
-import { Button, Card, Col, Form, List, Row, Tag } from 'antd';
-import { numberFormat } from '@grc/_shared/helpers';
+import { Button, Card, Col, Form, List, Row, Tag, message } from 'antd';
+import { numberFormat, truncate } from '@grc/_shared/helpers';
 import { AccountNamespace } from '@grc/_shared/namespace/account';
 import { IBalance, WalletNamespace } from '@grc/_shared/namespace/wallet';
 import CustomModal from '@grc/_shared/components/custom-modal';
 import { AuthDataType } from '@grc/_shared/namespace/auth';
-import { CoinIcon, ArrowLeftDownIcon, ArrowRightUpIcon } from '@grc/_shared/assets/svgs';
-import { capitalize, isEmpty, startCase, toLower } from 'lodash';
+import {
+  CoinIcon,
+  ArrowLeftDownIcon,
+  ArrowRightUpIcon,
+  CopyIcon,
+  CopyIconLight,
+} from '@grc/_shared/assets/svgs';
+import { capitalize, isEmpty, omit, startCase, toLower } from 'lodash';
 import { generateChartData, generateDisbursementData } from '@grc/_shared/helpers';
 import CreateWalletForm from './libs/create-wallet-form';
 import {
@@ -34,6 +40,9 @@ import { Pagination } from '@grc/_shared/namespace';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 import SinglePayoutForm from '../disbursement/libs/single-payout/libs/single-payout-form';
 import { DashboardAnalyticsNamespace } from '@grc/_shared/namespace/dashboard-analytics';
+import { useTheme } from 'next-themes';
+import { useRouter } from 'next/navigation';
+import { AppContext } from '@grc/app-context';
 
 type DashBoardProps = {
   authData?: AuthDataType | null;
@@ -88,6 +97,10 @@ const DashBoard = (props: DashBoardProps) => {
   const [toggleDisbursement, setToggleDisbursement] = useState(false);
   const isMobile = useMediaQuery(mediaSize.mobile);
   const [form] = Form.useForm();
+  const { theme } = useTheme();
+  const { setSelectedDashboardTransaction } = useContext(AppContext);
+  const { push } = useRouter();
+
   const {
     accruedFees,
     incomeAndDisbursements,
@@ -98,6 +111,31 @@ const DashBoard = (props: DashBoardProps) => {
 
   let delayed: any;
   const isVerified = !!authData?.bvn && !!authData?.mobile?.phoneNumber;
+
+  const onCopy: (text: string) => void = (text: string) =>
+    !isEmpty(text) && message.success({ content: 'Transaction reference copied.' });
+
+  const handleRowClick = (record: any) => {
+    const filteredData = omit(record, [
+      '_id',
+      'updatedAt',
+      'publicId',
+      'meta',
+      'user',
+      'requestSrc',
+      'deprecated',
+      'tRef',
+      'id',
+      'account',
+      'live',
+      'virtualAccount',
+      'parentRef',
+      'tags',
+      '_v',
+    ]);
+    setSelectedDashboardTransaction(filteredData);
+    push('/apps/giro-pay/transactions');
+  };
 
   return (
     <>
@@ -256,7 +294,11 @@ const DashBoard = (props: DashBoardProps) => {
                         ),
                       }}
                       renderItem={(item: Record<string, any>, index) => (
-                        <List.Item className="dashboard-transaction-list" key={index}>
+                        <List.Item
+                          className="dashboard-transaction-list cursor-pointer"
+                          onClick={() => handleRowClick(item)}
+                          key={index}
+                        >
                           <div className="w-full flex justify-between items-center text-left px-2 py-0">
                             <List.Item.Meta
                               title={
@@ -283,6 +325,25 @@ const DashBoard = (props: DashBoardProps) => {
                                     >
                                       {item?.status}
                                     </Tag>
+                                  </span>
+                                  <span className="flex items-center justify-center ">
+                                    {isMobile ? truncate(item?.reference, 20) : item?.reference}{' '}
+                                    <span
+                                      className={'cursor-pointer ml-1'}
+                                      onClick={(event) => {
+                                        event.stopPropagation();
+
+                                        navigator.clipboard
+                                          .writeText(item?.reference)
+                                          .then(() => onCopy(item?.reference));
+                                      }}
+                                    >
+                                      {theme === 'light' ? (
+                                        <CopyIcon className=" scale-75" />
+                                      ) : (
+                                        <CopyIconLight className=" scale-75" />
+                                      )}
+                                    </span>
                                   </span>
                                 </div>
                               }

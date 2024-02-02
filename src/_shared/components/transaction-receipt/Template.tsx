@@ -66,7 +66,7 @@ export const Template = ({ successData }: TeplateProps) => {
     } as CSSProperties,
     footer: {
       position: 'absolute',
-      bottom: '20px',
+      bottom: '60px',
       width: '100%',
       padding: '10px 0px',
       textAlign: 'center',
@@ -118,10 +118,10 @@ export const Template = ({ successData }: TeplateProps) => {
           <span style={styles.wordSpacing}>Transaction Time</span>
           <span style={styles.wordSpacing}>{dayjs(date).format('YYYY-MM-DD hh:mm:ss')}</span>
         </div>
-        <div style={styles.row}>
+        {/* <div style={styles.row}>
           <span style={styles.wordSpacing}>Transaction Status</span>
           <span style={styles.wordSpacing}>{startCase(lowerCase(status))}</span>
-        </div>
+        </div> */}
 
         <div style={styles.row}>
           <span style={styles.wordSpacing}>Transaction Reference</span>

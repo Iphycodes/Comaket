@@ -93,7 +93,7 @@ const SinglePayoutForm = ({
 
   return (
     <div className="max-h-[550px] overflow-y-scroll">
-      <Row className="py-5">
+      {/* <Row className="py-5">
         <Col span={24} className="beneficiary-form">
           <div className="mb-0 text-muted-foreground">Select Saved Beneficiary</div>
           <Select
@@ -108,7 +108,7 @@ const SinglePayoutForm = ({
             onChange={handleBeneficiaryChange}
           />
         </Col>
-      </Row>
+      </Row> */}
       <Form
         name={'single-payout-form'}
         onFinish={handleSubmit}
@@ -117,6 +117,28 @@ const SinglePayoutForm = ({
         form={form}
         className="single-payout-form"
       >
+        <Row className="pt-5">
+          <Col span={24} className="beneficiary-form">
+            {/* <div className="mb-0 text-muted-foreground">Select Saved Beneficiary</div> */}
+            <Form.Item
+              name="beneficiary"
+              className="mb-3"
+              label={<div className="mb-0 text-muted-foreground">Select Saved Beneficiary</div>}
+            >
+              <Select
+                bordered={true}
+                showSearch
+                size="large"
+                // disabled={true}
+                defaultValue={'Select a beneficiary'}
+                placeholder={'Select Saved Beneficiary'}
+                options={beneficiaryOptions}
+                className={'w-full'}
+                onChange={handleBeneficiaryChange}
+              />
+            </Form.Item>
+          </Col>
+        </Row>
         <Row>
           <Col lg={24} xs={24}>
             <Form.Item

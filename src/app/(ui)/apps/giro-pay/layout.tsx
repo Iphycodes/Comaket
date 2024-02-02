@@ -99,7 +99,7 @@ const AppsBaseLayout = (props: GiroPayPageProps) => {
                 {['Business Profile', 'API Keys & Webhook URL', 'Account'].map((text, index) => (
                   <div
                     onClick={() => push(`/apps/giro-pay/settings/${formatPathText(text)}`)}
-                    key={`setting-tab_${index}`}
+                    key={`setting-tab_${index}_${text}`}
                     className={`text-base tracking-wide ${
                       formatPathText(text) === currentPage
                         ? 'text-blue border-b-2 font-medium border-blue'

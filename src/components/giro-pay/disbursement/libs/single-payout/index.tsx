@@ -34,6 +34,7 @@ interface SinglePayoutProps {
   debouncedChangeHandler: (e: string) => void;
   handleVerifyUser: (values: Record<string, any>) => void;
   beneficiaryAccounts: Array<Record<string, any>>;
+  payoutSuccessData: Record<string, any>;
 }
 
 const SinglePayout = ({
@@ -49,6 +50,7 @@ const SinglePayout = ({
   form,
   debouncedChangeHandler,
   handleVerifyUser,
+  payoutSuccessData,
   beneficiaryAccounts,
 }: SinglePayoutProps) => {
   const handleSetPaymentDetails = (details: Record<string, any>) => {
@@ -67,13 +69,20 @@ const SinglePayout = ({
             className="text-[16px] flex justify-center items-center h-12 w-12 bg-blue"
             style={{ borderRadius: '50%' }}
           >
-            <i className="ri-send-plane-fill text-white text-[18px]"></i>{' '}
+            {singlePayoutSteps === 'step4' ? (
+              <i
+                className="ri-checkbox-circle-fill text-[30px] p-0 m-0  text-white"
+                style={{ lineHeight: '30px' }}
+              ></i>
+            ) : (
+              <i className="ri-send-plane-fill text-white text-[18px]"></i>
+            )}
           </span>
           <span className="font-bold text-[20px]">
             {singlePayoutSteps === 'step1' && 'Single Payout'}
             {singlePayoutSteps === 'step2' && 'Confirm Payout'}
             {singlePayoutSteps === 'step3' && 'Confirm Payment'}
-            {singlePayoutSteps === 'step4' && 'Payment Successful'}
+            {singlePayoutSteps === 'step4' && 'Money Sent'}
           </span>
         </Space>
       </div>
@@ -104,7 +113,7 @@ const SinglePayout = ({
           handleVerifyUser={handleVerifyUser}
         />
       )}
-      {singlePayoutSteps === 'step4' && <PayoutSuccess />}
+      {singlePayoutSteps === 'step4' && <PayoutSuccess payoutSuccessData={payoutSuccessData} />}
     </>
   );
 };
