@@ -26,6 +26,7 @@ const ConfirmPayout: React.FC<ConfirmPayoutProps> = ({
     bankName: 'bank name',
     accountNumber: 'account number',
     saveBeneficiary: 'save as beneficiary',
+    beneficiary: '',
   };
   const formatBoolean = (value: boolean) => {
     if (value) {
@@ -54,6 +55,8 @@ const ConfirmPayout: React.FC<ConfirmPayoutProps> = ({
                 <span>
                   {(() => {
                     switch (key) {
+                      case 'beneficiary':
+                        return;
                       case 'accountName':
                         return <i className="ri-user-line text-[20px]"></i>;
                       case 'bankName':
@@ -84,7 +87,9 @@ const ConfirmPayout: React.FC<ConfirmPayoutProps> = ({
                       ? `${numberFormat(value, '₦ ')}`
                       : key === 'saveBeneficiary'
                         ? formatBoolean(value)
-                        : startCase(capitalize(value))
+                        : ['beneficiary'].includes(key)
+                          ? ''
+                          : startCase(capitalize(value))
                   }`}</span>
                 )}
               </div>

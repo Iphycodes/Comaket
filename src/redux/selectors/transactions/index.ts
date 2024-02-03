@@ -14,7 +14,6 @@ export const selectAllTransactionsData = createSelector(
       ? allTransactions.data.data.map((item: any) =>
           omit(item, [
             '_id',
-            'createdAt',
             'updatedAt',
             'publicId',
             'meta',
@@ -28,6 +27,9 @@ export const selectAllTransactionsData = createSelector(
             'virtualAccount',
             'parentRef',
             'tags',
+            '_v',
+            'balance',
+            'currency',
           ])
         )
       : null; // or an empty array, depending on your use case

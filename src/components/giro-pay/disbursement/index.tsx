@@ -47,6 +47,7 @@ type DisbursementProps = {
   beneficiaryAccounts: Array<Record<string, any>>;
   disbursementAnalyticsData: Record<string, any>[] | any;
   recentDisbursementData: Record<string, any>[] | any;
+  payoutSuccessData: Record<string, any>;
 };
 
 const Disbursement = (props: DisbursementProps) => {
@@ -69,6 +70,7 @@ const Disbursement = (props: DisbursementProps) => {
     beneficiaryAccounts,
     disbursementAnalyticsData,
     recentDisbursementData,
+    payoutSuccessData,
   } = props;
   const [open, setOpen] = useState<boolean>(false);
   const [selectedRecord, setSelectedRecord] = useState<Record<string, any>>({});
@@ -209,7 +211,15 @@ const Disbursement = (props: DisbursementProps) => {
           className="disbursement-modal overflow-y-scroll"
           title={``}
           open={modalOpen}
-          onCancel={() => setModalOpen(false)}
+          onCancel={() => {
+            setModalOpen(false);
+            setPaymentDetails({});
+            setPayoutdetails({});
+            setSinglePayoutSteps('step1');
+            setBankCode('');
+            form.resetFields();
+            setModalElement('');
+          }}
           style={{ minWidth: modalElement === 'batch-payout' ? '700px' : '400px' }}
           footer={null}
           closeIcon={false}
@@ -245,6 +255,7 @@ const Disbursement = (props: DisbursementProps) => {
               setPaymentDetails={setPaymentDetails}
               singlePayoutSteps={singlePayoutSteps}
               setSinglePayoutSteps={setSinglePayoutSteps}
+              payoutSuccessData={payoutSuccessData}
             />
           )}
           {modalElement === 'batch-payout' && <BatchPayout />}

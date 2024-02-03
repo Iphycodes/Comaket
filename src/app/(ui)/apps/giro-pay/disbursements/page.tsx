@@ -66,6 +66,7 @@ const DisbursementPage = () => {
   const isLoadingBankDetails = bankDetailsResponse.isLoading;
   const isVerifyingUser = verifyUserResponse.isLoading;
   const isPayoutLoading = singlePayoutResponse.isLoading || batchPayoutResponse.isLoading;
+  const payoutSuccessData = singlePayoutResponse?.data?.data;
   const totalBalance = !isEmpty(allTotalBalance) && transactionBal(allTotalBalance);
 
   const handleVerifyUser = (values: Record<string, any>) => {
@@ -79,10 +80,12 @@ const DisbursementPage = () => {
 
   const handleSendMoney = (values: Record<string, any>) => {
     let payload;
+
+    console.log('send money values::', values);
     if (modalElement === 'single-payout') {
       if (!isEmpty(bankDetails)) {
         payload = {
-          ...omit(values, ['bankName', 'accountNumber', 'amount']),
+          ...omit(values, ['bankName', 'accountNumber', 'amount', 'beneficiary']),
           ...omit(bankDetails, ['nameEnquiryRef']),
           amount: values?.amount * 100,
           bankCode: receivedBankCode,
@@ -90,7 +93,7 @@ const DisbursementPage = () => {
         };
       } else {
         payload = {
-          ...omit(values, ['bankName', 'amount']),
+          ...omit(values, ['bankName', 'amount', 'beneficiary']),
           amount: values?.amount * 100,
           bankCode: receivedBankCode,
           sourceAccount: wallet?._id,
@@ -135,7 +138,6 @@ const DisbursementPage = () => {
       if (verifyUserResponse.data) {
         const { success } = verifyUserResponse.data.data;
         if (success) {
-          console.log('single payout form details:::', payoutDetails);
           handleSendMoney(payoutDetails);
         }
       }
@@ -175,6 +177,7 @@ const DisbursementPage = () => {
         beneficiaryAccounts={beneficiaryAccounts}
         disbursementAnalyticsData={disbursementAnalyticsData}
         recentDisbursementData={recentDisbursementsData}
+        payoutSuccessData={payoutSuccessData}
       />
     </WithLoaderRender>
   );

@@ -21,6 +21,8 @@ interface AppContextPropType {
   setToggleSider: Dispatch<SetStateAction<boolean>>;
   payoutDetails: Record<string, any>;
   setPayoutdetails: Dispatch<SetStateAction<Record<string, any>>>;
+  selectedDashboardTransaction: Record<string, any>;
+  setSelectedDashboardTransaction: Dispatch<SetStateAction<Record<string, any>>>;
 }
 
 export const AppContext = createContext<AppContextPropType>({
@@ -33,6 +35,8 @@ export const AppContext = createContext<AppContextPropType>({
   setToggleSider: () => {},
   payoutDetails: {},
   setPayoutdetails: () => {},
+  selectedDashboardTransaction: {},
+  setSelectedDashboardTransaction: () => {},
 });
 
 export const AppProvider = (props: AppProviderPropType) => {
@@ -43,6 +47,7 @@ export const AppProvider = (props: AppProviderPropType) => {
   const handleLogOut = () => dispatch(logout());
   const [toggleSider, setToggleSider] = useState(false);
   const [payoutDetails, setPayoutdetails] = useState({});
+  const [selectedDashboardTransaction, setSelectedDashboardTransaction] = useState({});
 
   useEffect(() => {
     isMobile && setToggleSider(true);
@@ -58,6 +63,8 @@ export const AppProvider = (props: AppProviderPropType) => {
     toggleSider,
     payoutDetails,
     setPayoutdetails,
+    selectedDashboardTransaction,
+    setSelectedDashboardTransaction,
   };
 
   return <AppContext.Provider value={values}>{children}</AppContext.Provider>;
