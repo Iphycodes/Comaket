@@ -1,10 +1,7 @@
-import {
-  BatchDisbursement,
-  DisbursementRecord,
-  mockDisbursementRecord,
-} from '@grc/_shared/constant';
+// import { BatchDisbursement, DisbursementRecord } from '@grc/_shared/constant';
 import { numberFormat } from '@grc/_shared/helpers';
 import { List, Space, Tag } from 'antd';
+import { isEmpty } from 'lodash';
 import moment from 'moment';
 import Link from 'next/link';
 import React, { Dispatch, SetStateAction } from 'react';
@@ -13,18 +10,20 @@ interface RecentDisbursementsProps {
   // Add your prop types here
   setSelectedRecord: Dispatch<SetStateAction<Record<string, any>>>;
   setOpen: Dispatch<SetStateAction<boolean>>;
+  recentDisbursementData: Record<string, any>[];
 }
 
 const RecentDisbursements: React.FC<RecentDisbursementsProps> = ({
   setOpen,
   setSelectedRecord,
+  recentDisbursementData,
 }) => {
   const handleItemClick = (item: Record<string, any>) => {
     setSelectedRecord(item);
     setOpen(true);
   };
 
-  const getBatch = (record: BatchDisbursement) => {
+  const getBatch = (record: Record<string, any>) => {
     let pendingFlag = 0;
     let color = '';
     let statusFlag = '';
@@ -33,12 +32,12 @@ const RecentDisbursements: React.FC<RecentDisbursementsProps> = ({
     let pendingPayouts = 0;
     let failedPayouts = 0;
 
-    record?.recipients.map(({ status }) => {
-      status === 'successful'
+    record?.recipients.map((recipient: any) => {
+      recipient?.status === 'successful'
         ? (successfulPayouts += 1)
-        : status === 'pending'
+        : recipient?.status === 'pending'
           ? (pendingPayouts += 1)
-          : status === 'failed'
+          : recipient?.status === 'failed'
             ? (failedPayouts += 1)
             : console.log('');
     });
@@ -76,7 +75,7 @@ const RecentDisbursements: React.FC<RecentDisbursementsProps> = ({
         className="overflow-y-auto"
         header={<div className="font-semibold">Recent Disbursements</div>}
         footer={
-          mockDisbursementRecord && (
+          !isEmpty(recentDisbursementData) && (
             <div className="text-center mt-5">
               <Link prefetch className="text-blue" href={'/apps/giro-pay/transactions'}>
                 See all &rarr;
@@ -84,11 +83,11 @@ const RecentDisbursements: React.FC<RecentDisbursementsProps> = ({
             </div>
           )
         }
-        dataSource={mockDisbursementRecord}
+        dataSource={recentDisbursementData}
         loading={false}
         locale={{
           emptyText: (
-            <div className="text-gray-500 text-justify">
+            <div className="text-gray-500 dark:text-gray-500 w-full min-h-full flex items-center justify-center gap-5 mt-8 px-10 flex-col text-center">
               <div>No Disbursements Record Available</div>
               <div>
                 Disbursement insight will be shown here once you create a virtual account and
@@ -97,20 +96,20 @@ const RecentDisbursements: React.FC<RecentDisbursementsProps> = ({
             </div>
           ),
         }}
-        renderItem={(item: DisbursementRecord, index) => {
+        renderItem={(item: Record<string, any>, index) => {
           const acctName =
-            item.type === 'single'
-              ? `${item?.recipient}`
-              : item?.recipients
+            typeof item?.beneficiary === 'object'
+              ? `${item?.beneficiary?.accountName}`
+              : Array.isArray(item?.beneficiary)
                 ? `${item?.recipients[0].recipient || ''}`
                 : 'account Name';
 
-          const amount =
-            item?.type === 'single'
-              ? item?.amount
-              : item?.recipients
-                ? item?.recipients[0].amount || 0
-                : 0;
+          // const amount =
+          //   item?.type === 'single'
+          //     ? item?.amount
+          //     : item?.recipients
+          //       ? item?.recipients[0].amount || 0
+          //       : 0;
 
           return (
             <List.Item
@@ -120,11 +119,14 @@ const RecentDisbursements: React.FC<RecentDisbursementsProps> = ({
             >
               <div className="w-full flex justify-between items-center text-left p-2">
                 <List.Item.Meta
-                  //   title={startCase(capitalize(item?.recipient))}
                   description={
                     <Space size={5}>
-                      {item?.type === 'single' && <i className="ri-user-line text-[24px]"></i>}
-                      {item?.type === 'Batch' && <i className="ri-group-line text-[24px]"></i>}
+                      {typeof item?.beneficiary === 'object' && (
+                        <i className="ri-user-line text-[24px]"></i>
+                      )}
+                      {Array.isArray(item?.beneficiary) && (
+                        <i className="ri-group-line text-[24px]"></i>
+                      )}
                       <div className="flex flex-col gap-0">
                         <span className="font-semibold text-black dark:text-gray-100">
                           {acctName}
@@ -133,9 +135,11 @@ const RecentDisbursements: React.FC<RecentDisbursementsProps> = ({
                           {moment(item?.date ?? '').format('MMM DD, YYYY hh:mm A')}
                         </span>
                         <Space className="font-semibold text-[10px] flex items-center gap-1 text-blue">
-                          <span>{item?.type} Payout</span>
-                          {item?.type === 'Batch' && (
-                            <div>{`(${item?.recipients.length} reciepients)`}</div>
+                          <span>
+                            {typeof item?.beneficiary === 'object' ? 'Single' : 'Batch'} Payout
+                          </span>
+                          {Array.isArray(item?.beneficiary) && (
+                            <div>{`(${item?.beneficiary.length} reciepients)`}</div>
                           )}
                         </Space>
                       </div>
@@ -143,24 +147,22 @@ const RecentDisbursements: React.FC<RecentDisbursementsProps> = ({
                   }
                 />
                 <div className="flex flex-col items-end">
-                  <div className="font-semibold m-0">{numberFormat(amount / 100, '₦')}</div>
-                  {item.type === 'single' && (
+                  <div className="font-semibold m-0">{numberFormat(item?.amount / 100, '₦')}</div>
+                  {typeof item?.beneficiary && (
                     <Tag
                       className="text-center m-0"
                       color={
-                        item?.type === 'single'
-                          ? item?.status === 'successful'
-                            ? 'success'
-                            : item?.status === 'pending'
-                              ? 'processing'
-                              : 'error'
-                          : 'default'
+                        item?.status === 'successful'
+                          ? 'success'
+                          : item?.status === 'processing'
+                            ? 'processing'
+                            : 'error'
                       }
                     >
-                      {item?.type === 'single' ? item?.status : getBatch(item)?.statusFlag}
+                      {item?.status}
                     </Tag>
                   )}
-                  {item.type === 'Batch' && (
+                  {Array.isArray(item?.beneficiary) && (
                     <Space size={8} className="flex items-center">
                       <div className="flex gap-0 font-semibold items-center">
                         <i className="ri-check-line text-green-500"></i>{' '}

@@ -17,7 +17,7 @@ const TransactionStatisticsCard = (props: TransactionStatisticsCardProps) => {
 
   return (
     <div
-      className="transaction-stat-card h-full dark:bg-zinc-800 border dark:border-gray-500 rounded-xl shadow-md py-5 px-3"
+      className="transaction-stat-card min-h-full dark:bg-zinc-800 border dark:border-gray-500 rounded-xl shadow-md py-5 px-3"
       style={{ ...style }}
     >
       <div className="flex flex-col h-full justify-between">

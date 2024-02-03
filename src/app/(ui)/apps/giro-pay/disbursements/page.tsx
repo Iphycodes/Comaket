@@ -7,6 +7,7 @@ import { AppContext } from '@grc/app-context';
 import Disbursement from '@grc/components/giro-pay/disbursement';
 import { useAuth } from '@grc/hooks/useAuth';
 import { useBankAccount } from '@grc/hooks/useBankAccount';
+import { useDisbursement } from '@grc/hooks/useDisbursement';
 import { useSearch } from '@grc/hooks/useSearch';
 import { useWallet } from '@grc/hooks/useWallet';
 import { Form } from 'antd';
@@ -28,6 +29,9 @@ const DisbursementPage = () => {
   const { searchValue, debouncedChangeHandler } = useSearch();
   const [bankCode, setBankCode] = useState('');
   const receivedBankCode = bankCode?.split('-')?.[1];
+  const { disbursementAnalyticsData, recentDisbursementsData } = useDisbursement({
+    callDisbursementAnalytics: true,
+  });
 
   const {
     walletsResponse,
@@ -169,6 +173,8 @@ const DisbursementPage = () => {
         setSinglePayoutSteps={setSinglePayoutSteps}
         handleVerifyUser={handleVerifyUser}
         beneficiaryAccounts={beneficiaryAccounts}
+        disbursementAnalyticsData={disbursementAnalyticsData}
+        recentDisbursementData={recentDisbursementsData}
       />
     </WithLoaderRender>
   );
