@@ -114,7 +114,7 @@ const RecentDisbursements: React.FC<RecentDisbursementsProps> = ({
           return (
             <List.Item
               onClick={() => handleItemClick(item)}
-              className="px-0 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-900"
+              className="px-0 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-800"
               key={index}
             >
               <div className="w-full flex justify-between items-center text-left p-2">
