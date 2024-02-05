@@ -9,7 +9,7 @@ import {
 import { message } from 'antd';
 import { useEffect } from 'react';
 import { useAuth } from '../useAuth';
-import { usePagination } from '../usePagination';
+import { usePagination } from '../usePagination/index';
 import { Pagination } from '@grc/_shared/namespace';
 
 interface useTransactionProps {
@@ -78,11 +78,11 @@ export const useTransaction = ({
 
   useEffect(() => {
     if (callTransactionAnalytics) triggerTransactionAnalytics(params);
-  }, [callTransactionAnalytics]);
+  }, [callTransactionAnalytics, walletId]);
 
   useEffect(() => {
     if (callAllTransactions) triggerAllTransactions(transParams);
-  }, [callAllTransactions, JSON.stringify(transParams)]);
+  }, [callAllTransactions, JSON.stringify(transParams), walletId]);
 
   const handleSendMail = () => {
     triggerMailTransactions(mailParams).then(() => {

@@ -22,7 +22,7 @@ import {
   selectTotalBalanceData,
   selectWalletData,
 } from '@grc/redux/selectors/wallet';
-import { usePagination } from '@grc/hooks/usePagination';
+import { usePagination } from '@grc/hooks/usePagination/index';
 import { Pagination } from '@grc/_shared/namespace';
 import { WalletNamespace, IBanks } from '@grc/_shared/namespace/wallet';
 import { isEmpty } from 'lodash';

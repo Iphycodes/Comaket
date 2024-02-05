@@ -26,7 +26,7 @@ export const usePagination = ({ key = '' }: usePaginationType): usePaginationRet
 
   const pagination = {
     showSizeChanger: false,
-    showTotal: (total: number) => `${total} transactions`,
+    showTotal: (total: number) => <span className="px-5">{`${total} transactions`}</span>,
     onChange: handlePageChange,
     current: _pagination?.[key]?.pagination?.current,
     pageSize: _pagination?.[key]?.pagination?.perPage,

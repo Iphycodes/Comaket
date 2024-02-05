@@ -73,7 +73,7 @@ const DisbursementPage = () => {
     verifyUser({
       payload: values,
       options: {
-        successMessage: 'User Verification Successful',
+        noSuccessMessage: true,
       },
     });
   };
@@ -99,7 +99,12 @@ const DisbursementPage = () => {
           sourceAccount: wallet?._id,
         };
       }
-      singlePayout({ payload }).then(() => {
+      singlePayout({
+        payload,
+        options: {
+          successMessage: 'Money sent',
+        },
+      }).then(() => {
         setSinglePayoutSteps('step4');
         setPayoutdetails({});
         form.resetFields();

@@ -262,3 +262,9 @@ export const camelCaseToSentence = (camelCaseString: string) => {
   const sentence = capitalizedWords.join(' ');
   return sentence;
 };
+
+export const convertCamelCaseToSentence = (camelCaseText: string) => {
+  const sentence = camelCaseText.replace(/([a-z])([A-Z])/g, '$1 $2');
+
+  return sentence.charAt(0).toUpperCase() + sentence.slice(1);
+};
