@@ -162,6 +162,11 @@ const TransactionsTable = (props: TransactionTableProps) => {
                 successful
               </Tag>
             )}
+            {text === 'processing' && (
+              <Tag className="mx-auto" color="processing">
+                Processing
+              </Tag>
+            )}
             {text === 'failed' && <Tag color="error">Failed</Tag>}
           </div>
         );
@@ -198,7 +203,11 @@ const TransactionsTable = (props: TransactionTableProps) => {
     onClick: () => handleRowClick(record),
   });
   return (
-    <div className="shadow-sm border dark:border-gray-500 rounded-lg">
+    <div
+      className={`shadow-sm border ${
+        isEmpty(transactionsData) && 'mt-10'
+      } dark:border-gray-500 rounded-lg`}
+    >
       <Skeleton active loading={isLoadingTransactions} paragraph={{ rows: 8 }}>
         <Table
           size="large"
@@ -209,7 +218,9 @@ const TransactionsTable = (props: TransactionTableProps) => {
           className={'transaction-table dark:bg-zinc-800 rounded-lg'}
           onRow={rowClick}
           footer={() =>
-            !isEmpty(filter?.filterData) ? <TableFooter handleSendMail={handleSendMail} /> : null
+            !isEmpty(filter?.filterData) && !isEmpty(transactionsData) ? (
+              <TableFooter handleSendMail={handleSendMail} />
+            ) : null
           }
           loading={isLoadingTransactions || isTransactionFetching}
         />

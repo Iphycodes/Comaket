@@ -4,7 +4,7 @@ import { Button, Drawer, message } from 'antd';
 import { capitalize, pick } from 'lodash';
 import { TransactionReceipt } from '@grc/_shared/components/transaction-receipt';
 import { omit } from 'lodash';
-import { getDate, numberFormat, truncate } from '@grc/_shared/helpers';
+import { convertCamelCaseToSentence, getDate, numberFormat, truncate } from '@grc/_shared/helpers';
 import { Fragment } from 'react';
 
 interface AdvancedTransactionProps {
@@ -14,12 +14,6 @@ interface AdvancedTransactionProps {
 }
 
 const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTransactionProps) => {
-  function convertCamelCaseToSentence(camelCaseText: string) {
-    const sentence = camelCaseText.replace(/([a-z])([A-Z])/g, '$1 $2');
-
-    return sentence.charAt(0).toUpperCase() + sentence.slice(1);
-  }
-
   const onreferenceCopy = () => {
     message.success('Reference copied', 5);
   };
@@ -75,9 +69,15 @@ const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTr
                                       {convertCamelCaseToSentence(ky3)}
                                     </span>
                                   </div>
-                                  <span className="font-semibold">
-                                    {convertCamelCaseToSentence(`${val3}`)}
-                                  </span>
+                                  <>
+                                    {ky3 === 'date' || ky3 === 'createdAt' ? (
+                                      <span className="font-semibold">{getDate(`${value}`)}</span>
+                                    ) : (
+                                      <span className="font-semibold">
+                                        {convertCamelCaseToSentence(`${val3}`)}
+                                      </span>
+                                    )}
+                                  </>
                                 </div>
                               );
                             })}
@@ -93,7 +93,7 @@ const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTr
                             </span>
                             <span className="text-[16px]">{convertCamelCaseToSentence(ky)}</span>
                           </div>
-                          {ky === 'date' ? (
+                          {ky === 'date' || ky === 'createdAt' ? (
                             <span className="font-semibold">{getDate(`${val}`)}</span>
                           ) : (
                             <span className="font-semibold">
@@ -120,19 +120,19 @@ const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTr
                   </span>
                 </div>
                 <div className="flex text-right justify-end">
-                  {key === 'date' ? (
+                  {key === 'date' || key === 'createdAt' ? (
                     <span className="font-semibold">{getDate(`${value}`)}</span>
                   ) : (
                     <>
-                      {key === 'amount' ? (
+                      {key === 'amount' || key === 'fee' ? (
                         <span className="font-semibold text-right">
                           {numberFormat(value / 100, '₦ ')}
                         </span>
                       ) : (
                         <>
-                          {key === 'reference' ? (
+                          {key === 'reference' || key === 'narration' ? (
                             <div>
-                              {truncate(`${value}`, 10)}{' '}
+                              {truncate(`${value}`, 15)}{' '}
                               <span>
                                 <i
                                   className="ri-file-copy-line mb-1 text-[18px] hover:text-blue cursor-pointer"

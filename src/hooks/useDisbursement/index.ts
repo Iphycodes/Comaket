@@ -39,7 +39,7 @@ export const useDisbursement = ({
 
   useEffect(() => {
     if (callDisbursementAnalytics) triggerDisbursmentAnalytics(disbursementParams);
-  }, [callDisbursementAnalytics]);
+  }, [callDisbursementAnalytics, walletId]);
 
   return {
     disbursementAnalyticsData,

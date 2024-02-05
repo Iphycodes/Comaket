@@ -1,5 +1,7 @@
-import { Drawer } from 'antd';
-import React, { Dispatch, SetStateAction } from 'react';
+import { convertCamelCaseToSentence, getDate, numberFormat, truncate } from '@grc/_shared/helpers';
+import { Drawer, message } from 'antd';
+import { capitalize, pick } from 'lodash';
+import React, { Dispatch, Fragment, SetStateAction } from 'react';
 
 interface DisbursementDrawerProps {
   selectedRecord: Record<string, any>;
@@ -17,6 +19,10 @@ const DisbursementDrawer: React.FC<DisbursementDrawerProps> = ({
     setOpen(false);
   };
 
+  const onreferenceCopy = () => {
+    message.success('Reference copied', 5);
+  };
+
   return (
     <Drawer
       closeIcon={false}
@@ -30,73 +36,127 @@ const DisbursementDrawer: React.FC<DisbursementDrawerProps> = ({
           <i className="ri-close-fill cursor-pointer text-[22px]"></i>
         </span>
       </div>
-      <div className="w-full p-5 flex flex-col gap-3">
-        {Object.entries(selectedRecord).map(([key, value]) => {
-          // typeof value === 'object' ?
-          if (Array.isArray(value)) {
+      <div className="w-full p-5 mb-14 flex flex-col gap-3">
+        {Object.entries(selectedRecord).map(([key, value], index) => {
+          if (typeof value === 'object') {
             return (
-              <div key={key} className="flex flex-col gap-2 w-full">
-                <div className="">
-                  <div className="flex items-center gap-1 text-gray-500">
-                    <i className="ri-group-line text-[20px]"></i>
-                    <span>{key}</span>
-                  </div>
+              <Fragment key={`${key}-${value}-${index}`}>
+                <div className="mt-4">
+                  <span className="text-[18px]">{capitalize(key).toUpperCase()}</span>
                 </div>
-                <div className="flex flex-col w-full gap-2">
-                  {value.map((item, idx) => {
-                    if (typeof item === 'object') {
+                <hr />
+                <div className="flex flex-col gap-2">
+                  {Object.entries(
+                    key === 'beneficiary'
+                      ? pick(value, ['accountNumber', 'accountName', 'bankName'])
+                      : key === 'source'
+                        ? pick(value, ['accountNumber', 'accountName', 'bankName'])
+                        : {}
+                  ).map(([ky, val]) => {
+                    if (typeof val === 'object') {
                       return (
-                        <div key={key} className="border-b-2 py-3">
-                          {Object.entries(item).map(([key, value]) => {
-                            return (
-                              <div key={idx} className="flex justify-between items-center">
-                                <span>{key}</span>
-                                <span className="font-semibold">{`${value}`}</span>
-                              </div>
-                            );
-                          })}
+                        <Fragment key={`${ky}-${val}-${index}`}>
+                          <div className="mt-1">
+                            <span className="text-[16px]">{capitalize(ky)}</span>
+                          </div>
+                          <div className="flex flex-col gap-2">
+                            {Object.entries(value).map(([ky3, val3], index) => {
+                              return (
+                                <div
+                                  key={`${ky3}-${val3}-${index}`}
+                                  className="flex justify-between gap-5 items-center"
+                                >
+                                  <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
+                                    <span>
+                                      <i className="ri-circle-fill text-[8px]"></i>
+                                    </span>
+                                    <span className="text-[16px]">
+                                      {convertCamelCaseToSentence(ky3)}
+                                    </span>
+                                  </div>
+                                  <>
+                                    {ky3 === 'date' || ky3 === 'createdAt' ? (
+                                      <span className="font-semibold">{getDate(`${value}`)}</span>
+                                    ) : (
+                                      <span className="font-semibold">
+                                        {convertCamelCaseToSentence(`${val3}`)}
+                                      </span>
+                                    )}
+                                  </>
+                                </div>
+                              );
+                            })}
+                          </div>
+                        </Fragment>
+                      );
+                    } else {
+                      return (
+                        <div key={ky} className="flex justify-between gap-5 items-center">
+                          <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
+                            <span>
+                              <i className="ri-circle-fill text-[8px]"></i>
+                            </span>
+                            <span className="text-[16px]">{convertCamelCaseToSentence(ky)}</span>
+                          </div>
+                          {ky === 'date' || ky === 'createdAt' ? (
+                            <span className="font-semibold">{getDate(`${val}`)}</span>
+                          ) : (
+                            <span className="font-semibold">
+                              {convertCamelCaseToSentence(`${val}`)}
+                            </span>
+                          )}
                         </div>
                       );
                     }
-                    // If item is not an object, you may want to handle it differently or skip it
                   })}
                 </div>
-              </div>
+              </Fragment>
             );
-          }
-          if (Array.isArray(value) === false) {
+          } else if (Array.isArray(value)) {
+          } else {
             return (
-              <div key={key} className="flex justify-between items-center">
-                <div className="flex items-center gap-1 text-gray-500">
+              <div key={key} className="flex justify-between gap-5 items-center">
+                <div className="flex items-center gap-1 text-gray-500 dark:text-gray-400">
                   <span>
-                    {(() => {
-                      switch (key) {
-                        case 'type':
-                          return <i className="ri-exchange-funds-line text-[20px]"></i>;
-                        case 'reciepient':
-                          return <i className="ri-user-line text-[20px]"></i>;
-                        case 'sessionId':
-                          return <i className="ri-timeline-view text-[20px]"></i>;
-                        case 'date':
-                          return <i className="ri-calendar-schedule-line text-[20px]"></i>;
-                        case 'key':
-                          return <i className="ri-key-2-fill text-[20px]"></i>;
-                        case 'reciepientBank':
-                          return <i className="ri-bank-line text-[20px]"></i>;
-                        case 'reciepientAccountStatus':
-                          return <i className="ri-bard-line text-[20px]"></i>;
-                        case 'amount':
-                          return <i className="ri-wallet-2-line text-[20px]"></i>;
-                        case 'time':
-                          return <i className="ri-time-line text-[20px]"></i>;
-                        default:
-                          return <i className="ri-rest-time-line text-[20px]"></i>;
-                      }
-                    })()}
+                    <i className="ri-circle-fill text-[8px]"></i>
                   </span>
-                  <span className="text-[16px]">{key}</span>
+                  <span className="text-[16px]">
+                    {key == 'createdAt' ? 'Date' : convertCamelCaseToSentence(key)}
+                  </span>
                 </div>
-                <span className="font-semibold">{`${value}`}</span>
+                <div className="flex text-right justify-end">
+                  {key === 'date' || key === 'createdAt' ? (
+                    <span className="font-semibold">{getDate(`${value}`)}</span>
+                  ) : (
+                    <>
+                      {key === 'amount' || key === 'fee' ? (
+                        <span className="font-semibold text-right">
+                          {numberFormat(value / 100, '₦ ')}
+                        </span>
+                      ) : (
+                        <>
+                          {key === 'reference' || key === 'narration' ? (
+                            <div>
+                              {truncate(`${value}`, 15)}{' '}
+                              <span>
+                                <i
+                                  className="ri-file-copy-line mb-1 text-[18px] hover:text-blue cursor-pointer"
+                                  onClick={() =>
+                                    navigator.clipboard.writeText(value).then(onreferenceCopy)
+                                  }
+                                ></i>
+                              </span>
+                            </div>
+                          ) : (
+                            <span className="font-semibold text-right">
+                              {convertCamelCaseToSentence(`${value}`)}
+                            </span>
+                          )}
+                        </>
+                      )}
+                    </>
+                  )}
+                </div>
               </div>
             );
           }

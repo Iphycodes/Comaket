@@ -78,11 +78,11 @@ export const useTransaction = ({
 
   useEffect(() => {
     if (callTransactionAnalytics) triggerTransactionAnalytics(params);
-  }, [callTransactionAnalytics]);
+  }, [callTransactionAnalytics, walletId]);
 
   useEffect(() => {
     if (callAllTransactions) triggerAllTransactions(transParams);
-  }, [callAllTransactions, JSON.stringify(transParams)]);
+  }, [callAllTransactions, JSON.stringify(transParams), walletId]);
 
   const handleSendMail = () => {
     triggerMailTransactions(mailParams).then(() => {

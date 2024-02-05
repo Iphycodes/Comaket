@@ -137,6 +137,10 @@ const DashBoard = (props: DashBoardProps) => {
     push('/apps/giro-pay/transactions');
   };
 
+  const handleSendMoney = () => {
+    push('disbursements', {});
+  };
+
   return (
     <>
       <motion.div
@@ -247,7 +251,7 @@ const DashBoard = (props: DashBoardProps) => {
                             <QuickActionBtn
                               title="send money"
                               icon={<CoinIcon />}
-                              handleClick={() => setToggleDisbursement(true)}
+                              handleClick={() => handleSendMoney()}
                             />
                           </div>
                         </div>

@@ -1,5 +1,3 @@
-import { Space } from 'antd';
-import { Wallet as WalletIcon } from '@grc/_shared/assets/svgs';
 import { numberFormat } from '@grc/_shared/helpers';
 
 interface BalanceCardProps {
@@ -15,14 +13,10 @@ const BalanceCard = ({ availableBalance, walletDetails }: BalanceCardProps) => {
           {walletDetails}
         </div>
         <div className="flex flex-col gap-2">
-          <Space size={5}>
-            <WalletIcon />
-            <span>Account Balance :</span>
-          </Space>
           <div className="text-4xl font-bold">
             {availableBalance ? numberFormat(availableBalance / 100, '₦ ') : '₦ 0.00'}
           </div>
-          <div className="font-thin">Total Balance from this account</div>
+          <div className="font-thin">Total Withdrawable balance from this account</div>
         </div>
       </div>
     </div>

@@ -127,14 +127,13 @@ const Transactions = ({
           );
         })}
       </Row>
-      {!isEmpty(transactionsData) && (
-        <div className="w-full flex gap-3 items-center justify-end">
-          <TopBar
-            setSearchValue={setSearchValue}
-            handleDrawerToggle={() => handleDrawerToggle(true)}
-          />
-        </div>
-      )}
+      <div className="w-full flex gap-3 items-center justify-end">
+        <TopBar
+          transactionsData={transactionsData}
+          setSearchValue={setSearchValue}
+          handleDrawerToggle={() => handleDrawerToggle(true)}
+        />
+      </div>
       <TransactionsTable
         isTransactionFetching={isFetchingTransaction}
         handleSendMail={handleSendMail}

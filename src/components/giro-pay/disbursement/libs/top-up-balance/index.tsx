@@ -34,7 +34,7 @@ const TopUpBalance = ({ wallet }: TopUpBalanceProps) => {
         </Space>
       </div>
       <div className="py-4 text-muted-foreground font-semibold">
-        Transfer Funds to the wallet below, to top up your balance.
+        Transfer funds to the wallet below, to top up your balance.
       </div>
       <div className="flex flex-col gap-2 py-3 border-y-2">
         <Row className="flex items-center">

@@ -49,7 +49,7 @@ const TopButtons = ({ setModalOpen, setModalElement }: TopButtonsProps) => {
         onClick={() => handleButtonClick('batch-payout')}
         className="opacity-100 font-normal dark:border dark:border-gray-500 bg-gray-800 text-white h-12"
         type="primary"
-        disabled={false}
+        disabled={true}
         loading={false}
       >
         <div className="flex items-center gap-2">

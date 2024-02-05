@@ -87,8 +87,8 @@ const RecentDisbursements: React.FC<RecentDisbursementsProps> = ({
         loading={false}
         locale={{
           emptyText: (
-            <div className="text-gray-500 dark:text-gray-500 w-full min-h-full flex items-center justify-center gap-5 mt-8 px-10 flex-col text-center">
-              <div>No Disbursements Record Available</div>
+            <div className="text-gray-500 dark:text-gray-500 w-full min-h-full flex text-left items-start gap-2 mt-5 px-10 pl-0 flex-col">
+              <div>No Disbursements Records Available</div>
               <div>
                 Disbursement insight will be shown here once you create a virtual account and
                 commence pay-ins and pay-outs
@@ -114,7 +114,7 @@ const RecentDisbursements: React.FC<RecentDisbursementsProps> = ({
           return (
             <List.Item
               onClick={() => handleItemClick(item)}
-              className="px-0 cursor-pointer"
+              className="px-0 cursor-pointer hover:bg-gray-100 dark:hover:bg-gray-900"
               key={index}
             >
               <div className="w-full flex justify-between items-center text-left p-2">

@@ -137,7 +137,7 @@ const FilterDrawer = (props: FilterDrawerProps) => {
             <Form.Item
               className="w-full"
               name="beneficiary.accountNumber"
-              rules={[{ required: false }]}
+              rules={[{ required: false, pattern: /^\d{10,}$/, message: 'Input account number' }]}
             >
               <Input size="large" className="w-full rounded-lg" />
             </Form.Item>
