@@ -9,7 +9,7 @@ import {
 import { message } from 'antd';
 import { useEffect } from 'react';
 import { useAuth } from '../useAuth';
-import { usePagination } from '../usePagination';
+import { usePagination } from '../usePagination/index';
 import { Pagination } from '@grc/_shared/namespace';
 
 interface useTransactionProps {
