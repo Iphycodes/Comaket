@@ -10,7 +10,7 @@ import TopUpBalance from './libs/top-up-balance';
 import SinglePayout from './libs/single-payout';
 import BatchPayout from './libs/batch-payout';
 import { CloseIcon } from '@grc/_shared/assets/svgs';
-import { numberFormat } from '@grc/_shared/helpers';
+import { camelCaseToSentence, numberFormat } from '@grc/_shared/helpers';
 import { IBalance, IBanks, WalletNamespace } from '@grc/_shared/namespace/wallet';
 import { motion } from 'framer-motion';
 import { capitalize, omit, startCase } from 'lodash';
@@ -45,6 +45,8 @@ type DisbursementProps = {
   singlePayoutSteps: 'step1' | 'step2' | 'step3' | 'step4';
   handleVerifyUser: (values: Record<string, any>) => void;
   beneficiaryAccounts: Array<Record<string, any>>;
+  disbursementAnalyticsData: Record<string, any>[] | any;
+  recentDisbursementData: Record<string, any>[] | any;
   payoutSuccessData: Record<string, any>;
 };
 
@@ -66,6 +68,8 @@ const Disbursement = (props: DisbursementProps) => {
     singlePayoutSteps,
     setSinglePayoutSteps,
     beneficiaryAccounts,
+    disbursementAnalyticsData,
+    recentDisbursementData,
     payoutSuccessData,
   } = props;
   const [open, setOpen] = useState<boolean>(false);
@@ -96,32 +100,49 @@ const Disbursement = (props: DisbursementProps) => {
     }
   }, [form, bankDetails?.accountName, modalElement]);
 
-  const mockPayoutsData = [
-    {
-      color: 'green',
-      title: 'Total Single Payout',
-      percentage: 40,
-      value: 200000,
-    },
-    {
-      color: 'rgb(30 136 229)',
-      title: 'Total Batch Payout',
-      percentage: 20,
-      value: 350000,
-    },
-    {
-      color: '#C9DE00',
-      title: 'Total Pending Payout',
-      percentage: 29.5,
-      value: 55000,
-    },
-    {
-      color: '#B21F00',
-      title: 'Total Failed Payout',
-      percentage: 29.5,
-      value: 16000,
-    },
-  ];
+  const getDisbursementAnalyticsCardsColor = (label: string) => {
+    switch (label) {
+      case 'totalSuccessfulTransactions':
+        return 'green';
+      case 'totalProcessingTransactions':
+        return '#C9DE00';
+      case 'totalFailedTransactions':
+        return '#B21F00';
+      case 'totalSingleDisbursements':
+        return 'rgb(30 136 229)';
+      case 'totalBatchDisbursements':
+        return 'lightblue';
+      default:
+        return 'pink';
+    }
+  };
+
+  // const mockPayoutsData = [
+  //   {
+  //     color: 'green',
+  //     title: 'Total Single Payout',
+  //     percentage: 40,
+  //     value: 200000,
+  //   },
+  //   {
+  //     color: 'rgb(30 136 229)',
+  //     title: 'Total Batch Payout',
+  //     percentage: 20,
+  //     value: 350000,
+  //   },
+  //   {
+  //     color: '#C9DE00',
+  //     title: 'Total Pending Payout',
+  //     percentage: 29.5,
+  //     value: 55000,
+  //   },
+  //   {
+  //     color: '#B21F00',
+  //     title: 'Total Failed Payout',
+  //     percentage: 29.5,
+  //     value: 16000,
+  //   },
+  // ];
 
   return (
     <>
@@ -150,26 +171,37 @@ const Disbursement = (props: DisbursementProps) => {
           </div>
           <div className="w-full flex flex-col gap-5">
             <div className="flex w-full gap-5 justify-between flex-wrap">
-              {mockPayoutsData.map(({ color, title, percentage, value }, idx) => {
+              {disbursementAnalyticsData?.map((disbursmentAnalyticsItem: any, idx: any) => {
                 return (
-                  <TransactionStatisticsCard
-                    key={`${idx}`}
-                    style={{ flex: 1 }}
-                    color={color}
-                    title={title}
-                    percentage={percentage}
-                    value={value}
-                  />
+                  <>
+                    {disbursmentAnalyticsItem?.label !== 'totalDisbursements' && (
+                      <TransactionStatisticsCard
+                        key={`${idx}`}
+                        style={{ flex: 1 }}
+                        color={
+                          getDisbursementAnalyticsCardsColor(disbursmentAnalyticsItem?.label) ??
+                          'blue'
+                        }
+                        title={camelCaseToSentence(disbursmentAnalyticsItem?.label) ?? ''}
+                        percentage={disbursmentAnalyticsItem?.percent ?? 0}
+                        value={disbursmentAnalyticsItem?.value ?? 0}
+                      />
+                    )}
+                  </>
                 );
               }, [])}
             </div>
             <div className="w-full flex gap-5">
               <div className="recent-disbursement" style={{ flex: 6 }}>
                 {/* <DisbursementHistory /> */}
-                <RecentDisbursements setOpen={setOpen} setSelectedRecord={setSelectedRecord} />
+                <RecentDisbursements
+                  setOpen={setOpen}
+                  setSelectedRecord={setSelectedRecord}
+                  recentDisbursementData={recentDisbursementData}
+                />
               </div>
               <div className="flex h-96" style={{ flex: 5 }}>
-                <PieChartAnaytics />
+                <PieChartAnaytics disbursementAnalyticsData={disbursementAnalyticsData} />
               </div>
             </div>
           </div>

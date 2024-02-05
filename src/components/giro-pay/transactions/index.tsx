@@ -10,6 +10,7 @@ import TransactionStatisticsCard from '../disbursement/libs/transaction-statisti
 import { WalletNamespace } from '@grc/_shared/namespace/wallet';
 import { Col, Row } from 'antd';
 import { Pagination } from '@grc/_shared/namespace';
+import { camelCaseToSentence } from '@grc/_shared/helpers';
 import { AppContext } from '@grc/app-context';
 import { isEmpty } from 'lodash';
 
@@ -73,13 +74,6 @@ const Transactions = ({
     }
   };
 
-  function camelCaseToSentence(camelCaseString: string) {
-    const words = camelCaseString.split(/(?=[A-Z])/);
-    const capitalizedWords = words.map((word) => word.charAt(0).toUpperCase() + word.slice(1));
-    const sentence = capitalizedWords.join(' ');
-    return sentence;
-  }
-
   const getAnalyticColor = (key: string) => {
     let color = '';
     if (key === 'totalTransactions') {
@@ -133,12 +127,14 @@ const Transactions = ({
           );
         })}
       </Row>
-      <div className="w-full flex gap-3 items-center justify-end">
-        <TopBar
-          setSearchValue={setSearchValue}
-          handleDrawerToggle={() => handleDrawerToggle(true)}
-        />
-      </div>
+      {!isEmpty(transactionsData) && (
+        <div className="w-full flex gap-3 items-center justify-end">
+          <TopBar
+            setSearchValue={setSearchValue}
+            handleDrawerToggle={() => handleDrawerToggle(true)}
+          />
+        </div>
+      )}
       <TransactionsTable
         isTransactionFetching={isFetchingTransaction}
         handleSendMail={handleSendMail}

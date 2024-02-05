@@ -252,15 +252,16 @@ const SinglePayoutForm = ({
           </Row>
         )}
 
-        <div className="flex items-center justify-end bottom-0">
+        <div className={`flex items-center ${!showSaveBeneficiary && 'mt-4'} justify-end bottom-0`}>
           <Button
             className="opacity-100 hover:opacity-95 font-normal bg-blue text-white h-12"
             type="primary"
             disabled={false}
             loading={false}
             htmlType="submit"
+            block={true}
           >
-            <div className="flex items-center gap-2">
+            <div className="flex w-full items-center justify-center gap-2">
               <span>Proceed to Payment</span>
               <span>
                 <i className="ri-arrow-drop-right-line text-[25px]"></i>

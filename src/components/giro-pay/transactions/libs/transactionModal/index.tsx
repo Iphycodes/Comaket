@@ -1,11 +1,12 @@
 'use client';
 
 import { capitalize } from 'lodash';
-import { Button, Modal, Space, Tag } from 'antd';
+import { Button, Modal, Space, Tag, message } from 'antd';
 import { GrTransaction } from 'react-icons/gr';
 import { DownloadOutlined } from '@ant-design/icons';
 import { TransactionReceipt } from '@grc/_shared/components/transaction-receipt';
 import { omit } from 'lodash';
+import { numberFormat, truncate } from '@grc/_shared/helpers';
 
 interface TransactionModalProps {
   transactionItem: Record<string, any>;
@@ -31,6 +32,10 @@ const TransactionModal = (props: TransactionModalProps) => {
     return formattedDate;
   };
 
+  const onReferenceCopy = () => {
+    message.success('Reference Copied to Clipboard');
+  };
+
   return (
     <Modal width={'600px'} title={``} open={isModalOpen} onCancel={handleCancel} footer={null}>
       <div className="w-full mt-8 flex flex-col gap-2">
@@ -47,7 +52,7 @@ const TransactionModal = (props: TransactionModalProps) => {
             </span>
           </Space>
           <span className="text-[24px] font-bold">
-            {`${transactionItem?.currency === 'NGN' && '\u20A6'}${transactionItem?.amount}` ?? ''}
+            {`${numberFormat(transactionItem?.amount / 100, '₦ ')}`}
           </span>
         </div>
         <div className="flex relative items-center justify-center">
@@ -93,7 +98,17 @@ const TransactionModal = (props: TransactionModalProps) => {
         <hr className="w-full my-4 border" />
         <div className="flex justify-between items-center">
           <span className="text-[16px] text-gray-500">Reference:</span>
-          <span className="font-semibold">{transactionItem?.reference ?? ''}</span>
+          <span>
+            {truncate(`${transactionItem?.reference}`, 10)}{' '}
+            <span>
+              <i
+                className="ri-file-copy-line mb-1 text-[18px] hover:text-blue cursor-pointer"
+                onClick={() =>
+                  navigator.clipboard.writeText(transactionItem?.reference).then(onReferenceCopy)
+                }
+              ></i>
+            </span>
+          </span>
         </div>
         <Button
           className="opacity-100 bg-blue hover:opacity-95 font-semibold mt-3 text-white h-12"

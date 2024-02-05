@@ -1,6 +1,6 @@
 'use client';
 
-import { Button, Drawer } from 'antd';
+import { Button, Drawer, message } from 'antd';
 import { capitalize, pick } from 'lodash';
 import { TransactionReceipt } from '@grc/_shared/components/transaction-receipt';
 import { omit } from 'lodash';
@@ -20,6 +20,9 @@ const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTr
     return sentence.charAt(0).toUpperCase() + sentence.slice(1);
   }
 
+  const onreferenceCopy = () => {
+    message.success('Reference copied', 5);
+  };
   return (
     <Drawer
       closeIcon={false}
@@ -128,7 +131,17 @@ const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTr
                       ) : (
                         <>
                           {key === 'reference' ? (
-                            <div>{truncate(`${value}`, 10)}</div>
+                            <div>
+                              {truncate(`${value}`, 10)}{' '}
+                              <span>
+                                <i
+                                  className="ri-file-copy-line mb-1 text-[18px] hover:text-blue cursor-pointer"
+                                  onClick={() =>
+                                    navigator.clipboard.writeText(value).then(onreferenceCopy)
+                                  }
+                                ></i>
+                              </span>
+                            </div>
                           ) : (
                             <span className="font-semibold text-right">
                               {convertCamelCaseToSentence(`${value}`)}
@@ -168,7 +181,6 @@ const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTr
                     : selectedRecord?.source?.bankName,
                 entry: selectedRecord?.entry,
               },
-              // setLoading,
             })
           }
         >

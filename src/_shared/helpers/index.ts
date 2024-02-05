@@ -209,11 +209,16 @@ export const generateChartData = (cashFlowBreakdown: {
   return chartData;
 };
 
-export const generateDisbursementData = (data: { label: string; value: number }[]) => {
+export const generateDisbursementData = (
+  data: { label: string; value: number }[] | Record<string, any>[]
+) => {
   const transformedLabel: Record<string, any> = {
     totalSuccessfulDisbursements: 'Successful Disbursements',
     totalProcessingDisbursements: 'Processing Disbursements',
     totalFailedDisbursements: 'Failed Disbursements',
+    totalSuccessfulTransactions: 'Successful Disbursements',
+    totalProcessingTransactions: 'Processing Disbursements',
+    totalFailedTransactions: 'Failed Disbursements',
   };
   const labels = data.map(({ label }) => transformedLabel[label]);
   const disBursementData = data.map(({ value }) => value);
@@ -239,13 +244,21 @@ export const generateDisbursementData = (data: { label: string; value: number }[
     ],
   };
   if (
-    formattedData.datasets &&
-    formattedData.datasets[0].data[0] === 0 &&
-    formattedData.datasets[0].data[1] === 0 &&
-    formattedData.datasets[0].data[2] === 0
+    (formattedData.datasets &&
+      formattedData.datasets[0].data[0] === 0 &&
+      formattedData.datasets[0].data[1] === 0 &&
+      formattedData.datasets[0].data[2] === 0) ||
+    isEmpty(disBursementData)
   ) {
     return emptyDoughnutChartData;
   }
 
   return formattedData;
+};
+
+export const camelCaseToSentence = (camelCaseString: string) => {
+  const words = camelCaseString.split(/(?=[A-Z])/);
+  const capitalizedWords = words.map((word) => word.charAt(0).toUpperCase() + word.slice(1));
+  const sentence = capitalizedWords.join(' ');
+  return sentence;
 };
