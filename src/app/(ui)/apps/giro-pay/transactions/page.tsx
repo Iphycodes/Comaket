@@ -2,15 +2,21 @@
 
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 import { WithLoaderRender } from '@grc/_shared/components/with-app-loder';
+import { AppContext } from '@grc/app-context';
 import Transactions from '@grc/components/giro-pay/transactions';
 import { useTransaction } from '@grc/hooks/useTransaction';
 import { useWallet } from '@grc/hooks/useWallet';
 import { useTheme } from 'next-themes';
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 
 const TransactionPage = () => {
   const [filter, setFilter] = useState<{ filterData: Record<string, any> }>({ filterData: {} });
   const [searchValue, setSearchValue] = useState<string>('');
+  const { setToggleSider } = useContext(AppContext);
+
+  useEffect(() => {
+    setToggleSider(true);
+  }, []);
 
   const {
     transactionAnalyticsData,

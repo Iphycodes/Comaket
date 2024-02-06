@@ -29,9 +29,10 @@ const DisbursementPage = () => {
   const { searchValue, debouncedChangeHandler } = useSearch();
   const [bankCode, setBankCode] = useState('');
   const receivedBankCode = bankCode?.split('-')?.[1];
-  const { disbursementAnalyticsData, recentDisbursementsData } = useDisbursement({
-    callDisbursementAnalytics: true,
-  });
+  const { disbursementAnalyticsData, recentDisbursementsData, getDisbursementAnalyicsResponse } =
+    useDisbursement({
+      callDisbursementAnalytics: true,
+    });
 
   const {
     walletsResponse,
@@ -59,6 +60,7 @@ const DisbursementPage = () => {
     callAllBankAccount: modalElement === 'single-payout',
   });
 
+  const isLoadingDisbursements = getDisbursementAnalyicsResponse?.isLoading;
   const isLoadingWallets = walletsResponse.isLoading;
   const isLoadingTotalBalance = totalBalanceResponse.isLoading;
   const isLoadingBanks = banksResponse.isLoading;
@@ -68,6 +70,7 @@ const DisbursementPage = () => {
   const isPayoutLoading = singlePayoutResponse.isLoading || batchPayoutResponse.isLoading;
   const payoutSuccessData = singlePayoutResponse?.data?.data;
   const totalBalance = !isEmpty(allTotalBalance) && transactionBal(allTotalBalance);
+  const { setToggleSider } = useContext(AppContext);
 
   const handleVerifyUser = (values: Record<string, any>) => {
     verifyUser({
@@ -125,6 +128,10 @@ const DisbursementPage = () => {
   };
 
   useEffect(() => {
+    setToggleSider(true);
+  }, []);
+
+  useEffect(() => {
     if (searchValue?.toString()?.length === 10 && !isEmpty(bankCode)) {
       const payload = {
         accountNumber: searchValue?.toString(),
@@ -151,7 +158,7 @@ const DisbursementPage = () => {
 
   return (
     <WithLoaderRender
-      loading={isLoadingWallets || isLoadingTotalBalance}
+      loading={isLoadingWallets || isLoadingTotalBalance || isLoadingDisbursements}
       mobileResponsive={mobileResponsive}
       theme={theme}
     >

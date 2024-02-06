@@ -13,8 +13,13 @@ import { AppContext } from '@grc/app-context';
 import { useRouter } from 'next/navigation';
 import { getFirstCharacter, getRandomColorByString } from '@grc/_shared/helpers';
 import * as _ from 'lodash';
-import { UserOutlined, LogoutOutlined } from '@ant-design/icons';
-import { PasswordIcon } from '@grc/_shared/assets/svgs';
+import {
+  UserOutlined,
+  LogoutOutlined,
+  ToolOutlined,
+  FileDoneOutlined,
+  LockOutlined,
+} from '@ant-design/icons';
 import { useTheme } from 'next-themes';
 
 const { Header } = Layout;
@@ -69,12 +74,36 @@ export const AppHeader = (props: AppHeaderProps) => {
               onClick={() => handleMenuClick('change-password')}
             >
               <Space className="p-1" size={15}>
-                <PasswordIcon />
+                <LockOutlined />
                 <span>Change Password</span>
               </Space>
             </div>
           </>
         )}
+        <>
+          {isMobile && (
+            <>
+              <div
+                className="cursor-pointer rounded-sm px-3 py-1 hover:bg-gray-100 dark:hover:bg-zinc-400"
+                onClick={() => handleMenuClick('logout')}
+              >
+                <Space className="p-1" size={15}>
+                  <FileDoneOutlined />
+                  <span>Api Document</span>
+                </Space>
+              </div>
+              <div
+                className="cursor-pointer rounded-sm px-3 py-1 hover:bg-gray-100 dark:hover:bg-zinc-400"
+                onClick={() => handleMenuClick('logout')}
+              >
+                <Space className="p-1" size={15}>
+                  <ToolOutlined />
+                  <span>For Developers</span>
+                </Space>
+              </div>
+            </>
+          )}
+        </>
 
         <div
           className="cursor-pointer rounded-sm px-3 py-1 hover:bg-gray-100 dark:hover:bg-zinc-400"
@@ -82,12 +111,12 @@ export const AppHeader = (props: AppHeaderProps) => {
         >
           <Space className="p-1" size={15}>
             <LogoutOutlined />
-            <span>Logout</span>
+            <span>Logouts</span>
           </Space>
         </div>
       </div>
     );
-  }, []);
+  }, [isMobile]);
 
   return (
     <Header

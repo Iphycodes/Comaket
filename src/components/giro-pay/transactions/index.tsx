@@ -13,6 +13,7 @@ import { Pagination } from '@grc/_shared/namespace';
 import { camelCaseToSentence } from '@grc/_shared/helpers';
 import { AppContext } from '@grc/app-context';
 import { isEmpty } from 'lodash';
+import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 
 interface balanceProps {
   availableAmount: number;
@@ -51,6 +52,7 @@ const Transactions = ({
   const [drawerOpen, setDrawerOpen] = useState<boolean>(false);
   const [transactionDrawerOpen, setTransactionDrawerOpen] = useState<boolean>(false);
   const { selectedDashboardTransaction, setSelectedDashboardTransaction } = useContext(AppContext);
+  const isMobile = useMediaQuery(mediaSize.mobile);
 
   const walletDetails = `${wallet?.accountName} | ${wallet?.accountNumber} | ${wallet?.bankName}`;
 
@@ -80,7 +82,7 @@ const Transactions = ({
       color = 'skyblue';
     } else if (key === 'totalSuccessfulTransactions') {
       color = 'green';
-    } else if (key === 'totalPendingTransactions') {
+    } else if (key === 'totalProcessingTransactions') {
       color = 'orange';
     } else if (key === 'totalFailedTransactions') {
       color = 'red';
@@ -109,21 +111,24 @@ const Transactions = ({
         </Col>
         {(transactionAnalyticsData ?? []).map((transactionAnalyticsItem, idx) => {
           return (
-            <Fragment key={`${transactionAnalyticsItem}-${idx}`}>
+            <>
               {transactionAnalyticsItem?.label !== 'totalDisbursements' &&
                 transactionAnalyticsItem?.label !== 'totalTransactions' && (
-                  <Col key={idx} md={5} lg={5} xs={12}>
-                    <TransactionStatisticsCard
-                      key={`${idx}`}
-                      style={{ flex: 2 }}
-                      color={getAnalyticColor(transactionAnalyticsItem?.label)}
-                      title={camelCaseToSentence(transactionAnalyticsItem?.label)}
-                      percentage={transactionAnalyticsItem?.percent}
-                      value={transactionAnalyticsItem?.value}
-                    />
+                  <Col key={idx} md={5} lg={5} xs={8}>
+                    <Fragment key={`${transactionAnalyticsItem}-${idx}`}>
+                      <TransactionStatisticsCard
+                        isMobile={isMobile}
+                        key={`${idx}`}
+                        style={{ flex: 2 }}
+                        color={getAnalyticColor(transactionAnalyticsItem?.label)}
+                        title={camelCaseToSentence(transactionAnalyticsItem?.label)}
+                        percentage={transactionAnalyticsItem?.percent}
+                        value={transactionAnalyticsItem?.value}
+                      />
+                    </Fragment>
                   </Col>
                 )}
-            </Fragment>
+            </>
           );
         })}
       </Row>

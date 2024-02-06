@@ -18,7 +18,7 @@ const TopBar = ({ handleDrawerToggle, setSearchValue, transactionsData }: TopBar
 
   return (
     <div className="flex justify-between gap-3 items-center">
-      {!isEmpty(transactionsData) && !isEmpty() && (
+      {!isEmpty(transactionsData) && (
         <Input
           placeholder={'Search Transaction...'}
           size="large"

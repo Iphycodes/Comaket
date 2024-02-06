@@ -16,6 +16,11 @@ const DashboardPage = () => {
   const mobileResponsive = useMediaQuery(mediaSize.mobile);
   const [, setFilter] = useState('');
   const [openCreateModal, setOpenCreateModal] = useState(false);
+  const { setToggleSider } = useContext(AppContext);
+
+  useEffect(() => {
+    setToggleSider(true);
+  }, []);
   const {
     createWallet,
     createWalletResponse,

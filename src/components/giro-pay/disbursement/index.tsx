@@ -15,6 +15,7 @@ import { IBalance, IBanks, WalletNamespace } from '@grc/_shared/namespace/wallet
 import { motion } from 'framer-motion';
 import { capitalize, omit, startCase } from 'lodash';
 import { AppContext } from '@grc/app-context';
+import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 
 type DisbursementProps = {
   // openCreateModal: boolean;
@@ -77,6 +78,7 @@ const Disbursement = (props: DisbursementProps) => {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [paymentDetails, setPaymentDetails] = useState<Record<string, any>>({});
   const { payoutDetails, setPayoutdetails } = useContext(AppContext);
+  const mobileResponsive = useMediaQuery(mediaSize.mobile);
 
   const initialValues = {
     bankName: payoutDetails?.bankName || paymentDetails?.bankName || bankCode,
@@ -117,33 +119,6 @@ const Disbursement = (props: DisbursementProps) => {
     }
   };
 
-  // const mockPayoutsData = [
-  //   {
-  //     color: 'green',
-  //     title: 'Total Single Payout',
-  //     percentage: 40,
-  //     value: 200000,
-  //   },
-  //   {
-  //     color: 'rgb(30 136 229)',
-  //     title: 'Total Batch Payout',
-  //     percentage: 20,
-  //     value: 350000,
-  //   },
-  //   {
-  //     color: '#C9DE00',
-  //     title: 'Total Pending Payout',
-  //     percentage: 29.5,
-  //     value: 55000,
-  //   },
-  //   {
-  //     color: '#B21F00',
-  //     title: 'Total Failed Payout',
-  //     percentage: 29.5,
-  //     value: 16000,
-  //   },
-  // ];
-
   return (
     <>
       <motion.div
@@ -156,11 +131,6 @@ const Disbursement = (props: DisbursementProps) => {
         <div className="w-full flex flex-col gap-5">
           <div className="flex w-full justify-between items-center font-semibold pb-2 shadow-sm border-b-2 border-border/100">
             <div className="flex flex-col gap-1">
-              {/* <Space size={5}>
-              <WalletIcon />
-              <span>Account Balance :</span>
-            </Space> */}
-              {/* <div className="text-3xl font-bold">&#x20A6;2,500,000.00</div> */}
               <span className="text-4xl font-bold">
                 {balance ? numberFormat(balance.withdrawableAmount / 100, '₦ ') : '₦ 0.00'}
               </span>
@@ -176,6 +146,7 @@ const Disbursement = (props: DisbursementProps) => {
                   <>
                     {disbursmentAnalyticsItem?.label !== 'totalDisbursements' && (
                       <TransactionStatisticsCard
+                        isMobile={mobileResponsive}
                         key={`${idx}`}
                         style={{ flex: 1 }}
                         color={

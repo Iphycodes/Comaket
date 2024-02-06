@@ -7,7 +7,7 @@ import { ColumnsType } from 'antd/lib/table';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 import TableFooter from './libs/table-footer';
 import { isEmpty } from 'lodash';
-import { numberFormat } from '@grc/_shared/helpers';
+import { numberFormat, truncate } from '@grc/_shared/helpers';
 import { Pagination } from '@grc/_shared/namespace';
 
 interface TransactionTableProps {
@@ -98,10 +98,12 @@ const TransactionsTable = (props: TransactionTableProps) => {
         </span>
       ),
       dataIndex: 'reference',
+      width: '150px',
       key: 'reference',
       ellipsis: {
         showTitle: true,
       },
+      render: (text) => <span>{truncate(text, 10)}</span>,
     },
     {
       title: (
