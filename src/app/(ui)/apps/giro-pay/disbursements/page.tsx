@@ -70,7 +70,6 @@ const DisbursementPage = () => {
   const isPayoutLoading = singlePayoutResponse.isLoading || batchPayoutResponse.isLoading;
   const payoutSuccessData = singlePayoutResponse?.data?.data;
   const totalBalance = !isEmpty(allTotalBalance) && transactionBal(allTotalBalance);
-  const { setToggleSider } = useContext(AppContext);
 
   const handleVerifyUser = (values: Record<string, any>) => {
     verifyUser({
@@ -126,10 +125,6 @@ const DisbursementPage = () => {
       });
     }
   };
-
-  useEffect(() => {
-    setToggleSider(true);
-  }, []);
 
   useEffect(() => {
     if (searchValue?.toString()?.length === 10 && !isEmpty(bankCode)) {

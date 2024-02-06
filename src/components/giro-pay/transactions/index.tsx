@@ -137,6 +137,7 @@ const Transactions = ({
           transactionsData={transactionsData}
           setSearchValue={setSearchValue}
           handleDrawerToggle={() => handleDrawerToggle(true)}
+          filter={filter}
         />
       </div>
       <TransactionsTable
