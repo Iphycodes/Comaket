@@ -110,38 +110,40 @@ const TransactionModal = (props: TransactionModalProps) => {
             </span>
           </span>
         </div>
-        <Button
-          className="opacity-100 bg-blue hover:opacity-95 font-semibold mt-3 text-white h-12"
-          type="primary"
-          disabled={false}
-          loading={false}
-          onClick={() =>
-            TransactionReceipt({
-              successData: {
-                ...omit(transactionItem, ['source', 'beneficiary']),
-                accountName:
-                  transactionItem?.entry === 'debit'
-                    ? transactionItem?.beneficiary?.accountName
-                    : transactionItem?.source?.accountName,
-                accountNumber:
-                  transactionItem?.entry === 'debit'
-                    ? transactionItem?.beneficiary?.accountNumber
-                    : transactionItem?.source?.accountNumber,
-                bankName:
-                  transactionItem?.entry === 'debit'
-                    ? transactionItem?.beneficiary?.bankName
-                    : transactionItem?.source?.bankName,
-                entry: transactionItem?.entry,
-              },
-              // setLoading,
-            })
-          }
-        >
-          <div className="flex items-center gap-2 justify-center">
-            <DownloadOutlined className="text-[18px]" />
-            <span>Download Reciept</span>
-          </div>
-        </Button>
+        {(transactionItem?.status === 'successful' || transactionItem?.status === 'failed') && (
+          <Button
+            className="opacity-100 bg-blue hover:opacity-95 font-semibold mt-3 text-white h-12"
+            type="primary"
+            disabled={false}
+            loading={false}
+            onClick={() =>
+              TransactionReceipt({
+                successData: {
+                  ...omit(transactionItem, ['source', 'beneficiary']),
+                  accountName:
+                    transactionItem?.entry === 'debit'
+                      ? transactionItem?.beneficiary?.accountName
+                      : transactionItem?.source?.accountName,
+                  accountNumber:
+                    transactionItem?.entry === 'debit'
+                      ? transactionItem?.beneficiary?.accountNumber
+                      : transactionItem?.source?.accountNumber,
+                  bankName:
+                    transactionItem?.entry === 'debit'
+                      ? transactionItem?.beneficiary?.bankName
+                      : transactionItem?.source?.bankName,
+                  entry: transactionItem?.entry,
+                },
+                // setLoading,
+              })
+            }
+          >
+            <div className="flex items-center gap-2 justify-center">
+              <DownloadOutlined className="text-[18px]" />
+              <span>Download Reciept</span>
+            </div>
+          </Button>
+        )}
       </div>
     </Modal>
   );

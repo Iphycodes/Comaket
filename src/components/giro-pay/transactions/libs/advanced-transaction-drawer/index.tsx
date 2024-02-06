@@ -157,39 +157,41 @@ const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTr
           }
         })}
       </div>
-      <div className="w-full absolute bottom-0 px-3">
-        <Button
-          className="opacity-100 flex w-full items-center justify-center bg-blue hover:opacity-95 font-semibold mt-2 text-white h-14"
-          type="primary"
-          disabled={false}
-          loading={false}
-          onClick={() =>
-            TransactionReceipt({
-              successData: {
-                ...omit(selectedRecord, ['source', 'beneficiary']),
-                accountName:
-                  selectedRecord?.entry === 'debit'
-                    ? selectedRecord?.beneficiary?.accountName
-                    : selectedRecord?.source?.accountName,
-                accountNumber:
-                  selectedRecord?.entry === 'debit'
-                    ? selectedRecord?.beneficiary?.accountNumber
-                    : selectedRecord?.source?.accountNumber,
-                bankName:
-                  selectedRecord?.entry === 'debit'
-                    ? selectedRecord?.beneficiary?.bankName
-                    : selectedRecord?.source?.bankName,
-                entry: selectedRecord?.entry,
-              },
-            })
-          }
-        >
-          <div className="flex items-center mx-auto gap-2 justify-center">
-            <i className="ri-download-line text-[18px]"></i>
-            <span>Download Reciept</span>
-          </div>
-        </Button>
-      </div>
+      {(selectedRecord?.status === 'successful' || selectedRecord?.status === 'failed') && (
+        <div className="w-full absolute bottom-0 px-3">
+          <Button
+            className="opacity-100 flex w-full items-center justify-center bg-blue hover:opacity-95 font-semibold mt-2 text-white h-14"
+            type="primary"
+            disabled={false}
+            loading={false}
+            onClick={() =>
+              TransactionReceipt({
+                successData: {
+                  ...omit(selectedRecord, ['source', 'beneficiary']),
+                  accountName:
+                    selectedRecord?.entry === 'debit'
+                      ? selectedRecord?.beneficiary?.accountName
+                      : selectedRecord?.source?.accountName,
+                  accountNumber:
+                    selectedRecord?.entry === 'debit'
+                      ? selectedRecord?.beneficiary?.accountNumber
+                      : selectedRecord?.source?.accountNumber,
+                  bankName:
+                    selectedRecord?.entry === 'debit'
+                      ? selectedRecord?.beneficiary?.bankName
+                      : selectedRecord?.source?.bankName,
+                  entry: selectedRecord?.entry,
+                },
+              })
+            }
+          >
+            <div className="flex items-center mx-auto gap-2 justify-center">
+              <i className="ri-download-line text-[18px]"></i>
+              <span>Download Reciept</span>
+            </div>
+          </Button>
+        </div>
+      )}
     </Drawer>
   );
 };
