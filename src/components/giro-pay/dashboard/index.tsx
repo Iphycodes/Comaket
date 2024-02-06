@@ -1,5 +1,5 @@
 'use client';
-import { Dispatch, SetStateAction, memo, useContext, useState } from 'react';
+import { Dispatch, SetStateAction, memo, useState } from 'react';
 import Link from 'next/link';
 import moment from 'moment';
 import { Button, Card, Col, Form, List, Row, Tag, message } from 'antd';
@@ -42,7 +42,7 @@ import SinglePayoutForm from '../disbursement/libs/single-payout/libs/single-pay
 import { DashboardAnalyticsNamespace } from '@grc/_shared/namespace/dashboard-analytics';
 import { useTheme } from 'next-themes';
 import { useRouter } from 'next/navigation';
-import { AppContext } from '@grc/app-context';
+import AdvancedTransactionDrawer from '../transactions/libs/advanced-transaction-drawer';
 
 type DashBoardProps = {
   authData?: AuthDataType | null;
@@ -98,8 +98,10 @@ const DashBoard = (props: DashBoardProps) => {
   const isMobile = useMediaQuery(mediaSize.mobile);
   const [form] = Form.useForm();
   const { theme } = useTheme();
-  const { setSelectedDashboardTransaction } = useContext(AppContext);
+  // const { setSelectedDashboardTransaction } = useContext(AppContext);
   const { push } = useRouter();
+  const [selectedRecord, setSelectedRecord] = useState<Record<string, any>>({});
+  const [transactionDrawerOpen, setTransactionDrawerOpen] = useState<boolean>(false);
 
   const {
     accruedFees,
@@ -132,9 +134,12 @@ const DashBoard = (props: DashBoardProps) => {
       'parentRef',
       'tags',
       '_v',
+      '__v',
     ]);
-    setSelectedDashboardTransaction(filteredData);
-    push('/apps/giro-pay/transactions');
+    // setSelectedDashboardTransaction(filteredData);
+    setSelectedRecord(filteredData);
+    setTransactionDrawerOpen(true);
+    // push('/apps/giro-pay/transactions');
   };
 
   const handleSendMoney = () => {
@@ -688,6 +693,12 @@ const DashBoard = (props: DashBoardProps) => {
           }
           setOpenModal={() => setToggleDisbursement(false)}
           openModal={toggleDisbursement}
+        />
+
+        <AdvancedTransactionDrawer
+          selectedRecord={selectedRecord}
+          open={transactionDrawerOpen}
+          onClose={() => setTransactionDrawerOpen(false)}
         />
       </motion.div>
     </>
