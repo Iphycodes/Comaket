@@ -121,7 +121,9 @@ const Transactions = ({
                         key={`${idx}`}
                         style={{ flex: 2 }}
                         color={getAnalyticColor(transactionAnalyticsItem?.label)}
-                        title={camelCaseToSentence(transactionAnalyticsItem?.label)}
+                        title={
+                          camelCaseToSentence(transactionAnalyticsItem?.label?.substring(5)) ?? ''
+                        }
                         percentage={transactionAnalyticsItem?.percent}
                         value={transactionAnalyticsItem?.value}
                       />

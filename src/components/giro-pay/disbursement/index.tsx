@@ -104,11 +104,11 @@ const Disbursement = (props: DisbursementProps) => {
 
   const getDisbursementAnalyticsCardsColor = (label: string) => {
     switch (label) {
-      case 'totalSuccessfulTransactions':
+      case 'totalSuccessfulDisbursements':
         return 'green';
-      case 'totalProcessingTransactions':
+      case 'totalProcessingDisbursements':
         return '#C9DE00';
-      case 'totalFailedTransactions':
+      case 'totalFailedDisbursements':
         return '#B21F00';
       case 'totalSingleDisbursements':
         return 'rgb(30 136 229)';
@@ -134,7 +134,6 @@ const Disbursement = (props: DisbursementProps) => {
               <span className="text-4xl font-bold">
                 {balance ? numberFormat(balance.withdrawableAmount / 100, '₦ ') : '₦ 0.00'}
               </span>
-              {/* <div className=" font-medium">Total account balance from all wallets</div> */}
               <div className=" font-medium">Current wallet withdrawable balance</div>
             </div>
             <TopButtons setModalOpen={setModalOpen} setModalElement={setModalElement} />
@@ -153,7 +152,9 @@ const Disbursement = (props: DisbursementProps) => {
                           getDisbursementAnalyticsCardsColor(disbursmentAnalyticsItem?.label) ??
                           'blue'
                         }
-                        title={camelCaseToSentence(disbursmentAnalyticsItem?.label) ?? ''}
+                        title={
+                          camelCaseToSentence(disbursmentAnalyticsItem?.label?.substring(5)) ?? ''
+                        }
                         percentage={disbursmentAnalyticsItem?.percent ?? 0}
                         value={disbursmentAnalyticsItem?.value ?? 0}
                       />
