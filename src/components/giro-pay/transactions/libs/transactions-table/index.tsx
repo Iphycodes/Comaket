@@ -205,11 +205,7 @@ const TransactionsTable = (props: TransactionTableProps) => {
     onClick: () => handleRowClick(record),
   });
   return (
-    <div
-      className={`shadow-sm border ${
-        isEmpty(transactionsData) && 'mt-10'
-      } dark:border-gray-500 rounded-lg`}
-    >
+    <div className={`shadow-sm borderdark:border-gray-500 rounded-lg`}>
       <Skeleton active loading={isLoadingTransactions} paragraph={{ rows: 8 }}>
         <Table
           size="large"
