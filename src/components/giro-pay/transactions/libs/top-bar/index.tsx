@@ -11,7 +11,7 @@ interface TopBarProps {
   filter?: Record<string, any>;
 }
 
-const TopBar = ({ handleDrawerToggle, setSearchValue, transactionsData, filter }: TopBarProps) => {
+const TopBar = ({ handleDrawerToggle, setSearchValue, filter }: TopBarProps) => {
   const handleSearch = (event: ChangeEvent<HTMLInputElement>) => {
     const inputValue = event.target.value;
     setSearchValue(inputValue);
@@ -19,15 +19,13 @@ const TopBar = ({ handleDrawerToggle, setSearchValue, transactionsData, filter }
 
   return (
     <div className="flex justify-between gap-3 items-center">
-      {!isEmpty(transactionsData) && (
-        <Input
-          placeholder={'Search Transaction...'}
-          size="large"
-          className="bg-gray-50 dark:bg-gray-800 w-80 border-gray-300 rounded-md shadow-sm"
-          style={{ borderRadius: '5px' }}
-          onChange={handleSearch}
-        />
-      )}
+      <Input
+        placeholder={'Search Transaction...'}
+        size="large"
+        className="bg-gray-50 dark:bg-gray-800 w-80 border-gray-300 rounded-md shadow-sm"
+        style={{ borderRadius: '5px' }}
+        onChange={handleSearch}
+      />
       <Button
         className="flex justify-center relative bg-cyan-50 dark:bg-gray-800 border-blue dark:border-gray-300 items-center h-12 w-12"
         shape="circle"
