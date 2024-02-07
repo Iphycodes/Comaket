@@ -1,7 +1,7 @@
 'use client';
 
 import { Button, Drawer, message } from 'antd';
-import { capitalize, pick } from 'lodash';
+import { capitalize, pick, startCase } from 'lodash';
 import { TransactionReceipt } from '@grc/_shared/components/transaction-receipt';
 import { omit } from 'lodash';
 import { convertCamelCaseToSentence, getDate, numberFormat, truncate } from '@grc/_shared/helpers';
@@ -74,7 +74,7 @@ const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTr
                                       <span className="font-semibold">{getDate(`${value}`)}</span>
                                     ) : (
                                       <span className="font-semibold">
-                                        {convertCamelCaseToSentence(`${val3}`)}
+                                        {startCase(capitalize(`${val3}`))}
                                       </span>
                                     )}
                                   </>
@@ -96,9 +96,7 @@ const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTr
                           {ky === 'date' || ky === 'createdAt' ? (
                             <span className="font-semibold">{getDate(`${val}`)}</span>
                           ) : (
-                            <span className="font-semibold">
-                              {convertCamelCaseToSentence(`${val}`)}
-                            </span>
+                            <span className="font-semibold">{startCase(capitalize(`${val}`))}</span>
                           )}
                         </div>
                       );
@@ -144,7 +142,7 @@ const AdvancedTransactionDrawer = ({ open, onClose, selectedRecord }: AdvancedTr
                             </div>
                           ) : (
                             <span className="font-semibold text-right">
-                              {convertCamelCaseToSentence(`${value}`)}
+                              {startCase(capitalize(`${value}`))}
                             </span>
                           )}
                         </>

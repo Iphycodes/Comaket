@@ -150,39 +150,32 @@ const Disbursement = (props: DisbursementProps) => {
             </Col>
           </Row>
           <div className="w-full flex flex-col gap-5">
-            <Row gutter={mobileResponsive ? [5, 5] : [10, 10]}>
+            <div
+              className={`flex ${mobileResponsive && 'overflow-x-scroll'} justify-between gap-3`}
+            >
               {disbursementAnalyticsData?.map((disbursmentAnalyticsItem: any, idx: any) => {
                 return (
                   <>
                     {disbursmentAnalyticsItem?.label !== 'totalDisbursements' && (
-                      <Col
-                        xs={
-                          disbursmentAnalyticsItem?.label !== 'totalSingleDisbursements' &&
-                          disbursmentAnalyticsItem?.label !== 'totalBatchDisbursements'
-                            ? 8
-                            : 12
+                      <TransactionStatisticsCard
+                        isMobile={mobileResponsive}
+                        key={`${idx}`}
+                        style={{ flex: 1 }}
+                        color={
+                          getDisbursementAnalyticsCardsColor(disbursmentAnalyticsItem?.label) ??
+                          'blue'
                         }
-                      >
-                        <TransactionStatisticsCard
-                          isMobile={mobileResponsive}
-                          key={`${idx}`}
-                          style={{ flex: 1 }}
-                          color={
-                            getDisbursementAnalyticsCardsColor(disbursmentAnalyticsItem?.label) ??
-                            'blue'
-                          }
-                          title={
-                            camelCaseToSentence(disbursmentAnalyticsItem?.label?.substring(5)) ?? ''
-                          }
-                          percentage={disbursmentAnalyticsItem?.percent ?? 0}
-                          value={disbursmentAnalyticsItem?.value ?? 0}
-                        />
-                      </Col>
+                        title={
+                          camelCaseToSentence(disbursmentAnalyticsItem?.label?.substring(5)) ?? ''
+                        }
+                        percentage={disbursmentAnalyticsItem?.percent ?? 0}
+                        value={disbursmentAnalyticsItem?.value ?? 0}
+                      />
                     )}
                   </>
                 );
               }, [])}
-            </Row>
+            </div>
             <Row gutter={mobileResponsive ? [0, 10] : [10, 10]} className="w-full">
               <Col lg={16} md={24} xs={24} className="recent-disbursement">
                 {/* <DisbursementHistory /> */}

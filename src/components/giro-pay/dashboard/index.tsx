@@ -135,6 +135,7 @@ const DashBoard = (props: DashBoardProps) => {
       'tags',
       '_v',
       '__v',
+      'balance',
     ]);
     // setSelectedDashboardTransaction(filteredData);
     setSelectedRecord(filteredData);
