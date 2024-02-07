@@ -1,5 +1,5 @@
 'use client';
-import { FormInstance, Modal } from 'antd';
+import { Col, FormInstance, Modal, Row } from 'antd';
 import TransactionStatisticsCard from './libs/transaction-statistics-card';
 import PieChartAnaytics from './libs/pie-chart-analytics';
 import TopButtons from './libs/top-buttons';
@@ -129,53 +129,73 @@ const Disbursement = (props: DisbursementProps) => {
         className="w-full"
       >
         <div className="w-full flex flex-col gap-5">
-          <div className="flex w-full justify-between items-center font-semibold pb-2 shadow-sm border-b-2 border-border/100">
-            <div className="flex flex-col gap-1">
-              <span className="text-4xl font-bold">
-                {balance ? numberFormat(balance.withdrawableAmount / 100, '₦ ') : '₦ 0.00'}
-              </span>
-              <div className=" font-medium">Current wallet withdrawable balance</div>
-            </div>
-            <TopButtons setModalOpen={setModalOpen} setModalElement={setModalElement} />
-          </div>
+          <Row
+            gutter={[0, 20]}
+            className="font-semibold pb-2 shadow-sm border-b-2 border-border/100 flex w-full justify-between items-center"
+          >
+            <Col md={12} xs={24} lg={12}>
+              <div className="flex flex-col gap-1">
+                <span className="text-4xl font-bold">
+                  {balance ? numberFormat(balance.withdrawableAmount / 100, '₦ ') : '₦ 0.00'}
+                </span>
+                <div className=" font-medium">Current wallet withdrawable balance</div>
+              </div>
+            </Col>
+            <Col md={12} xs={24} lg={12} className={`flex ${!mobileResponsive && 'justify-end'}`}>
+              <TopButtons
+                isMobile={mobileResponsive}
+                setModalOpen={setModalOpen}
+                setModalElement={setModalElement}
+              />
+            </Col>
+          </Row>
           <div className="w-full flex flex-col gap-5">
-            <div className="flex w-full gap-5 justify-between flex-wrap">
+            <Row gutter={mobileResponsive ? [5, 5] : [10, 10]}>
               {disbursementAnalyticsData?.map((disbursmentAnalyticsItem: any, idx: any) => {
                 return (
                   <>
                     {disbursmentAnalyticsItem?.label !== 'totalDisbursements' && (
-                      <TransactionStatisticsCard
-                        isMobile={mobileResponsive}
-                        key={`${idx}`}
-                        style={{ flex: 1 }}
-                        color={
-                          getDisbursementAnalyticsCardsColor(disbursmentAnalyticsItem?.label) ??
-                          'blue'
+                      <Col
+                        xs={
+                          disbursmentAnalyticsItem?.label !== 'totalSingleDisbursements' &&
+                          disbursmentAnalyticsItem?.label !== 'totalBatchDisbursements'
+                            ? 8
+                            : 12
                         }
-                        title={
-                          camelCaseToSentence(disbursmentAnalyticsItem?.label?.substring(5)) ?? ''
-                        }
-                        percentage={disbursmentAnalyticsItem?.percent ?? 0}
-                        value={disbursmentAnalyticsItem?.value ?? 0}
-                      />
+                      >
+                        <TransactionStatisticsCard
+                          isMobile={mobileResponsive}
+                          key={`${idx}`}
+                          style={{ flex: 1 }}
+                          color={
+                            getDisbursementAnalyticsCardsColor(disbursmentAnalyticsItem?.label) ??
+                            'blue'
+                          }
+                          title={
+                            camelCaseToSentence(disbursmentAnalyticsItem?.label?.substring(5)) ?? ''
+                          }
+                          percentage={disbursmentAnalyticsItem?.percent ?? 0}
+                          value={disbursmentAnalyticsItem?.value ?? 0}
+                        />
+                      </Col>
                     )}
                   </>
                 );
               }, [])}
-            </div>
-            <div className="w-full flex gap-5">
-              <div className="recent-disbursement" style={{ flex: 6 }}>
+            </Row>
+            <Row gutter={mobileResponsive ? [0, 10] : [10, 10]} className="w-full">
+              <Col lg={16} md={24} xs={24} className="recent-disbursement">
                 {/* <DisbursementHistory /> */}
                 <RecentDisbursements
                   setOpen={setOpen}
                   setSelectedRecord={setSelectedRecord}
                   recentDisbursementData={recentDisbursementData}
                 />
-              </div>
-              <div className="flex h-96" style={{ flex: 5 }}>
+              </Col>
+              <Col lg={8} md={24} xs={24} className="flex h-96">
                 <PieChartAnaytics disbursementAnalyticsData={disbursementAnalyticsData} />
-              </div>
-            </div>
+              </Col>
+            </Row>
           </div>
         </div>
         <DisbursementDrawer open={open} setOpen={setOpen} selectedRecord={selectedRecord} />
