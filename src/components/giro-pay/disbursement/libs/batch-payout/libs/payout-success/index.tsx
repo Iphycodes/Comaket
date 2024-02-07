@@ -47,7 +47,7 @@ const PayoutSuccess: React.FC<PayoutSuccessProps> = ({ payoutSuccessData }) => {
           <h5 className="text-[15px] text-muted-foreground">Transaction Reference</h5>
           <span className="text-[17px] font-bold">
             <span className="flex items-center justify-center ">
-              {truncate(reference, 20)}{' '}
+              {truncate(reference ?? '', 20)}{' '}
               <span
                 className={'cursor-pointer ml-1'}
                 onClick={() => {

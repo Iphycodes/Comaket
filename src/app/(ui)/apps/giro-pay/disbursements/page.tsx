@@ -83,7 +83,6 @@ const DisbursementPage = () => {
   const handleSendMoney = (values: Record<string, any>) => {
     let payload;
 
-    console.log('send money values::', values);
     if (modalElement === 'single-payout') {
       if (!isEmpty(bankDetails)) {
         payload = {
@@ -106,10 +105,6 @@ const DisbursementPage = () => {
         options: {
           successMessage: 'Money sent',
         },
-      }).then(() => {
-        setSinglePayoutSteps('step4');
-        setPayoutdetails({});
-        form.resetFields();
       });
     } else {
       payload = values?.batches?.map((value: Record<string, any>) => ({
@@ -125,6 +120,24 @@ const DisbursementPage = () => {
       });
     }
   };
+
+  useEffect(() => {
+    if (
+      modalElement === 'single-payout' &&
+      !singlePayoutResponse.isLoading &&
+      singlePayoutResponse.isError
+    ) {
+      setSinglePayoutSteps('step2');
+    } else if (
+      modalElement === 'single-payout' &&
+      !singlePayoutResponse.isLoading &&
+      singlePayoutResponse.isSuccess
+    ) {
+      setSinglePayoutSteps('step4');
+      setPayoutdetails({});
+      form.resetFields();
+    }
+  }, [singlePayoutResponse, modalElement]);
 
   useEffect(() => {
     if (searchValue?.toString()?.length === 10 && !isEmpty(bankCode)) {
