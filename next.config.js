@@ -34,10 +34,6 @@ module.exports = (phase) => {
     env,
     reactStrictMode: true,
     compiler: { styledComponents: true },
-    runtime: 'experimental-edge',
-    unstable_allowDynamic: [
-      '**/node_modules/lodash/**',
-    ],
     /* config options here */
     webpack: (config) => {
       config.module.rules.push({
