@@ -1,7 +1,6 @@
 import React, { memo, useEffect, useState } from 'react';
 import { Button, Card, message } from 'antd';
 import { CopyIcon } from '@grc/_shared/assets/svgs';
-// import { VirtualAccountNamespace } from '@grc/_shared/namespace/virtual-account';
 import isEmpty from 'lodash/isEmpty';
 
 const AcctDetails = ({

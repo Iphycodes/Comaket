@@ -1,9 +1,7 @@
-import { jwtDecode } from 'jwt-decode';
 import Cookie from 'js-cookie';
 import { AUTH_TOKEN_KEY, COLOR_LIST_ALPHA } from '@grc/_shared/constant';
 import { MenuProps } from 'antd';
-import * as _ from 'lodash';
-import { isEmpty } from 'lodash';
+import { get, capitalize, isEmpty } from 'lodash';
 
 export const numberFormat = (value: number | bigint, currency?: string) => {
   const formatter = new Intl.NumberFormat();
@@ -23,31 +21,31 @@ export const isValidPassword = (password: string) => {
   return passwordRegex.test(password);
 };
 
-type AuthTokenReturnProps = {
-  isLoggedIn: boolean;
-  expiresAt: Date | null;
-};
+// type AuthTokenReturnProps = {
+//   isLoggedIn: boolean;
+//   expiresAt: Date | null;
+// };
 
 /**decode token**/
-export const AuthToken = (token: string | undefined): AuthTokenReturnProps => {
-  const defaultState = {
-    isLoggedIn: false,
-    expiresAt: null,
-  };
-  if (token) {
-    try {
-      const decoded: any = jwtDecode(token);
-      const sessionTimeExp = decoded.exp;
-      return {
-        isLoggedIn: sessionTimeExp > new Date().getTime() / 1000,
-        expiresAt: new Date(sessionTimeExp * 1000),
-      };
-    } catch (e) {
-      return defaultState;
-    }
-  }
-  return defaultState;
-};
+// export const AuthToken = (token: string | undefined): AuthTokenReturnProps => {
+//   const defaultState = {
+//     isLoggedIn: false,
+//     expiresAt: null,
+//   };
+//   if (token) {
+//     try {
+//       const decoded: any = jwtDecode(token);
+//       const sessionTimeExp = decoded.exp;
+//       return {
+//         isLoggedIn: sessionTimeExp > new Date().getTime() / 1000,
+//         expiresAt: new Date(sessionTimeExp * 1000),
+//       };
+//     } catch (e) {
+//       return defaultState;
+//     }
+//   }
+//   return defaultState;
+// };
 
 type AppCookieProp = {
   cookie?: string | null;
@@ -135,11 +133,11 @@ export enum GET_COLOR {
 
 export const getRandomColorByString = (name: string) => {
   name = name?.toUpperCase();
-  return _.get(COLOR_LIST_ALPHA, getFirstCharacter(name) ?? 'A') ?? '#7B68ED';
+  return get(COLOR_LIST_ALPHA, getFirstCharacter(name) ?? 'A') ?? '#7B68ED';
 };
 
 export const getFirstCharacter = (name: string) => {
-  return _.capitalize(name?.charAt(0));
+  return capitalize(name?.charAt(0));
 };
 
 export const getDate = (datestring: string) => {
