@@ -58,7 +58,7 @@ const BatchPayout = () => {
         </Space>
       </div>
       {isDone ? (
-        <PayoutSuccess />
+        <PayoutSuccess payoutSuccessData={{}} />
       ) : (
         <>
           {steps === 'step1' && <BatchPayoutStarter handleSetSteps={handleSetSteps} />}

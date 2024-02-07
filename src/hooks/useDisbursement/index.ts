@@ -20,7 +20,7 @@ export const useDisbursement = ({
   callDisbursementAnalytics,
 }: useDisbursementProps): useDisbursementReturnProps => {
   const { wallet } = useAppSelector((state) => state.auth);
-  const walletId = wallet?.id;
+  const walletId = wallet?._id;
 
   const [triggerDisbursmentAnalytics, getDisbursementAnalyicsResponse] =
     useLazyGetDisbursementsQuery();
@@ -38,7 +38,7 @@ export const useDisbursement = ({
   );
 
   useEffect(() => {
-    if (callDisbursementAnalytics) triggerDisbursmentAnalytics(disbursementParams);
+    if (callDisbursementAnalytics && walletId) triggerDisbursmentAnalytics(disbursementParams);
   }, [callDisbursementAnalytics, walletId]);
 
   return {

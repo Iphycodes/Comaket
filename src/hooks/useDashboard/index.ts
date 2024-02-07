@@ -20,7 +20,7 @@ export const useDashboard = ({
   const [triggerDashboardAnalytics, getDashboardAnalyticsResponse] =
     useLazyGetDashboardAnalyticsQuery();
   const { wallet } = useAppSelector((state) => state.auth);
-  const walletId = wallet?.id;
+  const walletId = wallet?._id;
 
   const params = {
     filter: JSON.stringify({ virtualAccount: walletId }),
@@ -31,7 +31,7 @@ export const useDashboard = ({
   );
 
   useEffect(() => {
-    if (callDashboardAnalytics) triggerDashboardAnalytics(params);
+    if (callDashboardAnalytics && walletId) triggerDashboardAnalytics(params);
   }, [callDashboardAnalytics, walletId]);
 
   return {

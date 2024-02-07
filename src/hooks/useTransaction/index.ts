@@ -46,9 +46,9 @@ export const useTransaction = ({
     key: 'getAllTransactions',
   });
 
-  const { wallet } = useAppSelector((state) => state.auth);
-  const walletId = wallet?.id;
   const { authData } = useAuth({ callUser: true });
+  const { wallet } = useAppSelector((state) => state.auth);
+  const walletId = wallet?._id;
 
   message.config({
     duration: 5,
@@ -62,6 +62,7 @@ export const useTransaction = ({
     ...paginateTransaction,
     ...filter?.filterData,
     amount: filter?.filterData?.amount ? filter?.filterData?.amount * 100 : undefined,
+    virtualAccount: walletId,
     search: searchValue !== '' ? searchValue : undefined,
   };
 
@@ -77,7 +78,7 @@ export const useTransaction = ({
   const transactionsData = useAppSelector((state) => selectAllTransactionsData(state, transParams));
 
   useEffect(() => {
-    if (callTransactionAnalytics) triggerTransactionAnalytics(params);
+    if (callTransactionAnalytics && walletId) triggerTransactionAnalytics(params);
   }, [callTransactionAnalytics, walletId]);
 
   useEffect(() => {

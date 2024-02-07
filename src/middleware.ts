@@ -10,7 +10,9 @@ export function middleware(request: NextRequest) {
   const cookies = request.cookies.get(AUTH_TOKEN_KEY);
   const { isLoggedIn } = AuthToken(cookies?.value);
   const basePath = url.pathname.split('/')[1];
-  console.log('basePath::::', basePath);
+  console.log('basePath::::', basePath, path);
+
+  console.log('I got here now now:::', path);
 
   if (path.startsWith('/login')) {
     return NextResponse.rewrite(new URL('/auth/login', request.url));

@@ -111,7 +111,7 @@ export const AppHeader = (props: AppHeaderProps) => {
         >
           <Space className="p-1" size={15}>
             <LogoutOutlined />
-            <span>Logouts</span>
+            <span>Logout</span>
           </Space>
         </div>
       </div>

@@ -38,7 +38,6 @@ const PieChartAnaytics = ({ disbursementAnalyticsData }: PieChartAnalyticsProps)
       }
     });
 
-    console.log('doughnnuttttttttttttttttttttttttt: ', doughnutDataItem);
     setDoughnutData(doughnutDataItem);
   }, [disbursementAnalyticsData]);
 
