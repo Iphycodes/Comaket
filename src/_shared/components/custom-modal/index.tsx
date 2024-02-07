@@ -20,6 +20,7 @@ const CustomModal = (props: CustomModalProps) => {
       styles={{ body: { paddingTop: 45, paddingLeft: 24, paddingRight: 24, paddingBottom: 24 } }}
       className=""
       closeIcon={false}
+      onCancel={setOpenModal}
     >
       <div className="relative">
         <CloseIcon

@@ -38,7 +38,7 @@ const AppsBaseLayout = (props: GiroPayPageProps) => {
     callAllAccountSetting: true,
   });
 
-  const { wallets, walletsResponse, handleWallets } = useWallet({
+  const { wallets, walletsResponse, handleWallets, wallet } = useWallet({
     callAllWallets: true,
     callAccountTransaction: true,
     callTotalBalance: true,
@@ -87,6 +87,7 @@ const AppsBaseLayout = (props: GiroPayPageProps) => {
           setWallet={handleWallets}
           isLoadingWallets={isLoadingWallets}
           wallets={wallets}
+          wallet={wallet}
         />
         <Content className="main-content">
           <div

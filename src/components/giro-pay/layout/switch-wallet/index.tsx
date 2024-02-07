@@ -7,12 +7,14 @@ interface SwitchWalletHeaderProps {
   wallets: WalletNamespace.Wallet[];
   isLoadingWallets: boolean;
   setWallet: (acct: WalletNamespace.Wallet | null) => void;
+  wallet: WalletNamespace.Wallet | null;
 }
 
 const SwitchWalletHeader: React.FC<SwitchWalletHeaderProps> = ({
   wallets,
   isLoadingWallets,
   setWallet,
+  wallet,
 }) => {
   return (
     <div className="flex w-full sticky min-h-8 z-10 top-16 items-center justify-end px-10 h-10 bg-cyan-50 dark:bg-gray-800">
@@ -22,6 +24,7 @@ const SwitchWalletHeader: React.FC<SwitchWalletHeaderProps> = ({
           width="300px"
           isLoadingWallets={isLoadingWallets}
           wallets={wallets}
+          wallet={wallet}
           setWallet={setWallet}
           className="virtual-select font-bold"
         />

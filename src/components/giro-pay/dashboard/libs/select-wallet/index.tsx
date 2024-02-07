@@ -5,7 +5,7 @@ import { WalletNamespace } from '@grc/_shared/namespace/wallet';
 
 interface ISelectWallet {
   setWallet: (acct: WalletNamespace.Wallet | null) => void;
-  // wallet: WalletNamespace.Wallet | null;
+  wallet: WalletNamespace.Wallet | null;
   wallets: WalletNamespace.Wallet[];
   isLoadingWallets: boolean;
   theme?: string;
@@ -21,15 +21,16 @@ const SelectWallet = ({
   style,
   width,
   className,
+  wallet,
 }: ISelectWallet) => {
   const [form] = Form.useForm();
 
-  const pickAcctValue = (acct: any) =>
-    pick(acct, ['_id', 'accountName', 'accountNumber', 'accountNumber']);
+  const pickWalletValue = (wallet: any) =>
+    pick(wallet, ['_id', 'accountName', 'accountNumber', 'bankName']);
 
   // const initialValues = {
   //   selectWallet: !isEmpty(wallets)
-  //     ? JSON.stringify(pickAcctValue(wallets?.[0]))
+  //     ? JSON.stringify(pickWalletValue(wallets?.[0]))
   //     : 'No Wallet Created',
   // };
 
@@ -47,9 +48,8 @@ const SelectWallet = ({
         <span style={{ padding: '0 8px' }}>|</span> {w?.bankName}
       </div>
     ),
-    value: JSON.stringify(pickAcctValue(w)),
+    value: JSON.stringify(pickWalletValue(w)),
   }));
-
   return (
     <Form requiredMark={false} form={form}>
       <Form.Item name={'selectWallet'} className="virtual-select-form-item font-bold">
@@ -58,10 +58,16 @@ const SelectWallet = ({
           bordered={true}
           showSearch
           defaultValue={
-            !isEmpty(wallets) ? JSON.stringify(pickAcctValue(wallets?.[0])) : 'No Wallet Created'
+            isLoadingWallets
+              ? ''
+              : !isEmpty(wallet)
+                ? JSON.stringify(pickWalletValue(wallet ?? {}))
+                : !isEmpty(wallets)
+                  ? JSON.stringify(pickWalletValue(wallets?.[0]))
+                  : 'No Wallet Created'
           }
           loading={isLoadingWallets}
-          disabled={wallets?.length === 0}
+          disabled={isLoadingWallets || wallets?.length === 0}
           className={`${className} font-bold`}
           onChange={(value) => setWallet?.(JSON.parse(value))}
           options={options}

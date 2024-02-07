@@ -15,7 +15,6 @@ const DisbursementDrawer: React.FC<DisbursementDrawerProps> = ({
   setOpen,
 }: DisbursementDrawerProps) => {
   const onClose = () => {
-    console.log('');
     setOpen(false);
   };
 
