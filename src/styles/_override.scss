@@ -36,7 +36,6 @@
 .business-register-form,
 .update-profile-details-form,
 .update-business-profile-form {
-
   .ant-select-selector,
   .ant-select-in-form-item,
   .ant-select-selection-item {
@@ -118,7 +117,6 @@
 
   .ant-menu-light.ant-menu-root.ant-menu-inline {
     border-inline-end: none !important;
-
   }
 }
 
@@ -167,9 +165,6 @@
     padding: 0 !important;
   }
 }
-
-
-
 
 .transaction-stat-card {
   .ant-card-body {
@@ -224,7 +219,8 @@ canvas.disbursement-pie {
       background 0s;
   }
 
-  .update-api-key-webhook-form, .single-payout-form {
+  .update-api-key-webhook-form,
+  .single-payout-form {
     .ant-input-disabled,
     .ant-input-affix-wrapper-disabled {
       background-color: rgba(255, 255, 255, 1) !important;
@@ -260,7 +256,6 @@ canvas.disbursement-pie {
       // box-shadow: 0 0 0 2px rgba(0, 60, 180, 0.15) !important;
       outline: 0 !important;
     }
-
   }
 }
 
@@ -269,9 +264,18 @@ canvas.disbursement-pie {
     border-radius: 4px !important;
   }
 
-  .dashboard-transaction-list:hover {
-    background-color: hsl(var(--background)) !important;
+  .ant-tag.ant-tag-success {
+    background-color: #0d3400 !important;
+    color: #51f300 !important;
   }
+
+  .ant-tag.ant-tag-red {
+    background-color: #2f0000 !important;
+    color: #ff6565 !important;
+  }
+  // .dashboard-transaction-list:hover {
+  //   background-color: hsl(var(--background)) !important;
+  // }
 
   .ant-layout-sider,
   .ant-menu-light {
@@ -291,7 +295,8 @@ canvas.disbursement-pie {
       background 0s;
   }
 
-  .update-api-key-webhook-form, .single-payout-form {
+  .update-api-key-webhook-form,
+  .single-payout-form {
     .ant-input-disabled,
     .ant-input-affix-wrapper-disabled {
       background-color: #141414 !important;

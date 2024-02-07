@@ -154,7 +154,7 @@ const RecentDisbursements: React.FC<RecentDisbursementsProps> = ({
                       color={
                         item?.status === 'successful'
                           ? 'success'
-                          : item?.status === 'processing'
+                          : item?.status === 'processing' || item?.status === 'pending'
                             ? 'processing'
                             : 'error'
                       }

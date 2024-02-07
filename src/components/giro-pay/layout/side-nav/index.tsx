@@ -33,6 +33,8 @@ export const SideNav = (props: SideNavProps) => {
     } else {
       router.push(`/apps/giro-pay/${key}`);
     }
+
+    isMobile && setToggleSider(true);
   };
 
   useEffect(() => {

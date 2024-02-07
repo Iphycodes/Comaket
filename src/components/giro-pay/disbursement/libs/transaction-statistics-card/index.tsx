@@ -10,20 +10,31 @@ interface TransactionStatisticsCardProps {
   key?: string;
   style?: React.CSSProperties;
   color?: string;
+  isMobile?: boolean;
 }
 
 const TransactionStatisticsCard = (props: TransactionStatisticsCardProps) => {
-  const { style, color, value, title, percentage } = props;
+  const { style, color, value, title, percentage, isMobile } = props;
 
   return (
     <div
-      className="transaction-stat-card min-h-full dark:bg-zinc-800 border dark:border-gray-500 rounded-xl shadow-md py-5 px-3"
+      className="transaction-stat-card min-h-full min-w-40 dark:bg-zinc-800 border dark:border-gray-500 rounded-xl shadow-md py-5 px-3"
       style={{ ...style }}
     >
       <div className="flex flex-col h-full justify-between">
-        <div className="text-gray-500 w-full text-center dark:text-gray-100">{title}</div>
+        <div
+          className={`text-gray-500 w-full text-center dark:text-gray-100 ${
+            isMobile && 'text-[12px]'
+          }`}
+        >
+          {title}
+        </div>
         <div className="flex flex-col w-full text-center gap-0">
-          <span className="amount font-semibold text-[32px] text-gray-600 dark:text-gray-100">
+          <span
+            className={`amount font-semibold text-[${
+              isMobile ? '24px' : '32px'
+            }] text-gray-600 dark:text-gray-100`}
+          >
             {formatNumber(value ?? 0, 0) ?? ''}
           </span>
         </div>
@@ -37,7 +48,7 @@ const TransactionStatisticsCard = (props: TransactionStatisticsCardProps) => {
             bgColor="transparent" // Sets the background color as transparent
             lineWidth={'30'} // Sets the thickness of the blue border
             textStyle={{ fontSize: '5rem' }} // Customizes the text style if needed
-            size={'50'} // Sets the size of the circle
+            size={isMobile ? '40' : '50'} // Sets the size of the circle
           />
         </div>
       </div>

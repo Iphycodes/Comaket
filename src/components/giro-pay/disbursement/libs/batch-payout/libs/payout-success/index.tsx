@@ -1,10 +1,8 @@
 import React from 'react';
 import moment from 'moment';
-import { TransactionReceipt } from '@grc/_shared/components/transaction-receipt';
 import { numberFormat, truncate } from '@grc/_shared/helpers';
-import { Button, message } from 'antd';
-import { startCase, lowerCase, omit, isEmpty } from 'lodash';
-import { DownloadOutlined } from '@ant-design/icons';
+import { message } from 'antd';
+import { startCase, lowerCase, isEmpty } from 'lodash';
 import { useTheme } from 'next-themes';
 import { CopyIcon, CopyIconLight } from '@grc/_shared/assets/svgs';
 interface PayoutSuccessProps {
@@ -66,31 +64,6 @@ const PayoutSuccess: React.FC<PayoutSuccessProps> = ({ payoutSuccessData }) => {
           </span>
         </div>
       </section>
-      <Button
-        className="opacity-100 mt-5 flex justify-center text-center items-center hover:opacity-95 font-normal bg-blue text-white h-12 px-6"
-        type="primary"
-        disabled={false}
-        loading={false}
-        onClick={() =>
-          TransactionReceipt({
-            successData: {
-              ...omit(payoutSuccessData?.data, ['source', 'beneficiary']),
-              accountName: accountName,
-              accountNumber: accountNumber,
-              bankName:
-                payoutSuccessData?.data?.entry === 'debit'
-                  ? payoutSuccessData?.data?.beneficiary?.bankName
-                  : payoutSuccessData?.data?.source?.bankName,
-              entry: payoutSuccessData?.data?.entry,
-            },
-          })
-        }
-      >
-        <div className="flex items-center gap-2 justify-center">
-          <DownloadOutlined className="text-[18px]" />
-          <span>Download Receipt</span>
-        </div>
-      </Button>
     </div>
   );
 };

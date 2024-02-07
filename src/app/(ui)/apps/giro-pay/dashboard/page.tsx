@@ -16,6 +16,7 @@ const DashboardPage = () => {
   const mobileResponsive = useMediaQuery(mediaSize.mobile);
   const [, setFilter] = useState('');
   const [openCreateModal, setOpenCreateModal] = useState(false);
+
   const {
     createWallet,
     createWalletResponse,

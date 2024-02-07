@@ -16,7 +16,7 @@ const BalanceCard = ({ availableBalance, walletDetails }: BalanceCardProps) => {
           <div className="text-4xl font-bold">
             {availableBalance ? numberFormat(availableBalance / 100, '₦ ') : '₦ 0.00'}
           </div>
-          <div className="font-thin">Total Withdrawable balance from this account</div>
+          <div className=" font-medium">Current wallet withdrawable balance</div>
         </div>
       </div>
     </div>

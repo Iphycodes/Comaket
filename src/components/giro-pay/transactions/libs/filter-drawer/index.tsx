@@ -46,6 +46,10 @@ const FilterDrawer = (props: FilterDrawerProps) => {
       label: 'successful',
       value: 'successful',
     },
+    {
+      label: 'processing',
+      value: 'processing',
+    },
   ];
 
   // const currencyOptions = [

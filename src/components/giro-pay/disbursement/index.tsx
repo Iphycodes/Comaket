@@ -1,5 +1,5 @@
 'use client';
-import { FormInstance, Modal } from 'antd';
+import { Col, FormInstance, Modal, Row } from 'antd';
 import TransactionStatisticsCard from './libs/transaction-statistics-card';
 import PieChartAnaytics from './libs/pie-chart-analytics';
 import TopButtons from './libs/top-buttons';
@@ -15,6 +15,7 @@ import { IBalance, IBanks, WalletNamespace } from '@grc/_shared/namespace/wallet
 import { motion } from 'framer-motion';
 import { capitalize, omit, startCase } from 'lodash';
 import { AppContext } from '@grc/app-context';
+import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 
 type DisbursementProps = {
   // openCreateModal: boolean;
@@ -77,6 +78,7 @@ const Disbursement = (props: DisbursementProps) => {
   const [modalOpen, setModalOpen] = useState<boolean>(false);
   const [paymentDetails, setPaymentDetails] = useState<Record<string, any>>({});
   const { payoutDetails, setPayoutdetails } = useContext(AppContext);
+  const mobileResponsive = useMediaQuery(mediaSize.mobile);
 
   const initialValues = {
     bankName: payoutDetails?.bankName || paymentDetails?.bankName || bankCode,
@@ -102,11 +104,11 @@ const Disbursement = (props: DisbursementProps) => {
 
   const getDisbursementAnalyticsCardsColor = (label: string) => {
     switch (label) {
-      case 'totalSuccessfulTransactions':
+      case 'totalSuccessfulDisbursements':
         return 'green';
-      case 'totalProcessingTransactions':
+      case 'totalProcessingDisbursements':
         return '#C9DE00';
-      case 'totalFailedTransactions':
+      case 'totalFailedDisbursements':
         return '#B21F00';
       case 'totalSingleDisbursements':
         return 'rgb(30 136 229)';
@@ -116,33 +118,6 @@ const Disbursement = (props: DisbursementProps) => {
         return 'pink';
     }
   };
-
-  // const mockPayoutsData = [
-  //   {
-  //     color: 'green',
-  //     title: 'Total Single Payout',
-  //     percentage: 40,
-  //     value: 200000,
-  //   },
-  //   {
-  //     color: 'rgb(30 136 229)',
-  //     title: 'Total Batch Payout',
-  //     percentage: 20,
-  //     value: 350000,
-  //   },
-  //   {
-  //     color: '#C9DE00',
-  //     title: 'Total Pending Payout',
-  //     percentage: 29.5,
-  //     value: 55000,
-  //   },
-  //   {
-  //     color: '#B21F00',
-  //     title: 'Total Failed Payout',
-  //     percentage: 29.5,
-  //     value: 16000,
-  //   },
-  // ];
 
   return (
     <>
@@ -154,35 +129,45 @@ const Disbursement = (props: DisbursementProps) => {
         className="w-full"
       >
         <div className="w-full flex flex-col gap-5">
-          <div className="flex w-full justify-between items-center font-semibold pb-2 shadow-sm border-b-2 border-border/100">
-            <div className="flex flex-col gap-1">
-              {/* <Space size={5}>
-              <WalletIcon />
-              <span>Account Balance :</span>
-            </Space> */}
-              {/* <div className="text-3xl font-bold">&#x20A6;2,500,000.00</div> */}
-              <span className="text-4xl font-bold">
-                {balance ? numberFormat(balance.withdrawableAmount / 100, '₦ ') : '₦ 0.00'}
-              </span>
-              {/* <div className=" font-medium">Total account balance from all wallets</div> */}
-              <div className=" font-medium">Current wallet withdrawable balance</div>
-            </div>
-            <TopButtons setModalOpen={setModalOpen} setModalElement={setModalElement} />
-          </div>
+          <Row
+            gutter={[0, 20]}
+            className="font-semibold pb-2 shadow-sm border-b-2 border-border/100 flex w-full justify-between items-center"
+          >
+            <Col md={12} xs={24} lg={12}>
+              <div className="flex flex-col gap-1">
+                <span className="text-4xl font-bold">
+                  {balance ? numberFormat(balance.withdrawableAmount / 100, '₦ ') : '₦ 0.00'}
+                </span>
+                <div className=" font-medium">Current wallet withdrawable balance</div>
+              </div>
+            </Col>
+            <Col md={12} xs={24} lg={12} className={`flex ${!mobileResponsive && 'justify-end'}`}>
+              <TopButtons
+                isMobile={mobileResponsive}
+                setModalOpen={setModalOpen}
+                setModalElement={setModalElement}
+              />
+            </Col>
+          </Row>
           <div className="w-full flex flex-col gap-5">
-            <div className="flex w-full gap-5 justify-between flex-wrap">
+            <div
+              className={`flex ${mobileResponsive && 'overflow-x-scroll'} justify-between gap-3`}
+            >
               {disbursementAnalyticsData?.map((disbursmentAnalyticsItem: any, idx: any) => {
                 return (
                   <>
                     {disbursmentAnalyticsItem?.label !== 'totalDisbursements' && (
                       <TransactionStatisticsCard
+                        isMobile={mobileResponsive}
                         key={`${idx}`}
                         style={{ flex: 1 }}
                         color={
                           getDisbursementAnalyticsCardsColor(disbursmentAnalyticsItem?.label) ??
                           'blue'
                         }
-                        title={camelCaseToSentence(disbursmentAnalyticsItem?.label) ?? ''}
+                        title={
+                          camelCaseToSentence(disbursmentAnalyticsItem?.label?.substring(5)) ?? ''
+                        }
                         percentage={disbursmentAnalyticsItem?.percent ?? 0}
                         value={disbursmentAnalyticsItem?.value ?? 0}
                       />
@@ -191,19 +176,19 @@ const Disbursement = (props: DisbursementProps) => {
                 );
               }, [])}
             </div>
-            <div className="w-full flex gap-5">
-              <div className="recent-disbursement" style={{ flex: 6 }}>
+            <Row gutter={mobileResponsive ? [0, 10] : [10, 10]} className="w-full">
+              <Col lg={16} md={24} xs={24} className="recent-disbursement">
                 {/* <DisbursementHistory /> */}
                 <RecentDisbursements
                   setOpen={setOpen}
                   setSelectedRecord={setSelectedRecord}
                   recentDisbursementData={recentDisbursementData}
                 />
-              </div>
-              <div className="flex h-96" style={{ flex: 5 }}>
+              </Col>
+              <Col lg={8} md={24} xs={24} className="flex h-96">
                 <PieChartAnaytics disbursementAnalyticsData={disbursementAnalyticsData} />
-              </div>
-            </div>
+              </Col>
+            </Row>
           </div>
         </div>
         <DisbursementDrawer open={open} setOpen={setOpen} selectedRecord={selectedRecord} />

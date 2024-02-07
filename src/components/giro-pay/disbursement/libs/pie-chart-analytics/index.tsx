@@ -24,13 +24,13 @@ const PieChartAnaytics = ({ disbursementAnalyticsData }: PieChartAnalyticsProps)
     const doughnutDataItem: Record<string, any>[] = [];
     disbursementAnalyticsData?.map((item: any) => {
       switch (item?.label) {
-        case 'totalSuccessfulTransactions':
+        case 'totalSuccessfulDisbursements':
           doughnutDataItem[0] = item;
           break;
-        case 'totalProcessingTransactions':
+        case 'totalProcessingDisbursements':
           doughnutDataItem[1] = item;
           break;
-        case 'totalFailedTransactions':
+        case 'totalFailedDisbursements':
           doughnutDataItem[2] = item;
           break;
         default:
