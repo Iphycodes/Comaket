@@ -4,6 +4,7 @@ import { categories } from '@grc/_shared/constant';
 import { Button, Card, Col, Form, FormInstance, Input, InputNumber, Row, Select } from 'antd';
 import { motion } from 'framer-motion';
 import { AuthDataType } from '@grc/_shared/namespace/auth';
+import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 
 type BusinessProfileProps = {
   mobileResponsive?: boolean;
@@ -17,6 +18,7 @@ type BusinessProfileProps = {
 export const BusinessProfile = (props: BusinessProfileProps) => {
   const { handleUpdateBusinessProfile, isUpdatingBusinessProfile, form } = props;
   const initialValues = {};
+  const isMobile = useMediaQuery(mediaSize.mobile);
 
   const onFinish = (values: Record<string, any>) => {
     handleUpdateBusinessProfile(values);
@@ -33,7 +35,7 @@ export const BusinessProfile = (props: BusinessProfileProps) => {
       animate={{ opacity: 1 }}
       transition={{ type: 'ease-in-out', duration: 0.4 }}
     >
-      <section className=" w-4/5 mt-10 mx-auto">
+      <section className={`${isMobile ? 'w-[94%]' : 'w-4/5'} mt-10 mx-auto`}>
         <Card className="dark:bg-zinc-800 text-card-foreground border dark:border-gray-500 shadow-md">
           <Form
             form={form}
@@ -45,7 +47,7 @@ export const BusinessProfile = (props: BusinessProfileProps) => {
             name="update-business-profile-form"
             className="mt-5 update-business-profile-form"
           >
-            <Row gutter={[16, 16]}>
+            <Row gutter={isMobile ? [10, 10] : [16, 16]}>
               <Col md={12} xs={24}>
                 <Form.Item
                   name="name"
@@ -65,7 +67,7 @@ export const BusinessProfile = (props: BusinessProfileProps) => {
                 </Form.Item>
               </Col>
             </Row>
-            <Row gutter={[16, 16]}>
+            <Row gutter={isMobile ? [10, 10] : [16, 16]}>
               <Col md={12} xs={24}>
                 <Form.Item
                   name="addressLine_1"
@@ -96,7 +98,7 @@ export const BusinessProfile = (props: BusinessProfileProps) => {
                 </Form.Item>
               </Col>
             </Row>
-            <Row gutter={[16, 16]}>
+            <Row gutter={isMobile ? [10, 10] : [16, 16]}>
               <Col md={12} xs={24}>
                 <Form.Item
                   name="category"

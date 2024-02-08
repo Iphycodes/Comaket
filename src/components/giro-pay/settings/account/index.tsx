@@ -3,6 +3,7 @@ import React from 'react';
 import { Button, Card, Col, DatePicker, Form, FormInstance, Row, Switch, TimePicker } from 'antd';
 import { motion } from 'framer-motion';
 import dayjs, { Dayjs } from 'dayjs';
+import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 
 type AccountSettingProps = {
   mobileResponsive?: boolean;
@@ -14,6 +15,7 @@ type AccountSettingProps = {
 
 export const AccountSetting = (props: AccountSettingProps) => {
   const { handleUpdateAccountSetting, isUpdatingAccountSetting, form } = props;
+  const isMobile = useMediaQuery(mediaSize.mobile);
 
   const onFinish = (values: Record<string, any>) => {
     handleUpdateAccountSetting(values);
@@ -40,7 +42,7 @@ export const AccountSetting = (props: AccountSettingProps) => {
       animate={{ opacity: 1 }}
       transition={{ type: 'ease-in-out', duration: 0.4 }}
     >
-      <section className=" w-4/5 mt-10 mx-auto">
+      <section className={`${isMobile ? 'w-[94%]' : 'w-4/5'} mt-10 mx-auto`}>
         <Card className="dark:bg-zinc-800 text-card-foreground border dark:border-gray-500 shadow-md">
           <Form
             form={form}
@@ -52,7 +54,10 @@ export const AccountSetting = (props: AccountSettingProps) => {
             name="account-setting-form"
             className="mt-5 account-setting-form"
           >
-            <Row gutter={[16, 16]} className="flex items center justify-center">
+            <Row
+              gutter={isMobile ? [10, 10] : [16, 16]}
+              className="flex items center justify-center"
+            >
               <Col md={14} xs={24}>
                 <Form.Item
                   name="serviceFeeDeductionDate"
@@ -69,7 +74,10 @@ export const AccountSetting = (props: AccountSettingProps) => {
                 </Form.Item>
               </Col>
             </Row>
-            <Row gutter={[16, 16]} className="flex items center justify-center">
+            <Row
+              gutter={isMobile ? [10, 10] : [16, 16]}
+              className="flex items center justify-center"
+            >
               <Col md={14} xs={24}>
                 <Form.Item
                   name="reportDeliveryTime"
@@ -80,7 +88,10 @@ export const AccountSetting = (props: AccountSettingProps) => {
                 </Form.Item>
               </Col>
             </Row>
-            <Row gutter={[16, 16]} className="flex items center justify-center">
+            <Row
+              gutter={isMobile ? [10, 10] : [16, 16]}
+              className="flex items center justify-center"
+            >
               <Col md={14} xs={24}>
                 <Form.Item
                   name="dailyTransactionReport"

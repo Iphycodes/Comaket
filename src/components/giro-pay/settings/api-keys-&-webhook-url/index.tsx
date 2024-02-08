@@ -4,6 +4,7 @@ import { Button, Card, Col, Form, FormInstance, Input, Row, Spin, Tooltip, messa
 import { CopyIcon, CopyIconLight } from '@grc/_shared/assets/svgs';
 import { motion } from 'framer-motion';
 import CustomModal from '@grc/_shared/components/custom-modal';
+import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 
 type ApiKeysAndWebhooksUrlProps = {
   mobileResponsive?: boolean;
@@ -30,6 +31,7 @@ export const ApiKeysAndWebhooksUrl = (props: ApiKeysAndWebhooksUrlProps) => {
     isGettingSecretKeySuccessful,
   } = props;
   const [openModal, setOpenModal] = useState(false);
+  const isMobile = useMediaQuery(mediaSize.mobile);
 
   const handleAuthenticateGetSecretKey = (values: Record<string, any>) => {
     handleGetSecretKey(values);
@@ -93,7 +95,7 @@ export const ApiKeysAndWebhooksUrl = (props: ApiKeysAndWebhooksUrlProps) => {
       animate={{ opacity: 1 }}
       transition={{ type: 'ease-in-out', duration: 0.4 }}
     >
-      <section className=" w-4/5 mt-10 mx-auto">
+      <section className={`${isMobile ? 'w-[94%]' : 'w-4/5'} mt-10 mx-auto`}>
         <Card className="dark:bg-zinc-800 text-card-foreground border dark:border-gray-500 shadow-md">
           <Form
             form={form}
@@ -105,8 +107,11 @@ export const ApiKeysAndWebhooksUrl = (props: ApiKeysAndWebhooksUrlProps) => {
             name="update-api-key-webhook-form"
             className="mt-5 update-api-key-webhook-form"
           >
-            <Row gutter={[16, 16]} className="flex items center justify-center">
-              <Col md={14} xs={24}>
+            <Row
+              gutter={isMobile ? [10, 10] : [16, 16]}
+              className="flex items center justify-center"
+            >
+              <Col md={14} xs={20}>
                 <Form.Item
                   name="pubKey"
                   label={<span>{isLiveMode ? 'Live' : 'Test'} API Public Key</span>}
@@ -114,7 +119,7 @@ export const ApiKeysAndWebhooksUrl = (props: ApiKeysAndWebhooksUrlProps) => {
                   <Input placeholder="" className="h-14" disabled />
                 </Form.Item>
               </Col>
-              <Col className="flex items-center justify-center text-xs">
+              <Col xs={4} className="flex items-center justify-center text-xs">
                 <div
                   className={'flex items-center justify-center cursor-pointer'}
                   onClick={() =>
@@ -132,8 +137,11 @@ export const ApiKeysAndWebhooksUrl = (props: ApiKeysAndWebhooksUrlProps) => {
                 </div>
               </Col>
             </Row>
-            <Row gutter={[16, 16]} className="flex items center justify-center cursor-pointer">
-              <Col md={14} xs={24}>
+            <Row
+              gutter={isMobile ? [10, 10] : [16, 16]}
+              className="flex items center justify-center cursor-pointer"
+            >
+              <Col md={14} xs={20}>
                 <Form.Item
                   name="secKey"
                   label={<span>{isLiveMode ? 'Live' : 'Test'} API Secret Key</span>}
@@ -157,7 +165,7 @@ export const ApiKeysAndWebhooksUrl = (props: ApiKeysAndWebhooksUrlProps) => {
                   />
                 </Form.Item>
               </Col>
-              <Col className="flex items-center justify-center text-xs">
+              <Col xs={4} className="flex items-center justify-center text-xs">
                 <div
                   className={'flex items-center justify-center cursor-pointer'}
                   onClick={() =>
@@ -176,7 +184,10 @@ export const ApiKeysAndWebhooksUrl = (props: ApiKeysAndWebhooksUrlProps) => {
               </Col>
             </Row>
 
-            <Row gutter={[16, 16]} className="flex items center justify-center">
+            <Row
+              gutter={isMobile ? [10, 10] : [16, 16]}
+              className="flex items center justify-center"
+            >
               <Col md={14} xs={24}>
                 <Form.Item
                   name="webhooks"
