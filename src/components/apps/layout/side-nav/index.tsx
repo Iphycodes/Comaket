@@ -1,10 +1,11 @@
 'use client';
-import React, { useState } from 'react';
+import React, { useContext, useEffect, useState } from 'react';
 import { Layout, Menu } from 'antd';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 import { AppSettingsSiderHeader } from './libs/siderHeader';
 import { MenuItem } from '@grc/_shared/helpers';
 import { usePathname, useRouter } from 'next/navigation';
+import { AppContext } from '@grc/app-context';
 const { Sider } = Layout;
 
 export interface SettingsSideNavProps {
@@ -23,17 +24,25 @@ export const SettingsSideNav = (props: SettingsSideNavProps) => {
   const pathname = usePathname();
   const urlPath = pathname?.split('/');
 
+  const { toggleSider, setToggleSider } = useContext(AppContext);
+
   const handleMenuClick = ({ key }: { key: React.Key | string }) => {
     if (key === 'apps') {
       router.push(`/apps`);
     } else {
       router.push(`/apps/settings/${key}`);
     }
+
+    setToggleSider(true);
   };
+
+  useEffect(() => {
+    !isMobile && setToggleSider(false);
+  }, [isMobile]);
 
   return (
     <Sider
-      collapsed={false}
+      collapsed={toggleSider}
       collapsedWidth={isMobile ? 0 : 80}
       className="dash-sider text-lg shadow-sm border-r border-border/100"
       width={250}
@@ -50,7 +59,11 @@ export const SettingsSideNav = (props: SettingsSideNavProps) => {
         zIndex: 10,
       }}
     >
-      <AppSettingsSiderHeader collapsed={collapse} setCollapsed={setCollapse} />
+      <AppSettingsSiderHeader
+        setToggleSider={setToggleSider}
+        collapsed={collapse}
+        setCollapsed={setCollapse}
+      />
       <Menu
         className="sider-menu mt-10 text-card-foreground text-base"
         mode="inline"

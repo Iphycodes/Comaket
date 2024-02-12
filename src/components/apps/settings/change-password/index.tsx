@@ -4,6 +4,7 @@ import { Button, Card, Col, Form, FormInstance, Input, Row } from 'antd';
 import { isValidPassword } from '@grc/_shared/helpers';
 import PasswordInput from '@grc/components/auth/lib/password-input';
 import { motion } from 'framer-motion';
+import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 
 type ChangePasswordProps = {
   mobileResponsive?: boolean;
@@ -16,6 +17,7 @@ type ChangePasswordProps = {
 
 export const ChangePassword = (props: ChangePasswordProps) => {
   const { handleChangePassword, isChangePasswordLoading, isDashboard = false, form } = props;
+  const isMobile = useMediaQuery(mediaSize.mobile);
 
   const onFinish = (values: Record<string, any>) => {
     handleChangePassword(values);
@@ -33,7 +35,9 @@ export const ChangePassword = (props: ChangePasswordProps) => {
       animate={{ opacity: 1 }}
       transition={{ type: 'ease-in-out', duration: 0.4 }}
     >
-      <section className={`${isDashboard ? 'mt-0' : 'w-4/5 mt-10'} mx-auto`}>
+      <section
+        className={`${isDashboard ? 'mt-0' : `${isMobile ? 'w-[94%]' : 'w-4/5'} mt-10`} mx-auto`}
+      >
         <div className="my-5 font-bold text-lg">Change Password</div>
         <Card className="dark:bg-zinc-800 text-card-foreground border dark:border-gray-500 shadow-md mt-10">
           <Form
@@ -46,7 +50,10 @@ export const ChangePassword = (props: ChangePasswordProps) => {
             name="change-password-form"
             className="mt-5 change-password-form"
           >
-            <Row gutter={[16, 16]} className="flex items center justify-center">
+            <Row
+              gutter={isMobile ? [10, 10] : [16, 16]}
+              className="flex items center justify-center"
+            >
               <Col md={isDashboard ? 24 : 14} xs={24}>
                 <Form.Item
                   name="currentPassword"
@@ -62,7 +69,10 @@ export const ChangePassword = (props: ChangePasswordProps) => {
                 </Form.Item>
               </Col>
             </Row>
-            <Row gutter={[16, 16]} className="flex items center justify-center">
+            <Row
+              gutter={isMobile ? [10, 10] : [16, 16]}
+              className="flex items center justify-center"
+            >
               <Col md={isDashboard ? 24 : 14} xs={24}>
                 <Form.Item
                   name="password"
@@ -91,7 +101,10 @@ export const ChangePassword = (props: ChangePasswordProps) => {
               </Col>
             </Row>
 
-            <Row gutter={[16, 16]} className="flex items center justify-center">
+            <Row
+              gutter={isMobile ? [10, 10] : [16, 16]}
+              className="flex items center justify-center"
+            >
               <Col md={isDashboard ? 24 : 14} xs={24}>
                 <Form.Item
                   name="confirmPassword"

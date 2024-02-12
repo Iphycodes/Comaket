@@ -17,6 +17,7 @@ import {
 } from 'antd';
 import { InfoCircleOutlined } from '@ant-design/icons';
 import { motion } from 'framer-motion';
+import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 
 type ProfileDetailsProps = {
   mobileResponsive?: boolean;
@@ -28,6 +29,7 @@ type ProfileDetailsProps = {
 
 export const ProfileDetails = (props: ProfileDetailsProps) => {
   const { handleUpdateProfileDetails, isUpdatingProfile, form } = props;
+  const isMobile = useMediaQuery(mediaSize.mobile);
 
   const onFinish = (values: Record<string, any>) => {
     handleUpdateProfileDetails(values);
@@ -39,7 +41,7 @@ export const ProfileDetails = (props: ProfileDetailsProps) => {
       animate={{ opacity: 1 }}
       transition={{ type: 'ease-in-out', duration: 0.4 }}
     >
-      <section className=" w-4/5 mt-10 mx-auto">
+      <section className={`${isMobile ? 'w-[94%]' : 'w-4/5'} mt-10 mx-auto`}>
         <div className="my-5 font-bold text-lg">Profile Details</div>
         <Card className="dark:bg-zinc-800 text-card-foreground border dark:border-gray-500 shadow-md mt-10">
           <Form
@@ -52,7 +54,7 @@ export const ProfileDetails = (props: ProfileDetailsProps) => {
             name="update-profile-details-form"
             className="mt-5 update-profile-details-form"
           >
-            <Row gutter={[16, 16]}>
+            <Row gutter={isMobile ? [10, 10] : [16, 16]}>
               <Col md={12} xs={24}>
                 <Form.Item
                   name="firstName"
@@ -72,7 +74,7 @@ export const ProfileDetails = (props: ProfileDetailsProps) => {
                 </Form.Item>
               </Col>
             </Row>
-            <Row gutter={[16, 16]}>
+            <Row gutter={isMobile ? [10, 10] : [16, 16]}>
               <Col md={12} xs={24}>
                 <Form.Item
                   name="email"
@@ -103,7 +105,7 @@ export const ProfileDetails = (props: ProfileDetailsProps) => {
                 </Form.Item>
               </Col>
             </Row>
-            <Row gutter={[16, 16]}>
+            <Row gutter={isMobile ? [10, 10] : [16, 16]}>
               <Col md={12} xs={24}>
                 <Form.Item
                   name="bvn"
@@ -130,7 +132,7 @@ export const ProfileDetails = (props: ProfileDetailsProps) => {
                 </Form.Item>
               </Col>
               <Col md={12} xs={24}>
-                <Row gutter={[16, 16]}>
+                <Row gutter={isMobile ? [10, 10] : [16, 16]}>
                   <Col md={12} xs={24}>
                     <Form.Item
                       name="dob"
@@ -156,7 +158,7 @@ export const ProfileDetails = (props: ProfileDetailsProps) => {
                 </Row>
               </Col>
             </Row>
-            <Row gutter={[16, 16]}>
+            <Row gutter={isMobile ? [10, 10] : [16, 16]}>
               <Col md={12} xs={24}>
                 <Form.Item
                   name="addressLine_1"
@@ -176,7 +178,7 @@ export const ProfileDetails = (props: ProfileDetailsProps) => {
                 </Form.Item>
               </Col>
             </Row>
-            <Row gutter={[16, 16]}>
+            <Row gutter={isMobile ? [10, 10] : [16, 16]}>
               <Col md={12} xs={24}>
                 <Form.Item
                   name="city"
