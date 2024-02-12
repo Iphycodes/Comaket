@@ -78,32 +78,32 @@ export const AppHeader = (props: AppHeaderProps) => {
                 <span>Change Password</span>
               </Space>
             </div>
+            <>
+              {isMobile && (
+                <>
+                  <div
+                    className="cursor-pointer rounded-sm px-3 py-1 hover:bg-gray-100 dark:hover:bg-zinc-400"
+                    onClick={() => handleMenuClick('logout')}
+                  >
+                    <Space className="p-1" size={15}>
+                      <FileDoneOutlined />
+                      <span>Api Documentation</span>
+                    </Space>
+                  </div>
+                  <div
+                    className="cursor-pointer rounded-sm px-3 py-1 hover:bg-gray-100 dark:hover:bg-zinc-400"
+                    onClick={() => handleMenuClick('logout')}
+                  >
+                    <Space className="p-1" size={15}>
+                      <ToolOutlined />
+                      <span>For Developers</span>
+                    </Space>
+                  </div>
+                </>
+              )}
+            </>
           </>
         )}
-        <>
-          {isMobile && (
-            <>
-              <div
-                className="cursor-pointer rounded-sm px-3 py-1 hover:bg-gray-100 dark:hover:bg-zinc-400"
-                onClick={() => handleMenuClick('logout')}
-              >
-                <Space className="p-1" size={15}>
-                  <FileDoneOutlined />
-                  <span>Api Document</span>
-                </Space>
-              </div>
-              <div
-                className="cursor-pointer rounded-sm px-3 py-1 hover:bg-gray-100 dark:hover:bg-zinc-400"
-                onClick={() => handleMenuClick('logout')}
-              >
-                <Space className="p-1" size={15}>
-                  <ToolOutlined />
-                  <span>For Developers</span>
-                </Space>
-              </div>
-            </>
-          )}
-        </>
 
         <div
           className="cursor-pointer rounded-sm px-3 py-1 hover:bg-gray-100 dark:hover:bg-zinc-400"
@@ -127,7 +127,7 @@ export const AppHeader = (props: AppHeaderProps) => {
     >
       <div className="flex justify-between items-center min-w-full dark:text-white">
         {isMobile && (
-          <>
+          <Space size={20}>
             {(pathUrl ?? [])?.length <= 2 ? (
               <div>
                 <span className=" cursor-pointer" onClick={() => router.push('/apps')}>
@@ -148,7 +148,20 @@ export const AppHeader = (props: AppHeaderProps) => {
                 ></i>
               </div>
             )}
-          </>
+            {isAppSettingsPath ? (
+              <div className="font-bold text-3">
+                <span
+                  className={`text-muted-foreground ${isMobile ? 'mr-4' : 'mr-8'} cursor-pointer`}
+                  onClick={() => router.back()}
+                >
+                  &larr; Back
+                </span>{' '}
+                <span className="">Settings </span>
+              </div>
+            ) : (
+              <span className="font-bold text-3">{`${currentPath}`}</span>
+            )}
+          </Space>
         )}
         {!isMobile && (
           <>
@@ -165,7 +178,7 @@ export const AppHeader = (props: AppHeaderProps) => {
             ) : isAppSettingsPath ? (
               <div className="font-bold text-3">
                 <span
-                  className=" text-muted-foreground mr-8 cursor-pointer"
+                  className={`text-muted-foreground ${isMobile ? 'mr-4' : 'mr-8'} cursor-pointer`}
                   onClick={() => router.back()}
                 >
                   &larr; Back

@@ -56,7 +56,7 @@ const TopButtons = ({ setModalOpen, setModalElement, isMobile }: TopButtonsProps
           isMobile ? 'h-10 text-[10px] px-2' : 'h-12'
         }`}
         type="primary"
-        disabled={true}
+        disabled={false}
         loading={false}
       >
         <div className="flex items-center gap-2">
