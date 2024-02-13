@@ -36,7 +36,11 @@ const CreateBatchForm: React.FC<Props> = ({ handleSetCurrentBatch, handleSetStep
         <Row className="my-0">
           <Col className="my-0" lg={24} xs={24}>
             <div className="mb-0 text-muted-foreground">{`Batch Name`}</div>
-            <Form.Item name="batchName" className="mb-3">
+            <Form.Item
+              name="batchName"
+              className="mb-3"
+              rules={[{ required: true, message: 'Enter Batch Name' }]}
+            >
               <Input className="w-full" size="large" />
             </Form.Item>
           </Col>

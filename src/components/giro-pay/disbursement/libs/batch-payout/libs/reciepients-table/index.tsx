@@ -5,9 +5,13 @@ import React from 'react';
 
 interface ReciepientsTableProps {
   batchReciepientsData: ReciepientsDataType[];
+  isEditable: boolean;
 }
 
-const ReciepientsTable: React.FC<ReciepientsTableProps> = ({ batchReciepientsData }) => {
+const ReciepientsTable: React.FC<ReciepientsTableProps> = ({
+  batchReciepientsData,
+  isEditable,
+}) => {
   const columns: ColumnsType<ReciepientsDataType> = [
     {
       title: (
@@ -51,7 +55,7 @@ const ReciepientsTable: React.FC<ReciepientsTableProps> = ({ batchReciepientsDat
           <span>Amount</span>
         </span>
       ),
-      width: '80px',
+      width: `${isEditable ? '80px' : '100px'}`,
       ellipsis: {
         showTitle: true,
       },
@@ -59,24 +63,28 @@ const ReciepientsTable: React.FC<ReciepientsTableProps> = ({ batchReciepientsDat
       key: 'amount',
       render: (text) => <span>{`\u20A6${text}`}</span>,
     },
-    {
-      width: '30px',
-      key: 'edit',
-      render: () => (
-        <span>
-          <i className="ri-pencil-line text-blue"></i>
-        </span>
-      ),
-    },
-    {
-      width: '30px',
-      key: 'delete',
-      render: () => (
-        <span>
-          <i className="ri-close-line text-red-500"></i>
-        </span>
-      ),
-    },
+    isEditable
+      ? {
+          width: '30px',
+          key: 'edit',
+          render: () => (
+            <span>
+              <i className="ri-pencil-line text-blue"></i>
+            </span>
+          ),
+        }
+      : { width: '0px', key: 'edit' },
+    isEditable
+      ? {
+          width: '30px',
+          key: 'delete',
+          render: () => (
+            <span>
+              <i className="ri-close-line text-red-500"></i>
+            </span>
+          ),
+        }
+      : { width: '0px', key: 'edit' },
   ];
 
   return (

@@ -1,4 +1,4 @@
-import { Button, Col, Row, Space } from 'antd';
+import { Button, Col, Modal, Row, Space } from 'antd';
 import React, { useEffect, useState } from 'react';
 import AddReciepientForm from './libs/add-reciepient-form';
 import { ReciepientsDataType } from '@grc/_shared/constant';
@@ -7,25 +7,71 @@ import PayoutSuccess from './libs/payout-success';
 import BatchPayoutStarter from './libs/batch-payout-starter';
 import CreateBatchForm from './libs/create-batch-form';
 import CreateBatchSuccess from './libs/create-batch-success';
+import ConfirmPayout from '../confirm-payout';
+import { IBalance } from '@grc/_shared/namespace/wallet';
 
-const BatchPayout = () => {
+interface BatchPayoutProps {
+  balance: IBalance;
+}
+
+const BatchPayout = ({ balance }: BatchPayoutProps) => {
   const [batchReciepientsData, setBatchReciepientsData] = useState<ReciepientsDataType[]>([]);
   const [isAddState, setIsAddState] = useState<boolean>(false);
   const [isDone, setIsDone] = useState<boolean>(false);
   const [steps, setSteps] = useState<'step1' | 'step2' | 'step3' | 'step4' | 'step5'>('step1');
   const [currentBatch, setCurrentBatch] = useState<Record<string, any>>({});
 
+  const [paymentDetails, setPaymentDetails] = useState<Record<string, any>>({});
+
+  const handleSetPaymentDetails = () => {
+    let totalAmount = 0;
+    const charges = 25;
+    batchReciepientsData?.map((batchReciepient: any) => {
+      totalAmount += batchReciepient?.amount;
+    });
+
+    const batchPaymentDetails = {
+      amount: totalAmount,
+      charges: charges,
+      reciepients: batchReciepientsData,
+    };
+
+    setPaymentDetails(batchPaymentDetails);
+  };
+
+  const handleProceedToPayment = () => {
+    handleSetPaymentDetails();
+    setSteps('step5');
+  };
+
   const handleAddBatchReciepient = (reciepient: ReciepientsDataType) => {
     setBatchReciepientsData([...batchReciepientsData, reciepient]);
   };
 
   const handleClearBatchReciepients = () => {
-    setBatchReciepientsData([]);
+    Modal.confirm({
+      title: 'Confirm',
+      content: 'Are you sure you want to Clear all Recipients?, This Action is irreversible',
+      okText: 'Yes',
+      cancelText: 'No',
+      onOk: () => {
+        setBatchReciepientsData([]);
+      },
+      onCancel: () => {
+        console.log('Action canceled');
+      },
+    });
+    // if (
+    //   confirm(
+    //     'Are you sure you want to Clear all Recipients?, This Action is irreversible. Click OK to confirm'
+    //   )
+    // ) {
+    //   setBatchReciepientsData([]);
+    // }
   };
 
   const handleConfirmPayment = () => {
     setIsDone(true);
-    setSteps('step5');
   };
 
   const handleSetCurrentBatch = (currentBatchItem: Record<string, any>) => {
@@ -53,7 +99,11 @@ const BatchPayout = () => {
             <i className="ri-group-line text-white text-[18px]"></i>{' '}
           </span>
           <span className="font-bold text-[20px]">
-            {steps === 'step2' || steps === 'step3' ? 'Create New Batch' : 'Batch Payout'}
+            {steps === 'step2'
+              ? 'Create New Batch'
+              : steps === 'step3'
+                ? 'Batch Created'
+                : 'Batch Payout'}
           </span>
         </Space>
       </div>
@@ -140,14 +190,16 @@ const BatchPayout = () => {
                       </div>
                     ) : (
                       <div>
-                        <ReciepientsTable batchReciepientsData={batchReciepientsData} />
+                        <ReciepientsTable
+                          batchReciepientsData={batchReciepientsData}
+                          isEditable={true}
+                        />
                         <div className="flex items-center gap-2 justify-end">
                           <Button
                             className="opacity-100 flex items-center justify-center text-center hover:opacity-95 font-normal bg-blue text-white h-12"
                             type="primary"
                             disabled={false}
                             loading={false}
-                            onClick={() => handleConfirmPayment()}
                           >
                             <div className="flex items-center font-semibold gap-2">
                               <span>
@@ -161,13 +213,13 @@ const BatchPayout = () => {
                             type="primary"
                             disabled={false}
                             loading={false}
-                            onClick={() => handleConfirmPayment()}
+                            onClick={() => handleProceedToPayment()}
                           >
                             <div className="flex items-center font-semibold gap-2">
                               <span>
                                 <i className="ri-send-plane-fill text-[18px]"></i>
                               </span>
-                              <span>Confirm Payment</span>
+                              <span>Proceed to Payment</span>
                             </div>
                           </Button>
                         </div>
@@ -178,11 +230,16 @@ const BatchPayout = () => {
               )}
             </>
           )}
-          {/* {
-            steps === 'step5' && (
-              <ConfirmPayout/>
-            )
-          } */}
+          {steps === 'step5' && (
+            <ConfirmPayout
+              key="batch-payout"
+              handleSuccess={() => handleConfirmPayment()}
+              handleSetSteps={handleSetSteps}
+              paymentDetails={paymentDetails}
+              balance={balance}
+              batchReciepientsData={batchReciepientsData}
+            />
+          )}
         </>
       )}
     </div>

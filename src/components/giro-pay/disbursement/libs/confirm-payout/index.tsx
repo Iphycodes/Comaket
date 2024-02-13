@@ -2,24 +2,30 @@ import { numberFormat } from '@grc/_shared/helpers';
 import { IBalance } from '@grc/_shared/namespace/wallet';
 import { Button } from 'antd';
 import { capitalize, startCase } from 'lodash';
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { useState } from 'react';
+import ReciepientsTable from '../batch-payout/libs/reciepients-table';
+import { ReciepientsDataType } from '@grc/_shared/constant';
 
 interface ConfirmPayoutProps {
   paymentDetails: Record<string, any>;
   handleSetSteps: (steps: 'step1' | 'step2' | 'step3' | 'step4') => void;
   balance: IBalance;
-  setModalElement: Dispatch<
-    SetStateAction<'top-up-balance' | 'single-payout' | 'batch-payout' | ''>
-  >;
+  batchReciepientsData?: ReciepientsDataType[];
+  handleSuccess?: () => void;
+  key: 'batch-payout' | 'single-payout';
 }
 
 const ConfirmPayout: React.FC<ConfirmPayoutProps> = ({
   paymentDetails,
   handleSetSteps,
   balance,
+  batchReciepientsData,
+  key,
+  handleSuccess,
 }) => {
+  const [isViewReciepient, setViewReciepient] = useState<boolean>(false);
   const handleGoBack = () => {
-    handleSetSteps('step1');
+    key === 'single-payout' ? handleSetSteps('step1') : handleSetSteps('step4');
   };
   const paymentDetailsKeySwap: Record<string, any> = {
     accountName: 'account name',
@@ -33,6 +39,10 @@ const ConfirmPayout: React.FC<ConfirmPayoutProps> = ({
       return 'Yes';
     }
     return 'No';
+  };
+
+  const handleConfirmPayment = () => {
+    key === 'single-payout' ? handleSetSteps('step3') : handleSuccess?.();
   };
 
   return (
@@ -50,50 +60,69 @@ const ConfirmPayout: React.FC<ConfirmPayoutProps> = ({
       <div className="border-b">
         {Object.entries(paymentDetails).map(([key, value]) => {
           return (
-            <div key={key} className="flex justify-between items-center py-1">
-              <div className="flex items-center gap-1 text-gray-500">
-                <span>
-                  {(() => {
-                    switch (key) {
-                      case 'beneficiary':
-                        return;
-                      case 'accountName':
-                        return <i className="ri-user-line text-[20px]"></i>;
-                      case 'bankName':
-                        return <i className="ri-bank-line text-[20px]"></i>;
-                      case 'accountNumber':
-                        return <i className="ri-archive-drawer-line text-[20px]"></i>;
-                      case 'amount':
-                        return <i className="ri-wallet-2-line text-[20px]"></i>;
-                      case 'narration':
-                        return <i className="ri-quote-text text-[20px]"></i>;
-                      case 'saveBeneficiary':
-                        return <i className="ri-hand-coin-line text-[20px]"></i>;
-                      default:
-                        return <i className="ri-rest-time-line text-[20px]"></i>;
-                    }
-                  })()}
-                </span>
-                <span className="text-[16px]">
-                  {startCase(capitalize(paymentDetailsKeySwap[key] ?? key))}
-                </span>
+            <>
+              <div key={key} className="flex justify-between items-center py-1">
+                <div className="flex items-center gap-1 text-gray-500">
+                  <span>
+                    {(() => {
+                      switch (key) {
+                        case 'reciepients':
+                          return <i className="ri-group-line text-[20px]"></i>;
+                        case 'accountName':
+                          return <i className="ri-user-line text-[20px]"></i>;
+                        case 'bankName':
+                          return <i className="ri-bank-line text-[20px]"></i>;
+                        case 'accountNumber':
+                          return <i className="ri-archive-drawer-line text-[20px]"></i>;
+                        case 'amount':
+                          return <i className="ri-wallet-2-line text-[20px]"></i>;
+                        case 'narration':
+                          return <i className="ri-quote-text text-[20px]"></i>;
+                        case 'saveBeneficiary':
+                          return <i className="ri-hand-coin-line text-[20px]"></i>;
+                        case 'charges':
+                          return <i className="ri-funds-line text-[20px]"></i>;
+                        default:
+                          return <i className="ri-rest-time-line text-[20px]"></i>;
+                      }
+                    })()}
+                  </span>
+                  <span className="text-[16px]">
+                    {startCase(capitalize(paymentDetailsKeySwap[key] ?? key))}
+                  </span>
+                </div>
+                <div>
+                  {key === 'reciepients' ? (
+                    <span
+                      className="text-blue font-semibold hover:underline cursor-pointer"
+                      onClick={() => setViewReciepient(!isViewReciepient)}
+                    >
+                      {isViewReciepient ? `Hide Reciepients` : 'View Reciepients'}
+                    </span>
+                  ) : (
+                    <span className="font-semibold">{`${
+                      key === 'amount' || key === 'charges'
+                        ? `${numberFormat(value, '₦ ')}`
+                        : key === 'saveBeneficiary'
+                          ? formatBoolean(value)
+                          : ['beneficiary'].includes(key)
+                            ? ''
+                            : startCase(capitalize(value))
+                    }`}</span>
+                  )}
+                </div>
               </div>
               <div>
-                {key === 'recipients' ? (
-                  <span className="text-blue font-semibold hover:underline">View Reciepients</span>
-                ) : (
-                  <span className="font-semibold">{`${
-                    key === 'amount'
-                      ? `${numberFormat(value, '₦ ')}`
-                      : key === 'saveBeneficiary'
-                        ? formatBoolean(value)
-                        : ['beneficiary'].includes(key)
-                          ? ''
-                          : startCase(capitalize(value))
-                  }`}</span>
+                {key === 'reciepients' && isViewReciepient === true && (
+                  <div className="w-full">
+                    <ReciepientsTable
+                      isEditable={false}
+                      batchReciepientsData={batchReciepientsData ?? []}
+                    />
+                  </div>
                 )}
               </div>
-            </div>
+            </>
           );
         })}
       </div>
@@ -125,10 +154,10 @@ const ConfirmPayout: React.FC<ConfirmPayoutProps> = ({
         type="primary"
         disabled={false}
         loading={false}
-        onClick={() => handleSetSteps('step3')}
+        onClick={() => handleConfirmPayment()}
       >
         <div className="flex items-center gap-2 text-[18px] font-semibold">
-          <span>Proceed</span>
+          <span>Confirm Payment</span>
           <span>
             <i className="ri-arrow-drop-right-line text-[25px]"></i>
           </span>

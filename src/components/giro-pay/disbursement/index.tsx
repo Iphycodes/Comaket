@@ -243,7 +243,7 @@ const Disbursement = (props: DisbursementProps) => {
               payoutSuccessData={payoutSuccessData}
             />
           )}
-          {modalElement === 'batch-payout' && <BatchPayout />}
+          {modalElement === 'batch-payout' && <BatchPayout balance={balance} />}
         </Modal>
       </motion.div>
     </>

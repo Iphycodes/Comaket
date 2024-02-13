@@ -1,4 +1,4 @@
-import { Button, Row, Select, Space } from 'antd';
+import { Button, Col, Form, Row, Select, Space } from 'antd';
 import React from 'react';
 
 interface Props {
@@ -8,27 +8,38 @@ interface Props {
 const BatchPayoutStarter: React.FC<Props> = ({ handleSetSteps }) => {
   return (
     <div>
-      <Row className="py-2 items-center" style={{}}>
-        <div className="py-4 w-full flex justify-between items-center gap-2 border-b">
-          <Select
-            bordered={true}
-            style={{ flex: 1 }}
-            showSearch
-            size="large"
-            placeholder={'Enter Batch Name'}
-            options={[]}
-            className={'w-full'}
-          />
-          <Button
-            className="opacity-100 w-[140px] flex items-center justify-center text-center hover:opacity-95 font-normal bg-blue text-white h-10"
-            type="primary"
-            disabled={false}
-            loading={false}
-            htmlType="submit"
-          >
-            <span>Proceed</span>
-          </Button>
-        </div>
+      <Row className="py-2 items-center">
+        <Form name={'batch-add-reciepient-form'} className={'mt-4 w-full'} data-testid={'dti_form'}>
+          <Row className="py-4 w-full border-b px-0 m-0" gutter={[10, 10]}>
+            <Col lg={18}>
+              <Form.Item
+                name="batchName"
+                className="mb-3"
+                rules={[{ required: true, message: 'Select a Batch' }]}
+              >
+                <Select
+                  bordered={true}
+                  showSearch
+                  size="large"
+                  placeholder={'Select a Batch'}
+                  options={[]}
+                  className={'w-full'}
+                />
+              </Form.Item>
+            </Col>
+            <Col lg={6}>
+              <Button
+                className="opacity-100 w-full flex items-center justify-center text-center hover:opacity-95 font-normal bg-blue text-white h-10"
+                type="primary"
+                disabled={false}
+                loading={false}
+                htmlType="submit"
+              >
+                <span>Proceed</span>
+              </Button>
+            </Col>
+          </Row>
+        </Form>
         {/* <div className="mb-0 text-gray-500">Batch Name</div> */}
       </Row>
       <div className="w-full text-gray-500 text-center flex flex-col gap-1 py-2 justify-center items-center">

@@ -39,7 +39,6 @@ interface SinglePayoutProps {
 
 const SinglePayout = ({
   balance,
-  setModalElement,
   paymentDetails,
   setPaymentDetails,
   singlePayoutSteps,
@@ -101,10 +100,10 @@ const SinglePayout = ({
       )}
       {singlePayoutSteps === 'step2' && (
         <ConfirmPayout
+          key="single-payout"
           balance={balance}
           paymentDetails={paymentDetails}
           handleSetSteps={handleSetSinglePayoutSteps}
-          setModalElement={setModalElement}
         />
       )}
       {singlePayoutSteps === 'step3' && (
