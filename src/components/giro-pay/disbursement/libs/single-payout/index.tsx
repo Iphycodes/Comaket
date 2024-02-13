@@ -113,7 +113,7 @@ const SinglePayout = ({
         />
       )}
       {singlePayoutSteps === 'step4' && (
-        <PayoutSuccess key="single-payout" payoutSuccessData={payoutSuccessData} />
+        <PayoutSuccess title="single-payout" payoutSuccessData={payoutSuccessData} />
       )}
     </>
   );

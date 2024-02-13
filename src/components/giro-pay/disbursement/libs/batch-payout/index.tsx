@@ -21,6 +21,15 @@ const BatchPayout = ({ balance }: BatchPayoutProps) => {
   const [steps, setSteps] = useState<'step1' | 'step2' | 'step3' | 'step4' | 'step5'>('step1');
   const [currentBatch, setCurrentBatch] = useState<Record<string, any>>({});
 
+  // const getAmount = () => {
+  //   let totalAmount = 0;
+  //   batchReciepientsData?.map((batchReciepient: any) => {
+  //     totalAmount += batchReciepient?.amount;
+  //   });
+
+  //   return totalAmount;
+  // };
+
   const [paymentDetails, setPaymentDetails] = useState<Record<string, any>>({});
 
   const handleSetPaymentDetails = () => {
@@ -80,6 +89,14 @@ const BatchPayout = ({ balance }: BatchPayoutProps) => {
     console.log('currentbatch.....................', currentBatchItem);
   };
 
+  // const getBatchPayoutSuccessData = () => {
+  //   return {
+  //     batchName: currentBatch,
+  //     amount: 1000,
+  //     charges: 25,
+  //   };
+  // };
+
   const handleSetSteps = (steps: 'step1' | 'step2' | 'step3' | 'step4' | 'step5') => {
     setSteps(steps);
   };
@@ -108,7 +125,7 @@ const BatchPayout = ({ balance }: BatchPayoutProps) => {
         </Space>
       </div>
       {isDone ? (
-        <PayoutSuccess payoutSuccessData={{}} key="batch-payout" />
+        <PayoutSuccess payoutSuccessData={{}} title="batch-payout" />
       ) : (
         <>
           {steps === 'step1' && <BatchPayoutStarter handleSetSteps={handleSetSteps} />}

@@ -7,10 +7,10 @@ import { useTheme } from 'next-themes';
 import { CopyIcon, CopyIconLight } from '@grc/_shared/assets/svgs';
 interface PayoutSuccessProps {
   payoutSuccessData: Record<string, any>;
-  key: 'single-payout' | 'batch-payout';
+  title: 'single-payout' | 'batch-payout';
 }
 
-const PayoutSuccess: React.FC<PayoutSuccessProps> = ({ payoutSuccessData, key }) => {
+const PayoutSuccess: React.FC<PayoutSuccessProps> = ({ payoutSuccessData, title }) => {
   const {
     amount,
     accountName,
@@ -19,7 +19,7 @@ const PayoutSuccess: React.FC<PayoutSuccessProps> = ({ payoutSuccessData, key })
     beneficiary,
     createdAt,
     reference,
-    batchName,
+    charges,
   } = payoutSuccessData?.data ?? {};
   const { theme } = useTheme();
 
@@ -35,17 +35,29 @@ const PayoutSuccess: React.FC<PayoutSuccessProps> = ({ payoutSuccessData, key })
       ></i>
       <div className="text-lg font-bold text-muted-foreground mb-4">Money Sent</div> */}
       <section className="text-center">
-        {key === 'batch-payout' && (
+        {title === 'batch-payout' && (
           <div className=" pb-1">
             <h5 className="text-[15px] text-muted-foreground">Batch Name</h5>
-            <span className="text-[17px] font-bold">{batchName}</span>
+            <span className="text-[17px] font-bold">{'Payment Batch'}</span>
           </div>
         )}
-        <div className=" pb-1">
-          <h5 className="text-[15px] text-muted-foreground">Amount Sent</h5>
-          <span className="text-[17px] font-bold">{numberFormat(amount / 100, '₦ ')}</span>
+        <div className="pb-1">
+          <h5 className="text-[15px] text-muted-foreground">{`${
+            title === 'batch-payout' ? 'Total' : ''
+          } Amount Sent`}</h5>
+          <span className="text-[17px] font-bold">
+            {numberFormat(amount / 100, '₦ ') ?? '₦ 0.00'}
+          </span>
         </div>
-        {key === 'single-payout' && (
+        {title === 'batch-payout' && (
+          <div className=" pb-1">
+            <h5 className="text-[15px] text-muted-foreground">{`Fee`}</h5>
+            <span className="text-[17px] font-bold">
+              {numberFormat(charges / 100, '₦ ' ?? '₦ 0.00')}
+            </span>
+          </div>
+        )}
+        {title === 'single-payout' && (
           <div className=" pb-1">
             <h5 className="text-[15px] text-muted-foreground">Recipient Details</h5>
             <span className="text-[17px] font-bold">
