@@ -112,7 +112,9 @@ const SinglePayout = ({
           handleVerifyUser={handleVerifyUser}
         />
       )}
-      {singlePayoutSteps === 'step4' && <PayoutSuccess payoutSuccessData={payoutSuccessData} />}
+      {singlePayoutSteps === 'step4' && (
+        <PayoutSuccess key="single-payout" payoutSuccessData={payoutSuccessData} />
+      )}
     </>
   );
 };

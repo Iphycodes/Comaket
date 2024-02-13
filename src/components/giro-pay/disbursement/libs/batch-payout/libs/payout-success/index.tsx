@@ -7,11 +7,20 @@ import { useTheme } from 'next-themes';
 import { CopyIcon, CopyIconLight } from '@grc/_shared/assets/svgs';
 interface PayoutSuccessProps {
   payoutSuccessData: Record<string, any>;
+  key: 'single-payout' | 'batch-payout';
 }
 
-const PayoutSuccess: React.FC<PayoutSuccessProps> = ({ payoutSuccessData }) => {
-  const { amount, accountName, accountNumber, bankCode, beneficiary, createdAt, reference } =
-    payoutSuccessData?.data ?? {};
+const PayoutSuccess: React.FC<PayoutSuccessProps> = ({ payoutSuccessData, key }) => {
+  const {
+    amount,
+    accountName,
+    accountNumber,
+    bankCode,
+    beneficiary,
+    createdAt,
+    reference,
+    batchName,
+  } = payoutSuccessData?.data ?? {};
   const { theme } = useTheme();
 
   const onCopy: (text: string) => void = (text: string) =>
@@ -26,17 +35,26 @@ const PayoutSuccess: React.FC<PayoutSuccessProps> = ({ payoutSuccessData }) => {
       ></i>
       <div className="text-lg font-bold text-muted-foreground mb-4">Money Sent</div> */}
       <section className="text-center">
+        {key === 'batch-payout' && (
+          <div className=" pb-1">
+            <h5 className="text-[15px] text-muted-foreground">Batch Name</h5>
+            <span className="text-[17px] font-bold">{batchName}</span>
+          </div>
+        )}
         <div className=" pb-1">
           <h5 className="text-[15px] text-muted-foreground">Amount Sent</h5>
           <span className="text-[17px] font-bold">{numberFormat(amount / 100, '₦ ')}</span>
         </div>
-        <div className=" pb-1">
-          <h5 className="text-[15px] text-muted-foreground">Recipient Details</h5>
-          <span className="text-[17px] font-bold">
-            {startCase(lowerCase(accountName))} | {accountNumber} |{' '}
-            {beneficiary?.bankCode || bankCode}{' '}
-          </span>
-        </div>
+        {key === 'single-payout' && (
+          <div className=" pb-1">
+            <h5 className="text-[15px] text-muted-foreground">Recipient Details</h5>
+            <span className="text-[17px] font-bold">
+              {startCase(lowerCase(accountName))} | {accountNumber} |{' '}
+              {beneficiary?.bankCode || bankCode}{' '}
+            </span>
+          </div>
+        )}
+
         <div className=" pb-1">
           <h5 className="text-[15px] text-muted-foreground">Transaction Time</h5>
           <span className="text-[17px] font-bold">
