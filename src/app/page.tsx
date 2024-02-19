@@ -1,10 +1,17 @@
 // import LoginContainer from '@grc/container/auth/login'
+'use client';
 
-export default function Home() {
+import { useTheme } from 'next-themes';
+
+const Home = () => {
+  const { setTheme } = useTheme();
   return (
     <>
       {/* <LoginContainer /> */}
-      <div>Comaket Landing page</div>
+      <div>Sample Project Landing page</div>
+      <button onClick={() => setTheme('light')}>Change</button>
     </>
   );
-}
+};
+
+export default Home;

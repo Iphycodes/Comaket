@@ -5,7 +5,6 @@ import { AuthDataType } from '@grc/_shared/namespace/auth';
 import { persistor } from '@grc/redux/store';
 import { WalletNamespace } from '@grc/_shared/namespace/wallet';
 import { AccountNamespace } from '@grc/_shared/namespace/account';
-import { accountSettingApi } from '@grc/services/settings/account-setting';
 
 export const initialState = {
   authData: null,
@@ -58,13 +57,6 @@ export const authSlice = createSlice({
       state.authData = action.payload.data;
       state.isLiveMode = action.payload.data?.currentAccount?.live;
     });
-
-    builder.addMatcher(
-      accountSettingApi.endpoints.updateAccount.matchFulfilled,
-      (state, action) => {
-        state.isLiveMode = action.payload.data.live;
-      }
-    );
   },
 });
 

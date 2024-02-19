@@ -29,6 +29,7 @@ export default function RootLayout({ children }: LayoutProps) {
           attribute="class"
           defaultTheme="light"
           enableSystem
+          storageKey="sample-key"
           disableTransitionOnChange
         >
           {children}

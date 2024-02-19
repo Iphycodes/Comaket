@@ -2,7 +2,7 @@
 
 const MarketPage = () => {
   return (
-    <main className={`h-screen flex flex-col items-center bg-background`}>
+    <main className={`h-screen`}>
       <div>This is the market Page</div>
     </main>
   );
