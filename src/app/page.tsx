@@ -4,7 +4,7 @@ export default function Home() {
   return (
     <>
       {/* <LoginContainer /> */}
-      <div>Giro Landing page</div>
+      <div>Comaket Landing page</div>
     </>
   );
 }

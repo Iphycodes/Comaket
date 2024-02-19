@@ -11,8 +11,8 @@ const nunito = Nunito({
   display: 'swap',
 });
 export const metadata: Metadata = {
-  title: 'Giro',
-  description: 'This is a financial app',
+  title: 'Comaket',
+  description: 'Biggest Network of Buyers and Sellers',
   // viewport: { width: 'device-width', initialScale: 1 },
   icons: { icon: '/favicon.ico' },
 };
