@@ -3,6 +3,10 @@ import { AUTH_TOKEN_KEY, COLOR_LIST_ALPHA } from '@grc/_shared/constant';
 import { MenuProps } from 'antd';
 import { get, capitalize, isEmpty } from 'lodash';
 
+export const truncateText = (text: string) => {
+  return text.split('\n').slice(0, 2).join('\n') + '...';
+};
+
 export const numberFormat = (value: number | bigint, currency?: string) => {
   const formatter = new Intl.NumberFormat();
   return currency ? currency + formatter.format(value) : formatter.format(value);
@@ -20,32 +24,6 @@ const passwordRegex = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])(?=.*[^a-zA-Z0-9])(?!.*\s)
 export const isValidPassword = (password: string) => {
   return passwordRegex.test(password);
 };
-
-// type AuthTokenReturnProps = {
-//   isLoggedIn: boolean;
-//   expiresAt: Date | null;
-// };
-
-/**decode token**/
-// export const AuthToken = (token: string | undefined): AuthTokenReturnProps => {
-//   const defaultState = {
-//     isLoggedIn: false,
-//     expiresAt: null,
-//   };
-//   if (token) {
-//     try {
-//       const decoded: any = jwtDecode(token);
-//       const sessionTimeExp = decoded.exp;
-//       return {
-//         isLoggedIn: sessionTimeExp > new Date().getTime() / 1000,
-//         expiresAt: new Date(sessionTimeExp * 1000),
-//       };
-//     } catch (e) {
-//       return defaultState;
-//     }
-//   }
-//   return defaultState;
-// };
 
 type AppCookieProp = {
   cookie?: string | null;

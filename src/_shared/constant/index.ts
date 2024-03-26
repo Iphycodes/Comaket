@@ -1,5 +1,4 @@
-import moment from 'moment';
-import { faker } from '@faker-js/faker';
+import { mockMarketItemType } from '../namespace';
 
 export const POST = 'POST';
 export const PUT = 'PUT';
@@ -42,20 +41,8 @@ export const disbursementAnalyticsUrl = 'analytics/disbursements';
 /**Token**/
 
 export const AUTH_TOKEN_KEY = process.env.NEXT_PUBLIC_TOKEN_STORAGE_KEY as string;
-export const appName = 'Giro';
+export const appName = 'Comarket';
 export const dateFormat = 'DD-MM-YYYY';
-
-export const scrollOption: ScrollIntoViewOptions = {
-  inline: 'center',
-  block: 'nearest',
-  behavior: 'smooth',
-};
-
-export const status = [
-  { label: 'All', value: 'all' },
-  { label: 'Success', value: 'successful' },
-  { label: 'Failed', value: 'failed' },
-];
 
 export enum COLOR_LIST_ALPHA {
   A = '#3E82FF',
@@ -86,389 +73,249 @@ export enum COLOR_LIST_ALPHA {
   Z = '#2CA02C',
 }
 
-export const walletBalance = (data: Array<Record<string, any>>) => {
-  return data?.reduce((curr, acc) => {
-    return curr + acc.amount;
-  }, 0);
-};
-
-export const statsReducer = (data: Array<Record<string, any>>) => {
-  return data?.reduce((acc, stat) => {
-    return {
-      ...acc,
-      [stat.status]: stat.no_of_requests,
-    };
-  }, {});
-};
-
-export const billingReducer = (data: Array<Record<string, any>>) => {
-  return data?.reduce((acc, stat) => {
-    return {
-      ...acc,
-      [stat.status === 0 ? 'pending' : stat.status === 1 ? 'paid' : 0]: {
-        no_of_invoices: stat?.no_of_invoices,
-        total_cost: stat?.total_cost,
-      },
-    };
-  }, {});
-};
-
-export const countries = [
+export const mockMarketItems: Partial<mockMarketItemType[]> = [
   {
-    label: 'Nigeria',
-    value: 'nigeria',
-  },
-  {
-    label: 'Ghana',
-    value: 'ghana',
-  },
-  {
-    label: 'Kenya',
-    value: 'kenya',
-  },
-  {
-    label: 'South Africa',
-    value: 'south-africa',
-  },
-];
-
-export const categories = [
-  {
-    label: 'Fintech',
-    value: 'fintech',
-  },
-  {
-    label: 'Ecommerce',
-    value: 'ecommerce',
-  },
-];
-
-export const businessStatus = [
-  {
-    label: 'Disabled',
-    value: 'disabled',
-  },
-  {
-    label: 'Blocked',
-    value: 'blocked',
-  },
-  {
-    label: 'Active',
-    value: 'active',
-  },
-  {
-    label: 'Pending',
-    value: 'pending',
-  },
-  {
-    label: 'Inactive',
-    value: 'inactive',
-  },
-  {
-    label: 'Rejected',
-    value: 'rejected',
-  },
-];
-export const gender = [
-  {
-    label: 'Male',
-    value: 'male',
-  },
-  {
-    label: 'Female',
-    value: 'female',
-  },
-];
-
-export const business_category = [
-  {
-    label: 'Small and Medium Scale Business',
-    value: 'small_medium',
-  },
-  {
-    label: 'Fintech and Loans Provider',
-    value: 'fintech_loan',
-  },
-  {
-    label: 'Online Store',
-    value: 'online_store',
-  },
-  {
-    label: 'Fashion and Apparel',
-    value: 'fashion_apparel',
-  },
-  {
-    label: 'Confectionary / Restaurant',
-    value: 'confectionary_restaurant',
-  },
-  {
-    label: 'Event Management',
-    value: 'event_management',
-  },
-];
-
-export const IdentityType = [
-  {
-    label: 'BVN',
-    value: 'bvn',
-  },
-];
-
-export const transactionData = [
-  {
-    entry: 'debit',
-    id: '00001',
-    createdAt: '12/06/23',
-    time: '00:34:12',
-    amount: 45023400,
-    currency: 'NGN',
-    recipient: 'john doe',
-    status: 'successful',
-  },
-  {
-    entry: 'debit',
-    id: '00002',
-    createdAt: '12/06/23',
-    time: '00:34:12',
-    amount: 45023400,
-    currency: 'NGN',
-    recipient: 'john doe',
-    status: 'processing',
-  },
-  {
-    entry: 'credit',
-    id: '00003',
-    createdAt: '12/06/23',
-    time: '00:34:12',
-    amount: 45023400,
-    currency: 'NGN',
-    recipient: 'sinzu money',
-    status: 'successful',
-  },
-  {
-    entry: 'debit',
-    id: '00005',
-    createdAt: '12/06/23',
-    time: '00:34:12',
-    amount: 45023400,
-    currency: 'NGN',
-    recipient: 'john doe',
-    status: 'failed',
-  },
-  {
-    entry: 'credit',
-    id: '00003',
-    createdAt: '12/06/23',
-    time: '00:34:12',
-    amount: 45023400,
-    currency: 'NGN',
-    recipient: 'sinzu money',
-    status: 'successful',
-  },
-];
-
-export const statisticsFilter = [
-  { label: 'all', value: 'all' },
-  { label: 'week', value: 'week' },
-  { label: 'month', value: 'month' },
-  { label: 'quarter', value: 'quarter' },
-  { label: 'year', value: 'year' },
-];
-
-export const statCardProps = [
-  {
-    title: 'Total',
-    value: 10034000,
-  },
-  {
-    title: 'Pending',
-    value: 3,
-  },
-  {
-    title: 'Processing',
-    value: 1,
-  },
-  {
-    title: 'Successful',
-    value: 401030,
-  },
-  {
-    title: 'Failed',
-    value: 2,
-  },
-];
-
-export const mockTransactionAnalyticsData = {
-  labels: ['Failed Payouts', 'Pending Payouts', 'Successful Payouts'],
-  datasets: [
-    {
-      backgroundColor: ['#B21F00', '#C9DE00', '#2FDE00'],
-      hoverBackgroundColor: ['#501800', '#4B5000', '#175000'],
-      data: [80, 100, 280],
+    postUserProfile: {
+      profilePicUrl: '/assets/imgs/debit-logo.png',
+      userName: 'odogwu_1',
+      businessName: 'Odogwu Laptops',
     },
-  ],
-};
-
-type SingleDisbursement = {
-  type: 'single';
-  recipient: string;
-  recipientAccount: string;
-  amount: number;
-  status: 'successful' | 'pending' | 'failed';
-  date?: string;
-};
-
-export type BatchDisbursement = {
-  type: 'Batch';
-  date?: string;
-  recipients: {
-    recipient: string;
-    recipientAccount: string;
-    amount: number;
-    status: 'successful' | 'pending' | 'failed';
-  }[];
-};
-
-export type DisbursementRecord = SingleDisbursement | BatchDisbursement;
-
-export const mockDisbursementRecord: DisbursementRecord[] = [
-  {
-    type: 'single',
-    recipient: 'Ifeanyi Ogbonna',
-    recipientAccount: '0065453363',
-    amount: 2000,
-    status: 'successful',
-  },
-  {
-    type: 'single',
-    recipient: 'Emmanuel Ogbonna',
-    recipientAccount: '0065453363',
-    amount: 100000,
-    status: 'successful',
-  },
-  {
-    type: 'Batch',
-    recipients: [
+    postAccountType: 'vendor',
+    sponsored: true,
+    sold: false,
+    postImgUrls: ['/assets/imgs/macbook.jpg'],
+    askingPrice: {
+      price: 5000000,
+      negotiable: true,
+    },
+    condition: 'Fairly Used',
+    itemName: 'Hp EliteBook 840 g5',
+    description: `Processor: Core i5
+        HDD: 500gb
+        RAM: 16gb
+        Keyboard Light
+        2gb Dedicated Graphics
+        10th generation`,
+    likes: [
       {
-        recipient: 'Adams Oshomole',
-        recipientAccount: '3092301102',
-        amount: 2000000,
-        status: 'pending',
+        userDpImageUrl: '',
+        userName: 'samuel_ng',
       },
       {
-        recipient: 'Labaran Idris',
-        recipientAccount: '3092322202',
-        amount: 10000000,
-        status: 'successful',
+        userDpImageUrl: '',
+        userName: 'kings',
+      },
+      {
+        userDpImageUrl: '',
+        userName: 'queenex20',
+      },
+    ],
+    comments: [
+      {
+        userDpImageUrl: '',
+        userName: 'samuel_ng',
+        message: 'This is very beautiful, I love it',
+        date: '12 march 2023',
+      },
+      {
+        userDpImageUrl: '',
+        userName: 'kings',
+        message:
+          'I love this laptop, I used it sometime last year and I must confess that it is so so powerful. Everything works fine with this laptop. You cant even ave issues with the laptop',
+        date: '5 August 2023',
       },
     ],
   },
   {
-    type: 'single',
-    recipient: 'Otedola Omotola',
-    recipientAccount: '0065453363',
-    amount: 100000,
-    status: 'successful',
-  },
-  {
-    type: 'Batch',
-    recipients: [
+    postUserProfile: {
+      profilePicUrl: '/assets/imgs/sneakers.jpg',
+      userName: 'gunji_the_sneaker_king',
+    },
+    postAccountType: 'vendor',
+    sponsored: false,
+    sold: true,
+    postImgUrls: ['/assets/imgs/sneakers.jpg'],
+    askingPrice: {
+      price: 1400000,
+      negotiable: false,
+    },
+    condition: 'Brand New',
+    itemName: 'Airforce Sneaker Jumong',
+    description: `Strong and Durable
+        Size: UK 42 - 45
+        Color: White
+        Weight: 3kg
+        `,
+    likes: [
       {
-        recipient: 'Adams Oshomole',
-        recipientAccount: '3092301102',
-        amount: 2000000,
-        status: 'failed',
+        userDpImageUrl: '',
+        userName: 'samuel_ng',
       },
       {
-        recipient: 'Labaran Idris',
-        recipientAccount: '3092322202',
-        amount: 10000000,
-        status: 'successful',
+        userDpImageUrl: '',
+        userName: 'kings',
+      },
+      {
+        userDpImageUrl: '',
+        userName: 'queenex20',
+      },
+    ],
+    comments: [
+      {
+        userDpImageUrl: '',
+        userName: 'samuel_ng',
+        message: 'This is very beautiful, I love it',
+        date: '12 march 2023',
+      },
+      {
+        userDpImageUrl: '',
+        userName: 'kings',
+        message:
+          'I love this laptop, I used it sometime last year and I must confess that it is so so powerful. Everything works fine with this laptop. You cant even ave issues with the laptop',
+        date: '5 August 2023',
+      },
+    ],
+  },
+  {
+    postUserProfile: {
+      profilePicUrl: '/assets/imgs/woman-face.jpg',
+      userName: 'emmnauella_ng',
+    },
+    postAccountType: 'vendor',
+    sponsored: false,
+    sold: true,
+    postImgUrls: ['/assets/imgs/cooking-gas.jpg'],
+    askingPrice: {
+      price: 500000,
+      negotiable: true,
+    },
+    condition: 'Fairly Used',
+    itemName: '5kg Cooking Gas',
+    description: `Weight: 5kg.. I used this gas for just 2 months so it's almost like a new one
+        `,
+    likes: [
+      {
+        userDpImageUrl: '',
+        userName: 'samuel_ng',
+      },
+      {
+        userDpImageUrl: '',
+        userName: 'kings',
+      },
+      {
+        userDpImageUrl: '',
+        userName: 'queenex20',
+      },
+      {
+        userDpImageUrl: '',
+        userName: 'queenex20',
+      },
+    ],
+    comments: [
+      {
+        userDpImageUrl: '/assets/imgs/woman-face.jpg',
+        userName: 'samuel_ng',
+        message: 'This is very beautiful, I love it',
+        date: '12 march 2023',
+      },
+      {
+        userDpImageUrl: '/assets/imgs/woman-face.jpg',
+        userName: 'kings',
+        message:
+          'I love this laptop, I used it sometime last year and I must confess that it is so so powerful. Everything works fine with this laptop. You cant even ave issues with the laptop',
+        date: '5 August 2023',
+      },
+      {
+        userDpImageUrl: '/assets/imgs/woman-face.jpg',
+        userName: 'kings',
+        message:
+          'I love this laptop, I used it sometime last year and I must confess that it is so so powerful. Everything works fine with this laptop. You cant even ave issues with the laptop',
+        date: '5 August 2023',
+      },
+      {
+        userDpImageUrl: '/assets/imgs/woman-face.jpg',
+        userName: 'kings',
+        message:
+          'I love this laptop, I used it sometime last year and I must confess that it is so so powerful. Everything works fine with this laptop. You cant even ave issues with the laptop',
+        date: '5 August 2023',
+      },
+      {
+        userDpImageUrl: '/assets/imgs/woman-face.jpg',
+        userName: 'kings',
+        message:
+          'I love this laptop, I used it sometime last year and I must confess that it is so so powerful. Everything works fine with this laptop. You cant even ave issues with the laptop',
+        date: '5 August 2023',
+      },
+      {
+        userDpImageUrl: '/assets/imgs/woman-face.jpg',
+        userName: 'kings',
+        message:
+          'I love this laptop, I used it sometime last year and I must confess that it is so so powerful. Everything works fine with this laptop. You cant even ave issues with the laptop',
+        date: '5 August 2023',
+      },
+      {
+        userDpImageUrl: '/assets/imgs/woman-face.jpg',
+        userName: 'kings',
+        message:
+          'I love this laptop, I used it sometime last year and I must confess that it is so so powerful. Everything works fine with this laptop. You cant even ave issues with the laptop',
+        date: '5 August 2023',
+      },
+      {
+        userDpImageUrl: '/assets/imgs/woman-face.jpg',
+        userName: 'kings',
+        message:
+          'I love this laptop, I used it sometime last year and I must confess that it is so so powerful. Everything works fine with this laptop. You cant even ave issues with the laptop',
+        date: '5 August 2023',
+      },
+      {
+        userDpImageUrl: '/assets/imgs/woman-face.jpg',
+        userName: 'kings',
+        message:
+          'I love this laptop, I used it sometime last year and I must confess that it is so so powerful. Everything works fine with this laptop. You cant even ave issues with the laptop',
+        date: '5 August 2023',
+      },
+      {
+        userDpImageUrl: '/assets/imgs/woman-face.jpg',
+        userName: 'kings',
+        message:
+          'I love this laptop, I used it sometime last year and I must confess that it is so so powerful. Everything works fine with this laptop. You cant even ave issues with the laptop',
+        date: '5 August 2023',
+      },
+      {
+        userDpImageUrl: '/assets/imgs/woman-face.jpg',
+        userName: 'kings',
+        message:
+          'I love this laptop, I used it sometime last year and I must confess that it is so so powerful. Everything works fine with this laptop. You cant even ave issues with the laptop',
+        date: '5 August 2023',
+      },
+      {
+        userDpImageUrl: '/assets/imgs/woman-face.jpg',
+        userName: 'kings',
+        message:
+          'I love this laptop, I used it sometime last year and I must confess that it is so so powerful. Everything works fine with this laptop. You cant even ave issues with the laptop',
+        date: '5 August 2023',
+      },
+      {
+        userDpImageUrl: '/assets/imgs/woman-face.jpg',
+        userName: 'kings',
+        message:
+          'I love this laptop, I used it sometime last year and I must confess that it is so so powerful. Everything works fine with this laptop. You cant even ave issues with the laptop',
+        date: '5 August 2023',
+      },
+      {
+        userDpImageUrl: '/assets/imgs/woman-face.jpg',
+        userName: 'kings',
+        message:
+          'I love this laptop, I used it sometime last year and I must confess that it is so so powerful. Everything works fine with this laptop. You cant even ave issues with the laptop',
+        date: '5 August 2023',
+      },
+      {
+        userDpImageUrl: '/assets/imgs/woman-face.jpg',
+        userName: 'kings',
+        message:
+          'I love this laptop, I used it sometime last year and I must confess that it is so so powerful. Everything works fine with this laptop. You cant even ave issues with the laptopsssssssss',
+        date: '5 August 2023',
       },
     ],
   },
 ];
-const labels = Array.from({ length: 12 }, (_, index) =>
-  moment().subtract(index, 'months').format('MMMM')
-);
-export const mockTransactionAnalyticsData2 = {
-  labels: labels,
-  datasets: [
-    {
-      label: 'My First Dataset',
-      data: [65, 59, 80, 81, 56, 55, 40],
-      backgroundColor: 'rgba(30, 136, 229, 1)',
-      borderColor: 'rgba(30, 136, 229, 0.2)',
-      borderWidth: 2,
-      // barThickness: 70,
-    },
-  ],
-};
-
-export const comparativeAnalysisData = {
-  labels,
-  datasets: [
-    {
-      label: 'Dataset 1',
-      data: labels.map(() => faker.number.int({ min: 0, max: 1000 })),
-      backgroundColor: 'rgba(255, 99, 132, 0.5)',
-    },
-    {
-      label: 'Dataset 2',
-      data: labels.map(() => faker.number.int({ min: 0, max: 1000 })),
-      backgroundColor: 'rgba(53, 162, 235, 0.5)',
-    },
-  ],
-};
-
-export const smoothLineChartData = {
-  labels: [
-    'January',
-    'February',
-    'March',
-    'April',
-    'May',
-    'June',
-    'July',
-    'August',
-    'September',
-    'October',
-    'November',
-    'December',
-  ],
-  datasets: [
-    {
-      label: 'income',
-      data: [50, 60, 55, 73, 65, 90, 75, 50, 33, 67, 11, 70],
-      fill: false,
-      backgroundColor: 'rgba(30, 136, 229, 0.2)',
-      borderColor: 'rgba(30, 136, 229, 1)',
-      borderWidth: 2,
-    },
-    {
-      label: 'disbursements',
-      data: [60, 50, 55, 44, 45, 90, 75],
-      fill: false,
-      borderColor: 'rgb(255, 99, 132)',
-      backgroundColor: 'rgba(255, 99, 132, 0.5)',
-      borderWidth: 2,
-    },
-  ],
-};
-
-export const CashFlowAnalytics = [
-  { type: 'income', amount: 9000000, count: 60200 },
-  { type: 'disbursements', amount: 7500000, count: 40 },
-];
-// export const MockWallets = [];
-export const MockWallets: any = [
-  { id: '001', accountName: 'The 30th Concept', accountNumber: '004002001', amount: 3300000000 },
-  { id: '002', accountName: 'Jay Doe Biz', accountNumber: '004002003', amount: 52000000 },
-];
-
-export interface ReciepientsDataType {
-  accountNumber?: number;
-  accountName?: string;
-  bank?: string;
-  amount?: number;
-}

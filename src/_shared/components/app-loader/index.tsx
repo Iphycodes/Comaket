@@ -1,4 +1,4 @@
-import { Preloader, Audio } from 'react-preloader-icon';
+import { Preloader, TailSpin } from 'react-preloader-icon';
 import React, { FC } from 'react';
 import { LoaderProps } from 'react-preloader-icon/Preloader';
 
@@ -8,13 +8,13 @@ export const AppLoader = (props: {
   use?: FC<LoaderProps>;
   theme?: string;
 }) => {
-  const { size = 80, style, use, theme } = props;
+  const { size = 80, style, use } = props;
   return (
     <Preloader
-      use={use || Audio}
+      use={use || TailSpin}
       size={size}
       strokeWidth={8}
-      strokeColor={theme === 'light' ? '#1e88e5' : '#1e88e5'}
+      strokeColor={'#F0AD4E'}
       style={{
         position: 'absolute',
         top: '30vh',

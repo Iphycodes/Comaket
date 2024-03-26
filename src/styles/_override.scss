@@ -1,90 +1,67 @@
-.register-form,
-.reset-password-form,
-.update-profile-details-form,
-.update-business-profile-form {
-  .ant-input-number-group-wrapper,
-  .ant-input-number-in-form-item {
-    width: 100% !important;
-  }
+.item-post-modal {
+  padding: 0 !important;
+  top: 50px !important;
 
-  .ant-input-number-group {
-    height: 100% !important;
-  }
-
-  .ant-input-number-input-wrap {
-    height: 100% !important;
-
-    input {
-      height: 100% !important;
-    }
+  .ant-modal-content {
+    padding: 2px !important;
   }
 }
 
-.business-register-form,
-.update-profile-details-form,
-.update-business-profile-form {
-  .ant-select-selector,
-  .ant-select-in-form-item,
-  .ant-select-selection-item {
-    height: 3.5rem !important;
-    overflow: hidden;
-    display: flex;
-    align-items: center !important;
+.find-vendor-input {
+  .ant-input {
+    background: none !important;
   }
 }
 
-.business-register-form,
-.update-profile-details-form,
-.update-business-profile-form {
-  .ant-select-selector,
-  .ant-select-in-form-item,
-  .ant-select-selection-item {
-    height: 3.5rem !important;
-    overflow: hidden;
-    display: flex;
-    align-items: center !important;
+.ant-modal-close {
+  position: fixed !important;
+  top: 15px !important; /* Adjust the top position as needed */
+  right: 24px !important; /* Adjust the right position as needed */
+  z-index: 1001 !important; /* Ensure the close button appears above other content */
+  height: 30px !important;
+  width: 30px !important;
+
+  &:hover {
+    background-color: transparent !important;
+  }
+
+  .ant-modal-close-x {
+    color: #ffffff !important;
+    font-size: 22px !important;
+    font-weight: bolder !important;
   }
 }
 
-.select-virtual-account {
-  .ant-select-selector,
-  .ant-select-in-form-item,
-  .ant-select-selection-item {
-    height: 3rem !important;
-    overflow: hidden;
-    display: flex;
-    align-items: center !important;
-  }
+.used-status-badge .ant-badge-count {
+  display: flex !important;
+  font-size: 14px !important;
+  align-items: center !important;
+  height: 24px !important;
 }
 
-// .ant-menu-item-selected,
-// .ant-menu-item-active {
-//   // background-color: transparent !important;
-//   // color: #000000 !important;
-// }
-.ant-menu-item-active {
-  color: #666666 !important;
+.sider-menu .ant-menu-item {
+  margin-bottom: 14px !important;
+}
+
+.ant-menu-item {
+  // padding-top: 24px !important;
+  // padding-bottom: 24px !important;
+  i {
+    transition: all 0.1s ease !important;
+  }
+
+  &:hover i {
+    transform: scale(1.1) !important;
+  }
+}
+.ant-menu-item-active i {
+  font-weight: 600 !important;
+  transform: scale(1.5) !important;
 }
 
 .ant-menu-item-selected {
-  background-color: rgba(0, 0, 0, 0.06) !important;
-  color: #666666 !important;
-}
-
-.transaction-table {
-  .ant-table-tbody {
-    .ant-table-row {
-      cursor: pointer !important;
-
-      .ant-table-cell {
-        cursor: pointer;
-        font-size: 15px;
-        font-weight: 400 !important;
-        padding-top: 20px !important;
-        padding-bottom: 20px !important;
-      }
-    }
-  }
+  font-weight: 700 !important;
+  background: transparent !important;
 }
 
 .ant-switch {
@@ -96,6 +73,8 @@
 }
 
 .dash-sider {
+  transition: all 0.4s ease !important;
+
   .ant-select-selector {
     // border: 1px solid black !important;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.09);
@@ -110,31 +89,13 @@
     align-items: center !important;
   }
 
-  .ant-menu-item:last-child {
-    position: absolute;
-    bottom: 50px;
-  }
+  // .ant-menu-item:last-child {
+  //   position: absolute;
+  //   bottom: 50px;
+  // }
 
   .ant-menu-light.ant-menu-root.ant-menu-inline {
     border-inline-end: none !important;
-  }
-}
-
-.live-mode-switch.ant-switch {
-  .ant-switch-inner {
-    background-color: #666666 !important;
-  }
-}
-
-.virtual-select {
-  .ant-select-selector {
-    border: 1px solid rgb(30 136 229) !important;
-  }
-}
-
-.live-mode-switch.ant-switch-checked {
-  .ant-switch-inner {
-    background-color: #1e88e5 !important;
   }
 }
 
@@ -149,63 +110,6 @@
   margin: 0;
 }
 
-.filter-drawer {
-  .ant-drawer-body {
-    padding: 0 !important;
-
-    .ant-select-selector {
-      border: 1px solid #1677ff !important;
-      border-radius: 2px !important;
-    }
-  }
-}
-
-.advanced-transaction-drawer {
-  .ant-drawer-body {
-    padding: 0 !important;
-  }
-}
-
-.transaction-stat-card {
-  .ant-card-body {
-    padding: 10px 20px !important;
-  }
-}
-
-.recent-disburseent-card,
-.piechart-card {
-  .ant-card-body {
-    padding: 10px 0 !important;
-  }
-}
-
-.send-money-card {
-  .ant-card-body {
-    padding: 0 20px !important;
-  }
-}
-
-canvas.disbursement-pie {
-  width: 300px !important;
-  height: 300px !important;
-}
-
-.virtual-select-form-item.ant-form-item {
-  margin: 0 !important;
-}
-
-.disbursement-modal {
-  .ant-modal-content {
-    padding-top: 30px;
-  }
-}
-
-.single-payout-form {
-  .ant-form-item {
-    margin-bottom: 12px !important;
-  }
-}
-
 .light {
   .dashboard-transaction-list:hover {
     background-color: #eee !important;
@@ -213,19 +117,14 @@ canvas.disbursement-pie {
 
   .ant-layout-sider,
   .ant-menu-light {
-    background: #f3f3f3 !important;
+    background: #ffffff !important;
     transition:
       all 0.2s,
       background 0s;
   }
 
-  .update-api-key-webhook-form,
-  .single-payout-form {
-    .ant-input-disabled,
-    .ant-input-affix-wrapper-disabled {
-      background-color: rgba(255, 255, 255, 1) !important;
-      color: rgba(0, 0, 0, 0.85) !important;
-    }
+  .ant-menu-item-selected {
+    color: #000000 !important;
   }
 
   .react-code-input {
@@ -293,53 +192,5 @@ canvas.disbursement-pie {
     transition:
       all 0.2s,
       background 0s;
-  }
-
-  .update-api-key-webhook-form,
-  .single-payout-form {
-    .ant-input-disabled,
-    .ant-input-affix-wrapper-disabled {
-      background-color: #141414 !important;
-      color: rgba(255, 255, 255, 0.85) !important;
-    }
-  }
-
-  .react-code-input {
-    margin: 32px -20px 32px 0;
-    text-align: center;
-
-    input {
-      margin-right: 20px !important;
-      width: 60px !important;
-      height: 60px !important;
-      border-radius: 8px;
-      border: 1px solid rgba(27, 28, 30, 0.01) !important;
-      outline: none !important;
-      caret-color: var(--accent) !important;
-      text-align: center;
-      font-weight: bold;
-      background-color: #141414 !important;
-      color: rgba(255, 255, 255, 0.85) !important;
-      border-color: #424242 !important;
-    }
-
-    textarea {
-      background-color: #141414 !important;
-      color: rgba(255, 255, 255, 0.85) !important;
-      border-color: #424242 !important;
-    }
-
-    input:focus,
-    input:hover {
-      border-color: #1668dc !important;
-      box-shadow: 0 0 0 2px rgba(0, 60, 180, 0.15) !important;
-      outline: 0 !important;
-    }
-  }
-
-  #batch-add-reciepient-form_description {
-    background-color: #141414 !important;
-    border-color: #424242 !important;
-    color: rgba(255, 255, 255, 0.85) !important;
   }
 }

@@ -1,79 +1,93 @@
 'use client';
 import React from 'react';
 import { SiderTheme } from 'antd/es/layout/Sider';
-import { NavItem } from '@grc/_shared/helpers';
-import {
-  DashboardIcon,
-  DisbursementIcon,
-  LogoutIcon,
-  SettingsIcon,
-  TransactionIcon,
-} from '@grc/_shared/assets/svgs';
+import { NavItem, getFirstCharacter, getRandomColorByString } from '@grc/_shared/helpers';
+import { isEmpty } from 'lodash';
+import { Avatar } from 'antd';
 
-type Nav = {
+export type Nav = {
   theme: SiderTheme & string;
   appName: string;
   items: NavItem[];
+  footerMenuItems: NavItem[];
 };
 
-const menuItems: NavItem[] = [
+const footerMenuItems: NavItem[] = [
   {
-    label: 'Dashboard',
-    key: 'dashboard',
-    destination: 'dashboard',
-    icon: <DashboardIcon />,
+    label: 'Create Store',
+    key: 'create-store',
+    destination: '',
+    icon: <i className="ri-store-line" style={{ fontSize: '22px' }}></i>,
   },
   {
-    label: 'Transactions',
-    key: 'transactions',
-    destination: 'transactions',
-    icon: <TransactionIcon />,
-  },
-  {
-    label: 'Disbursements',
-    key: 'disbursements',
-    destination: 'disbursements',
-    icon: <DisbursementIcon />,
-  },
-  {
-    label: 'Settings',
-    key: 'settings',
-    destination: '/settings',
-    icon: <SettingsIcon />,
-  },
-  {
-    label: 'Logout',
-    key: 'logout',
-    destination: '/auth/logout',
-    icon: <LogoutIcon />,
+    label: 'Profile',
+    key: 'profile',
+    destination: '',
+    icon: (
+      <Avatar
+        style={{
+          backgroundColor: getRandomColorByString('Ifeanyi'),
+          verticalAlign: 'middle',
+          height: '22px',
+          width: '22px',
+        }}
+      >
+        {isEmpty('') && getFirstCharacter('Ifeanyi')}
+      </Avatar>
+    ),
   },
 ];
 
-// const settingsMenuItems: NavItem[] = [
-//   {
-//     label: 'Profile Details',
-//     key: 'profile-details',
-//     destination: 'profile-details',
-//     icon: <ProfileIcon />,
-//   },
-//   {
-//     label: 'Change Password',
-//     key: 'change-password',
-//     destination: 'change-password',
-//     icon: <PasswordIcon />,
-//   },
-//   {
-//     label: 'Apps',
-//     key: 'apps',
-//     destination: '/apps',
-//     icon: <AppIcon />,
-//   },
-// ];
+const menuItems: NavItem[] = [
+  {
+    label: 'Market',
+    key: 'market',
+    destination: '/',
+    icon: <i className="ri-store-2-line" style={{ fontSize: '22px' }}></i>,
+  },
+  // {
+  //   label: 'Explore',
+  //   key: 'explore',
+  //   destination: '/explore',
+  //   icon: <i className="ri-search-line" style={{ fontSize: '22px' }}></i>,
+  // },
+  {
+    label: 'Find Vendor',
+    key: 'find-vendor',
+    destination: '',
+    icon: <i className="ri-user-location-line" style={{ fontSize: '22px' }}></i>,
+  },
+  {
+    label: 'Chats',
+    key: 'chats',
+    destination: '',
+    icon: <i className="ri-question-answer-line" style={{ fontSize: '22px' }}></i>,
+  },
+  {
+    label: 'Notifications',
+    key: 'notifications',
+    destination: '',
+    icon: <i className="ri-notification-line" style={{ fontSize: '22px' }}></i>,
+  },
+  {
+    label: 'Saved',
+    key: 'saved',
+    destination: '/saved',
+    icon: <i className="ri-pushpin-line" style={{ fontSize: '22px' }}></i>,
+  },
+  {
+    label: 'Sell An Item',
+    key: 'sell',
+    destination: '',
+    icon: <i className="ri-arrow-left-right-line" style={{ fontSize: '22px' }}></i>,
+  },
+];
 
 const appNav: Nav = {
   appName: 'Comaket',
   theme: 'light',
   items: menuItems,
+  footerMenuItems: footerMenuItems,
 };
 
 export { appNav };

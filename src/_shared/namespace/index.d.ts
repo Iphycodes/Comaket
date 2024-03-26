@@ -68,3 +68,36 @@ export interface Mobile {
   isoCode: string;
   _id: string;
 }
+
+interface likesType {
+  userDpImageUrl: string;
+  userName: string;
+}
+
+interface commentsType {
+  userDpImageUrl: string;
+  userName: string;
+  message: string;
+  date: string;
+}
+
+export interface mockMarketItemType {
+  postUserProfile: {
+    profilePicUrl: string;
+    userName: string;
+    businessName?: string;
+  };
+  postAccountType: string;
+  sponsored: boolean;
+  sold: boolean;
+  postImgUrls: string[];
+  askingPrice: {
+    price: number;
+    negotiable: boolean;
+  };
+  condition: 'Brand New' | 'Fairly Used';
+  itemName: string;
+  description: string;
+  likes: likesType[];
+  comments: commentsType[];
+}
