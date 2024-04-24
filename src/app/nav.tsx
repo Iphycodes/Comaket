@@ -14,7 +14,7 @@ export type Nav = {
 
 const footerMenuItems: NavItem[] = [
   {
-    label: 'Create store',
+    label: 'Create Store',
     key: 'create-store',
     destination: '',
     icon: <i className="ri-store-line" style={{ fontSize: '22px' }}></i>,
