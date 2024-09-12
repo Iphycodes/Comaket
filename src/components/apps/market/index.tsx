@@ -1,4 +1,4 @@
-import { Col, Row } from 'antd';
+ import { Col, Row } from 'antd';
 import React from 'react';
 import SearchBar from './lib/search-bar';
 import ItemPost from '../item-post';
