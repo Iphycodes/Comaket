@@ -194,3 +194,13 @@
       background 0s;
   }
 }
+
+.tall-number-input {
+  .ant-input-number-wrapper {
+    height: 3.5rem !important;
+  }
+  .ant-input-number-input-wrap,
+  .ant-input-number-input {
+    height: 100% !important;
+  }
+}

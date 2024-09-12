@@ -1,5 +1,5 @@
 import { numberFormat } from '@grc/_shared/helpers';
-import { Badge, Space } from 'antd';
+import { Badge, Button, Space } from 'antd';
 import Image from 'next/image';
 import React from 'react';
 
@@ -43,7 +43,14 @@ const ItemPostBody: React.FC<Props> = ({ postImgUrls, askingPrice, condition }) 
           <i className="ri-pushpin-line text-[28px]"></i>
         </Space>
         <Space size={10} className="flex items-center">
-          <i className="ri-message-2-line text-[28px]"></i>
+          <Button
+            className="opacity-100 hover:opacity-70 mt-1.5 bg-neutral-900 text-white h-12 rounded-md px-6"
+            type="primary"
+            block={false}
+            htmlType="submit"
+          >
+            Message Seller
+          </Button>
         </Space>
       </div>
       <div className="m-0 mb-1 text-[14px] text-gray-500">125 Recommended</div>
