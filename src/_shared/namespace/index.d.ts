@@ -74,11 +74,22 @@ interface likesType {
   userName: string;
 }
 
+interface bookMarksType {
+  userDpImageUrl: string;
+  userName: string;
+}
+
 interface commentsType {
   userDpImageUrl: string;
   userName: string;
   message: string;
   date: string;
+}
+
+export enum statusEnum {
+  pending = 'pending',
+  approved = 'approved',
+  rejected = 'rejected',
 }
 
 export interface mockMarketItemType {
@@ -96,8 +107,15 @@ export interface mockMarketItemType {
     negotiable: boolean;
   };
   condition: 'Brand New' | 'Fairly Used';
+  location: string;
   itemName: string;
   description: string;
   likes: likesType[];
   comments: commentsType[];
+  bookMarks: bookMarksType[];
+  status: 'pending' | 'approved' | 'rejected';
+  id: string | number;
+  fee: number;
+  live: boolean;
+  feePaymentStatus: 'processed' | 'pending' | 'awaiting payment' | 'awaiting approval';
 }

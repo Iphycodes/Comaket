@@ -1,11 +1,12 @@
+import SavedItems from '@grc/components/apps/saved';
 import React from 'react';
 
 interface Props {
   // Add your prop types here
 }
 
-const Saved: React.FC<Props> = ({}) => {
-  return <div>This is the Saved Page</div>;
+const SavedItemsPage: React.FC<Props> = ({}) => {
+  return <SavedItems />;
 };
 
-export default Saved;
+export default SavedItemsPage;

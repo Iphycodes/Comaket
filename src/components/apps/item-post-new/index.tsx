@@ -1,0 +1,315 @@
+import React, { useState } from 'react';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Badge, Tooltip } from 'antd';
+import {
+  Heart,
+  MessageCircle,
+  Bookmark,
+  Share2,
+  ChevronLeft,
+  ChevronRight,
+  MapPin,
+  Store,
+  Clock,
+} from 'lucide-react';
+import Image from 'next/image';
+import { numberFormat } from '@grc/_shared/helpers';
+import TruncatedDescription from '@grc/_shared/components/truncated-description';
+import ItemDetailModal from '../item-detail-modal';
+import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
+import { useRouter } from 'next/navigation';
+import { Currencies } from '@grc/_shared/constant';
+
+interface ItemPostProps {
+  description: string;
+  sponsored: boolean;
+  postUserProfile: Record<string, any>;
+  postImgurls: string[];
+  askingPrice: Record<string, any>;
+  condition: 'Brand New' | 'Fairly Used';
+  comments: Record<string, any>[];
+  itemName: string;
+  id: string | number;
+}
+
+const ModernItemPost: React.FC<ItemPostProps> = ({
+  description,
+  sponsored,
+  postUserProfile,
+  postImgurls,
+  askingPrice,
+  condition,
+  comments,
+  itemName,
+  id,
+}) => {
+  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const [isLiked, setIsLiked] = useState(false);
+  const [isSaved, setIsSaved] = useState(false);
+  const [slideDirection, setSlideDirection] = useState(0);
+  const [isModalOpen, setIsModalOpen] = useState(false);
+  const isMobile = useMediaQuery(mediaSize.mobile);
+  const { push } = useRouter();
+
+  const nextImage = () => {
+    setSlideDirection(1);
+    setCurrentImageIndex((prev) => (prev + 1) % postImgurls.length);
+  };
+
+  const prevImage = () => {
+    setSlideDirection(-1);
+    setCurrentImageIndex((prev) => (prev - 1 + postImgurls.length) % postImgurls.length);
+  };
+
+  const handleViewItem = () => {
+    if (isMobile) {
+      push(`/product/${id}`);
+    } else {
+      setIsModalOpen(true);
+    }
+  };
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, y: 10 }}
+      animate={{ opacity: 1, y: 0 }}
+      className="w-full border-b border-gray-100 dark:border-zinc-800 py-8 first:pt-0"
+    >
+      {/* Seller info */}
+      <div className="flex items-center gap-3 mb-4">
+        <div className="relative w-10 h-10">
+          <Image
+            src={postUserProfile?.profilePicUrl}
+            alt="Seller"
+            fill
+            className="rounded-full object-cover"
+          />
+          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
+        </div>
+        <div className="flex-1">
+          <div className="flex items-center gap-2">
+            <h3 className="font-medium">
+              {postUserProfile?.businessName || postUserProfile?.userName}
+            </h3>
+            {sponsored && (
+              <span className="text-xs bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-blue-900/20 dark:to-indigo-900/20 text-blue-600 dark:text-blue-400 px-2 py-0.5 rounded-full font-medium">
+                Sponsored
+              </span>
+            )}
+          </div>
+          <div className="flex items-center gap-3 text-[12px] text-gray-500 dark:text-gray-400">
+            <div className="flex items-center gap-1">
+              <MapPin size={14} />
+              <span>Kaduna State, Zaria</span>
+            </div>
+            <div className="flex items-center gap-1">
+              <Clock size={14} />
+              <span>2d ago</span>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div className="flex flex-col md:flex-row w-full gap-8">
+        {/* Left section - Product Images */}
+        <div className="relative w-full md:w-3/5 overflow-hidden rounded-lg">
+          <div className="relative aspect-square">
+            <AnimatePresence initial={false} custom={slideDirection}>
+              <motion.div
+                key={currentImageIndex}
+                custom={slideDirection}
+                initial={{ x: slideDirection * 100 + '%', opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: slideDirection * -100 + '%', opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 300, damping: 30 }}
+                className="absolute inset-0 rounded-lg cursor-pointer"
+                onClick={handleViewItem}
+              >
+                <Image
+                  src={postImgurls[currentImageIndex]}
+                  alt={`Product image ${currentImageIndex + 1}`}
+                  fill
+                  className="object-cover"
+                  priority
+                />
+              </motion.div>
+            </AnimatePresence>
+
+            {/* Navigation controls */}
+            {postImgurls.length > 1 && (
+              <>
+                <button
+                  onClick={prevImage}
+                  className="absolute left-1 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full backdrop-blur-sm transition-colors"
+                >
+                  <ChevronLeft className="w-6 h-6" />
+                </button>
+                <button
+                  onClick={nextImage}
+                  className="absolute right-1 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full backdrop-blur-sm transition-colors"
+                >
+                  <ChevronRight className="w-6 h-6" />
+                </button>
+
+                <div className="absolute bottom-4 right-2 bg-black/30 text-white px-3 py-1 rounded-full backdrop-blur-sm text-sm">
+                  {currentImageIndex + 1}/{postImgurls.length}
+                </div>
+              </>
+            )}
+
+            <Badge
+              className="absolute top-3 right-3 backdrop-blur-lg !rounded-md"
+              count={
+                <span className="px-2 py-1 text-sm text-white font-semibold">{condition}</span>
+              }
+              color={condition === 'Brand New' ? 'green' : 'blue'}
+            />
+
+            {/* <Badge
+              className="absolute top-4 right-4 blur-lg"
+              count={condition}
+              color={condition === 'Brand New' ? 'green' : 'blue'}
+            /> */}
+          </div>
+        </div>
+
+        {/* Right section - Product Details */}
+        <div className="w-full md:w-1/2 flex flex-col">
+          {/* Product info */}
+          <div className="space-y-2 mb-1">
+            <div>
+              <h2 className="text-xl font-semibold mb-1 cursor-pointer" onClick={handleViewItem}>
+                {itemName}
+              </h2>
+              <div className="flex items-center gap-2">
+                <span className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-rose-500 bg-clip-text text-transparent">
+                  {numberFormat(askingPrice?.price / 100, Currencies.NGN)}
+                </span>
+                {askingPrice?.negotiable && (
+                  <span className="text-[12px] bg-gradient-to-r from-orange-50 to-rose-50 dark:from-orange-900/20 dark:to-rose-900/20 text-orange-600 dark:text-orange-400 px-2 py-1 rounded-full font-medium">
+                    Negotiable
+                  </span>
+                )}
+              </div>
+            </div>
+
+            {/* <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{description}</p> */}
+            <TruncatedDescription description={description} max={100} />
+          </div>
+
+          {/* Stats and actions */}
+          <div className="mt-auto space-y-6">
+            <div className="flex items-center justify-between">
+              <div className="flex items-center gap-6">
+                <Tooltip title={isLiked ? 'Unlike' : 'Like'}>
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => setIsLiked(!isLiked)}
+                    className="flex items-center gap-2 group"
+                  >
+                    <Heart
+                      className={`w-6 h-6 ${
+                        isLiked
+                          ? 'fill-rose-500 text-rose-500'
+                          : 'text-gray-400 group-hover:text-gray-600'
+                      } transition-colors`}
+                    />
+                    <span className="text-sm text-gray-500">125</span>
+                  </motion.button>
+                </Tooltip>
+
+                <Tooltip title="Comments">
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="flex items-center gap-2 group"
+                  >
+                    <MessageCircle className="w-6 h-6 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                    <span className="text-sm text-gray-500">{comments.length}</span>
+                  </motion.button>
+                </Tooltip>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <Tooltip title={isSaved ? 'Remove from saved' : 'Save item'}>
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    onClick={() => setIsSaved(!isSaved)}
+                    className="group"
+                  >
+                    <Bookmark
+                      className={`w-6 h-6 ${
+                        isSaved
+                          ? 'fill-blue-500 text-blue-500'
+                          : 'text-gray-400 group-hover:text-gray-600'
+                      } transition-colors`}
+                    />
+                  </motion.button>
+                </Tooltip>
+
+                <Tooltip title="Share">
+                  <motion.button
+                    whileHover={{ scale: 1.1 }}
+                    whileTap={{ scale: 0.9 }}
+                    className="group"
+                  >
+                    <Share2 className="w-6 h-6 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                  </motion.button>
+                </Tooltip>
+              </div>
+            </div>
+
+            {/* Primary actions */}
+            <div className="flex gap-4">
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="flex-1 bg-gradient-to-r from-blue to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-1 shadow-sm"
+              >
+                <MessageCircle size={20} />
+                Chat Seller
+              </motion.button>
+
+              <motion.button
+                whileHover={{ scale: 1.02 }}
+                whileTap={{ scale: 0.98 }}
+                className="flex-1 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-zinc-800 dark:to-zinc-900 border border-gray-200 dark:border-zinc-700 hover:border-gray-300 dark:hover:border-zinc-600 py-3 rounded-lg font-medium flex items-center justify-center gap-2"
+              >
+                <Store size={20} />
+                Visit Store
+              </motion.button>
+            </div>
+          </div>
+        </div>
+      </div>
+      <ItemDetailModal
+        open={isModalOpen}
+        onClose={() => setIsModalOpen(false)}
+        item={{
+          description,
+          sponsored,
+          postUserProfile,
+          postImgurls,
+          askingPrice,
+          condition,
+          comments,
+          itemName,
+        }}
+      />
+    </motion.div>
+  );
+};
+
+export default ModernItemPost;
+
+interface ItemPostProps {
+  description: string;
+  sponsored: boolean;
+  postUserProfile: Record<string, any>;
+  postImgurls: string[];
+  askingPrice: Record<string, any>;
+  condition: 'Brand New' | 'Fairly Used';
+  comments: Record<string, any>[];
+  itemName: string;
+}

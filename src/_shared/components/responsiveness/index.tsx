@@ -26,7 +26,7 @@ export function useMediaQuery(query: string) {
 
 export const mediaSize: Record<string, string> = {
   desktop: '(min-width: 992px)',
-  mobile: '(max-width: 991px)' /**mobile width is 767px but we're using 991px**/,
+  mobile: '(max-width: 767px)' /**mobile width is 767px but we're using 991px**/,
   tablet: '(max-width: 991px)',
 };
 

@@ -1,5 +1,6 @@
 import React from 'react';
 import { Layout } from 'antd';
+import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 
 const { Sider } = Layout;
 interface LeftDrawerProps {
@@ -7,6 +8,7 @@ interface LeftDrawerProps {
 }
 
 const LeftDrawer: React.FC<LeftDrawerProps> = ({}) => {
+  const isMobile = useMediaQuery(mediaSize.mobile);
   return (
     <Sider
       collapsed={true}
@@ -20,7 +22,7 @@ const LeftDrawer: React.FC<LeftDrawerProps> = ({}) => {
         height: '100vh',
         scrollbarWidth: 'none',
         scrollbarColor: 'red',
-        left: 80,
+        ...(isMobile ? { right: -5 } : { left: 80 }),
         top: 0,
         bottom: 0,
         zIndex: 10,

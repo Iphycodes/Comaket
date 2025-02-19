@@ -1,164 +1,202 @@
-import { Popover, Select, Space } from 'antd';
-import React, { useCallback, useState } from 'react';
-import { Checkbox } from 'antd';
-import type { CheckboxValueType } from 'antd/lib/checkbox/Group';
-import { CheckboxChangeEvent } from 'antd/lib/checkbox';
+import { Currencies } from '@grc/_shared/constant';
+import { numberFormat } from '@grc/_shared/helpers';
+import { Slider, Tag } from 'antd';
+import { AnimatePresence, motion } from 'framer-motion';
+import { useState } from 'react';
 
-const CheckboxGroup = Checkbox.Group;
-const plainOptions = ['New', 'Used', 'Foreign Used'];
-const defaultCheckedList: CheckboxValueType[] = ['New', 'Used', 'Foreign Used'];
+// Define types
+type Condition = 'new' | 'used' | 'refurbished';
+type Category = string;
 
-interface FilterPanelProps {
-  // Add your prop types here
-}
+// FilterPanel Component
+const FilterPanel = () => {
+  const [priceRange, setPriceRange] = useState<number[]>([0, 1000]);
+  const [selectedConditions, setSelectedConditions] = useState<Condition[]>([]);
+  const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
+  const [activeSection, setActiveSection] = useState<'all' | 'price' | 'condition' | 'category'>(
+    'all'
+  );
 
-const FilterPanel: React.FC<FilterPanelProps> = ({}) => {
-  const [isLocationContentOpen, setIsLocationContentOpen] = useState<boolean>(false);
-  const [isFilterContentOpen, setIsFilterContentOpen] = useState<boolean>(false);
-  const [checkedList, setCheckedList] = useState<CheckboxValueType[]>(defaultCheckedList);
+  const conditions: { value: Condition; label: string }[] = [
+    { value: 'new', label: 'Brand New' },
+    { value: 'used', label: 'Fairly Used' },
+    { value: 'refurbished', label: 'Refurbished' },
+  ];
 
-  const getContent = useCallback(() => {
-    const checkAll = plainOptions.length === checkedList.length;
-    // const indeterminate = checkedList.length > 0 && checkedList.length < plainOptions.length;
+  const categories: Category[] = [
+    'Electronics',
+    'Fashion',
+    'Home & Living',
+    'Sports',
+    'Books',
+    'Automotive',
+    'Health & Beauty',
+  ];
 
-    const onChange = (list: CheckboxValueType[]) => {
-      setCheckedList(list);
-      console.log('list::::::::::::::::::', list);
-    };
+  const sections = [
+    { id: 'all' as const, label: 'All Filters' },
+    { id: 'price' as const, label: 'Price Range' },
+    { id: 'condition' as const, label: 'Condition' },
+    { id: 'category' as const, label: 'Category' },
+  ];
 
-    const onCheckAllChange = (e: CheckboxChangeEvent) => {
-      setCheckedList(e.target.checked ? plainOptions : []);
-    };
-
-    const handleSubmitFilter = () => {
-      setIsFilterContentOpen(false);
-    };
-
-    return (
-      <div className="drop-down-content text-[16px]">
-        <div className="cursor-pointer border-b rounded-sm px-3 py-2">
-          <Space className="p-1" size={15}>
-            <span className="font-semibold">Sort By:</span>
-            <Select
-              defaultValue="newest"
-              style={{ width: 120 }}
-              options={[
-                { value: 'newest', label: 'Newest' },
-                { value: 'oldest', label: 'Oldest' },
-                { value: 'popluarity', label: 'Popularity' },
-              ]}
-            />
-          </Space>
-        </div>{' '}
-        <div className="cursor-pointer border-b rounded-sm px-3 py-2">
-          <Space className="p-1" size={15}>
-            <span className="font-semibold">Condition:</span>
-            <Space>
-              <Checkbox onChange={onCheckAllChange} checked={checkAll}>
-                All
-              </Checkbox>
-              <CheckboxGroup options={plainOptions} onChange={onChange} value={checkedList} />
-            </Space>
-          </Space>
-        </div>{' '}
-        <div className="cursor-pointer border-b rounded-sm px-3 py-2">
-          <Space className="p-1" size={15}>
-            <span className="font-semibold">Price Range:</span>
-            <Space size={10}></Space>
-          </Space>
-        </div>{' '}
-        <div className="cursor-pointer flex justify-end rounded-sm px-3 py-2">
-          <span
-            onClick={handleSubmitFilter}
-            className="font-semibold text-blue hover:underline text-[14px] cursor-pointer"
-          >
-            Apply
-          </span>
-        </div>{' '}
-      </div>
+  const handleCategoryToggle = (category: Category) => {
+    setSelectedCategories((prev) =>
+      prev.includes(category) ? prev.filter((c) => c !== category) : [...prev, category]
     );
-  }, []);
+  };
 
-  const getLocationContent = useCallback(() => {
-    const mockLocations = [
-      { value: 'kaduna', label: 'Kaduna' },
-      { value: 'lagos', label: 'Lagos' },
-      { value: 'abuja', label: 'Abuja' },
-      { value: 'kogi', label: 'Kogi' },
-      { value: 'Portharcourt', label: 'Portharcourt' },
-    ];
-
-    const handleSetLocation = () => {
-      setIsLocationContentOpen(false);
-    };
-
-    return (
-      <div className="px-4 py-4 text-[16px]">
-        <Space size={10} className="mb-4">
-          <span className="font-semibold">Select Location:</span>
-          <Select
-            mode="multiple"
-            size="large"
-            allowClear
-            style={{ width: '300px' }}
-            placeholder="Please select"
-            defaultValue={['Nigeria']}
-            options={mockLocations}
-          />
-        </Space>
-        <div className="flex justify-end">
-          <span
-            onClick={handleSetLocation}
-            className="font-semibold text-blue hover:underline text-[14px] cursor-pointer"
-          >
-            Apply
-          </span>
-        </div>
-      </div>
-    );
-  }, []);
-
+  // Rest of your component remains the same until the categories mapping
   return (
-    <div className="flex items-center w-full justify-between py-2 border-b">
-      <Popover
-        content={getLocationContent()}
-        placement={'bottomLeft'}
-        overlayClassName="dropdown-popover rounded-0"
-        open={isLocationContentOpen}
-        trigger={'click'}
-        showArrow={false}
-        overlayStyle={{ zIndex: 500, borderRadius: 0 }}
-      >
-        <section
-          onClick={() => setIsLocationContentOpen(!isLocationContentOpen)}
-          className="flex items-center gap-2 cursor-pointer"
-        >
-          <span className="flex items-center w-8 h-8 justify-center border border-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-400 rounded-md cursor-pointer">
-            <i className="ri-map-pin-2-line text-[20px] text-gray-700"></i>
-          </span>
-          <span>Kaduna State, Zaria ...</span>
-        </section>
-      </Popover>
-      <section>
-        <Popover
-          content={getContent()}
-          placement={'bottomRight'}
-          overlayClassName="dropdown-popover rounded-0"
-          open={isFilterContentOpen}
-          trigger={'click'}
-          showArrow={false}
-          overlayStyle={{ zIndex: 500, borderRadius: 0 }}
-        >
-          <span
-            onClick={() => setIsFilterContentOpen(!isFilterContentOpen)}
-            className="flex gap-4 items-center justify-center border border-gray-300 hover:bg-gray-100 dark:hover:bg-zinc-400 rounded-md px-3 cursor-pointer"
+    <motion.div
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="bg-white dark:bg-gray-800 rounded-lg mt-4"
+    >
+      {/* Filter Sections Tabs */}
+      <div className="flex gap-2 mb-4 overflow-x-auto pb-2">
+        {sections.map((section) => (
+          <button
+            key={section.id}
+            onClick={() => setActiveSection(section.id)}
+            className={`px-4 py-2 rounded-lg text-sm whitespace-nowrap transition-colors
+              ${
+                activeSection === section.id
+                  ? 'bg-blue-50 bg-gray-100 dark:bg-gray-700 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+                  : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700'
+              }`}
           >
-            <span>Filter</span>
-            <i className="ri-equalizer-fill text-[20px] text-gray-700"></i>{' '}
-          </span>
-        </Popover>
-      </section>
-    </div>
+            {section.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="space-y-6">
+        {/* Price Range */}
+        <AnimatePresence>
+          {(activeSection === 'all' || activeSection === 'price') && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="mb-4">
+                <h3 className="text-sm font-medium mb-3">Price Range</h3>
+                <div className="px-1">
+                  <Slider
+                    range
+                    min={0}
+                    max={1000}
+                    value={priceRange}
+                    onChange={(value: number[]) => setPriceRange(value)}
+                    tooltip={{
+                      formatter: (value) => `$${value}`,
+                    }}
+                  />
+                </div>
+
+                <div className="flex justify-between text-sm text-gray-500 mt-1">
+                  <span>{numberFormat(priceRange[0], Currencies.NGN)}</span>
+                  <span>{numberFormat(priceRange[1], Currencies.NGN)}</span>
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Conditions */}
+        <AnimatePresence>
+          {(activeSection === 'all' || activeSection === 'condition') && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden"
+            >
+              <div className="mb-4">
+                <h3 className="text-sm font-medium mb-3">Condition</h3>
+                <div className="flex flex-wrap gap-2">
+                  {conditions.map((condition) => (
+                    <Tag
+                      key={condition.value}
+                      className={`px-3 py-1 rounded-lg cursor-pointer text-sm transition-colors
+                        ${
+                          selectedConditions.includes(condition.value)
+                            ? 'bg-blue text-white border-blue-200 dark:bg-blue-900/30 dark:text-blue-400'
+                            : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700'
+                        }`}
+                      onClick={() => {
+                        setSelectedConditions((prev) =>
+                          prev.includes(condition.value)
+                            ? prev.filter((c) => c !== condition.value)
+                            : [...prev, condition.value]
+                        );
+                      }}
+                    >
+                      {condition.label}
+                    </Tag>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Categories */}
+        <AnimatePresence>
+          {(activeSection === 'all' || activeSection === 'category') && (
+            <motion.div
+              initial={{ height: 0, opacity: 0 }}
+              animate={{ height: 'auto', opacity: 1 }}
+              exit={{ height: 0, opacity: 0 }}
+              className="overflow-hidden"
+            >
+              <div>
+                <h3 className="text-sm font-medium mb-3">Categories</h3>
+                <div className="flex flex-wrap gap-2">
+                  {categories.map((category) => (
+                    <Tag
+                      key={category}
+                      className={`px-3 py-1 rounded-lg cursor-pointer text-sm transition-colors
+                        ${
+                          selectedCategories.includes(category)
+                            ? 'bg-blue text-white border-blue-200 dark:bg-blue-900/30 dark:text-blue-400'
+                            : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700'
+                        }`}
+                      onClick={() => handleCategoryToggle(category)}
+                    >
+                      {category}
+                    </Tag>
+                  ))}
+                </div>
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+
+      {/* Apply Filters Button */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        className="mt-6 flex justify-end gap-3"
+      >
+        <button
+          onClick={() => {
+            setSelectedCategories([]);
+            setSelectedConditions([]);
+            setPriceRange([0, 1000]);
+          }}
+          className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+        >
+          Reset
+        </button>
+        <button className="px-6 py-2 bg-blue hover:bg-blue-600 text-white rounded-lg transition-colors text-sm">
+          Apply Filters
+        </button>
+      </motion.div>
+    </motion.div>
   );
 };
 

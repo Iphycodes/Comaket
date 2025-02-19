@@ -4,6 +4,7 @@ import { SideNavHeader } from './lib';
 import { usePathname, useRouter } from 'next/navigation';
 import { Nav } from '@grc/app/nav';
 import { AppContext } from '@grc/app-context';
+import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 
 const { Sider } = Layout;
 interface SideNavProps {
@@ -25,7 +26,6 @@ const SideNav: React.FC<SideNavProps> = (props) => {
     setSelectedKey,
     setToggleSider,
     setIsCreateStoreModalOpen,
-    setIsSellItemModalOpen,
     setIsChatsModalOpen,
   } = props;
   const pathname = usePathname();
@@ -33,6 +33,8 @@ const SideNav: React.FC<SideNavProps> = (props) => {
   const { push } = useRouter();
   const { setToggleFindVendorDrawer, setToggleNotificationsDrawer, setToggleProfileDrawer } =
     useContext(AppContext);
+
+  const isMobile = useMediaQuery(mediaSize.mobile);
 
   const handleMenuClick = ({ key }: { key: string }) => {
     setToggleSider(false);
@@ -53,10 +55,10 @@ const SideNav: React.FC<SideNavProps> = (props) => {
         }
       }
     });
-    if (key === 'find-vendor') {
-      setToggleFindVendorDrawer(false);
-      setToggleSider(true);
-    }
+    // if (key === 'find-vendor') {
+    //   setToggleFindVendorDrawer(false);
+    //   setToggleSider(true);
+    // }
     if (key === 'notifications') {
       setToggleNotificationsDrawer(false);
       setToggleSider(true);
@@ -64,9 +66,9 @@ const SideNav: React.FC<SideNavProps> = (props) => {
     if (key === 'create-store') {
       setIsCreateStoreModalOpen(true);
     }
-    if (key === 'sell') {
-      setIsSellItemModalOpen(true);
-    }
+    // if (key === 'sell') {
+    //   setIsSellItemModalOpen(true);
+    // }
     if (key === 'chats') {
       setIsChatsModalOpen(true);
     }
@@ -80,7 +82,7 @@ const SideNav: React.FC<SideNavProps> = (props) => {
   return (
     <Sider
       collapsed={toggleSider}
-      collapsedWidth={80}
+      collapsedWidth={isMobile ? 0 : 80}
       className="dash-sider border-r p-0 text-lg shadow-sm border-border/100"
       width={300}
       style={{

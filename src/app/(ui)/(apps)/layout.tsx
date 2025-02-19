@@ -2,16 +2,14 @@
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 import { AppContext } from '@grc/app-context';
 import { appNav } from '@grc/app/nav';
-import LeftDrawer from '@grc/components/apps/layout/left-drawer';
 import SideNav from '@grc/components/apps/layout/side-nav';
 import { Layout } from 'antd';
 import React, { ReactElement, useContext, useState } from 'react';
-import FindVendorDrawer from '../../../components/apps/find-vendor-drawer';
 import NotificationsDrawer from '@grc/components/apps/notification-drawer';
 import CreateStoreModal from '@grc/components/apps/create-store-modal';
-import ProfileDrawer from '@grc/components/apps/profile-drawer';
 import SellItemModal from '@grc/components/apps/sell-item-modal';
 import ChatsModal from '@grc/components/apps/chats-modal';
+import MobileNav from '@grc/components/apps/layout/mobile-nav';
 
 const { Content, Footer } = Layout;
 
@@ -26,11 +24,8 @@ const AppBaseLayout: React.FC<AppBaseLayoutProps> = ({ children }) => {
   const {
     toggleSider,
     setToggleSider,
-    toggleNotificationsDrawer,
     setToggleNotificationsDrawer,
-    toggleFindVendorDrawer,
     setToggleFindVendorDrawer,
-    toggleProfileDrawer,
     setToggleProfileDrawer,
     isCreateStoreModalOpen,
     setIsCreateStoreModalOpen,
@@ -51,27 +46,26 @@ const AppBaseLayout: React.FC<AppBaseLayoutProps> = ({ children }) => {
 
   return (
     <Layout hasSider={true} className="bg-background">
-      <SideNav
-        appNav={appNav}
-        toggleSider={toggleSider}
-        selectedKey={selectedKey}
-        setSelectedKey={setSelectedKey}
-        setToggleSider={setToggleSider}
-        setIsCreateStoreModalOpen={setIsCreateStoreModalOpen}
-        setIsSellItemModalOpen={setIsSellItemModalOpen}
-        setIsChatsModalOpen={setIsChatsModalOpen}
-      />
-      <LeftDrawer toggleLeftDrawer={!toggleSider} />
-      <FindVendorDrawer toggleFindVendorDrawer={toggleFindVendorDrawer} />
-      <NotificationsDrawer toggleNoticationDrawer={toggleNotificationsDrawer} />
-      <ProfileDrawer toggleProfileDrawer={toggleProfileDrawer} />
+      {/* Only show SideNav on non-mobile screens */}
+      {!mobileResponsive && (
+        <SideNav
+          appNav={appNav}
+          toggleSider={toggleSider}
+          selectedKey={selectedKey}
+          setSelectedKey={setSelectedKey}
+          setToggleSider={setToggleSider}
+          setIsCreateStoreModalOpen={setIsCreateStoreModalOpen}
+          setIsSellItemModalOpen={setIsSellItemModalOpen}
+          setIsChatsModalOpen={setIsChatsModalOpen}
+        />
+      )}
+      <NotificationsDrawer />
       <CreateStoreModal
         setSelectedKey={setSelectedKey}
         isCreateStoreModalOpen={isCreateStoreModalOpen}
         setIsCreateStoreModalOpen={setIsCreateStoreModalOpen}
       />
       <SellItemModal
-        setSelectedKey={setSelectedKey}
         isSellItemModalOpen={isSellItemModalOpen}
         setIsSellItemModalOpen={setIsSellItemModalOpen}
       />
@@ -80,27 +74,42 @@ const AppBaseLayout: React.FC<AppBaseLayoutProps> = ({ children }) => {
         isChatsModalOpen={isChatsModalOpen}
         setIsChatsModalOpen={setIsChatsModalOpen}
       />
+
       <Layout
         className="body-layout relative z-0 bg-background"
         style={{
           marginLeft: `${mobileResponsive ? 0 : tabletResponsive ? 0 : '300px'}`,
           transition: 'margin-left 0.3s ease',
+          // Add padding bottom for mobile to account for bottom navigation
+          paddingBottom: mobileResponsive ? '64px' : '0',
         }}
         onClick={handleLayoutBodyClick}
       >
-        {/* <AppHeader handleSwitchAccountMode={handleSwitchAccountMode} /> */}
         <Content className="main-content">
           <div
-            className={`dark:text-white ${mobileResponsive ? 'p-4' : 'px-[15%]'} py-6`}
+            className={`dark:text-white ${mobileResponsive ? 'p-1' : 'px-[12%]'} py-6`}
             style={{ minHeight: '100vh' }}
           >
             {children}
           </div>
+          {!mobileResponsive && (
+            <Footer className="shadow-sm border-t border-border/100 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:text-white">
+              Footer
+            </Footer>
+          )}
         </Content>
-        <Footer className="shadow-sm border-t border-border/100 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:text-white">
-          Footer
-        </Footer>
       </Layout>
+
+      {/* Show mobile navigation only on mobile screens */}
+      {mobileResponsive && (
+        <MobileNav
+          appNav={appNav}
+          setSelectedKey={setSelectedKey}
+          setIsCreateStoreModalOpen={setIsCreateStoreModalOpen}
+          setIsSellItemModalOpen={setIsSellItemModalOpen}
+          setIsChatsModalOpen={setIsChatsModalOpen}
+        />
+      )}
     </Layout>
   );
 };

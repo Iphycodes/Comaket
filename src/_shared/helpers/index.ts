@@ -1,19 +1,45 @@
 import Cookie from 'js-cookie';
-import { AUTH_TOKEN_KEY, COLOR_LIST_ALPHA } from '@grc/_shared/constant';
+import { AUTH_TOKEN_KEY, COLOR_LIST_ALPHA, Currencies } from '@grc/_shared/constant';
 import { MenuProps } from 'antd';
 import { get, capitalize, isEmpty } from 'lodash';
 
-export const truncateText = (text: string) => {
+export const truncateText = (text: string, max: number) => {
+  if (text.length < max) {
+    return text;
+  }
   return text.split('\n').slice(0, 2).join('\n') + '...';
 };
 
-export const numberFormat = (value: number | bigint, currency?: string) => {
-  const formatter = new Intl.NumberFormat();
-  return currency ? currency + formatter.format(value) : formatter.format(value);
-};
+export const numberFormat = (value: number | bigint, currency?: Currencies) => {
+  // First determine if the number is an integer
+  const isInteger = Number.isInteger(Number(value));
 
-export const transactionBal = (transBalances: Record<string, any>) => {
-  return Object.values(transBalances)?.reduce((acc, curr) => acc + curr?.availableAmount, 0);
+  // Create formatter with specific decimal places
+  const formatter = new Intl.NumberFormat(undefined, {
+    minimumFractionDigits: isInteger ? 0 : 2,
+    maximumFractionDigits: 2,
+  });
+
+  let symbol = '';
+  switch (currency) {
+    case Currencies.NGN:
+      symbol = '₦';
+      break;
+    case Currencies.USD:
+      symbol = '$';
+      break;
+    case Currencies.GBP:
+      symbol = '£';
+      break;
+    case Currencies.CAD:
+      symbol = 'CA$';
+      break;
+    default:
+      symbol = '₦';
+      break;
+  }
+
+  return currency ? symbol + formatter.format(Number(value)) : formatter.format(Number(value));
 };
 
 export const truncate = (text: string, length = 8) => {
@@ -46,7 +72,7 @@ export type NavItem = {
   label: string;
   key: string;
   destination: string;
-  icon: React.ReactNode;
+  icon: React.ReactNode | any;
   items?: NavItem[];
 };
 

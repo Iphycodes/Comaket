@@ -194,3 +194,24 @@
       background 0s;
   }
 }
+
+.category-select {
+  .ant-select-selector {
+    border-radius: 12px !important;
+    height: 3rem !important; // This ensures the height matches your h-12 class
+    display: flex;
+    align-items: center;
+  }
+}
+
+.ant-input-number-input-wrap,
+.ant-input-number-input {
+  height: 100% !important;
+}
+
+.ant-layout {
+  aside {
+    // styles here
+    // display: none !important;
+  }
+}

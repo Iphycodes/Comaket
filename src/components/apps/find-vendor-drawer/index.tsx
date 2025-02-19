@@ -1,6 +1,7 @@
 import React, { useRef, useState } from 'react';
 import { Input, InputRef, Layout } from 'antd';
 import VendorAccount from './lib/vendorAccount';
+import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 
 const { Sider } = Layout;
 interface LeftDrawerProps {
@@ -11,6 +12,7 @@ const FindVendorDrawer: React.FC<LeftDrawerProps> = ({ toggleFindVendorDrawer })
   const inputRef = useRef<InputRef>(null);
   const [isIconVisible, setIsIconVisible] = useState(true);
   const [inputValue, setInputValue] = useState('');
+  const isMobile = useMediaQuery(mediaSize.mobile);
 
   const handleFocus = () => {
     setIsIconVisible(false);
@@ -77,7 +79,7 @@ const FindVendorDrawer: React.FC<LeftDrawerProps> = ({ toggleFindVendorDrawer })
         height: '100vh',
         scrollbarWidth: 'thin',
         // scrollbarColor: 'black',
-        left: 80,
+        ...(isMobile ? { right: -5 } : { left: 80 }),
         top: 0,
         bottom: 0,
         zIndex: 10,
