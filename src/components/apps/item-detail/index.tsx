@@ -28,15 +28,15 @@ interface ItemDetailProps {
     condition: string;
     comments: Record<string, any>[];
     itemName: string;
-    status: 'pending' | 'approved' | 'rejected';
+    status?: 'pending' | 'approved' | 'rejected';
     feePaymentStatus?:
       | 'pending'
       | 'processed'
       | 'awaiting payment'
       | 'awaiting approval'
       | undefined;
-    platformFee: number;
-    live: boolean;
+    platformFee?: number;
+    live?: boolean;
   };
   isSellerView?: boolean;
   onClose?: () => void;
@@ -232,7 +232,7 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ item, isSellerView, onClose }) 
               {isSellerView && (
                 <div className="flex flex-col gap-1">
                   <span className="text-muted-foreground text-sm">
-                    Platform Fee: {numberFormat(item?.platformFee / 100, Currencies.NGN)}
+                    Platform Fee: {numberFormat((item?.platformFee ?? 0) / 100, Currencies.NGN)}
                   </span>
                   <div>
                     <Tag

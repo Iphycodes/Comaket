@@ -25,15 +25,15 @@ interface ItemDetailModalProps {
     condition: string;
     comments: Record<string, any>[];
     itemName: string;
-    status: 'pending' | 'approved' | 'rejected';
+    status?: 'pending' | 'approved' | 'rejected';
     feePaymentStatus?:
       | 'pending'
       | 'processed'
       | 'awaiting payment'
       | 'awaiting approval'
       | undefined;
-    platformFee: number;
-    live: boolean;
+    platformFee?: number;
+    live?: boolean;
   };
   isSellerView?: boolean;
 }
