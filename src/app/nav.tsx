@@ -13,6 +13,7 @@ import {
   ShopRemove,
 } from 'iconsax-react';
 import { HandCoins, MessageCircleMore, ShoppingBag, UserRoundSearch } from 'lucide-react';
+import SideNavAuthButton from '@grc/components/apps/layout/side-nav/lib/side-nav-auth-button';
 
 export type Nav = {
   theme: SiderTheme & string;
@@ -23,12 +24,6 @@ export type Nav = {
 };
 
 const footerMenuItems: NavItem[] = [
-  {
-    label: 'Create Store',
-    key: 'create-store',
-    destination: '',
-    icon: <i className="ri-store-line" style={{ fontSize: '22px' }}></i>,
-  },
   {
     label: 'Profile',
     key: 'profile',
@@ -45,6 +40,12 @@ const footerMenuItems: NavItem[] = [
         {isEmpty('') && getFirstCharacter('Ifeanyi')}
       </Avatar>
     ),
+  },
+  {
+    label: <SideNavAuthButton />,
+    key: 'auth',
+    destination: '',
+    icon: <></>,
   },
 ];
 

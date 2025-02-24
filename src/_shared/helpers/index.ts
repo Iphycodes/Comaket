@@ -2,6 +2,7 @@ import Cookie from 'js-cookie';
 import { AUTH_TOKEN_KEY, COLOR_LIST_ALPHA, Currencies } from '@grc/_shared/constant';
 import { MenuProps } from 'antd';
 import { get, capitalize, isEmpty } from 'lodash';
+import { ReactNode } from 'react';
 
 export const truncateText = (text: string, max: number) => {
   if (text.length < max) {
@@ -69,7 +70,7 @@ export const AppCookie = ({ cookie = null, allowDelete = false }: AppCookieProp)
 export type MenuItem = Required<MenuProps>['items'][number];
 
 export type NavItem = {
-  label: string;
+  label: string | ReactNode;
   key: string;
   destination: string;
   icon: React.ReactNode | any;

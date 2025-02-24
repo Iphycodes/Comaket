@@ -63,7 +63,7 @@ const Market = () => {
             animate={{ y: 0, opacity: 1 }}
             className="sticky top-0 z-20 backdrop-blur-sm bg-white/80 dark:bg-gray-900/80 shadow-sm"
           >
-            <div className="p-4">
+            <div className={`p-4 ${isMobile ? 'px-1' : ''}`}>
               <div className="w-full flex items-center justify-between gap-3">
                 <div className="flex-1">
                   <SearchBar

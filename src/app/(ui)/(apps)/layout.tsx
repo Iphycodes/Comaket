@@ -7,7 +7,6 @@ import { Layout } from 'antd';
 import React, { ReactElement, useContext, useState } from 'react';
 import NotificationsDrawer from '@grc/components/apps/notification-drawer';
 import CreateStoreModal from '@grc/components/apps/create-store-modal';
-import SellItemModal from '@grc/components/apps/sell-item-modal';
 import ChatsModal from '@grc/components/apps/chats-modal';
 import MobileNav from '@grc/components/apps/layout/mobile-nav';
 
@@ -29,7 +28,6 @@ const AppBaseLayout: React.FC<AppBaseLayoutProps> = ({ children }) => {
     setToggleProfileDrawer,
     isCreateStoreModalOpen,
     setIsCreateStoreModalOpen,
-    isSellItemModalOpen,
     setIsSellItemModalOpen,
     isChatsModalOpen,
     setIsChatsModalOpen,
@@ -65,10 +63,10 @@ const AppBaseLayout: React.FC<AppBaseLayoutProps> = ({ children }) => {
         isCreateStoreModalOpen={isCreateStoreModalOpen}
         setIsCreateStoreModalOpen={setIsCreateStoreModalOpen}
       />
-      <SellItemModal
+      {/* <SellItemModal
         isSellItemModalOpen={isSellItemModalOpen}
         setIsSellItemModalOpen={setIsSellItemModalOpen}
-      />
+      /> */}
       <ChatsModal
         setSelectedKey={setSelectedKey}
         isChatsModalOpen={isChatsModalOpen}

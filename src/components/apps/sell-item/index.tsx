@@ -13,9 +13,9 @@ import ItemDetailModal from '../item-detail-modal';
 import UpdateItemModal from '../update-item-modal';
 import DeleteConfirmModal from '../delete-confirm-modal';
 import TableSkeleton from '../../../_shared/components/table-skeleton';
+import ItemDetail from '../item-detail';
 
 const SellItem = () => {
-  // const searchParams = useSearchParams();
   const [isLoading, setIsLoading] = useState(true);
   // const [viewType, setViewType] = useState(searchParams?.get('view') || 'list');
   const [selectedItem, setSelectedItem] = useState<Partial<mockMarketItemType>>({});
@@ -95,6 +95,38 @@ const SellItem = () => {
     );
   };
 
+  if (isItemModalOpen && selectedItem && isMobile) {
+    return (
+      <div className={` dark:bg-gray-900/50 ${isMobile ? 'max-w-100vw' : ''}`}>
+        <div className={`w-full ${!isMobile ? 'max-w-7xl mx-auto px-4' : 'max-w-100vw px-2'}`}>
+          <div className="mb-5">
+            <span className="flex items-center gap-1" onClick={() => setIsItemModalOpen(false)}>
+              <i className="ri-arrow-left-line"></i>
+              <span>Back</span>
+            </span>
+          </div>
+          <ItemDetail
+            item={{
+              description: selectedItem?.description ?? '',
+              sponsored: selectedItem?.sponsored ?? false,
+              postUserProfile: selectedItem?.postUserProfile ?? {},
+              postImgurls: selectedItem?.postImgUrls ?? [],
+              askingPrice: selectedItem?.askingPrice ?? {},
+              condition: selectedItem?.condition ?? 'Fairly Used',
+              comments: selectedItem?.comments ?? [],
+              itemName: selectedItem?.itemName ?? '',
+              status: selectedItem.status ?? 'pending',
+              platformFee: selectedItem.fee ?? 0,
+              live: selectedItem.live ?? false,
+              feePaymentStatus: selectedItem.feePaymentStatus ?? 'awaiting approval',
+            }}
+            isSellerView={true}
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className={` dark:bg-gray-900/50 ${isMobile ? 'max-w-100vw' : ''}`}>
       <div className={`w-full ${!isMobile ? 'max-w-7xl mx-auto px-4' : 'max-w-100vw px-2'}`}>
@@ -102,7 +134,7 @@ const SellItem = () => {
         <motion.div
           initial={{ y: -20, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          className="py-0 sticky top-5 z-20"
+          className="py-0 sticky top-0 z-20"
         >
           <div className="bg-white dark:bg-gray-800 rounded-lg p-6 px-0">
             <div className="flex justify-end">
@@ -117,7 +149,7 @@ const SellItem = () => {
               </motion.button>
             </div>
           </div>
-          <div className="flex justify-between items-center mb-6">
+          <div className="flex bg-white justify-between items-center pb-4">
             <h2 className="text-xl font-semibold dark:text-white">My Products</h2>
             {/* <div className="flex items-center gap-4">
               <button

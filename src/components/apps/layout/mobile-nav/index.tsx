@@ -2,6 +2,7 @@ import React from 'react';
 import { Tooltip } from 'antd';
 import { usePathname, useRouter } from 'next/navigation';
 import { Nav } from '@grc/app/nav';
+import { isEmpty } from 'lodash';
 
 interface MobileNavProps {
   appNav: Nav;
@@ -21,20 +22,20 @@ const MobileNav: React.FC<MobileNavProps> = ({
   const { push } = useRouter();
 
   const handleMenuClick = ({ key }: { key: string }) => {
-    appNav?.items.map((item) => {
+    appNav?.mobileMenuItems.map((item) => {
       if (item.key === key) {
         if (item.destination !== '') {
           push(item?.destination);
         }
       }
     });
-    appNav?.footerMenuItems.map((item) => {
-      if (item.key === key) {
-        if (item.destination !== '') {
-          push(item?.destination);
-        }
-      }
-    });
+    // appNav?.footerMenuItems.map((item) => {
+    //   if (item.key === key) {
+    //     if (item.destination !== '') {
+    //       push(item?.destination);
+    //     }
+    //   }
+    // });
     // if (key === 'notifications') {
     //   setToggleNotificationsDrawer(false);
     // }
@@ -84,7 +85,11 @@ const MobileNav: React.FC<MobileNavProps> = ({
             <span
               onClick={() => handleMenuClick(item)}
               className={`p-2 transition-colors h-10 w-10 cursor-pointer hover:bg-neutral-50 ${
-                path === item.key ? 'bg-neutral-200' : ''
+                isEmpty(path) && item.key === 'market'
+                  ? 'bg-neutral-200'
+                  : path === item.key
+                    ? 'bg-neutral-200'
+                    : ''
               } rounded-[50%] ${
                 path === item.key
                   ? 'text-primary bg-primary/10'

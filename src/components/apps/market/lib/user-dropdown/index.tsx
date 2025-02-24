@@ -1,8 +1,9 @@
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 import { getFirstCharacter, getRandomColorByString } from '@grc/_shared/helpers';
+import SideNavAuthButton from '@grc/components/apps/layout/side-nav/lib/side-nav-auth-button';
 import { Dropdown, Button } from 'antd';
 import { isEmpty } from 'lodash';
-import { Store, User, LogOut, ChevronDown } from 'lucide-react';
+import { Store, User, ChevronDown } from 'lucide-react';
 
 const UserDropdown = () => {
   const isMobile = useMediaQuery(mediaSize.mobile);
@@ -68,13 +69,14 @@ const UserDropdown = () => {
     {
       key: 'logout',
       label: (
-        <span
-          onClick={() => console.log('logout')}
-          className="flex items-center gap-2 py-1 text-red-500"
-        >
-          <LogOut size={16} />
-          Logout
-        </span>
+        // <span
+        //   onClick={() => console.log('logout')}
+        //   className="flex items-center gap-2 py-1 text-red-500"
+        // >
+        //   <LogOut size={16} />
+        //   Logout
+        // </span>
+        <SideNavAuthButton />
       ),
     },
   ];
