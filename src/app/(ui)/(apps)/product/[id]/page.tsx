@@ -1,3 +1,4 @@
+'use client';
 import Product from '@grc/components/apps/product';
 import React, { useState } from 'react';
 
