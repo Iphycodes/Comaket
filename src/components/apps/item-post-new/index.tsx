@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Badge, Tooltip } from 'antd';
 import {
@@ -17,7 +17,6 @@ import { numberFormat } from '@grc/_shared/helpers';
 import TruncatedDescription from '@grc/_shared/components/truncated-description';
 import ItemDetailModal from '../item-detail-modal';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
-import { useRouter } from 'next/navigation';
 import { Currencies } from '@grc/_shared/constant';
 
 interface ItemPostProps {
@@ -30,6 +29,7 @@ interface ItemPostProps {
   comments: Record<string, any>[];
   itemName: string;
   id: string | number;
+  setSelectedProductId: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const ModernItemPost: React.FC<ItemPostProps> = ({
@@ -41,6 +41,7 @@ const ModernItemPost: React.FC<ItemPostProps> = ({
   condition,
   comments,
   itemName,
+  setSelectedProductId,
   id,
 }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
@@ -49,25 +50,70 @@ const ModernItemPost: React.FC<ItemPostProps> = ({
   const [slideDirection, setSlideDirection] = useState(0);
   const [isModalOpen, setIsModalOpen] = useState(false);
   const isMobile = useMediaQuery(mediaSize.mobile);
-  const { push } = useRouter();
+
+  // Ref for touch swiping on mobile
+  const imageContainerRef = useRef<HTMLDivElement>(null);
+  const touchStartXRef = useRef<number | null>(null);
 
   const nextImage = () => {
-    setSlideDirection(1);
-    setCurrentImageIndex((prev) => (prev + 1) % postImgurls.length);
+    if (currentImageIndex < postImgurls.length - 1) {
+      setSlideDirection(1);
+      setCurrentImageIndex((prev) => prev + 1);
+    }
   };
 
   const prevImage = () => {
-    setSlideDirection(-1);
-    setCurrentImageIndex((prev) => (prev - 1 + postImgurls.length) % postImgurls.length);
+    if (currentImageIndex > 0) {
+      setSlideDirection(-1);
+      setCurrentImageIndex((prev) => prev - 1);
+    }
   };
 
   const handleViewItem = () => {
-    if (isMobile) {
-      push(`/product/${id}`);
-    } else {
+    if (!isMobile) {
       setIsModalOpen(true);
+    } else {
+      setSelectedProductId(id?.toString());
     }
   };
+
+  // Touch event handlers for swiping on mobile
+  useEffect(() => {
+    const imageContainer = imageContainerRef.current;
+    if (!imageContainer || !isMobile) return;
+
+    const handleTouchStart = (e: TouchEvent) => {
+      touchStartXRef.current = e.touches[0].clientX;
+    };
+
+    const handleTouchEnd = (e: TouchEvent) => {
+      if (touchStartXRef.current === null) return;
+
+      const touchEndX = e.changedTouches[0].clientX;
+      const diffX = touchEndX - touchStartXRef.current;
+
+      // Swipe threshold - only register swipes that move more than 50px
+      if (Math.abs(diffX) > 50) {
+        if (diffX > 0 && currentImageIndex > 0) {
+          // Swipe right -> previous image
+          prevImage();
+        } else if (diffX < 0 && currentImageIndex < postImgurls.length - 1) {
+          // Swipe left -> next image
+          nextImage();
+        }
+      }
+
+      touchStartXRef.current = null;
+    };
+
+    imageContainer.addEventListener('touchstart', handleTouchStart);
+    imageContainer.addEventListener('touchend', handleTouchEnd);
+
+    return () => {
+      imageContainer.removeEventListener('touchstart', handleTouchStart);
+      imageContainer.removeEventListener('touchend', handleTouchEnd);
+    };
+  }, [isMobile, currentImageIndex, postImgurls.length]);
 
   return (
     <motion.div
@@ -109,10 +155,14 @@ const ModernItemPost: React.FC<ItemPostProps> = ({
           </div>
         </div>
       </div>
-      <div className="flex flex-col md:flex-row w-full gap-8">
+      <div className={`flex flex-col md:flex-row w-full ${isMobile ? 'gap-4' : 'gap-8'}`}>
         {/* Left section - Product Images */}
-        <div className="relative w-full md:w-3/5 overflow-hidden rounded-lg">
-          <div className="relative aspect-square">
+        <div
+          className={`relative w-full md:w-3/5 overflow-hidden ${
+            isMobile ? 'rounded-sm' : 'rounded-md'
+          }`}
+        >
+          <div ref={imageContainerRef} className="relative aspect-square">
             <AnimatePresence initial={false} custom={slideDirection}>
               <motion.div
                 key={currentImageIndex}
@@ -121,8 +171,12 @@ const ModernItemPost: React.FC<ItemPostProps> = ({
                 animate={{ x: 0, opacity: 1 }}
                 exit={{ x: slideDirection * -100 + '%', opacity: 0 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 30 }}
-                className="absolute inset-0 rounded-lg cursor-pointer"
-                onClick={handleViewItem}
+                className={`absolute inset-0 rounded-sm ${!isMobile ? 'cursor-pointer' : ''}`}
+                onClick={() => {
+                  if (!isMobile) {
+                    handleViewItem();
+                  }
+                }}
               >
                 <Image
                   src={postImgurls[currentImageIndex]}
@@ -137,21 +191,40 @@ const ModernItemPost: React.FC<ItemPostProps> = ({
             {/* Navigation controls */}
             {postImgurls.length > 1 && (
               <>
-                <button
-                  onClick={prevImage}
-                  className="absolute left-1 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full backdrop-blur-sm transition-colors"
-                >
-                  <ChevronLeft className="w-6 h-6" />
-                </button>
-                <button
-                  onClick={nextImage}
-                  className="absolute right-1 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full backdrop-blur-sm transition-colors"
-                >
-                  <ChevronRight className="w-6 h-6" />
-                </button>
+                {currentImageIndex > 0 && (
+                  <button
+                    onClick={prevImage}
+                    className={`absolute left-1 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white ${
+                      isMobile ? 'p-1' : 'p-2'
+                    } rounded-full backdrop-blur-sm transition-colors`}
+                  >
+                    <ChevronLeft className={`${isMobile ? 'w-4 h-4' : 'w-6 h-6'}`} />
+                  </button>
+                )}
 
-                <div className="absolute bottom-4 right-2 bg-black/30 text-white px-3 py-1 rounded-full backdrop-blur-sm text-sm">
-                  {currentImageIndex + 1}/{postImgurls.length}
+                {currentImageIndex < postImgurls.length - 1 && (
+                  <button
+                    onClick={nextImage}
+                    className={`absolute right-1 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white ${
+                      isMobile ? 'p-1' : 'p-2'
+                    } rounded-full backdrop-blur-sm transition-colors`}
+                  >
+                    <ChevronRight className={`${isMobile ? 'w-4 h-4' : 'w-6 h-6'}`} />
+                  </button>
+                )}
+
+                {/* Dots indicator */}
+                <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5">
+                  {postImgurls.map((_, index) => (
+                    <div
+                      key={index}
+                      className={`w-2 h-2 rounded-full ${
+                        currentImageIndex === index
+                          ? 'bg-white'
+                          : 'bg-white/30 border border-white/60'
+                      } transition-all duration-200`}
+                    />
+                  ))}
                 </div>
               </>
             )}
@@ -163,18 +236,77 @@ const ModernItemPost: React.FC<ItemPostProps> = ({
               }
               color={condition === 'Brand New' ? 'green' : 'blue'}
             />
-
-            {/* <Badge
-              className="absolute top-4 right-4 blur-lg"
-              count={condition}
-              color={condition === 'Brand New' ? 'green' : 'blue'}
-            /> */}
           </div>
         </div>
 
         {/* Right section - Product Details */}
         <div className="w-full md:w-1/2 flex flex-col">
           {/* Product info */}
+          {isMobile && (
+            <div className="mt-auto space-y-6 mb-5">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-6">
+                  <Tooltip title={isLiked ? 'Unlike' : 'Like'}>
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => setIsLiked(!isLiked)}
+                      className="flex items-center gap-2 group"
+                    >
+                      <Heart
+                        className={`w-6 h-6 ${
+                          isLiked
+                            ? 'fill-rose-500 text-rose-500'
+                            : 'text-gray-400 group-hover:text-gray-600'
+                        } transition-colors`}
+                      />
+                      <span className="text-sm text-gray-500">125</span>
+                    </motion.button>
+                  </Tooltip>
+
+                  <Tooltip title="Comments">
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      className="flex items-center gap-2 group"
+                    >
+                      <MessageCircle className="w-6 h-6 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                      <span className="text-sm text-gray-500">{comments.length}</span>
+                    </motion.button>
+                  </Tooltip>
+                </div>
+
+                <div className="flex items-center gap-4">
+                  <Tooltip title={isSaved ? 'Remove from saved' : 'Save item'}>
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => setIsSaved(!isSaved)}
+                      className="group"
+                    >
+                      <Bookmark
+                        className={`w-6 h-6 ${
+                          isSaved
+                            ? 'fill-blue-500 text-blue-500'
+                            : 'text-gray-400 group-hover:text-gray-600'
+                        } transition-colors`}
+                      />
+                    </motion.button>
+                  </Tooltip>
+
+                  <Tooltip title="Share">
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      className="group"
+                    >
+                      <Share2 className="w-6 h-6 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                    </motion.button>
+                  </Tooltip>
+                </div>
+              </div>
+            </div>
+          )}
           <div className="space-y-2 mb-1">
             <div>
               <h2 className="text-xl font-semibold mb-1 cursor-pointer" onClick={handleViewItem}>
@@ -192,94 +324,124 @@ const ModernItemPost: React.FC<ItemPostProps> = ({
               </div>
             </div>
 
-            {/* <p className="text-gray-600 dark:text-gray-300 leading-relaxed">{description}</p> */}
             <TruncatedDescription description={description} max={100} />
+
+            <div className="pt-1">
+              <button className="text-blue-500 hover:text-blue-600 text-sm font-medium transition-colors">
+                View all comments ({comments.length})
+              </button>
+            </div>
+          </div>
+
+          {/* Comment input */}
+          <div className="mt-auto mb-4 relative">
+            <button
+              id="post-comment-button"
+              className="ml-auto mb-1 text-[10px] bottom-2 bg-blue text-white px-3 py-[2px] text-sm rounded-full font-medium hidden hover:bg-blue-600 transition-colors"
+            >
+              Post
+            </button>
+            <textarea
+              placeholder="Add a comment..."
+              rows={2}
+              className="w-full max-h-12 focus:!max-h-15 px-3 !py-2 border-b !outline-none focus:!outline-none focus:bg-neutral-100 border-gray-300 focus:!border-none dark:border-gray-700 dark:focus:border-blue-400 bg-transparent transition-colors resize-none"
+              onChange={(e) => {
+                const hasContent = e.target.value.trim().length > 0;
+                // You can use state to control the button visibility
+                // This is a simple inline approach
+                const postButton = document.getElementById('post-comment-button');
+                if (postButton) {
+                  postButton.style.display = hasContent ? 'block' : 'none';
+                }
+              }}
+            />
           </div>
 
           {/* Stats and actions */}
-          <div className="mt-auto space-y-6">
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-6">
-                <Tooltip title={isLiked ? 'Unlike' : 'Like'}>
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => setIsLiked(!isLiked)}
-                    className="flex items-center gap-2 group"
-                  >
-                    <Heart
-                      className={`w-6 h-6 ${
-                        isLiked
-                          ? 'fill-rose-500 text-rose-500'
-                          : 'text-gray-400 group-hover:text-gray-600'
-                      } transition-colors`}
-                    />
-                    <span className="text-sm text-gray-500">125</span>
-                  </motion.button>
-                </Tooltip>
+          {!isMobile && (
+            <div className="space-y-6 mb-3">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-6">
+                  <Tooltip title={isLiked ? 'Unlike' : 'Like'}>
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => setIsLiked(!isLiked)}
+                      className="flex items-center gap-2 group"
+                    >
+                      <Heart
+                        className={`w-6 h-6 ${
+                          isLiked
+                            ? 'fill-rose-500 text-rose-500'
+                            : 'text-gray-400 group-hover:text-gray-600'
+                        } transition-colors`}
+                      />
+                      <span className="text-sm text-gray-500">125</span>
+                    </motion.button>
+                  </Tooltip>
 
-                <Tooltip title="Comments">
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="flex items-center gap-2 group"
-                  >
-                    <MessageCircle className="w-6 h-6 text-gray-400 group-hover:text-gray-600 transition-colors" />
-                    <span className="text-sm text-gray-500">{comments.length}</span>
-                  </motion.button>
-                </Tooltip>
-              </div>
+                  <Tooltip title="Comments">
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      className="flex items-center gap-2 group"
+                    >
+                      <MessageCircle className="w-6 h-6 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                      <span className="text-sm text-gray-500">{comments.length}</span>
+                    </motion.button>
+                  </Tooltip>
+                </div>
 
-              <div className="flex items-center gap-4">
-                <Tooltip title={isSaved ? 'Remove from saved' : 'Save item'}>
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    onClick={() => setIsSaved(!isSaved)}
-                    className="group"
-                  >
-                    <Bookmark
-                      className={`w-6 h-6 ${
-                        isSaved
-                          ? 'fill-blue-500 text-blue-500'
-                          : 'text-gray-400 group-hover:text-gray-600'
-                      } transition-colors`}
-                    />
-                  </motion.button>
-                </Tooltip>
+                <div className="flex items-center gap-4">
+                  <Tooltip title={isSaved ? 'Remove from saved' : 'Save item'}>
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      onClick={() => setIsSaved(!isSaved)}
+                      className="group"
+                    >
+                      <Bookmark
+                        className={`w-6 h-6 ${
+                          isSaved
+                            ? 'fill-blue-500 text-blue-500'
+                            : 'text-gray-400 group-hover:text-gray-600'
+                        } transition-colors`}
+                      />
+                    </motion.button>
+                  </Tooltip>
 
-                <Tooltip title="Share">
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="group"
-                  >
-                    <Share2 className="w-6 h-6 text-gray-400 group-hover:text-gray-600 transition-colors" />
-                  </motion.button>
-                </Tooltip>
+                  <Tooltip title="Share">
+                    <motion.button
+                      whileHover={{ scale: 1.1 }}
+                      whileTap={{ scale: 0.9 }}
+                      className="group"
+                    >
+                      <Share2 className="w-6 h-6 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                    </motion.button>
+                  </Tooltip>
+                </div>
               </div>
             </div>
+          )}
+          {/* Primary actions */}
+          <div className="flex gap-4">
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="flex-1 bg-gradient-to-r from-blue to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-1 shadow-sm"
+            >
+              <MessageCircle size={20} />
+              Chat Seller
+            </motion.button>
 
-            {/* Primary actions */}
-            <div className="flex gap-4">
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="flex-1 bg-gradient-to-r from-blue to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-1 shadow-sm"
-              >
-                <MessageCircle size={20} />
-                Chat Seller
-              </motion.button>
-
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                className="flex-1 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-zinc-800 dark:to-zinc-900 border border-gray-200 dark:border-zinc-700 hover:border-gray-300 dark:hover:border-zinc-600 py-3 rounded-lg font-medium flex items-center justify-center gap-2"
-              >
-                <Store size={20} />
-                Visit Store
-              </motion.button>
-            </div>
+            <motion.button
+              whileHover={{ scale: 1.02 }}
+              whileTap={{ scale: 0.98 }}
+              className="flex-1 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-zinc-800 dark:to-zinc-900 border border-gray-200 dark:border-zinc-700 hover:border-gray-300 dark:hover:border-zinc-600 py-3 rounded-lg font-medium flex items-center justify-center gap-2"
+            >
+              <Store size={20} />
+              Visit Store
+            </motion.button>
           </div>
         </div>
       </div>

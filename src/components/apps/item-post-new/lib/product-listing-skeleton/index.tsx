@@ -3,7 +3,7 @@ import { Skeleton } from 'antd';
 
 const ProductListingSkeleton = () => {
   return (
-    <div className="w-full bg-white rounded-lg shadow-sm p-4">
+    <div className="w-full bg-white rounded-lg shadow-sm">
       {/* Seller info */}
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-3">

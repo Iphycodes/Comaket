@@ -13,12 +13,14 @@ import NotificationsDrawer from '../notification-drawer';
 import { AppContext } from '@grc/app-context';
 import UserDropdown from './lib/user-dropdown';
 import ProductListingSkeleton from '../item-post-new/lib/product-listing-skeleton';
+import Product from '../product';
 
 const Market = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [showFilters, setShowFilters] = useState(false);
-
   const { setToggleNotificationsDrawer, toggleNotificationsDrawer } = useContext(AppContext);
+  const [selectedProductId, setSelectedProductId] = useState('');
+  // const [selectedCommentsData, setSelectedCommentsData] = useState({});
   // Simulate initial loading
   useEffect(() => {
     const timer = setTimeout(() => setIsLoading(false), 2000);
@@ -36,14 +38,14 @@ const Market = () => {
     },
   };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5 },
-    },
-  };
+  // const itemVariants = {
+  //   hidden: { opacity: 0, y: 20 },
+  //   visible: {
+  //     opacity: 1,
+  //     y: 0,
+  //     transition: { duration: 0.5 },
+  //   },
+  // };
 
   const isMobile = useMediaQuery(mediaSize.mobile);
   const isDesktop = useMediaQuery(mediaSize.desktop);
@@ -51,6 +53,10 @@ const Market = () => {
   useEffect(() => {
     console.log('toggle:::', toggleNotificationsDrawer);
   }, [toggleNotificationsDrawer]);
+
+  if (selectedProductId !== '' && isMobile) {
+    return <Product productId={selectedProductId} setSelectedProductId={setSelectedProductId} />;
+  }
 
   return (
     <div className="min-h-screen dark:bg-gray-900/50 w-full">
@@ -61,9 +67,9 @@ const Market = () => {
           <motion.div
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="sticky top-0 z-20 backdrop-blur-sm bg-white/80 dark:bg-gray-900/80 shadow-sm"
+            className="sticky top-0 z-20 backdrop-blur-md bg-white/80 dark:bg-gray-900/80 shadow-sm"
           >
-            <div className={`p-4 ${isMobile ? 'px-1' : ''}`}>
+            <div className={`p-4 ${isMobile ? 'px-1 pt-2' : ''}`}>
               <div className="w-full flex items-center justify-between gap-3">
                 <div className="flex-1">
                   <SearchBar
@@ -119,43 +125,49 @@ const Market = () => {
           </motion.div>
 
           {/* Items Grid */}
-          <div className="px-4 py-6">
-            {isLoading ? (
-              <div className="space-y-6">
-                {[1, 2, 3].map((i) => (
-                  <div key={i}>
-                    <ProductListingSkeleton />
-                  </div>
-                ))}
-              </div>
-            ) : (
-              <motion.div
-                variants={containerVariants}
-                initial="hidden"
-                animate="visible"
-                className="space-y-6"
-              >
-                {mockMarketItems?.map((item, idx) => (
-                  <motion.div
-                    key={idx}
-                    variants={itemVariants}
-                    className="bg-white dark:bg-gray-800 rounded-lg transition-all duration-300"
-                  >
-                    <ModernItemPost
-                      postUserProfile={item?.postUserProfile ?? {}}
-                      sponsored={item?.sponsored ?? false}
-                      description={item?.description ?? ''}
-                      postImgurls={item?.postImgUrls ?? []}
-                      askingPrice={item?.askingPrice ?? {}}
-                      condition={item?.condition ?? 'Brand New'}
-                      itemName={item?.itemName ?? ''}
-                      comments={item?.comments ?? []}
-                      id={item?.id ?? ''}
-                    />
-                  </motion.div>
-                ))}
-              </motion.div>
-            )}
+          <div className={`${isMobile ? 'px-2' : 'px-4'} py-6`}>
+            <motion.div
+              variants={containerVariants}
+              initial="hidden"
+              animate="visible"
+              className="space-y-6"
+            >
+              {isLoading ? (
+                <div className="space-y-6">
+                  {[1, 2, 3].map((i) => (
+                    <div key={i}>
+                      <ProductListingSkeleton />
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <>
+                  {mockMarketItems?.map((item, idx) => (
+                    // <motion.div
+                    //   key={idx}
+                    //   variants={itemVariants}
+                    //   className="bg-white dark:bg-gray-800 rounded-lg transition-all duration-300"
+                    // >
+                    <div key={idx}>
+                      <ModernItemPost
+                        postUserProfile={item?.postUserProfile ?? {}}
+                        sponsored={item?.sponsored ?? false}
+                        description={item?.description ?? ''}
+                        postImgurls={item?.postImgUrls ?? []}
+                        askingPrice={item?.askingPrice ?? {}}
+                        condition={item?.condition ?? 'Brand New'}
+                        itemName={item?.itemName ?? ''}
+                        comments={item?.comments ?? []}
+                        id={item?.id ?? ''}
+                        setSelectedProductId={setSelectedProductId}
+                      />
+                    </div>
+
+                    // </motion.div>
+                  ))}
+                </>
+              )}
+            </motion.div>
           </div>
         </Col>
 
