@@ -29,7 +29,7 @@ interface ItemPostProps {
   comments: Record<string, any>[];
   itemName: string;
   id: string | number;
-  setSelectedProductId: React.Dispatch<React.SetStateAction<string>>;
+  setSelectedProductId?: React.Dispatch<React.SetStateAction<string>>;
 }
 
 const ModernItemPost: React.FC<ItemPostProps> = ({
@@ -73,7 +73,7 @@ const ModernItemPost: React.FC<ItemPostProps> = ({
     if (!isMobile) {
       setIsModalOpen(true);
     } else {
-      setSelectedProductId(id?.toString());
+      setSelectedProductId?.(id?.toString());
     }
   };
 

@@ -1,8 +1,11 @@
 import Product from '@grc/components/apps/product';
-import React from 'react';
+import React, { useState } from 'react';
 
 const ProductPage = ({ params }: { params: { id: string } }) => {
-  return <Product productId={params?.id} />;
+  const [selectedProductId, setSelectedProductId] = useState('');
+
+  console.log(selectedProductId);
+  return <Product productId={params?.id} setSelectedProductId={setSelectedProductId} />;
 };
 
 export default ProductPage;
