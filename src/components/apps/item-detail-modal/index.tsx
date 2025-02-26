@@ -45,8 +45,8 @@ const ItemDetailModal: React.FC<ItemDetailModalProps> = ({ open, onClose, item, 
       onCancel={onClose}
       footer={null}
       width={1200}
-      className="item-detail-modal relative"
-      closeIcon={null}
+      className="item-detail-modal relative !p-0"
+      // closeIcon={null}
     >
       <ItemDetail item={item} onClose={onClose} isSellerView={isSellerView} />
     </Modal>

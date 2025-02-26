@@ -201,21 +201,7 @@ export const mockMarketItems: Partial<mockMarketItemType>[] = [
         userName: 'queenex20',
       },
     ],
-    comments: [
-      {
-        userDpImageUrl: '',
-        userName: 'samuel_ng',
-        message: 'This is very beautiful, I love it',
-        date: '12 march 2023',
-      },
-      {
-        userDpImageUrl: '',
-        userName: 'kings',
-        message:
-          'I love this laptop, I used it sometime last year and I must confess that it is so so powerful. Everything works fine with this laptop. You cant even ave issues with the laptop',
-        date: '5 August 2023',
-      },
-    ],
+    comments: mockComments,
     status: 'approved',
     live: true,
     feePaymentStatus: 'processed',
@@ -257,21 +243,7 @@ export const mockMarketItems: Partial<mockMarketItemType>[] = [
       },
     ],
     bookMarks: [],
-    comments: [
-      {
-        userDpImageUrl: '',
-        userName: 'samuel_ng',
-        message: 'This is very beautiful, I love it',
-        date: '12 march 2023',
-      },
-      {
-        userDpImageUrl: '',
-        userName: 'kings',
-        message:
-          'I love this laptop, I used it sometime last year and I must confess that it is so so powerful. Everything works fine with this laptop. You cant even ave issues with the laptop',
-        date: '5 August 2023',
-      },
-    ],
+    comments: mockComments.slice(0, 5),
     status: 'pending',
     live: false,
     feePaymentStatus: 'awaiting payment',
@@ -314,112 +286,7 @@ export const mockMarketItems: Partial<mockMarketItemType>[] = [
       },
     ],
     bookMarks: [],
-    comments: [
-      {
-        userDpImageUrl: '/assets/imgs/woman-face.jpg',
-        userName: 'samuel_ng',
-        message: 'This is very beautiful, I love it',
-        date: '12 march 2023',
-      },
-      {
-        userDpImageUrl: '/assets/imgs/woman-face.jpg',
-        userName: 'kings',
-        message:
-          'I love this laptop, I used it sometime last year and I must confess that it is so so powerful. Everything works fine with this laptop. You cant even ave issues with the laptop',
-        date: '5 August 2023',
-      },
-      {
-        userDpImageUrl: '/assets/imgs/woman-face.jpg',
-        userName: 'kings',
-        message:
-          'I love this laptop, I used it sometime last year and I must confess that it is so so powerful. Everything works fine with this laptop. You cant even ave issues with the laptop',
-        date: '5 August 2023',
-      },
-      {
-        userDpImageUrl: '/assets/imgs/woman-face.jpg',
-        userName: 'kings',
-        message:
-          'I love this laptop, I used it sometime last year and I must confess that it is so so powerful. Everything works fine with this laptop. You cant even ave issues with the laptop',
-        date: '5 August 2023',
-      },
-      {
-        userDpImageUrl: '/assets/imgs/woman-face.jpg',
-        userName: 'kings',
-        message:
-          'I love this laptop, I used it sometime last year and I must confess that it is so so powerful. Everything works fine with this laptop. You cant even ave issues with the laptop',
-        date: '5 August 2023',
-      },
-      {
-        userDpImageUrl: '/assets/imgs/woman-face.jpg',
-        userName: 'kings',
-        message:
-          'I love this laptop, I used it sometime last year and I must confess that it is so so powerful. Everything works fine with this laptop. You cant even ave issues with the laptop',
-        date: '5 August 2023',
-      },
-      {
-        userDpImageUrl: '/assets/imgs/woman-face.jpg',
-        userName: 'kings',
-        message:
-          'I love this laptop, I used it sometime last year and I must confess that it is so so powerful. Everything works fine with this laptop. You cant even ave issues with the laptop',
-        date: '5 August 2023',
-      },
-      {
-        userDpImageUrl: '/assets/imgs/woman-face.jpg',
-        userName: 'kings',
-        message:
-          'I love this laptop, I used it sometime last year and I must confess that it is so so powerful. Everything works fine with this laptop. You cant even ave issues with the laptop',
-        date: '5 August 2023',
-      },
-      {
-        userDpImageUrl: '/assets/imgs/woman-face.jpg',
-        userName: 'kings',
-        message:
-          'I love this laptop, I used it sometime last year and I must confess that it is so so powerful. Everything works fine with this laptop. You cant even ave issues with the laptop',
-        date: '5 August 2023',
-      },
-      {
-        userDpImageUrl: '/assets/imgs/woman-face.jpg',
-        userName: 'kings',
-        message:
-          'I love this laptop, I used it sometime last year and I must confess that it is so so powerful. Everything works fine with this laptop. You cant even ave issues with the laptop',
-        date: '5 August 2023',
-      },
-      {
-        userDpImageUrl: '/assets/imgs/woman-face.jpg',
-        userName: 'kings',
-        message:
-          'I love this laptop, I used it sometime last year and I must confess that it is so so powerful. Everything works fine with this laptop. You cant even ave issues with the laptop',
-        date: '5 August 2023',
-      },
-      {
-        userDpImageUrl: '/assets/imgs/woman-face.jpg',
-        userName: 'kings',
-        message:
-          'I love this laptop, I used it sometime last year and I must confess that it is so so powerful. Everything works fine with this laptop. You cant even ave issues with the laptop',
-        date: '5 August 2023',
-      },
-      {
-        userDpImageUrl: '/assets/imgs/woman-face.jpg',
-        userName: 'kings',
-        message:
-          'I love this laptop, I used it sometime last year and I must confess that it is so so powerful. Everything works fine with this laptop. You cant even ave issues with the laptop',
-        date: '5 August 2023',
-      },
-      {
-        userDpImageUrl: '/assets/imgs/woman-face.jpg',
-        userName: 'kings',
-        message:
-          'I love this laptop, I used it sometime last year and I must confess that it is so so powerful. Everything works fine with this laptop. You cant even ave issues with the laptop',
-        date: '5 August 2023',
-      },
-      {
-        userDpImageUrl: '/assets/imgs/woman-face.jpg',
-        userName: 'kings',
-        message:
-          'I love this laptop, I used it sometime last year and I must confess that it is so so powerful. Everything works fine with this laptop. You cant even ave issues with the laptopsssssssss',
-        date: '5 August 2023',
-      },
-    ],
+    comments: mockComments.slice(0, 1),
     status: 'rejected',
     live: false,
     feePaymentStatus: 'awaiting approval',

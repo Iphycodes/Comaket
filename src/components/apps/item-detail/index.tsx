@@ -17,6 +17,7 @@ import { numberFormat } from '@grc/_shared/helpers';
 import { Currencies, mockComments } from '@grc/_shared/constant';
 import { capitalize, startCase } from 'lodash';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
+import CommentBox from '../comment-box';
 
 interface ItemDetailProps {
   item: {
@@ -42,7 +43,7 @@ interface ItemDetailProps {
   onClose?: () => void;
 }
 
-const ItemDetail: React.FC<ItemDetailProps> = ({ item, isSellerView, onClose }) => {
+const ItemDetail: React.FC<ItemDetailProps> = ({ item, isSellerView }) => {
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [slideDirection, setSlideDirection] = useState(0);
@@ -73,14 +74,14 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ item, isSellerView, onClose }) 
     }),
   };
 
-  const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: {
-      opacity: 1,
-      y: 0,
-      transition: { duration: 0.5 },
-    },
-  };
+  // const itemVariants = {
+  //   hidden: { opacity: 0, y: 20 },
+  //   visible: {
+  //     opacity: 1,
+  //     y: 0,
+  //     transition: { duration: 0.5 },
+  //   },
+  // };
 
   const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
@@ -109,54 +110,61 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ item, isSellerView, onClose }) 
   };
 
   return (
-    <motion.div
-      variants={itemVariants}
+    // <motion.div
+    //   variants={itemVariants}
+    //   className={`relative bg-white dark:bg-gray-800 rounded-lg transition-all duration-300 ${
+    //     isMobile ? 'px-3' : ''
+    //   }`}
+    // >
+    <div
       className={`relative bg-white dark:bg-gray-800 rounded-lg transition-all duration-300 ${
         isMobile ? 'px-3' : ''
       }`}
     >
       {/* Seller Info */}
-      <div className="flex items-center gap-3 mb-6">
-        <div className="relative w-12 h-12">
-          <Image
-            src={item.postUserProfile?.profilePicUrl}
-            alt="Seller"
-            fill
-            className="rounded-full object-cover"
-          />
-          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
-        </div>
-        <div>
-          <h3 className="font-medium text-lg">
-            {item.postUserProfile?.businessName || item.postUserProfile?.userName}
-          </h3>
-          <div className="flex items-center gap-3 text-sm text-gray-500">
-            <span className="flex items-center gap-1">
-              <MapPin size={14} />
-              Kaduna State, Zaria
-            </span>
-            <span className="flex items-center gap-1">
-              <Clock size={14} />
-              2d ago
-            </span>
+      {isMobile && (
+        <div className="flex items-center gap-3 mb-6">
+          <div className="relative w-12 h-12">
+            <Image
+              src={item.postUserProfile?.profilePicUrl}
+              alt="Seller"
+              fill
+              className="rounded-full object-cover"
+            />
+            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
+          </div>
+          <div>
+            <h3 className="font-medium text-lg">
+              {item.postUserProfile?.businessName || item.postUserProfile?.userName}
+            </h3>
+            <div className="flex items-center gap-3 text-sm text-gray-500">
+              <span className="flex items-center gap-1">
+                <MapPin size={14} />
+                Kaduna State, Zaria
+              </span>
+              <span className="flex items-center gap-1">
+                <Clock size={14} />
+                2d ago
+              </span>
+            </div>
           </div>
         </div>
-      </div>
+      )}
 
-      {onClose && (
+      {/* {onClose && (
         <button
           onClick={onClose}
           className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
         >
           ×
         </button>
-      )}
+      )} */}
 
-      <div className={`flex ${isMobile ? 'flex-col' : ''} gap-8`}>
+      <div className={`flex ${isMobile ? 'flex-col' : ''}`}>
         {/* Left Section - Image */}
-        <div className={`${isMobile ? 'w-full' : 'w-[60%]'} relative`}>
+        <div className={`${isMobile ? 'w-full' : 'w-2/3'} relative`}>
           <div className="sticky top-0 h-full">
-            <div className="relative aspect-square rounded-lg overflow-hidden">
+            <div className="relative aspect-square overflow-hidden">
               <AnimatePresence initial={false} custom={slideDirection} mode="popLayout">
                 <motion.div
                   key={currentImageIndex}
@@ -201,7 +209,39 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ item, isSellerView, onClose }) 
         </div>
 
         {/* Right Section - Details */}
-        <div className={`${isMobile ? 'w-full' : 'w-1/2 !min-h-[100%] overflow-y-auto'} relative`}>
+        <div
+          className={`${isMobile ? 'w-full' : 'w-1/3 !min-h-[100%] overflow-y-auto p-5'} relative`}
+        >
+          {/* Seller Details */}
+
+          {!isMobile && (
+            <div className="flex items-center gap-3 mb-6">
+              <div className="relative w-12 h-12">
+                <Image
+                  src={item.postUserProfile?.profilePicUrl}
+                  alt="Seller"
+                  fill
+                  className="rounded-full object-cover"
+                />
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
+              </div>
+              <div>
+                <h3 className="font-medium text-lg">
+                  {item.postUserProfile?.businessName || item.postUserProfile?.userName}
+                </h3>
+                <div className="flex items-center gap-3 text-sm text-gray-500">
+                  <span className="flex items-center gap-1">
+                    <MapPin size={14} />
+                    Kaduna State, Zaria
+                  </span>
+                  <span className="flex items-center gap-1">
+                    <Clock size={14} />
+                    2d ago
+                  </span>
+                </div>
+              </div>
+            </div>
+          )}
           {/* Item Details */}
           <div className="space-y-6">
             <div className="flex justify-between">
@@ -329,7 +369,7 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ item, isSellerView, onClose }) 
               </div>
 
               {/* Comments Section */}
-              <div>
+              <div className="mb-[100px]">
                 <h4 className="font-medium mb-4">Comments ({mockComments.length})</h4>
                 <div className="space-y-4">
                   {mockComments.map((comment) => (
@@ -360,7 +400,22 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ item, isSellerView, onClose }) 
 
           {/* Action Buttons */}
           {!isSellerView && (
-            <div className="absolute w-full bottom-0 bg-white pt-4 mt-6 border-t">
+            <div className="absolute max-w-full w-[90%] bottom-0 bg-white py-4 mt-6 border-t">
+              <div className="mb-4 w-full">
+                <div className="flex gap-3 w-full items-start">
+                  <Image
+                    src={item.postUserProfile?.profilePicUrl}
+                    alt={'user'}
+                    width={32}
+                    height={32}
+                    className="rounded-full"
+                    style={{ width: '32px', height: '32px' }}
+                  />
+                  <div className="flex-1">
+                    <CommentBox />
+                  </div>
+                </div>
+              </div>
               <div className="flex gap-4">
                 <motion.button
                   whileHover={{ scale: 1.02 }}
@@ -383,7 +438,7 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ item, isSellerView, onClose }) 
           )}
         </div>
       </div>
-    </motion.div>
+    </div>
   );
 };
 

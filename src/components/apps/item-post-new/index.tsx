@@ -326,15 +326,18 @@ const ModernItemPost: React.FC<ItemPostProps> = ({
 
             <TruncatedDescription description={description} max={100} />
 
-            <div className="pt-1">
-              <button className="text-blue-500 hover:text-blue-600 text-sm font-medium transition-colors">
+            <div className="py-1">
+              <button
+                onClick={() => handleViewItem()}
+                className="text-neutral-500 hover:text-blue text-sm font-medium transition-colors"
+              >
                 View all comments ({comments.length})
               </button>
             </div>
           </div>
 
           {/* Comment input */}
-          <div className="mt-auto mb-4 relative">
+          {/* <div className="mt-auto mb-4 relative">
             <button
               id="post-comment-button"
               className="ml-auto mb-1 text-[10px] bottom-2 bg-blue text-white px-3 py-[2px] text-sm rounded-full font-medium hidden hover:bg-blue-600 transition-colors"
@@ -355,11 +358,11 @@ const ModernItemPost: React.FC<ItemPostProps> = ({
                 }
               }}
             />
-          </div>
+          </div> */}
 
           {/* Stats and actions */}
           {!isMobile && (
-            <div className="space-y-6 mb-3">
+            <div className="mt-auto space-y-6 mb-3">
               <div className="flex items-center justify-between">
                 <div className="flex items-center gap-6">
                   <Tooltip title={isLiked ? 'Unlike' : 'Like'}>

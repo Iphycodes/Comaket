@@ -1,9 +1,11 @@
-.item-post-modal {
+.item-detail-modal {
   padding: 0 !important;
-  top: 50px !important;
+  // top: 50px !important;
+  border-radius: 0 !important;
 
   .ant-modal-content {
-    padding: 2px !important;
+    padding: 0 !important;
+    border-radius: 0 !important;
   }
 }
 
@@ -13,24 +15,24 @@
   }
 }
 
-.ant-modal-close {
-  position: fixed !important;
-  top: 15px !important; /* Adjust the top position as needed */
-  right: 24px !important; /* Adjust the right position as needed */
-  z-index: 1001 !important; /* Ensure the close button appears above other content */
-  height: 30px !important;
-  width: 30px !important;
+// .ant-modal-close {
+//   position: fixed !important;
+//   top: 15px !important; /* Adjust the top position as needed */
+//   right: 24px !important; /* Adjust the right position as needed */
+//   z-index: 1001 !important; /* Ensure the close button appears above other content */
+//   height: 30px !important;
+//   width: 30px !important;
 
-  &:hover {
-    background-color: transparent !important;
-  }
+//   &:hover {
+//     background-color: transparent !important;
+//   }
 
-  .ant-modal-close-x {
-    color: #ffffff !important;
-    font-size: 22px !important;
-    font-weight: bolder !important;
-  }
-}
+//   .ant-modal-close-x {
+//     color: #ffffff !important;
+//     font-size: 22px !important;
+//     font-weight: bolder !important;
+//   }
+// }
 
 .used-status-badge .ant-badge-count {
   display: flex !important;

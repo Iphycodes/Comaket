@@ -80,10 +80,13 @@ interface bookMarksType {
 }
 
 interface commentsType {
-  userDpImageUrl: string;
-  userName: string;
-  message: string;
-  date: string;
+  id: string | number;
+  user: {
+    name: string;
+    avatar: string;
+  };
+  text: string;
+  timestamp: string;
 }
 
 export enum statusEnum {
