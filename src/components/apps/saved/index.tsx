@@ -8,6 +8,7 @@ import { mockMarketItems } from '@grc/_shared/constant';
 import ModernItemPost from '@grc/components/apps/item-post-new';
 import { useSearch } from '@grc/hooks/useSearch';
 import ProductListingSkeleton from '../item-post-new/lib/product-listing-skeleton';
+import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 
 // Mock vendor data - replace with actual data later
 const mockVendorData = {
@@ -31,6 +32,7 @@ const SavedItems = () => {
   const [selectedItem, setSelectedItem] = useState<any>(null);
   const [isModalVisible, setIsModalVisible] = useState(false);
   const { searchValue, debouncedChangeHandler } = useSearch();
+  const isMobile = useMediaQuery(mediaSize.mobile);
 
   useEffect(() => {
     // console.log('Vendor ID:', params.id);
@@ -215,9 +217,13 @@ const SavedItems = () => {
 
   return (
     <div className="min-h-screen dark:bg-gray-900/50">
-      <div className="w-full max-w-7xl mx-auto px-4">
+      <div className={`w-full max-w-7xl mx-auto ${isMobile ? 'px-0' : 'px-4'}`}>
         <div className="mb-8">
-          <div className="py-5 sticky top-0 z-20 backdrop-blur-sm bg-white dark:bg-gray-800">
+          <div
+            className={`py-5 ${
+              isMobile ? 'px-2' : ''
+            } sticky top-0 z-20 backdrop-blur-sm bg-white dark:bg-gray-800`}
+          >
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-semibold dark:text-white">My Saved Products</h2>
               <div className="flex items-center gap-4">

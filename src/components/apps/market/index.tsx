@@ -125,7 +125,7 @@ const Market = () => {
           </motion.div>
 
           {/* Items Grid */}
-          <div className={`${isMobile ? 'px-2' : 'px-4'} py-6`}>
+          <div className={`${isMobile ? 'px-0' : 'px-4'} py-6`}>
             <motion.div
               variants={containerVariants}
               initial="hidden"

@@ -122,7 +122,7 @@ const ModernItemPost: React.FC<ItemPostProps> = ({
       className="w-full border-b border-gray-100 dark:border-zinc-800 py-8 first:pt-0"
     >
       {/* Seller info */}
-      <div className="flex items-center gap-3 mb-4">
+      <div className={`flex items-center gap-3 mb-4 ${isMobile ? 'px-2' : ''}`}>
         <div className="relative w-10 h-10">
           <Image
             src={postUserProfile?.profilePicUrl}
@@ -240,7 +240,7 @@ const ModernItemPost: React.FC<ItemPostProps> = ({
         </div>
 
         {/* Right section - Product Details */}
-        <div className="w-full md:w-1/2 flex flex-col">
+        <div className={`w-full md:w-1/2 ${isMobile ? 'px-2' : ''} flex flex-col`}>
           {/* Product info */}
           {isMobile && (
             <div className="mt-auto space-y-6 mb-5">
@@ -254,13 +254,13 @@ const ModernItemPost: React.FC<ItemPostProps> = ({
                       className="flex items-center gap-2 group"
                     >
                       <Heart
-                        className={`w-6 h-6 ${
+                        className={`w-7 h-7 ${
                           isLiked
                             ? 'fill-rose-500 text-rose-500'
-                            : 'text-gray-400 group-hover:text-gray-600'
+                            : 'text-neutral-900 group-hover:text-black'
                         } transition-colors`}
                       />
-                      <span className="text-sm text-gray-500">125</span>
+                      <span className="text-sm text-neutral-900">125</span>
                     </motion.button>
                   </Tooltip>
 
@@ -270,8 +270,10 @@ const ModernItemPost: React.FC<ItemPostProps> = ({
                       whileTap={{ scale: 0.9 }}
                       className="flex items-center gap-2 group"
                     >
-                      <MessageCircle className="w-6 h-6 text-gray-400 group-hover:text-gray-600 transition-colors" />
-                      <span className="text-sm text-gray-500">{comments.length}</span>
+                      <MessageCircle className="w-7 h-7 text-neutral-900 group-hover:text-black transition-colors" />
+                      <span className="text-sm text-neutral-900" onClick={() => handleViewItem()}>
+                        {comments.length}
+                      </span>
                     </motion.button>
                   </Tooltip>
                 </div>
@@ -285,10 +287,10 @@ const ModernItemPost: React.FC<ItemPostProps> = ({
                       className="group"
                     >
                       <Bookmark
-                        className={`w-6 h-6 ${
+                        className={`w-7 h-7 ${
                           isSaved
                             ? 'fill-blue-500 text-blue-500'
-                            : 'text-gray-400 group-hover:text-gray-600'
+                            : 'text-black group-hover:text-black'
                         } transition-colors`}
                       />
                     </motion.button>
@@ -300,7 +302,7 @@ const ModernItemPost: React.FC<ItemPostProps> = ({
                       whileTap={{ scale: 0.9 }}
                       className="group"
                     >
-                      <Share2 className="w-6 h-6 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                      <Share2 className="w-7 h-7 text-black group-hover:text-black transition-colors" />
                     </motion.button>
                   </Tooltip>
                 </div>
@@ -390,7 +392,9 @@ const ModernItemPost: React.FC<ItemPostProps> = ({
                       className="flex items-center gap-2 group"
                     >
                       <MessageCircle className="w-6 h-6 text-gray-400 group-hover:text-gray-600 transition-colors" />
-                      <span className="text-sm text-gray-500">{comments.length}</span>
+                      <span className="text-sm text-gray-500" onClick={() => handleViewItem()}>
+                        {comments.length}
+                      </span>
                     </motion.button>
                   </Tooltip>
                 </div>

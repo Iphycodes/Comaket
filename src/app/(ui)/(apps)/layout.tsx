@@ -85,7 +85,7 @@ const AppBaseLayout: React.FC<AppBaseLayoutProps> = ({ children }) => {
       >
         <Content className="main-content">
           <div
-            className={`dark:text-white ${mobileResponsive ? 'px-1' : 'px-[12%] py-6'}`}
+            className={`dark:text-white ${mobileResponsive ? 'px-0' : 'px-[12%] py-6'}`}
             style={{ minHeight: '100vh' }}
           >
             {children}
