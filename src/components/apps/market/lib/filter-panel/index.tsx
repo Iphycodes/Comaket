@@ -1,16 +1,26 @@
-import { Currencies } from '@grc/_shared/constant';
+import { Currencies, mockMarketItems } from '@grc/_shared/constant';
 import { numberFormat } from '@grc/_shared/helpers';
 import { Slider, Tag } from 'antd';
 import { AnimatePresence, motion } from 'framer-motion';
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useContext, useState } from 'react';
+import { AppContext } from '@grc/app-context';
 
 // Define types
-type Condition = 'new' | 'used' | 'refurbished';
+type Condition = 'Brand New' | 'Fairly Used' | 'Uk Used';
 type Category = string;
 
-// FilterPanel Component
-const FilterPanel = () => {
-  const [priceRange, setPriceRange] = useState<number[]>([0, 1000]);
+interface FilterPanelProps {
+  setIsLoading: Dispatch<SetStateAction<boolean>>;
+  setShowFilters: Dispatch<SetStateAction<boolean>>;
+}
+
+const FilterPanel: React.FC<FilterPanelProps> = ({ setIsLoading, setShowFilters }) => {
+  const { setShopItems } = useContext(AppContext);
+
+  // Max price in naira (from kobo) — adjust as needed
+  const MAX_PRICE = 3000000;
+
+  const [priceRange, setPriceRange] = useState<number[]>([0, MAX_PRICE]);
   const [selectedConditions, setSelectedConditions] = useState<Condition[]>([]);
   const [selectedCategories, setSelectedCategories] = useState<Category[]>([]);
   const [activeSection, setActiveSection] = useState<'all' | 'price' | 'condition' | 'category'>(
@@ -18,19 +28,20 @@ const FilterPanel = () => {
   );
 
   const conditions: { value: Condition; label: string }[] = [
-    { value: 'new', label: 'Brand New' },
-    { value: 'used', label: 'Fairly Used' },
-    { value: 'refurbished', label: 'Refurbished' },
+    { value: 'Brand New', label: 'Brand New' },
+    { value: 'Fairly Used', label: 'Fairly Used' },
+    { value: 'Uk Used', label: 'UK Used' },
   ];
 
   const categories: Category[] = [
+    'Laptops',
+    'Phones',
     'Electronics',
+    'Audio',
+    'Gaming',
+    'Accessories',
     'Fashion',
     'Home & Living',
-    'Sports',
-    'Books',
-    'Automotive',
-    'Health & Beauty',
   ];
 
   const sections = [
@@ -46,7 +57,51 @@ const FilterPanel = () => {
     );
   };
 
-  // Rest of your component remains the same until the categories mapping
+  const handleConditionToggle = (condition: Condition) => {
+    setSelectedConditions((prev) =>
+      prev.includes(condition) ? prev.filter((c) => c !== condition) : [...prev, condition]
+    );
+  };
+
+  const handleApplyFilters = () => {
+    setIsLoading(true);
+
+    setTimeout(() => {
+      const filtered = mockMarketItems.filter((item) => {
+        // Price filter (convert kobo to naira for comparison)
+        const priceInNaira = (item.askingPrice?.price ?? 0) / 100;
+        const priceMatch = priceInNaira >= priceRange[0] && priceInNaira <= priceRange[1];
+
+        // Condition filter
+        const conditionMatch =
+          selectedConditions.length === 0 || selectedConditions.includes(item.condition);
+
+        // Category filter
+        const categoryMatch =
+          selectedCategories.length === 0 ||
+          selectedCategories.some((cat) => item.category?.toLowerCase() === cat.toLowerCase());
+
+        return priceMatch && conditionMatch && categoryMatch;
+      });
+
+      setShopItems(filtered);
+      setIsLoading(false);
+      setShowFilters(false);
+    }, 1000);
+  };
+
+  const handleReset = () => {
+    setSelectedCategories([]);
+    setSelectedConditions([]);
+    setPriceRange([0, MAX_PRICE]);
+    setIsLoading(true);
+
+    setTimeout(() => {
+      setShopItems(mockMarketItems);
+      setIsLoading(false);
+    }, 500);
+  };
+
   return (
     <motion.div
       initial={{ opacity: 0 }}
@@ -62,7 +117,7 @@ const FilterPanel = () => {
             className={`px-4 py-2 rounded-lg text-sm whitespace-nowrap transition-colors
               ${
                 activeSection === section.id
-                  ? 'bg-blue-50 bg-gray-100 dark:bg-gray-700 text-blue-600 dark:bg-blue-900/30 dark:text-blue-400'
+                  ? 'bg-indigo-50 dark:bg-gray-700 text-blue dark:text-blue'
                   : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700'
               }`}
           >
@@ -87,11 +142,12 @@ const FilterPanel = () => {
                   <Slider
                     range
                     min={0}
-                    max={1000}
+                    max={MAX_PRICE}
+                    step={10000}
                     value={priceRange}
                     onChange={(value: number[]) => setPriceRange(value)}
                     tooltip={{
-                      formatter: (value) => `$${value}`,
+                      formatter: (value) => numberFormat(value ?? 0, Currencies.NGN),
                     }}
                   />
                 </div>
@@ -123,16 +179,10 @@ const FilterPanel = () => {
                       className={`px-3 py-1 rounded-lg cursor-pointer text-sm transition-colors
                         ${
                           selectedConditions.includes(condition.value)
-                            ? 'bg-blue text-white border-blue-200 dark:bg-blue-900/30 dark:text-blue-400'
+                            ? 'bg-blue text-white border-blue dark:bg-blue/30 dark:text-blue'
                             : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700'
                         }`}
-                      onClick={() => {
-                        setSelectedConditions((prev) =>
-                          prev.includes(condition.value)
-                            ? prev.filter((c) => c !== condition.value)
-                            : [...prev, condition.value]
-                        );
-                      }}
+                      onClick={() => handleConditionToggle(condition.value)}
                     >
                       {condition.label}
                     </Tag>
@@ -161,7 +211,7 @@ const FilterPanel = () => {
                       className={`px-3 py-1 rounded-lg cursor-pointer text-sm transition-colors
                         ${
                           selectedCategories.includes(category)
-                            ? 'bg-blue text-white border-blue-200 dark:bg-blue-900/30 dark:text-blue-400'
+                            ? 'bg-blue text-white border-blue dark:bg-blue/30 dark:text-blue'
                             : 'text-gray-600 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700'
                         }`}
                       onClick={() => handleCategoryToggle(category)}
@@ -176,23 +226,22 @@ const FilterPanel = () => {
         </AnimatePresence>
       </div>
 
-      {/* Apply Filters Button */}
+      {/* Apply / Reset Buttons */}
       <motion.div
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         className="mt-6 flex justify-end gap-3"
       >
         <button
-          onClick={() => {
-            setSelectedCategories([]);
-            setSelectedConditions([]);
-            setPriceRange([0, 1000]);
-          }}
-          className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 transition-colors"
+          onClick={handleReset}
+          className="px-4 py-2 text-sm text-gray-600 hover:text-gray-900 dark:text-gray-400 dark:hover:text-gray-100 transition-colors"
         >
           Reset
         </button>
-        <button className="px-6 py-2 bg-blue hover:bg-blue-600 text-white rounded-lg transition-colors text-sm">
+        <button
+          onClick={handleApplyFilters}
+          className="px-6 py-2 bg-blue hover:bg-blue text-white rounded-lg transition-colors text-sm"
+        >
           Apply Filters
         </button>
       </motion.div>

@@ -1,3 +1,4 @@
+import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 import { AuthModal } from '@grc/components/apps/auth-modal';
 import { LogOut } from 'lucide-react';
 import React, { useState } from 'react';
@@ -8,6 +9,8 @@ const SideNavAuthButton = ({}: SideNavAuthButtonProps) => {
   const [isAuthenticated] = useState<boolean>(true);
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
+  const isMobile = useMediaQuery(mediaSize.mobile);
 
   if (isAuthenticated) {
     return (
@@ -21,9 +24,11 @@ const SideNavAuthButton = ({}: SideNavAuthButtonProps) => {
       <>
         <span
           onClick={() => setIsAuthModalOpen(true)}
-          className="flex items-center gap-4 py-1 text-blue"
+          className={`flex items-center gap-2 px-3 rounded-md py-1 ${
+            isMobile ? 'text-sm' : ''
+          } bg-indigo-100 text-blue`}
         >
-          <LogOut size={16} />
+          <LogOut size={isMobile ? 16 : 16} />
           Sign In
         </span>
         <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
@@ -34,9 +39,9 @@ const SideNavAuthButton = ({}: SideNavAuthButtonProps) => {
   return (
     <span
       onClick={() => console.log('logout')}
-      className="flex items-center gap-3 py-1 text-red-500"
+      className={`flex items-center gap-2 py-1 ${isMobile ? 'text-sm' : ''} text-red-500`}
     >
-      <LogOut size={16} />
+      <LogOut size={isMobile ? 16 : 16} />
       Logout
     </span>
   );

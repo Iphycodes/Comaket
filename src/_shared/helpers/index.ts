@@ -1,8 +1,9 @@
 import Cookie from 'js-cookie';
-import { AUTH_TOKEN_KEY, COLOR_LIST_ALPHA, Currencies } from '@grc/_shared/constant';
+import { AUTH_TOKEN_KEY, COLOR_LIST_ALPHA, Currencies, mockVendors } from '@grc/_shared/constant';
 import { MenuProps } from 'antd';
 import { get, capitalize, isEmpty } from 'lodash';
 import { ReactNode } from 'react';
+import { Vendor } from '../namespace/vendor';
 
 export const truncateText = (text: string, max: number) => {
   if (text.length < max) {
@@ -32,9 +33,9 @@ export const numberFormat = (value: number | bigint, currency?: Currencies) => {
     case Currencies.GBP:
       symbol = '£';
       break;
-    case Currencies.CAD:
-      symbol = 'CA$';
-      break;
+    // case Currencies.CAD:
+    //   symbol = 'CA$';
+    //   break;
     default:
       symbol = '₦';
       break;
@@ -73,8 +74,9 @@ export type NavItem = {
   label: string | ReactNode;
   key: string;
   destination: string;
-  icon: React.ReactNode | any;
+  icon?: React.ReactNode | any;
   items?: NavItem[];
+  children?: NavItem[];
 };
 
 export const getItem = (menuItem: NavItem): MenuItem => {
@@ -271,3 +273,17 @@ export const convertCamelCaseToSentence = (camelCaseText: string) => {
 
   return sentence.charAt(0).toUpperCase() + sentence.slice(1);
 };
+
+// ─── Helper to get vendor by ID ───────────────────────────────────────────────
+export const getVendorById = (id: string): Vendor | undefined =>
+  mockVendors.find((v) => v.id === id);
+
+// ─── All unique categories across vendors ─────────────────────────────────────
+export const allVendorCategories: string[] = Array.from(
+  new Set(mockVendors.flatMap((v) => v.categories))
+).sort();
+
+// ─── All unique locations ─────────────────────────────────────────────────────
+export const allVendorLocations: string[] = Array.from(
+  new Set(mockVendors.map((v) => v.location))
+).sort();

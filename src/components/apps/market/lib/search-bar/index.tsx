@@ -59,7 +59,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, className, section }) =
                 isMobile ? 'pl-7' : 'pl-11'
               } pr-4 ${
                 isMobile ? 'rounded-lg rounded-r-none border-r-0' : 'rounded-xl'
-              } border-gray-200 hover:border-blue-400 focus:border-blue-500 transition-colors`}
+              } border-gray-200 hover:border-blue focus:border-blue transition-colors`}
               suffix={
                 searchValue && (
                   <X
@@ -82,7 +82,7 @@ const SearchBar: React.FC<SearchBarProps> = ({ onSearch, className, section }) =
             onClick={() => onSearch(searchValue, searchCategory)}
             className={`${
               isMobile ? 'h-10' : 'h-12 px-6'
-            } !bg-blue hover:bg-blue-600 !text-white hover:!text-white  ${
+            } !bg-blue hover:bg-blue !text-white hover:!text-white  ${
               isMobile ? 'rounded-lg rounded-l-none border-l-0' : 'rounded-xl'
             } transition-colors flex items-center gap-2`}
           >

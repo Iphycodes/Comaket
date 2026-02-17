@@ -17,7 +17,7 @@ const TruncatedDescription = ({ description, max }: TruncatedDescriptionProps) =
       {description.length > 100 && (
         <button
           onClick={() => setIsExpanded(!isExpanded)}
-          className="ml-1 text-blue-500 hover:text-blue-700 font-medium"
+          className="ml-1 text-blue hover:text-blue font-medium"
         >
           {isExpanded ? 'Read less' : 'Read more'}
         </button>

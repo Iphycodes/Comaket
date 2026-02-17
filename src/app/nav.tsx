@@ -4,15 +4,16 @@ import { SiderTheme } from 'antd/es/layout/Sider';
 import { NavItem, getFirstCharacter, getRandomColorByString } from '@grc/_shared/helpers';
 import { isEmpty } from 'lodash';
 import { Avatar } from 'antd';
+import { Bookmark, HeartSearch, MoneyChange, Notification, ShopRemove, Bag } from 'iconsax-react';
 import {
-  Bookmark,
-  HeartSearch,
-  MessageNotif,
-  MoneyChange,
-  Notification,
-  ShopRemove,
-} from 'iconsax-react';
-import { HandCoins, MessageCircleMore, ShoppingBag, UserRoundSearch } from 'lucide-react';
+  HandCoins,
+  ShoppingBag,
+  UserRoundSearch,
+  Settings,
+  ShieldAlert,
+  MoreHorizontal,
+  Store,
+} from 'lucide-react';
 import SideNavAuthButton from '@grc/components/apps/layout/side-nav/lib/side-nav-auth-button';
 
 export type Nav = {
@@ -23,116 +24,147 @@ export type Nav = {
   footerMenuItems: NavItem[];
 };
 
+// ─── Mock Vendor Stores tied to the user's account ──────────────────────────
+
+export interface UserVendorStore {
+  id: string;
+  name: string;
+  avatar?: string;
+}
+
+export const mockUserVendorStores: UserVendorStore[] = [
+  { id: 'vs-001', name: 'EmTech Store' },
+  { id: 'vs-002', name: 'Gadget Hub NG' },
+  { id: 'vs-003', name: 'PhoneDeals Kaduna' },
+];
+
+// ─── Footer Menu Items ──────────────────────────────────────────────────────
+
 const footerMenuItems: NavItem[] = [
   {
     label: 'Profile',
     key: 'profile',
-    destination: '',
+    destination: '/profile',
     icon: (
       <Avatar
         style={{
           backgroundColor: getRandomColorByString('Ifeanyi'),
           verticalAlign: 'middle',
-          height: '22px',
-          width: '22px',
+          height: '24px',
+          width: '24px',
         }}
       >
-        {isEmpty('') && getFirstCharacter('Ifeanyi')}
+        <span className="text-white">{isEmpty('') && getFirstCharacter('Ifeanyi')}</span>
       </Avatar>
     ),
   },
   {
-    label: <SideNavAuthButton />,
-    key: 'auth',
+    label: 'My Stores',
+    key: 'my-store',
+    destination: '/my-store',
+    icon: <Store />,
+    children: [
+      ...mockUserVendorStores.map((store) => ({
+        label: <span className="!text-sm">{store.name}</span>,
+        key: `my-store-${store.id}`,
+        destination: `/my-store/${store.id}`,
+      })),
+    ],
+  },
+  {
+    label: 'More',
+    key: 'more',
     destination: '',
-    icon: <></>,
+    icon: <MoreHorizontal size={22} color="#64748b" />,
+    children: [
+      {
+        label: 'Settings',
+        key: 'settings',
+        destination: '/settings',
+        icon: <Settings size={18} />,
+      },
+      {
+        label: 'Disputes',
+        key: 'disputes',
+        destination: '/disputes',
+        icon: <ShieldAlert size={18} />,
+      },
+      {
+        label: <SideNavAuthButton />,
+        key: 'auth',
+        destination: '',
+        icon: <></>,
+      },
+    ],
   },
 ];
+
+// ─── Main Menu Items ────────────────────────────────────────────────────────
 
 const menuItems: NavItem[] = [
   {
     label: 'Market',
     key: 'market',
     destination: '/',
-    // icon: <i className="ri-store-2-line" style={{ fontSize: '22px' }}></i>,
     icon: <ShopRemove variant="Bulk" color="#6366f1" />,
   },
   {
-    label: 'Find Vendor',
-    key: 'vendors',
-    destination: '/vendors',
-    // icon: <i className="ri-user-location-line" style={{ fontSize: '22px' }}></i>,
-    icon: <HeartSearch variant="Bulk" color="#22c55e" />,
+    label: 'Cart',
+    key: 'cart',
+    destination: '/cart',
+    icon: <Bag variant="Bulk" color="#22c55e" />,
   },
   {
-    label: 'Chats',
-    key: 'chats',
-    destination: '',
-    // icon: <i className="ri-question-answer-line" style={{ fontSize: '22px' }}></i>,
-    icon: <MessageNotif variant="Bulk" color="#ef4444" />,
+    label: 'Vendors',
+    key: 'vendors',
+    destination: '/vendors',
+    icon: <HeartSearch variant="Bulk" color="#22c55e" />,
   },
   {
     label: 'Notifications',
     key: 'notifications',
     destination: '',
-    // icon: <i className="ri-notification-line" style={{ fontSize: '22px' }}></i>,
     icon: <Notification variant="Bulk" color="#1e88e5" />,
   },
   {
     label: 'Saved',
     key: 'saved',
     destination: '/saved',
-    // icon: <i className="ri-pushpin-line" style={{ fontSize: '22px' }}></i>,
     icon: <Bookmark variant="Bulk" color="#ec4899" />,
   },
   {
     label: 'Sell Item',
     key: 'sell-item',
-    destination: '/sell-item',
-    // icon: <i className="ri-arrow-left-right-line" style={{ fontSize: '22px' }}></i>,
+    destination: '/sell-item', // Mobile routes here; desktop opens modal (handled in SideNav)
     icon: <MoneyChange variant="Bulk" color="#f97316" />,
   },
 ];
+
+// ─── Mobile Menu Items ──────────────────────────────────────────────────────
 
 const mobileMenuItems: NavItem[] = [
   {
     label: 'Market',
     key: 'market',
     destination: '/',
-    // icon: <i className="ri-store-2-line" style={{ fontSize: '22px' }}></i>,
-    // icon: <ShopRemove variant="Bulk" color="#6366f1" />,
     icon: <ShoppingBag />,
   },
   {
-    label: 'Find Vendor',
+    label: 'Vendors',
     key: 'vendors',
     destination: '/vendors',
-    // icon: <i className="ri-user-location-line" style={{ fontSize: '22px' }}></i>,
-    // icon: <HeartSearch variant="Bulk" color="#22c55e" />,
     icon: <UserRoundSearch />,
-  },
-  {
-    label: 'Chats',
-    key: 'chats',
-    destination: '',
-    // icon: <i className="ri-question-answer-line" style={{ fontSize: '22px' }}></i>,
-    // icon: <MessageNotif variant="Bulk" color="#ef4444" />,
-    icon: <MessageCircleMore />,
   },
   {
     label: 'Saved',
     key: 'saved',
     destination: '/saved',
-    // icon: <i className="ri-bookmark-line" style={{ fontSize: '22px' }}></i>,
-    // icon: <Bookmark variant="Bulk" color="#ec4899" />,
     icon: <Bookmark />,
   },
   {
     label: 'Sell Item',
     key: 'sell-item',
     destination: '/sell-item',
-    // icon: <i className="ri-arrow-left-right-line" style={{ fontSize: '22px' }}></i>,
-    // icon: <MoneyChange variant="Bulk" color="#f97316" />,
     icon: <HandCoins />,
   },
 ];

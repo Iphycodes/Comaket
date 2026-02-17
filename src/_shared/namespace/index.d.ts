@@ -1,3 +1,5 @@
+import { Vendor } from './vendor';
+
 export interface AppObject {
   _id: string;
   __v: number;
@@ -121,4 +123,70 @@ export interface mockMarketItemType {
   fee: number;
   live: boolean;
   feePaymentStatus: 'processed' | 'pending' | 'awaiting payment' | 'awaiting approval';
+}
+
+export type ListingType = 'self-listing' | 'consignment' | 'direct-purchase';
+
+export interface MediaItem {
+  url: string;
+  type: 'image' | 'video';
+  thumbnail?: string; // optional poster/thumbnail for videos
+}
+
+export interface SellerProfile {
+  userName: string;
+  businessName: string;
+  profilePicUrl: string;
+  phoneNumber: string;
+  location?: string;
+  isVerified?: boolean;
+}
+
+export interface AskingPrice {
+  price: number;
+  negotiable: boolean;
+}
+
+export interface MarketItem {
+  id: string | number;
+  itemName: string;
+  description: string;
+  media: MediaItem[];
+  askingPrice: AskingPrice;
+  condition: 'Brand New' | 'Fairly Used' | 'Uk Used';
+  availability: boolean;
+  quantity: number;
+  category?: string;
+  productTags: string[];
+  postUserProfile: Partial<Vendor>;
+  sponsored: boolean;
+  comments: Record<string, any>[];
+  isBuyable: boolean;
+  listingType: ListingType;
+  createdAt?: string;
+}
+
+export interface QueryArgs {
+  page?: number;
+  limit?: number;
+  search?: string;
+  category?: string;
+  sort?: string;
+}
+
+export interface ApiRequest<T = any> {
+  data?: T;
+  params?: QueryArgs;
+}
+
+export interface Pagination {
+  page: number;
+  limit: number;
+  total: number;
+  totalPages: number;
+}
+
+export interface PaginatedResponse<T = any> {
+  data: T[];
+  pagination: Pagination;
 }

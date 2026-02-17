@@ -1,30 +1,25 @@
 import React from 'react';
 import { Modal } from 'antd';
-// import {
-//   Heart,
-//   MessageCircle,
-//   Bookmark,
-//   Share2,
-//   ChevronLeft,
-//   ChevronRight,
-//   MapPin,
-//   Store,
-//   Clock,
-// } from 'lucide-react';
 import ItemDetail from '../item-detail';
+import { ListingType, MediaItem } from '@grc/_shared/namespace';
 
 interface ItemDetailModalProps {
   open: boolean;
   onClose: () => void;
   item: {
+    id: string | number;
     description: string;
+    productTags: string[];
     sponsored: boolean;
     postUserProfile: Record<string, any>;
-    postImgurls: string[];
+    media: MediaItem[];
     askingPrice: Record<string, any>;
     condition: string;
     comments: Record<string, any>[];
     itemName: string;
+    quantity?: number;
+    isBuyable: boolean;
+    listingType: ListingType;
     status?: 'pending' | 'approved' | 'rejected';
     feePaymentStatus?:
       | 'pending'
@@ -46,7 +41,6 @@ const ItemDetailModal: React.FC<ItemDetailModalProps> = ({ open, onClose, item, 
       footer={null}
       width={1200}
       className="item-detail-modal relative !p-0"
-      // closeIcon={null}
     >
       <ItemDetail item={item} onClose={onClose} isSellerView={isSellerView} />
     </Modal>

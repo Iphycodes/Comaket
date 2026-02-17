@@ -33,7 +33,10 @@ export default function RootLayout({ children }: LayoutProps) {
   const loading = false;
   return (
     <html lang="en">
-      <body className={nunito.className} suppressHydrationWarning={true}>
+      <body
+        className={`${nunito.className} max-w-[100vw] !overflow-x-hidden`}
+        suppressHydrationWarning={true}
+      >
         <ThemeProvider
           attribute="class"
           defaultTheme="light"

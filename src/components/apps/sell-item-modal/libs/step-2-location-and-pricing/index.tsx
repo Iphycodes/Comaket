@@ -1,322 +1,282 @@
-import { Col, Form, FormInstance, InputNumber, Row, Select } from 'antd';
-import React, { useEffect, useState } from 'react';
+'use client';
 
-interface SellItemStep2Props {
-  handleSetLocationAndPricingData: (values: Record<string, any>) => void;
-  handleSetCurrentStep: (step: 'step1' | 'step2' | 'step3') => void;
-  locationAndPricingData: Record<string, any>;
-  sellItemStep2Form: FormInstance<any>;
-  fee: number;
-  setFee: React.Dispatch<React.SetStateAction<number>>;
+import React, { useEffect, useState } from 'react';
+import { Form, InputNumber, Select } from 'antd';
+import { FormInstance } from 'antd/lib/form';
+import { Info, Wallet, Percent, HandCoins } from 'lucide-react';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+  SellingModel,
+  LISTING_FEE_PERCENT,
+  CONSIGNMENT_COMMISSION_PERCENT,
+  calculateListingFee,
+  calculateConsignmentCut,
+} from '@grc/_shared/namespace/sell-item';
+
+interface Props {
+  form: FormInstance;
+  initialData: Record<string, any>;
+  onContinue: (values: Record<string, any>) => void;
+  onBack: () => void;
+  sellingModel: SellingModel;
 }
 
-const SellItemStep2 = ({
-  handleSetLocationAndPricingData,
-  handleSetCurrentStep,
-  locationAndPricingData,
-  sellItemStep2Form,
-  fee,
-  setFee,
-}: SellItemStep2Props) => {
-  const [locationValue, setLocationValue] = useState<string>('');
+const mockLocations = [
+  { label: 'Abuja', value: 'Abuja' },
+  { label: 'Kaduna', value: 'Kaduna' },
+  { label: 'Kano', value: 'Kano' },
+  { label: 'Lagos', value: 'Lagos' },
+  { label: 'Port Harcourt', value: 'Port Harcourt' },
+];
+
+const SellItemPricing: React.FC<Props> = ({
+  form,
+  initialData,
+  onContinue,
+  onBack,
+  sellingModel,
+}) => {
+  const [askPrice, setAskPrice] = useState<number>(initialData?.askPrice || 0);
 
   useEffect(() => {
-    sellItemStep2Form.setFieldsValue(locationAndPricingData);
-  }, [locationAndPricingData]);
+    form.setFieldsValue(initialData);
+    if (initialData?.askPrice) setAskPrice(initialData.askPrice);
+  }, [initialData]);
 
-  const handleCalculateFee = (price: number) => {
-    const itemFee = price / 100;
-    setFee(itemFee);
-  };
+  const priceInKobo = (askPrice || 0) * 100;
+  const listingFee = calculateListingFee(priceInKobo);
+  const { platformCut, sellerCut } = calculateConsignmentCut(priceInKobo);
 
   const onFinish = (values: Record<string, any>) => {
-    handleSetLocationAndPricingData({ ...values, fee: fee });
-    handleSetCurrentStep('step3');
+    const fee =
+      sellingModel === 'self-listing'
+        ? listingFee / 100
+        : sellingModel === 'consignment'
+          ? platformCut / 100
+          : 0;
+    onContinue({ ...values, fee });
   };
 
-  const handleLocationOptionChange = (newValue: string) => {
-    setLocationValue(newValue);
+  const getPricingHint = () => {
+    switch (sellingModel) {
+      case 'self-listing':
+        return {
+          icon: Wallet,
+          color: 'blue',
+          bg: 'bg-indigo-50 dark:bg-blue-950/30',
+          border: 'border-blue dark:border-blue',
+          title: 'Listing Fee',
+          description: `A ${LISTING_FEE_PERCENT}% listing fee is required to publish your item on the marketplace. This fee is one-time and non-refundable.`,
+        };
+      case 'consignment':
+        return {
+          icon: Percent,
+          color: 'violet',
+          bg: 'bg-violet-50 dark:bg-violet-950/30',
+          border: 'border-violet-200 dark:border-violet-800',
+          title: 'Commission Split',
+          description: `When your item sells, Comaket takes a ${CONSIGNMENT_COMMISSION_PERCENT}% commission. You receive the remaining ${
+            100 - CONSIGNMENT_COMMISSION_PERCENT
+          }% directly to your account.`,
+        };
+      case 'direct-sale':
+        return {
+          icon: HandCoins,
+          color: 'emerald',
+          bg: 'bg-emerald-50 dark:bg-emerald-950/30',
+          border: 'border-emerald-200 dark:border-emerald-800',
+          title: 'Your Asking Price',
+          description:
+            "Enter how much you want for this item. After review, we'll make you an offer. You can accept, counter, or decline.",
+        };
+    }
   };
-  const mockLocations = [
-    {
-      label: 'Kaduna',
-      value: 'kaduna',
-    },
-    {
-      label: 'Kano',
-      value: 'kano',
-    },
-    {
-      label: 'Abuja',
-      value: 'abuja',
-    },
-  ];
 
-  const locationOptions = mockLocations.map(({ value, label }) => {
-    return {
-      label: label,
-      value: value,
-    };
-  });
+  const hint = getPricingHint();
+  const HintIcon = hint.icon;
 
   return (
-    <div className="w-full">
-      <Form
-        form={sellItemStep2Form}
-        layout="vertical"
-        requiredMark={false}
-        onFinish={onFinish}
-        className="w-full mt-4"
-      >
-        <div
-          className="min-h-[460px] max-h-[460px] overflow-y-scroll w-full"
-          style={
-            {
-              // scrollbarWidth: 'thin',
-              // scrollbarColor: 'black',
-              // scrollbarGutter: 'auto',
-            }
-          }
+    <Form
+      form={form}
+      layout="vertical"
+      requiredMark={false}
+      onFinish={onFinish}
+      className="space-y-5"
+      initialValues={initialData}
+    >
+      <div className="space-y-5">
+        {/* Location */}
+        <Form.Item
+          name="location"
+          rules={[{ required: true, message: 'Select location' }]}
+          label={<span className="font-semibold text-sm">Location</span>}
+          className="mb-0"
         >
-          {/* <div className="mb-3">
-            <span
-              onClick={() => handleSetCurrentStep('step1')}
-              className="py-1 sticky top-0 flex gap-1 w-20 cursor-pointer text-blue items-center"
+          <Select
+            showSearch
+            className="h-12 [&_.ant-select-selector]:!rounded-xl"
+            placeholder="Where is the item located?"
+            filterOption={(input, option) =>
+              (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
+            }
+            options={mockLocations}
+          />
+        </Form.Item>
+
+        {/* Pricing hint card */}
+        <div className={`${hint.bg} ${hint.border} border rounded-xl p-4 flex gap-3`}>
+          <div
+            className={`flex-shrink-0 w-8 h-8 rounded-lg bg-${hint.color}-100 dark:bg-${hint.color}-900/50 flex items-center justify-center`}
+          >
+            <HintIcon size={16} className={`text-${hint.color}-600 dark:text-${hint.color}-400`} />
+          </div>
+          <div>
+            <h4
+              className={`text-sm font-semibold text-${hint.color}-700 dark:text-${hint.color}-300`}
             >
-              <i className="ri-arrow-left-line text-[20px]"></i>
-              <span>Go Back</span>
-            </span>
-          </div> */}
-          <Row>
-            <Col md={24} xs={24}>
-              <Form.Item
-                name="location"
-                rules={[{ required: true, message: 'Enter Location' }]}
-                label={<span className="font-semibold text-muted-foreground mb-0">Location</span>}
+              {hint.title}
+            </h4>
+            <p className="text-xs text-gray-600 dark:text-gray-400 mt-0.5 leading-relaxed">
+              {hint.description}
+            </p>
+          </div>
+        </div>
+
+        {/* Ask Price */}
+        <div>
+          <Form.Item
+            name="askPrice"
+            className="tall-number-input mb-0 w-full"
+            rules={[{ required: true, message: 'Enter your asking price' }]}
+            label={
+              <span className="font-semibold text-sm">
+                {sellingModel === 'direct-sale' ? 'Your Asking Price (₦)' : 'Ask Price (₦)'}
+              </span>
+            }
+          >
+            <InputNumber
+              className="w-full h-14 !rounded-xl"
+              size="large"
+              controls={false}
+              prefix={<span className="text-gray-400">₦</span>}
+              placeholder="Enter amount"
+              formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
+              parser={(value: any) => value?.replace(/,/g, '')}
+              onChange={(value) => setAskPrice(Number(value) || 0)}
+            />
+          </Form.Item>
+
+          {/* Fee/Commission Breakdown */}
+          <AnimatePresence>
+            {askPrice > 0 && (
+              <motion.div
+                initial={{ height: 0, opacity: 0 }}
+                animate={{ height: 'auto', opacity: 1 }}
+                exit={{ height: 0, opacity: 0 }}
+                transition={{ duration: 0.2 }}
+                className="overflow-hidden"
               >
-                <Select
-                  showSearch
-                  className="h-14"
-                  value={locationValue}
-                  placeholder={'Location'}
-                  //   size="large"
-                  defaultActiveFirstOption={false}
-                  //   suffixIcon={null}
-                  filterOption={(input, option) =>
-                    (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
-                  }
-                  //   onSearch={handleSearch}
-                  onChange={handleLocationOptionChange}
-                  notFoundContent={null}
-                  options={locationOptions}
-                />
-              </Form.Item>
-            </Col>
-          </Row>
+                <div className="mt-3 bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3 space-y-2">
+                  {sellingModel === 'self-listing' && (
+                    <>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">Ask Price</span>
+                        <span className="font-medium">₦{askPrice.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">Listing Fee ({LISTING_FEE_PERCENT}%)</span>
+                        <span className="font-semibold text-blue">
+                          ₦{(listingFee / 100).toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="border-t border-gray-200 dark:border-gray-700 pt-2 flex justify-between text-sm">
+                        <span className="text-gray-600 font-medium">Fee to pay after review</span>
+                        <span className="font-bold text-blue">
+                          ₦{(listingFee / 100).toLocaleString()}
+                        </span>
+                      </div>
+                    </>
+                  )}
 
-          <Row className="mb-3">
-            <Form.Item
-              name="askPrice"
-              className="tall-number-input mb-0 w-full"
-              rules={[{ required: true, message: 'Input price' }]}
-              label={<div className="mb-0 text-muted-foreground">{`Ask Price (\u20A6)`}</div>}
-            >
-              <InputNumber
-                className="w-full h-14"
-                size="large"
-                controls={false}
-                prefix={<span>&#8358; </span>}
-                placeholder="Enter Amount"
-                onChange={(value) => handleCalculateFee(Number(value) ?? 0)}
-              />
-            </Form.Item>
-            {<div className="w-full text-right">{`Fee: \u20A6${fee}`}</div>}
-          </Row>
+                  {sellingModel === 'consignment' && (
+                    <>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">Selling Price</span>
+                        <span className="font-medium">₦{askPrice.toLocaleString()}</span>
+                      </div>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">
+                          Platform Commission ({CONSIGNMENT_COMMISSION_PERCENT}%)
+                        </span>
+                        <span className="font-medium text-violet-600">
+                          ₦{(platformCut / 100).toLocaleString()}
+                        </span>
+                      </div>
+                      <div className="border-t border-gray-200 dark:border-gray-700 pt-2 flex justify-between text-sm">
+                        <span className="text-gray-600 font-medium">You receive when sold</span>
+                        <span className="font-bold text-emerald-600">
+                          ₦{(sellerCut / 100).toLocaleString()}
+                        </span>
+                      </div>
+                    </>
+                  )}
 
-          <Row>
-            <Form.Item
-              name="negotiable"
-              className="mb-0 w-full"
-              rules={[{ required: true, message: 'Select an option' }]}
-              label={<div className="mb-0 text-muted-foreground">{`Negotiable`}</div>}
-            >
-              <Select
-                options={[
-                  { label: 'Yes (Negotiable)', value: true },
-                  { label: 'No (Not Negotiable)', value: false },
-                ]}
-                className="h-14"
-                placeholder="Negotiable"
-              />
-            </Form.Item>
-          </Row>
+                  {sellingModel === 'direct-sale' && (
+                    <>
+                      <div className="flex justify-between text-sm">
+                        <span className="text-gray-500">Your asking price</span>
+                        <span className="font-medium">₦{askPrice.toLocaleString()}</span>
+                      </div>
+                      <div className="flex items-center gap-1.5 text-xs text-gray-400 mt-1">
+                        <Info size={12} />
+                        <span>We'll review and make you an offer after approval</span>
+                      </div>
+                    </>
+                  )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
 
-        <div className="mt-2 flex justify-between items-center">
-          <button
-            type="button"
-            onClick={() => handleSetCurrentStep('step1')}
-            className="px-6 py-2 text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+        {/* Negotiable - only for self-listing and consignment */}
+        {sellingModel !== 'direct-sale' && (
+          <Form.Item
+            name="negotiable"
+            className="mb-0"
+            rules={[{ required: true, message: 'Select an option' }]}
+            label={<span className="font-semibold text-sm">Open to Negotiation?</span>}
           >
-            Back
-          </button>
-          <button
-            type="submit"
-            className="px-10 text-lg font-semibold py-2 !h-14 bg-gradient-to-r from-blue to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white rounded-md  transition-colors"
-          >
-            Next
-          </button>
-        </div>
-      </Form>
-    </div>
+            <Select
+              options={[
+                { label: 'Yes — Buyers can negotiate the price', value: true },
+                { label: 'No — Price is fixed', value: false },
+              ]}
+              className="h-12 [&_.ant-select-selector]:!rounded-xl"
+              placeholder="Select option"
+            />
+          </Form.Item>
+        )}
+      </div>
+
+      {/* Actions */}
+      <div className="flex justify-between pt-4 border-t border-gray-100 dark:border-gray-700">
+        <button
+          type="button"
+          onClick={onBack}
+          className="px-5 py-2.5 text-sm text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors font-medium"
+        >
+          Back
+        </button>
+        <button
+          type="submit"
+          className="px-8 py-2.5 text-sm font-semibold bg-gradient-to-r from-blue to-indigo-500 hover:from-blue hover:to-indigo-600 text-white rounded-xl shadow-md shadow-blue/20 hover:shadow-lg transition-all"
+        >
+          Continue
+        </button>
+      </div>
+    </Form>
   );
 };
 
-export default SellItemStep2;
-
-// Enhanced SellItemStep2.tsx
-// import { Form, InputNumber, Select, Tooltip } from 'antd';
-// import { FormInstance } from 'antd/lib/form';
-// import { useState, useEffect } from 'react';
-
-// interface SellItemStep2Props {
-//   handleSetLocationAndPricingData: (values: Record<string, any>) => void;
-//   handleSetCurrentStep: (step: 'step1' | 'step2' | 'step3') => void;
-//   locationAndPricingData: Record<string, any>;
-//   sellItemStep2Form: FormInstance<any>;
-//   fee: number;
-//   setFee: React.Dispatch<React.SetStateAction<number>>;
-// }
-
-// export const SellItemStep2: React.FC<SellItemStep2Props> = ({
-//   handleSetLocationAndPricingData,
-//   handleSetCurrentStep,
-//   locationAndPricingData,
-//   sellItemStep2Form,
-//   fee,
-//   setFee,
-// }) => {
-//   const [price, setPrice] = useState<number>(locationAndPricingData?.askPrice || 0);
-
-//   useEffect(() => {
-//     sellItemStep2Form.setFieldsValue(locationAndPricingData);
-//   }, [locationAndPricingData]);
-
-//   const handleCalculateFee = (value: number | null) => {
-//     if (value) {
-//       const calculatedFee = value * 0.01; // 1% fee
-//       setFee(calculatedFee);
-//       setPrice(value);
-//     } else {
-//       setFee(0);
-//       setPrice(0);
-//     }
-//   };
-
-//   const onFinish = (values: any) => {
-//     handleSetLocationAndPricingData({ ...values, fee });
-//     handleSetCurrentStep('step3');
-//   };
-
-//   const mockLocations = [
-//     { label: 'Lagos', value: 'lagos' },
-//     { label: 'Abuja', value: 'abuja' },
-//     { label: 'Port Harcourt', value: 'port_harcourt' },
-//     { label: 'Kaduna', value: 'kaduna' },
-//     { label: 'Kano', value: 'kano' },
-//     // Add more locations as needed
-//   ];
-
-//   return (
-//     <Form
-//       form={sellItemStep2Form}
-//       layout="vertical"
-//       requiredMark={false}
-//       onFinish={onFinish}
-//       className="space-y-6"
-//       initialValues={locationAndPricingData}
-//     >
-//       <div className="max-h-[600px] overflow-y-auto px-4 space-y-6">
-//         <Form.Item
-//           name="location"
-//           label="Location"
-//           rules={[{ required: true, message: 'Please select a location' }]}
-//         >
-//           <Select
-//             showSearch
-//             options={mockLocations}
-//             placeholder="Select location"
-//             className="h-12"
-//             filterOption={(input, option) =>
-//               (option?.label ?? '').toLowerCase().includes(input.toLowerCase())
-//             }
-//           />
-//         </Form.Item>
-
-//         <div className="space-y-2">
-//           <Form.Item
-//             name="askPrice"
-//             label={
-//               <div className="flex items-center gap-2">
-//                 Price
-//                 <Tooltip title="Set your asking price. A 1% fee will be calculated.">
-//                   <i className="ri-information-line text-gray-400" />
-//                 </Tooltip>
-//               </div>
-//             }
-//             rules={[{ required: true, message: 'Please enter asking price' }]}
-//           >
-//             <InputNumber
-//               className="w-full h-12"
-//               formatter={(value) => `₦ ${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
-//               // parser={value =>  value!.replace(/₦\s?|(,*)/g, '')}
-//               parser={(value) => 0}
-//               onChange={handleCalculateFee}
-//               min={0}
-//               placeholder="Enter amount"
-//             />
-//           </Form.Item>
-
-//           <div className="flex justify-between text-sm">
-//             <span className="text-gray-500">Platform Fee (1%)</span>
-//             <span className="font-medium">₦ {fee.toLocaleString()}</span>
-//           </div>
-//           <div className="flex justify-between text-sm">
-//             <span className="text-gray-500">You'll Receive</span>
-//             <span className="font-medium">₦ {(price - fee).toLocaleString()}</span>
-//           </div>
-//         </div>
-
-//         <Form.Item
-//           name="negotiable"
-//           label="Price Negotiation"
-//           rules={[{ required: true, message: 'Please select an option' }]}
-//         >
-//           <Select
-//             options={[
-//               { label: 'Price is Negotiable', value: true },
-//               { label: 'Fixed Price (Non-negotiable)', value: false },
-//             ]}
-//             className="h-12"
-//           />
-//         </Form.Item>
-//       </div>
-
-//       <div className="flex justify-between px-4 py-3 bg-gray-50 -mx-6 -mb-6">
-//         <button
-//           type="button"
-//           onClick={() => handleSetCurrentStep('step1')}
-//           className="px-6 py-2 text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
-//         >
-//           Back
-//         </button>
-//         <button
-//           type="submit"
-//           className="px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
-//         >
-//           Next
-//         </button>
-//       </div>
-//     </Form>
-//   );
-// };
+export default SellItemPricing;

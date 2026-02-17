@@ -1,9 +1,13 @@
+import { getSellingModelLabel, SellingModel } from '@grc/_shared/namespace/sell-item';
+import React from 'react';
+
 interface PostRequestSuccessfulProps {
   itemName?: string;
   itemId: string;
   onClose: () => void;
   onTrackStatus: (id: string | number) => void;
   type: 'update' | 'new';
+  sellingModel?: SellingModel;
 }
 
 export const PostRequestSuccessful: React.FC<PostRequestSuccessfulProps> = ({
@@ -12,6 +16,7 @@ export const PostRequestSuccessful: React.FC<PostRequestSuccessfulProps> = ({
   onClose,
   onTrackStatus,
   type,
+  sellingModel,
 }) => {
   return (
     <div className="flex flex-col items-center justify-center py-8 px-4">
@@ -27,18 +32,26 @@ export const PostRequestSuccessful: React.FC<PostRequestSuccessfulProps> = ({
       )}
 
       {type === 'new' && (
-        <p className="text-center text-gray-600 max-w-md mb-8">
+        <p className="text-center text-gray-600 max-w-md mb-2">
           Your request to sell <span className="font-medium">{itemName ?? 'New Product'}</span> with
           ID <span className="font-medium">{itemId}</span> has been submitted successfully.
         </p>
       )}
 
       {type === 'update' && (
-        <p className="text-center text-gray-600 max-w-md mb-8">
+        <p className="text-center text-gray-600 max-w-md mb-2">
           Your request to update Product <span className="font-medium">{itemId}</span> has been
           submitted successfully.
         </p>
       )}
+
+      {sellingModel && (
+        <p className="text-sm text-gray-500 mb-8">
+          Selling via <span className="font-medium">{getSellingModelLabel(sellingModel)}</span>
+        </p>
+      )}
+
+      {!sellingModel && <div className="mb-6" />}
 
       <div className="bg-gray-50 rounded-lg p-4 mb-8 w-full max-w-md">
         {type === 'new' && (

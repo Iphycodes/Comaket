@@ -24,7 +24,7 @@ const ComingSoon = ({ header }: ComingSoonProps) => {
           repeat: Infinity,
           repeatType: 'reverse',
         }}
-        className="text-blue-500 dark:text-blue-400"
+        className="text-blue dark:text-blue"
       >
         <Timer size={48} />
       </motion.div>

@@ -4,13 +4,16 @@ import { AppContext } from '@grc/app-context';
 import { appNav } from '@grc/app/nav';
 import SideNav from '@grc/components/apps/layout/side-nav';
 import { Layout } from 'antd';
-import React, { ReactElement, useContext, useState } from 'react';
+import React, { ReactElement, useContext, useEffect, useState } from 'react';
 import NotificationsDrawer from '@grc/components/apps/notification-drawer';
 import CreateStoreModal from '@grc/components/apps/create-store-modal';
 import ChatsModal from '@grc/components/apps/chats-modal';
 import MobileNav from '@grc/components/apps/layout/mobile-nav';
+import { usePathname } from 'next/navigation';
+import SellItemModal from '@grc/components/apps/sell-item-modal';
+import MobileTopBar from '@grc/components/apps/layout/mobile-top-bar';
 
-const { Content, Footer } = Layout;
+const { Content } = Layout;
 
 interface AppBaseLayoutProps {
   // Add your prop types here
@@ -29,10 +32,12 @@ const AppBaseLayout: React.FC<AppBaseLayoutProps> = ({ children }) => {
     isCreateStoreModalOpen,
     setIsCreateStoreModalOpen,
     setIsSellItemModalOpen,
+    isSellItemModalOpen,
     isChatsModalOpen,
     setIsChatsModalOpen,
   } = useContext(AppContext);
   const [selectedKey, setSelectedKey] = useState('');
+  const path = usePathname();
 
   const handleLayoutBodyClick = () => {
     setSelectedKey('');
@@ -42,8 +47,14 @@ const AppBaseLayout: React.FC<AppBaseLayoutProps> = ({ children }) => {
     setToggleProfileDrawer(true);
   };
 
+  useEffect(() => {
+    setIsSellItemModalOpen(false);
+  }, [path]);
+
+  const fullRoutes = ['profile', 'sell-item'];
+
   return (
-    <Layout hasSider={true} className="bg-background">
+    <Layout hasSider={true} className="bg-background max-w-[100vw] overflow-x-clip">
       {/* Only show SideNav on non-mobile screens */}
       {!mobileResponsive && (
         <SideNav
@@ -79,24 +90,39 @@ const AppBaseLayout: React.FC<AppBaseLayoutProps> = ({ children }) => {
           marginLeft: `${mobileResponsive ? 0 : tabletResponsive ? 0 : '300px'}`,
           transition: 'margin-left 0.3s ease',
           // Add padding bottom for mobile to account for bottom navigation
-          paddingBottom: mobileResponsive ? '64px' : '0',
+          // paddingBottom: mobileResponsive ? '0' : '0',
         }}
         onClick={handleLayoutBodyClick}
       >
         <Content className="main-content">
           <div
-            className={`dark:text-white ${mobileResponsive ? 'px-0' : 'px-[12%] py-6'}`}
+            className={`dark:text-white ${
+              mobileResponsive
+                ? 'px-0 !max-w-[100vw] !overflow-x-clip'
+                : fullRoutes?.includes(path?.split('/')?.[1] ?? '')
+                  ? 'px-[20px]'
+                  : 'px-[12%]'
+            }`}
             style={{ minHeight: '100vh' }}
           >
-            {children}
+            {mobileResponsive && (
+              <MobileTopBar setIsCreateStoreModalOpen={setIsCreateStoreModalOpen} />
+            )}
+            <div className={`${mobileResponsive ? '' : ''}`}>{children}</div>
           </div>
-          {!mobileResponsive && (
+          {/* {!mobileResponsive && (
             <Footer className="shadow-sm border-t border-border/100 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:text-white">
               Footer
             </Footer>
-          )}
+          )} */}
         </Content>
       </Layout>
+
+      <SellItemModal
+        isSellItemModalOpen={isSellItemModalOpen}
+        setIsSellItemModalOpen={setIsSellItemModalOpen}
+        handleTrackStatus={() => {}}
+      />
 
       {/* Show mobile navigation only on mobile screens */}
       {mobileResponsive && (

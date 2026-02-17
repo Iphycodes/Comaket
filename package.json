@@ -51,6 +51,7 @@
     "react-dom": "^18.2.0",
     "react-icons": "^5.0.1",
     "react-image-crop": "^11.0.7",
+    "react-paystack": "^6.0.0",
     "react-preloader-icon": "^1.0.0",
     "react-redux": "^9.0.4",
     "redux-logger": "^3.0.6",

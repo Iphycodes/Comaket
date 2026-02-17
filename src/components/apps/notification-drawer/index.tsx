@@ -57,7 +57,7 @@ const NotificationItem: React.FC<NotificationItemComponentProps> = ({
   const getColorClass = () => {
     switch (type) {
       case 'listing':
-        return 'bg-blue-50 text-blue-600';
+        return 'bg-indigo-50 text-blue';
       case 'payment':
         return 'bg-green-50 text-green-600';
       case 'social':

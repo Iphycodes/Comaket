@@ -34,7 +34,6 @@ module.exports = (phase) => {
     env,
     reactStrictMode: true,
     compiler: { styledComponents: true },
-    /* config options here */
     webpack: (config) => {
       config.module.rules.push({
         test: /\.svg$/i,
@@ -43,7 +42,14 @@ module.exports = (phase) => {
       });
       return config;
     },
-
+    images: {
+      remotePatterns: [
+        {
+          protocol: 'https',
+          hostname: 'images.unsplash.com',
+        },
+      ],
+    },
     // redirects: async =() => {
     //   return [
     //     {

@@ -7,6 +7,7 @@ import { AppContext } from '@grc/app-context';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 
 const { Sider } = Layout;
+
 interface SideNavProps {
   toggleSider: boolean;
   appNav: Nav;
@@ -26,56 +27,83 @@ const SideNav: React.FC<SideNavProps> = (props) => {
     setSelectedKey,
     setToggleSider,
     setIsCreateStoreModalOpen,
+    setIsSellItemModalOpen,
     setIsChatsModalOpen,
   } = props;
+
   const pathname = usePathname();
   const urlPath = pathname?.split('/');
   const { push } = useRouter();
-  const { setToggleFindVendorDrawer, setToggleNotificationsDrawer, setToggleProfileDrawer } =
-    useContext(AppContext);
-
+  const { setToggleFindVendorDrawer, setToggleNotificationsDrawer } = useContext(AppContext);
   const isMobile = useMediaQuery(mediaSize.mobile);
+
+  // ── Build a flat lookup of ALL nav items (including children) → destination ──
+  const getDestinationForKey = (key: string): string => {
+    // Check top-level items
+    for (const item of appNav?.items || []) {
+      if (item.key === key && item.destination) return item.destination;
+      // Check children
+      if (item?.children) {
+        for (const child of item.children) {
+          if (child.key === key && child.destination) return child.destination;
+        }
+      }
+    }
+    // Check footer items
+    for (const item of appNav?.footerMenuItems || []) {
+      if (item.key === key && item.destination) return item.destination;
+    }
+    return '';
+  };
 
   const handleMenuClick = ({ key }: { key: string }) => {
     setToggleSider(false);
     setToggleFindVendorDrawer(true);
     setToggleNotificationsDrawer(true);
-    setToggleProfileDrawer(true);
-    appNav?.items.map((item) => {
-      if (item.key === key) {
-        if (item.destination !== '') {
-          push(item?.destination);
-        }
-      }
-    });
-    appNav?.footerMenuItems.map((item) => {
-      if (item.key === key) {
-        if (item.destination !== '') {
-          push(item?.destination);
-        }
-      }
-    });
-    // if (key === 'find-vendor') {
-    //   setToggleFindVendorDrawer(false);
-    //   setToggleSider(true);
-    // }
+    setIsSellItemModalOpen(false);
+
+    // ── Special intercepts ────────────────────────────────────────────
+
+    // Sell Item: desktop → open modal, mobile → route to /sell-item
+    if (key === 'sell-item') {
+      // if (isMobile) {
+      //   push('/sell-item');
+      // } else {
+      //   setIsSellItemModalOpen(true);
+      // }
+      setIsSellItemModalOpen(true);
+      setSelectedKey(key);
+      return;
+    }
+
+    // Notifications: open drawer
     if (key === 'notifications') {
       setToggleNotificationsDrawer(false);
       setToggleSider(true);
+      setSelectedKey(key);
+      return;
     }
+
+    // Create store modal
     if (key === 'create-store') {
       setIsCreateStoreModalOpen(true);
+      setSelectedKey(key);
+      return;
     }
-    // if (key === 'sell') {
-    //   setIsSellItemModalOpen(true);
-    // }
+
+    // Chats modal
     if (key === 'chats') {
       setIsChatsModalOpen(true);
+      setSelectedKey(key);
+      return;
     }
-    if (key === 'profile') {
-      setToggleProfileDrawer(false);
-      setToggleSider(true);
+
+    // ── Default: route to destination ─────────────────────────────────
+    const destination = getDestinationForKey(key);
+    if (destination) {
+      push(destination);
     }
+
     setSelectedKey(key);
   };
 
@@ -90,14 +118,14 @@ const SideNav: React.FC<SideNavProps> = (props) => {
         position: 'fixed',
         height: '100vh',
         scrollbarWidth: 'none',
-        scrollbarColor: 'red',
         left: 0,
         top: 0,
         bottom: 0,
         zIndex: 100,
       }}
     >
-      <SideNavHeader toggleSider={toggleSider} />{' '}
+      <SideNavHeader toggleSider={toggleSider} />
+
       <Menu
         className="sider-menu mt-10 mb-48 text-card-foreground text-[16px]"
         mode="inline"
@@ -111,7 +139,8 @@ const SideNav: React.FC<SideNavProps> = (props) => {
               : [urlPath?.[1] ?? '']
         }
         onClick={handleMenuClick}
-      ></Menu>
+      />
+
       <Menu
         className="bottom-5 text-card-foreground text-[16px]"
         mode="inline"

@@ -88,7 +88,7 @@ const FindVendorDrawer: React.FC<LeftDrawerProps> = ({ toggleFindVendorDrawer })
       <div className="pb-2 sticky top-0 bg-white z-50">
         <div className="px-5 py-3 border-b border-b-gray-300">
           <div className="my-6 mb-10">
-            <h1 className="text-[24px] font-semibold">Find Vendor</h1>
+            <h1 className="text-[24px] font-semibold">Vendors</h1>
           </div>
           <div className="py-4">
             <Input

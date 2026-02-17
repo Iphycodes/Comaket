@@ -138,7 +138,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ form, onFinish }) => {
           htmlType="submit"
           block
           //   size="large"
-          className="!h-12 bg-gradient-to-r from-blue to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white py-3 rounded-lg flex items-center justify-center gap-1 shadow-sm"
+          className="!h-12 bg-gradient-to-r from-blue to-indigo-500 hover:from-blue hover:to-indigo-600 text-white py-3 rounded-lg flex items-center justify-center gap-1 shadow-sm"
         >
           Log In
         </Button>
@@ -242,7 +242,7 @@ const SignupForm: React.FC<SignupFormProps> = ({ form, onFinish }) => {
           htmlType="submit"
           block
           //   size="large"
-          className="!h-12 bg-gradient-to-r from-blue to-indigo-500 hover:from-blue-600 hover:to-indigo-600 text-white py-3 rounded-lg flex items-center justify-center gap-1 shadow-sm"
+          className="!h-12 bg-gradient-to-r from-blue to-indigo-500 hover:from-blue hover:to-indigo-600 text-white py-3 rounded-lg flex items-center justify-center gap-1 shadow-sm"
         >
           Create Account
         </Button>

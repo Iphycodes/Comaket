@@ -1,34 +1,44 @@
-import React, { useState } from 'react';
-import { Tag, Tooltip } from 'antd';
+import React, { useState, useEffect, useContext } from 'react';
+import { Tag, Tooltip, message as antMessage } from 'antd';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
-  Heart,
-  MessageCircle,
   Bookmark,
   Share2,
   ChevronLeft,
   ChevronRight,
   MapPin,
-  Store,
   Clock,
+  MessageCircle,
+  ShoppingCart,
+  ShoppingBag,
 } from 'lucide-react';
 import Image from 'next/image';
+import { useRouter } from 'next/navigation';
 import { numberFormat } from '@grc/_shared/helpers';
-import { Currencies, mockComments } from '@grc/_shared/constant';
+import { Currencies } from '@grc/_shared/constant';
 import { capitalize, startCase } from 'lodash';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
-import CommentBox from '../comment-box';
+import { AppContext } from '@grc/app-context';
+import { CartItem } from '@grc/_shared/namespace/cart';
+import { setBuyNowItem } from '@grc/_shared/namespace/buy';
+import { ListingType, MediaItem } from '@grc/_shared/namespace';
+import MediaRenderer, { getFirstImageUrl } from '../media-renderer';
 
 interface ItemDetailProps {
   item: {
     description: string;
     sponsored: boolean;
     postUserProfile: Record<string, any>;
-    postImgurls: string[];
+    media: MediaItem[];
     askingPrice: Record<string, any>;
     condition: string;
     comments: Record<string, any>[];
     itemName: string;
+    productTags?: string[];
+    id: string | number;
+    quantity?: number;
+    isBuyable: boolean;
+    listingType: ListingType;
     status?: 'pending' | 'approved' | 'rejected';
     feePaymentStatus?:
       | 'pending'
@@ -44,44 +54,141 @@ interface ItemDetailProps {
 }
 
 const ItemDetail: React.FC<ItemDetailProps> = ({ item, isSellerView }) => {
-  const [currentImageIndex, setCurrentImageIndex] = useState(0);
+  const router = useRouter();
+  const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
   const [slideDirection, setSlideDirection] = useState(0);
+  const [isSaved, setIsSaved] = useState(false);
   const isMobile = useMediaQuery(mediaSize.mobile);
+  const { addToCart, isInCart, cartItems } = useContext(AppContext);
 
-  const nextImage = () => {
-    setSlideDirection(1);
-    setCurrentImageIndex((prev) => (prev + 1) % item.postImgurls.length);
+  const itemInCart = isInCart(item?.id);
+  const maxQuantity = item?.quantity ?? 1;
+  const cartItem = cartItems?.find((i: CartItem) => i.id === item?.id);
+  const cartQuantity = cartItem?.quantity || 0;
+  const isMaxQuantityReached = cartQuantity >= maxQuantity;
+
+  const currentMedia = item.media[currentMediaIndex];
+
+  const buildCartItem = (): CartItem => ({
+    id: item.id,
+    itemName: item.itemName,
+    description: item.description,
+    price: item.askingPrice?.price || 0,
+    quantity: 1,
+    maxQuantity,
+    image: getFirstImageUrl(item.media),
+    condition: item.condition,
+    negotiable: item.askingPrice?.negotiable || false,
+    sellerName: item.postUserProfile?.businessName || item.postUserProfile?.userName || '',
+  });
+
+  const handleAddToCart = () => {
+    if (isMaxQuantityReached) {
+      antMessage.warning(`Maximum quantity (${maxQuantity}) reached for this item`);
+      return;
+    }
+    if (isInCart(item?.id)) {
+      antMessage.info('Item is already in your cart');
+      return;
+    }
+    addToCart(item?.id);
+    antMessage.success('Added to cart!');
   };
 
-  const prevImage = () => {
+  const handleBuyNow = () => {
+    setBuyNowItem(buildCartItem());
+    router.push('/checkout?mode=buynow');
+  };
+
+  const handleWhatsAppMessage = () => {
+    const phoneNumber = item.postUserProfile?.phoneNumber || '';
+    if (!phoneNumber) {
+      antMessage.error('Seller phone number not available');
+      return;
+    }
+    const formattedPrice = numberFormat(item?.askingPrice?.price / 100, Currencies.NGN);
+    const sellerName =
+      item.postUserProfile?.businessName || item.postUserProfile?.userName || 'Seller';
+
+    const message = `Hi, ${sellerName},
+I am interested in this item on Comaket.
+
+Item Id: ${item?.id}
+Name: ${item?.itemName}
+Description: ${item?.description}
+Price: ${formattedPrice}`;
+
+    const encodedMessage = encodeURIComponent(message);
+    const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
+    window.open(whatsappUrl, '_blank');
+  };
+
+  const nextMedia = () => {
+    setSlideDirection(1);
+    setCurrentMediaIndex((prev) => (prev + 1) % item.media.length);
+  };
+
+  const prevMedia = () => {
     setSlideDirection(-1);
-    setCurrentImageIndex((prev) => (prev - 1 + item.postImgurls.length) % item.postImgurls.length);
+    setCurrentMediaIndex((prev) => (prev - 1 + item.media.length) % item.media.length);
+  };
+
+  const handleBookmark = () => {
+    try {
+      const savedItems = JSON.parse(localStorage.getItem('savedItems') || '[]');
+      if (isSaved) {
+        const updatedItems = savedItems.filter((itemId: string | number) => itemId !== item.id);
+        localStorage.setItem('savedItems', JSON.stringify(updatedItems));
+        setIsSaved(false);
+      } else {
+        if (!savedItems.includes(item.id)) {
+          savedItems.push(item.id);
+          localStorage.setItem('savedItems', JSON.stringify(savedItems));
+        }
+        setIsSaved(true);
+      }
+      window.dispatchEvent(new Event('savedItemsChanged'));
+    } catch (error) {
+      console.error('Error managing bookmarks:', error);
+    }
+  };
+
+  useEffect(() => {
+    try {
+      const savedItems = JSON.parse(localStorage.getItem('savedItems') || '[]');
+      setIsSaved(savedItems.includes(item?.id));
+    } catch (error) {
+      console.error('Error loading bookmarks:', error);
+    }
+  }, [item?.id]);
+
+  const handleShare = async () => {
+    const shareData = {
+      title: item.itemName,
+      text: `Check out this item: ${item.itemName} - ${numberFormat(
+        item.askingPrice?.price / 100,
+        Currencies.NGN
+      )}`,
+      url: `${window.location.origin}/product/${item?.id}`,
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(`${window.location.origin}/product/${item?.id}`);
+        alert('Link copied to clipboard!');
+      }
+    } catch (err) {
+      console.error('Error sharing:', err);
+    }
   };
 
   const slideVariants = {
-    enter: (direction: number) => ({
-      x: direction > 0 ? '100%' : '-100%',
-      opacity: 0,
-    }),
-    center: {
-      x: 0,
-      opacity: 1,
-    },
-    exit: (direction: number) => ({
-      x: direction < 0 ? '100%' : '-100%',
-      opacity: 0,
-    }),
+    enter: (direction: number) => ({ x: direction > 0 ? '100%' : '-100%', opacity: 0 }),
+    center: { x: 0, opacity: 1 },
+    exit: (direction: number) => ({ x: direction < 0 ? '100%' : '-100%', opacity: 0 }),
   };
-
-  // const itemVariants = {
-  //   hidden: { opacity: 0, y: 20 },
-  //   visible: {
-  //     opacity: 1,
-  //     y: 0,
-  //     transition: { duration: 0.5 },
-  //   },
-  // };
 
   const getStatusColor = (status: string) => {
     switch (status?.toLowerCase()) {
@@ -109,19 +216,26 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ item, isSellerView }) => {
     }
   };
 
+  const getListingTypeLabel = (type: ListingType) => {
+    switch (type) {
+      case 'consignment':
+        return 'Consignment';
+      case 'direct-purchase':
+        return 'Comaket Verified';
+      case 'self-listing':
+        return 'Seller Listing';
+      default:
+        return '';
+    }
+  };
+
   return (
-    // <motion.div
-    //   variants={itemVariants}
-    //   className={`relative bg-white dark:bg-gray-800 rounded-lg transition-all duration-300 ${
-    //     isMobile ? 'px-3' : ''
-    //   }`}
-    // >
     <div
       className={`relative bg-white dark:bg-gray-800 rounded-lg transition-all duration-300 ${
         isMobile ? 'px-3' : ''
       }`}
     >
-      {/* Seller Info */}
+      {/* Seller Info - Mobile */}
       {isMobile && (
         <div className="flex items-center gap-3 mb-6">
           <div className="relative w-12 h-12">
@@ -134,13 +248,16 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ item, isSellerView }) => {
             <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
           </div>
           <div>
-            <h3 className="font-medium text-lg">
-              {item.postUserProfile?.businessName || item.postUserProfile?.userName}
-            </h3>
+            <div className="flex items-center gap-2">
+              <h3 className="font-medium text-lg">
+                {item.postUserProfile?.businessName || item.postUserProfile?.userName}
+              </h3>
+              {item.postUserProfile?.isVerified && <span className="text-blue text-xs">✓</span>}
+            </div>
             <div className="flex items-center gap-3 text-sm text-gray-500">
               <span className="flex items-center gap-1">
                 <MapPin size={14} />
-                Kaduna State, Zaria
+                {item.postUserProfile?.location || 'Nigeria'}
               </span>
               <span className="flex items-center gap-1">
                 <Clock size={14} />
@@ -151,69 +268,108 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ item, isSellerView }) => {
         </div>
       )}
 
-      {/* {onClose && (
-        <button
-          onClick={onClose}
-          className="absolute top-4 right-4 text-gray-500 hover:text-gray-700"
-        >
-          ×
-        </button>
-      )} */}
-
       <div className={`flex ${isMobile ? 'flex-col' : ''}`}>
-        {/* Left Section - Image */}
+        {/* Left Section — Media */}
         <div className={`${isMobile ? 'w-full' : 'w-2/3'} relative`}>
           <div className="sticky top-0 h-full">
             <div className="relative aspect-square overflow-hidden">
               <AnimatePresence initial={false} custom={slideDirection} mode="popLayout">
                 <motion.div
-                  key={currentImageIndex}
+                  key={currentMediaIndex}
                   custom={slideDirection}
                   variants={slideVariants}
                   initial="enter"
                   animate="center"
                   exit="exit"
-                  transition={{
-                    x: { type: 'tween', duration: 0.25 },
-                    position: { delay: 0 },
-                  }}
+                  transition={{ x: { type: 'tween', duration: 0.25 }, position: { delay: 0 } }}
                   className="w-full h-full"
                 >
-                  <Image
-                    src={item.postImgurls[currentImageIndex]}
-                    alt={item.itemName}
-                    fill
-                    className="object-cover"
-                  />
+                  {currentMedia && <MediaRenderer media={currentMedia} alt={item.itemName} />}
                 </motion.div>
               </AnimatePresence>
+
+              {/* Low stock badge */}
+              {maxQuantity > 0 && maxQuantity <= 5 && (
+                <div className="absolute bottom-4 right-4 bg-black/60 backdrop-blur-sm text-white text-xs font-semibold px-2.5 py-1 rounded-full z-10">
+                  Only {maxQuantity} left
+                </div>
+              )}
             </div>
 
-            {item.postImgurls.length > 1 && (
+            {item.media.length > 1 && (
               <>
                 <button
-                  onClick={prevImage}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full backdrop-blur-sm"
+                  onClick={prevMedia}
+                  className="absolute left-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full backdrop-blur-sm z-10"
                 >
                   <ChevronLeft className="w-6 h-6" />
                 </button>
                 <button
-                  onClick={nextImage}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full backdrop-blur-sm"
+                  onClick={nextMedia}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 bg-black/30 hover:bg-black/50 text-white p-2 rounded-full backdrop-blur-sm z-10"
                 >
                   <ChevronRight className="w-6 h-6" />
                 </button>
+
+                {/* Thumbnail strip */}
+                {/* <div className="flex gap-2 mt-3 px-1 overflow-x-auto">
+                  {item.media.map((m, index) => (
+                    <button
+                      key={index}
+                      onClick={() => {
+                        setSlideDirection(index > currentMediaIndex ? 1 : -1);
+                        setCurrentMediaIndex(index);
+                      }}
+                      className={`relative w-16 h-16 rounded-md overflow-hidden flex-shrink-0 border-2 transition-all ${
+                        currentMediaIndex === index
+                          ? 'border-blue opacity-100'
+                          : 'border-transparent opacity-60 hover:opacity-80'
+                      }`}
+                    >
+                      {m.type === 'image' ? (
+                        <Image
+                          src={m.url}
+                          alt={`Thumb ${index + 1}`}
+                          fill
+                          className="object-cover"
+                        />
+                      ) : (
+                        <div className="relative w-full h-full bg-gray-900">
+                          {m.thumbnail ? (
+                            <Image
+                              src={m.thumbnail}
+                              alt={`Video ${index + 1}`}
+                              fill
+                              className="object-cover"
+                            />
+                          ) : (
+                            <video
+                              src={m.url}
+                              className="w-full h-full object-cover"
+                              muted
+                              preload="metadata"
+                            />
+                          )}
+                          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
+                            <div className="w-5 h-5 rounded-full bg-white/80 flex items-center justify-center">
+                              <div className="w-0 h-0 border-l-[5px] border-l-gray-800 border-y-[3px] border-y-transparent ml-0.5" />
+                            </div>
+                          </div>
+                        </div>
+                      )}
+                    </button>
+                  ))}
+                </div> */}
               </>
             )}
           </div>
         </div>
 
-        {/* Right Section - Details */}
+        {/* Right Section — Details */}
         <div
           className={`${isMobile ? 'w-full' : 'w-1/3 !min-h-[100%] overflow-y-auto p-5'} relative`}
         >
-          {/* Seller Details */}
-
+          {/* Seller Details - Desktop */}
           {!isMobile && (
             <div className="flex items-center gap-3 mb-6">
               <div className="relative w-12 h-12">
@@ -226,13 +382,16 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ item, isSellerView }) => {
                 <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
               </div>
               <div>
-                <h3 className="font-medium text-lg">
-                  {item.postUserProfile?.businessName || item.postUserProfile?.userName}
-                </h3>
+                <div className="flex items-center gap-2">
+                  <h3 className="font-medium text-lg">
+                    {item.postUserProfile?.businessName || item.postUserProfile?.userName}
+                  </h3>
+                  {item.postUserProfile?.isVerified && <span className="text-blue text-xs">✓</span>}
+                </div>
                 <div className="flex items-center gap-3 text-sm text-gray-500">
                   <span className="flex items-center gap-1">
                     <MapPin size={14} />
-                    Kaduna State, Zaria
+                    {item.postUserProfile?.location || 'Nigeria'}
                   </span>
                   <span className="flex items-center gap-1">
                     <Clock size={14} />
@@ -242,6 +401,7 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ item, isSellerView }) => {
               </div>
             </div>
           )}
+
           {/* Item Details */}
           <div className="space-y-6">
             <div className="flex justify-between">
@@ -258,6 +418,21 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ item, isSellerView }) => {
                   </div>
                 )}
                 <h2 className="text-xl font-semibold mb-1 cursor-pointer">{item.itemName}</h2>
+
+                <div className="mb-2">
+                  <span
+                    className={`inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded-full ${
+                      item.listingType === 'direct-purchase'
+                        ? 'bg-blue-50 dark:bg-blue/20 text-blue dark:text-blue'
+                        : item.listingType === 'consignment'
+                          ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400'
+                          : 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400'
+                    }`}
+                  >
+                    {getListingTypeLabel(item.listingType)}
+                  </span>
+                </div>
+
                 <div className="flex items-center gap-3">
                   <span className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-rose-500 bg-clip-text text-transparent">
                     {numberFormat(item.askingPrice?.price / 100, Currencies?.NGN)}
@@ -297,50 +472,42 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ item, isSellerView }) => {
               )}
             </div>
 
-            <div className="flex items-center justify-between">
-              <div className="flex items-center gap-6">
-                <Tooltip title={'Like'}>
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="flex items-center gap-2 group"
+            {item.productTags && item.productTags.length > 0 && (
+              <div className="flex flex-wrap gap-2 py-2">
+                {item.productTags.map((tag, index) => (
+                  <span
+                    key={index}
+                    className="px-3 py-1 text-xs font-medium bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
                   >
-                    <Heart
-                      className={`w-6 h-6 ${'text-gray-400 group-hover:text-gray-600'} transition-colors`}
-                    />
-                    <span className="text-sm text-gray-500">125</span>
-                  </motion.button>
-                </Tooltip>
-
-                <Tooltip title="Comments">
-                  <motion.button
-                    whileHover={{ scale: 1.1 }}
-                    whileTap={{ scale: 0.9 }}
-                    className="flex items-center gap-2 group"
-                  >
-                    <MessageCircle className="w-6 h-6 text-gray-400 group-hover:text-gray-600 transition-colors" />
-                    <span className="text-sm text-gray-500">{10}</span>
-                  </motion.button>
-                </Tooltip>
+                    {tag}
+                  </span>
+                ))}
               </div>
+            )}
 
-              <div className="flex items-center gap-4">
-                <Tooltip title={'Save item'}>
+            <div className="flex items-center justify-end">
+              <div className="flex items-center gap-3">
+                <Tooltip title={isSaved ? 'Remove from saved' : 'Save item'}>
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
+                    onClick={handleBookmark}
                     className="group"
                   >
                     <Bookmark
-                      className={`w-6 h-6 ${'text-gray-400 group-hover:text-gray-600'} transition-colors`}
+                      className={`w-6 h-6 ${
+                        isSaved
+                          ? 'fill-pink-500 text-pink-500'
+                          : 'text-gray-400 group-hover:text-gray-600'
+                      } transition-colors`}
                     />
                   </motion.button>
                 </Tooltip>
-
                 <Tooltip title="Share">
                   <motion.button
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.9 }}
+                    onClick={handleShare}
                     className="group"
                   >
                     <Share2 className="w-6 h-6 text-gray-400 group-hover:text-gray-600 transition-colors" />
@@ -354,7 +521,6 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ item, isSellerView }) => {
                 !isMobile ? 'max-h-[500px] overflow-y-scroll' : 'max-h-[500px] overflow-y-scroll'
               }`}
             >
-              {/* Description */}
               <div className="bg-gray-50 rounded-lg p-3 mb-3">
                 <h4 className="font-medium mb-2">Description</h4>
                 <p className={`text-gray-600 ${!isDescriptionExpanded && 'line-clamp-3'}`}>
@@ -362,78 +528,151 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ item, isSellerView }) => {
                 </p>
                 <button
                   onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                  className="text-blue-600 text-sm mt-2"
+                  className="text-blue text-sm mt-2"
                 >
                   Show {isDescriptionExpanded ? 'less' : 'more'}
                 </button>
               </div>
-
-              {/* Comments Section */}
-              <div className="mb-[100px]">
-                <h4 className="font-medium mb-4">Comments ({mockComments.length})</h4>
-                <div className="space-y-4">
-                  {mockComments.map((comment) => (
-                    <div key={comment.id} className="flex gap-3 items-start">
-                      <Image
-                        src={comment.user.avatar}
-                        alt={comment.user.name}
-                        width={32}
-                        height={32}
-                        className="rounded-full"
-                        style={{ width: '32px', height: '32px' }}
-                      />
-                      <div className="flex-1">
-                        <div className="rounded-lg">
-                          <span className="font-semibold">{comment.user.name}</span>
-                          <p className="text-gray-600 mt-1">{comment.text}</p>
-                        </div>
-                        <span className="text-sm text-gray-500 mt-1 block">
-                          {comment.timestamp}
-                        </span>
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </div>
             </div>
           </div>
 
-          {/* Action Buttons */}
+          {/* Action Buttons — conditional on isBuyable */}
           {!isSellerView && (
-            <div className="absolute max-w-full w-[90%] bottom-0 bg-white py-4 mt-6 border-t">
-              <div className="mb-4 w-full">
-                <div className="flex gap-3 w-full items-start">
-                  <Image
-                    src={item.postUserProfile?.profilePicUrl}
-                    alt={'user'}
-                    width={32}
-                    height={32}
-                    className="rounded-full"
-                    style={{ width: '32px', height: '32px' }}
-                  />
-                  <div className="flex-1">
-                    <CommentBox />
+            <div className="absolute w-[90%] flex flex-col gap-2 bottom-0 bg-white dark:bg-gray-800 py-4 mt-6 border-t">
+              {item.isBuyable ? (
+                <>
+                  {/* BUYABLE: Buy Now + Add to Cart */}
+                  <div className="flex items-center gap-1.5">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={handleBuyNow}
+                      className="flex-1 py-3 rounded-lg font-medium flex items-center justify-center gap-2 shadow-sm transition-all bg-gradient-to-r from-blue to-indigo-700 hover:from-blue hover:to-indigo-800 text-white hover:shadow-md"
+                    >
+                      <ShoppingBag size={20} />
+                      Buy Now
+                    </motion.button>
+
+                    <Tooltip
+                      title={
+                        isMaxQuantityReached
+                          ? `Max quantity (${maxQuantity}) reached`
+                          : itemInCart
+                            ? 'Already in cart'
+                            : 'Add to cart'
+                      }
+                    >
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={handleAddToCart}
+                        disabled={isMaxQuantityReached}
+                        className={`p-3 rounded-lg border shadow-sm transition-colors ${
+                          isMaxQuantityReached
+                            ? 'bg-gray-100 border-gray-200 text-gray-300 cursor-not-allowed'
+                            : itemInCart
+                              ? 'bg-blue-50 border-blue text-blue'
+                              : 'bg-neutral-100 border-neutral-200 text-gray-600 hover:border-blue hover:text-blue'
+                        }`}
+                      >
+                        <ShoppingCart size={20} />
+                      </motion.button>
+                    </Tooltip>
                   </div>
-                </div>
-              </div>
-              <div className="flex gap-4">
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="flex-1 bg-blue hover:bg-blue-700 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-2"
-                >
-                  <MessageCircle size={20} />
-                  Chat with Seller
-                </motion.button>
-                <motion.button
-                  whileHover={{ scale: 1.02 }}
-                  whileTap={{ scale: 0.98 }}
-                  className="flex-1 border border-gray-200 hover:border-gray-300 py-3 rounded-lg font-medium flex items-center justify-center gap-2"
-                >
-                  <Store size={20} />
-                  Visit Store
-                </motion.button>
-              </div>
+
+                  {/* BUYABLE: WhatsApp + Save + Share */}
+                  <div className="flex items-center gap-1.5">
+                    <motion.button
+                      whileHover={{ scale: 1.02 }}
+                      whileTap={{ scale: 0.98 }}
+                      onClick={handleWhatsAppMessage}
+                      className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-2 shadow-sm"
+                    >
+                      <MessageCircle size={20} />
+                      WhatsApp
+                    </motion.button>
+
+                    <Tooltip title={isSaved ? 'Remove from saved' : 'Save item'}>
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={handleBookmark}
+                        className={`p-3 rounded-lg border shadow-sm transition-colors ${
+                          isSaved
+                            ? 'bg-pink-50 border-pink-200'
+                            : 'bg-neutral-100 border-neutral-200'
+                        }`}
+                      >
+                        <Bookmark
+                          size={20}
+                          className={`${
+                            isSaved ? 'fill-pink-500 text-pink-500' : 'text-gray-500'
+                          } transition-colors`}
+                        />
+                      </motion.button>
+                    </Tooltip>
+
+                    <Tooltip title="Share">
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={handleShare}
+                        className="p-3 rounded-lg border border-neutral-200 bg-neutral-100 shadow-sm"
+                      >
+                        <Share2 size={20} className="text-gray-500" />
+                      </motion.button>
+                    </Tooltip>
+                  </div>
+                </>
+              ) : (
+                <>
+                  {/* NOT BUYABLE: WhatsApp only */}
+                  <motion.button
+                    whileHover={{ scale: 1.02 }}
+                    whileTap={{ scale: 0.98 }}
+                    onClick={handleWhatsAppMessage}
+                    className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-2 shadow-sm"
+                  >
+                    <MessageCircle size={20} />
+                    Message on WhatsApp
+                  </motion.button>
+
+                  <div className="flex items-center gap-1.5">
+                    <Tooltip title={isSaved ? 'Remove from saved' : 'Save item'}>
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={handleBookmark}
+                        className={`flex-1 p-3 rounded-lg border shadow-sm transition-colors flex items-center justify-center gap-1.5 ${
+                          isSaved
+                            ? 'bg-pink-50 border-pink-200 text-pink-500'
+                            : 'bg-neutral-100 border-neutral-200 text-gray-500'
+                        }`}
+                      >
+                        <Bookmark
+                          size={18}
+                          className={`${
+                            isSaved ? 'fill-pink-500 text-pink-500' : 'text-gray-500'
+                          } transition-colors`}
+                        />
+                        Save
+                      </motion.button>
+                    </Tooltip>
+
+                    <Tooltip title="Share">
+                      <motion.button
+                        whileHover={{ scale: 1.1 }}
+                        whileTap={{ scale: 0.9 }}
+                        onClick={handleShare}
+                        className="flex-1 p-3 rounded-lg border border-neutral-200 bg-neutral-100 shadow-sm flex items-center justify-center gap-1.5 text-gray-500"
+                      >
+                        <Share2 size={18} className="text-gray-500" />
+                        Share
+                      </motion.button>
+                    </Tooltip>
+                  </div>
+                </>
+              )}
             </div>
           )}
         </div>
