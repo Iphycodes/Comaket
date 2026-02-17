@@ -1,7 +1,6 @@
 'use client';
 
 import { Popover, Space } from 'antd';
-import Image from 'next/image';
 import React, { useCallback } from 'react';
 
 interface Props {
@@ -72,7 +71,7 @@ const SidePanelUserAccount: React.FC<Props> = ({ userProfile }) => {
   return (
     <div className="w-full py-2 mb-4 flex justify-between items-center">
       <section className="flex gap-3 items-center">
-        <Image
+        <img
           src={userProfile?.profilePicUrl ?? ''}
           alt="user-dp"
           width={50}

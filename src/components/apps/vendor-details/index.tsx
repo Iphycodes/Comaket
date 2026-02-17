@@ -45,7 +45,6 @@ import {
   Vendor,
   VendorReview,
 } from '@grc/_shared/namespace/vendor';
-import Image from 'next/image';
 
 const { TextArea } = Input;
 
@@ -768,7 +767,7 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
         <div className={`${isMobile ? 'px-4' : ''} -mt-24 relative z-10`}>
           <div className="flex items-end justify-between gap-4">
             <div className="w-40 h-40 rounded-full border-4 border-white dark:border-gray-900 overflow-hidden shadow-lg bg-gray-200 dark:bg-gray-700 flex-shrink-0">
-              <Image
+              <img
                 src={vendor.profilePicUrl}
                 alt={vendor.businessName}
                 className="w-full h-full object-cover"

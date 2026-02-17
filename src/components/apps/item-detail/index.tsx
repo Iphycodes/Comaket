@@ -327,7 +327,7 @@ Price: ${formattedPrice}`;
                       }`}
                     >
                       {m.type === 'image' ? (
-                        <Image
+                        <img
                           src={m.url}
                           alt={`Thumb ${index + 1}`}
                           fill
@@ -336,7 +336,7 @@ Price: ${formattedPrice}`;
                       ) : (
                         <div className="relative w-full h-full bg-gray-900">
                           {m.thumbnail ? (
-                            <Image
+                            <img
                               src={m.thumbnail}
                               alt={`Video ${index + 1}`}
                               fill

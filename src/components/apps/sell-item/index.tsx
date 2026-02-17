@@ -1,11 +1,9 @@
-'use client';
-
 import React, { useEffect, useState, useCallback, useContext } from 'react';
 import { Modal, message, InputNumber, Select } from 'antd';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Plus, Search, X, ArrowLeft, Send } from 'lucide-react';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
-import SellItemModal from '../sell-item-modal';
+// import SellItemModal from '../sell-item-modal';
 import UpdateItemModal from '../update-item-modal';
 import DeleteConfirmModal from '../delete-confirm-modal';
 import TableSkeleton from '../../../_shared/components/table-skeleton';
@@ -208,7 +206,7 @@ const SellItem = () => {
 
   // Modals (desktop)
   // const [isSellItemModalOpen, setIsSellItemModalOpen] = useState(false);
-  const { isSellItemModalOpen, setIsSellItemModalOpen } = useContext(AppContext);
+  const { setIsSellItemModalOpen } = useContext(AppContext);
   const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [isCounterOfferModalOpen, setIsCounterOfferModalOpen] = useState(false);
@@ -628,11 +626,11 @@ const SellItem = () => {
       {/* ══════════════════════════════════════════════════════════════════ */}
 
       {/* Sell Item Modal */}
-      <SellItemModal
+      {/* <SellItemModal
         isSellItemModalOpen={isSellItemModalOpen}
         setIsSellItemModalOpen={setIsSellItemModalOpen}
         handleTrackStatus={handleTrackStatus}
-      />
+      /> */}
 
       {/* Update Item Modal — handles mobile/desktop rendering internally */}
       {selectedItem && (

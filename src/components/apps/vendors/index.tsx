@@ -18,7 +18,6 @@ import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness
 import { Vendor } from '@grc/_shared/namespace/vendor';
 import { mockVendors } from '@grc/_shared/constant';
 import { allVendorCategories, allVendorLocations } from '@grc/_shared/helpers';
-import Image from 'next/image';
 
 // ─── Twitter-style Verified Badge ─────────────────────────────────────────────
 
@@ -82,7 +81,7 @@ const VendorCard: React.FC<{
       {/* Top row: avatar + name + verified */}
       <div className="flex items-center gap-3">
         <div className="w-11 h-11 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700 flex-shrink-0">
-          <Image
+          <img
             src={vendor.profilePicUrl}
             alt={vendor.businessName}
             className="w-full h-full object-cover"

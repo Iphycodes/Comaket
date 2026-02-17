@@ -1,17 +1,19 @@
 'use client';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 import { AppContext } from '@grc/app-context';
-import SellItem from '@grc/components/apps/sell-item';
+import dynamic from 'next/dynamic';
 import React, { useContext } from 'react';
 
-interface SellItemPageProps {}
+const SellItem = dynamic(() => import('@grc/components/apps/sell-item'), { ssr: false });
 
-const SellItemPage = ({}: SellItemPageProps) => {
+const SellItemPage = () => {
   const isMobile = useMediaQuery(mediaSize.mobile);
   const { setIsSellItemModalOpen } = useContext(AppContext);
+
   if (isMobile) {
     setIsSellItemModalOpen(true);
   }
+
   return <SellItem />;
 };
 
