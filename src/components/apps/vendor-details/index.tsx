@@ -721,13 +721,32 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
             isBuyable={item?.isBuyable ?? false}
             listingType={item?.listingType ?? 'self-listing'}
           />
+          <ModernItemPost
+            postUserProfile={item?.postUserProfile ?? {}}
+            sponsored={item?.sponsored ?? false}
+            description={item?.description ?? ''}
+            media={item?.media ?? []}
+            askingPrice={item?.askingPrice ?? {}}
+            condition={item?.condition ?? 'Brand New'}
+            itemName={item?.itemName ?? ''}
+            comments={item?.comments ?? []}
+            productTags={item?.productTags ?? []}
+            id={item?.id ?? ''}
+            quantity={item?.quantity ?? 1}
+            setSelectedProductId={setSelectedProductId}
+            availability={item?.availability ?? true}
+            isBuyable={item?.isBuyable ?? false}
+            listingType={item?.listingType ?? 'self-listing'}
+          />
         </div>
       ))}
     </div>
   );
 
   return (
-    <div className={`dark:bg-gray-900/50 min-h-screen ${isMobile ? 'max-w-[100vw] mb-14' : ''}`}>
+    <div
+      className={`dark:bg-gray-900/50 min-h-screen ${isMobile ? 'max-w-[100vw] mb-14 pt-8' : ''}`}
+    >
       <div className={`w-full ${!isMobile ? 'max-w-4xl mx-auto px-4' : ''}`}>
         {/* ── Cover Image ──────────────────────────────────────────────── */}
         <div className="relative h-44 sm:h-56 bg-gradient-to-br from-gray-200 to-gray-100 dark:from-gray-800 dark:to-gray-900 overflow-hidden sm:rounded-b-2xl">
@@ -916,7 +935,11 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
         <div className={`mt-6 ${isMobile ? 'px-4' : ''} pb-10`}>
           <Tabs
             defaultActiveKey="products"
-            className="[&_.ant-tabs-nav]:!mb-4 [&_.ant-tabs-tab]:!text-sm [&_.ant-tabs-tab]:!font-medium [&_.ant-tabs-tab-active]:!font-semibold [&_.ant-tabs-ink-bar]:!bg-blue"
+            className={`[&_.ant-tabs-nav]:!mb-4 [&_.ant-tabs-tab]:!text-sm [&_.ant-tabs-tab]:!font-medium [&_.ant-tabs-tab-active]:!font-semibold [&_.ant-tabs-ink-bar]:!bg-blue [&_.ant-tabs-nav]:!px-4 ${
+              isMobile
+                ? '[&_.ant-tabs-nav-list]:!w-full [&_.ant-tabs-nav-list]:!justify-around [&_.ant-tabs-nav]:!sticky [&_.ant-tabs-nav]:!z-[100] [&_.ant-tabs-nav]:!top-[30px] [&_.ant-tabs-nav]:!bg-white [&_.ant-tabs-nav]:dark:!bg-gray-900'
+                : ''
+            }`}
             items={[
               // ─── Products Tab ──────────────────────────────────────
               {

@@ -502,37 +502,42 @@ const MobileOverlay: React.FC<MobileOverlayProps> = ({
   title,
   zIndex = 200,
   children,
-}) => (
-  <AnimatePresence>
-    {open && (
-      <motion.div
-        initial={{ opacity: 0, x: '100%' }}
-        animate={{ opacity: 1, x: 0 }}
-        exit={{ opacity: 0, x: '100%' }}
-        transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-        className="fixed inset-0 bg-white dark:bg-gray-900 flex flex-col overflow-hidden"
-        style={{ zIndex }}
-      >
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-800 flex-shrink-0 bg-white dark:bg-gray-900">
-          <button
-            onClick={onClose}
-            className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors"
-          >
-            <ArrowLeft size={18} />
-            <span className="font-medium">{title || 'Back'}</span>
-          </button>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-          >
-            <X size={16} className="text-gray-500" />
-          </button>
-        </div>
-        <div className="flex-1 overflow-y-auto">{children}</div>
-      </motion.div>
-    )}
-  </AnimatePresence>
-);
+}) => {
+  const isMobile = useMediaQuery(mediaSize.mobile);
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          initial={{ opacity: 0, x: '100%' }}
+          animate={{ opacity: 1, x: 0 }}
+          exit={{ opacity: 0, x: '100%' }}
+          transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+          className={`fixed inset-0 bg-white dark:bg-gray-900 flex flex-col overflow-hidden ${
+            isMobile ? 'pt-10' : ''
+          }`}
+          style={{ zIndex }}
+        >
+          <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-800 flex-shrink-0 bg-white dark:bg-gray-900">
+            <button
+              onClick={onClose}
+              className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors"
+            >
+              <ArrowLeft size={18} />
+              <span className="font-medium">{title || 'Back'}</span>
+            </button>
+            <button
+              onClick={onClose}
+              className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            >
+              <X size={16} className="text-gray-500" />
+            </button>
+          </div>
+          <div className="flex-1 overflow-y-auto">{children}</div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
 
 // ─── Order Detail View ────────────────────────────────────────────────────
 
@@ -743,7 +748,7 @@ const EditAboutForm: React.FC<EditAboutFormProps> = ({ profile, onSave, onCancel
   );
 
   return (
-    <div className="p-5 space-y-6">
+    <div className="p-5 space-y-6 pb-16">
       <div>
         <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">Edit Profile Info</h2>
         <p className="text-sm text-gray-400">Update your profile details visible to buyers</p>
@@ -1355,7 +1360,7 @@ const Profile = () => {
 
   return (
     <div
-      className={`dark:bg-gray-900/50 min-h-screen ${isMobile ? 'max-w-[100vw] mb-14 pt-4' : ''}`}
+      className={`dark:bg-gray-900/50 min-h-screen ${isMobile ? 'max-w-[100vw] mb-14 pt-8' : ''}`}
     >
       <div className={`w-full ${!isMobile ? 'mx-auto px-4' : ''}`}>
         {/* ── Cover Image ────────────────────────────────────────────── */}

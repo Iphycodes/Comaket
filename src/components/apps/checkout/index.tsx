@@ -294,36 +294,44 @@ const Checkout = () => {
 
   // ─── Main checkout flow ───────────────────────────────────────────
   return (
-    <div className={`min-h-screen ${isMobile ? 'px-3 pt-4 pb-24' : 'py-6'}`}>
+    <div className={`min-h-screen ${isMobile ? 'px-3 pb-24' : 'py-6'}`}>
       {/* Header */}
-      <div className="flex items-center gap-3 mb-6">
-        <motion.button
-          whileTap={{ scale: 0.9 }}
-          onClick={handleBack}
-          className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
-        >
-          <ArrowLeft size={20} />
-        </motion.button>
-        <div>
-          <h1 className="text-2xl font-bold dark:text-white">Checkout</h1>
-          <p className="text-sm text-gray-500 dark:text-gray-400">
-            {step === 'info' ? 'Step 1: Your Information' : 'Step 2: Review & Pay'}
-          </p>
-        </div>
-      </div>
+      <div
+        className={`sticky w-full top-0 items-center justify-between mb-6 bg-background py-4 border-b border-b-neutral-200 z-10 ${
+          isMobile ? 'pt-10' : ''
+        }`}
+      >
+        <div className="flex items-center gap-3 mb-6">
+          <motion.button
+            whileTap={{ scale: 0.9 }}
+            onClick={handleBack}
+            className="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+          >
+            <ArrowLeft size={20} />
+          </motion.button>
 
-      {/* Step indicator */}
-      <div className="flex items-center gap-2 mb-8">
-        <div
-          className={`flex-1 h-1.5 rounded-full transition-colors ${
-            step === 'info' || step === 'review' ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'
-          }`}
-        />
-        <div
-          className={`flex-1 h-1.5 rounded-full transition-colors ${
-            step === 'review' ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'
-          }`}
-        />
+          <div>
+            <h1 className="text-lg font-bold dark:text-white">Checkout</h1>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
+              {step === 'info' ? 'Step 1: Your Information' : 'Step 2: Review & Pay'}
+            </p>
+          </div>
+        </div>
+        {/* Step indicator */}
+        <div className="flex items-center gap-2">
+          <div
+            className={`flex-1 h-1.5 rounded-full transition-colors ${
+              step === 'info' || step === 'review'
+                ? 'bg-indigo-500'
+                : 'bg-gray-200 dark:bg-gray-700'
+            }`}
+          />
+          <div
+            className={`flex-1 h-1.5 rounded-full transition-colors ${
+              step === 'review' ? 'bg-indigo-500' : 'bg-gray-200 dark:bg-gray-700'
+            }`}
+          />
+        </div>
       </div>
 
       <div className={`flex ${isMobile ? 'flex-col' : 'gap-8'}`}>

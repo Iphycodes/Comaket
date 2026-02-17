@@ -224,13 +224,13 @@ Price: ${formattedPrice}`;
       exit={{ opacity: 0, y: 20 }}
       transition={{ duration: 0.3 }}
       className={`bg-white dark:bg-gray-800 ${
-        isMobile ? 'fixed inset-0 z-50 overflow-y-auto' : 'rounded-lg mt-10'
+        isMobile ? 'fixed inset-0 z-[100] overflow-y-auto' : 'rounded-lg mt-10'
       }`}
     >
       {/* ─── Sticky back header ─── */}
       <div
         className={`sticky top-0 left-0 w-full py-3 z-50 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-zinc-800 ${
-          isMobile ? 'px-3' : 'px-0'
+          isMobile ? 'px-3 pt-9' : 'px-0'
         }`}
       >
         <motion.button
