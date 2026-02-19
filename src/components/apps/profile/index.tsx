@@ -32,6 +32,7 @@ import {
   XCircle,
   Timer,
   Save,
+  Sparkles,
 } from 'lucide-react';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 import { mockMarketItems, Currencies } from '@grc/_shared/constant';
@@ -39,6 +40,7 @@ import { numberFormat } from '@grc/_shared/helpers';
 import { formatJoinDate, getRatingLabel, VendorReview } from '@grc/_shared/namespace/vendor';
 import SellItem from '../sell-item';
 import SavedItems from '../saved';
+import FeaturedWorks from '../featured-works';
 
 const { TextArea } = Input;
 
@@ -456,7 +458,7 @@ const orderStatusConfig: Record<
   },
   processing: {
     label: 'Processing',
-    color: 'text-blue dark:text-blue-400',
+    color: 'text-blue dark:text-blue',
     bg: 'bg-blue-50 dark:bg-blue-900/20',
     icon: <Package size={14} />,
   },
@@ -1497,6 +1499,24 @@ const Profile = () => {
             }`}
             items={[
               // ─── Products Tab ────────────────────────────────────
+              {
+                key: 'featured',
+                label: (
+                  <span className="flex items-center gap-1.5">
+                    {isMobile ? (
+                      <Tooltip title="Featured Works">
+                        <Sparkles size={20} />
+                      </Tooltip>
+                    ) : (
+                      <>
+                        <Sparkles size={15} />
+                        <span>Featured Works</span>
+                      </>
+                    )}
+                  </span>
+                ),
+                children: <FeaturedWorks />,
+              },
               {
                 key: 'products',
                 label: (

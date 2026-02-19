@@ -18,7 +18,7 @@ const VendorDetailPage = () => {
         <p className="text-gray-500 text-sm">Vendor not found</p>
         <button
           onClick={() => router.push('/vendors')}
-          className="text-sm text-blue-500 hover:text-blue-600 font-medium"
+          className="text-sm text-blue hover:text-blue font-medium"
         >
           Back to Vendors
         </button>
