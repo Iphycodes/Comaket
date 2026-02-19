@@ -1,11 +1,25 @@
 'use client';
-
 import React from 'react';
-import Profile from '@grc/components/apps/profile';
-import BasicProfile from '@grc/components/apps/basic-profile';
+import dynamic from 'next/dynamic';
+
+const Profile = dynamic(() => import('@grc/components/apps/profile'), {
+  ssr: false,
+  loading: () => (
+    <div className="min-h-[80vh] flex items-center justify-center">
+      <p className="text-gray-400">Loading profile...</p>
+    </div>
+  ),
+});
+const BasicProfile = dynamic(() => import('@grc/components/apps/basic-profile'), {
+  ssr: false,
+  loading: () => (
+    <div className="min-h-[80vh] flex items-center justify-center">
+      <p className="text-gray-400">Loading profile...</p>
+    </div>
+  ),
+});
 
 const ProfilePage = () => {
-  // Toggle this to switch between creator and basic user profiles
   const isCreatorAccount = false;
 
   if (isCreatorAccount) {
