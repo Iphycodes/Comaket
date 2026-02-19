@@ -287,3 +287,12 @@ export const allVendorCategories: string[] = Array.from(
 export const allVendorLocations: string[] = Array.from(
   new Set(mockVendors.map((v) => v.location))
 ).sort();
+
+export const fetchData = async (url: string): Promise<any> => {
+  const response = await fetch(url, {
+    headers: { 'X-CSCAPI-KEY': process.env.NEXT_PUBLIC_COUNTRY_API_KEY as string },
+    method: 'GET',
+  });
+  if (!response.ok) throw new Error('Failed to fetch data');
+  return await response.json();
+};
