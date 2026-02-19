@@ -167,7 +167,7 @@ const StoreCard: React.FC<{
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05, duration: 0.3 }}
-      className="group bg-white dark:bg-gray-800/80 rounded-xl border border-gray-200 dark:border-gray-700/60 p-4 cursor-pointer hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-md transition-all duration-200"
+      className="group bg-white dark:bg-gray-800/80 rounded-xl border border-gray-200 dark:border-gray-700/60 p-4 cursor-pointer hover:border-blue dark:hover:border-blue hover:shadow-md transition-all duration-200"
     >
       {/* Top row */}
       <div className="flex items-center gap-3">
@@ -251,7 +251,7 @@ const StoreCard: React.FC<{
 
         <ChevronRight
           size={16}
-          className="ml-auto text-gray-300 dark:text-gray-600 group-hover:text-blue-400 transition-colors flex-shrink-0"
+          className="ml-auto text-gray-300 dark:text-gray-600 group-hover:text-blue transition-colors flex-shrink-0"
         />
       </div>
 

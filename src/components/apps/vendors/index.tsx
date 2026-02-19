@@ -76,7 +76,7 @@ const VendorCard: React.FC<{
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.04, duration: 0.3 }}
       onClick={() => onSelect(vendor.id)}
-      className="group bg-white dark:bg-gray-800/80 rounded-xl border border-gray-200 dark:border-gray-700/60 p-4 cursor-pointer hover:border-blue-300 dark:hover:border-blue-700 hover:shadow-md transition-all duration-200"
+      className="group bg-white dark:bg-gray-800/80 rounded-xl border border-gray-200 dark:border-gray-700/60 p-4 cursor-pointer hover:border-blue dark:hover:border-blue hover:shadow-md transition-all duration-200"
     >
       {/* Top row: avatar + name + verified */}
       <div className="flex items-center gap-3">
@@ -101,7 +101,7 @@ const VendorCard: React.FC<{
         </div>
         <ChevronRight
           size={16}
-          className="text-gray-300 dark:text-gray-600 group-hover:text-blue-400 transition-colors flex-shrink-0"
+          className="text-gray-300 dark:text-gray-600 group-hover:text-blue transition-colors flex-shrink-0"
         />
       </div>
 
@@ -228,7 +228,7 @@ const Vendors: React.FC<Props> = ({ onSelectVendor }) => {
               <div className="flex items-center justify-between">
                 <div>
                   <h1 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                    <Users size={22} className="text-blue-500" />
+                    <Users size={22} className="text-blue" />
                     Vendors
                   </h1>
                   <p className="text-xs text-gray-400 mt-1">
@@ -251,7 +251,7 @@ const Vendors: React.FC<Props> = ({ onSelectVendor }) => {
                 placeholder="Search vendors by name, category..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
-                className="!w-full h-11 pl-10 pr-4 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue-500/20 focus:border-blue-400 outline-none transition-all"
+                className="!w-full h-11 pl-10 pr-4 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue/20 focus:border-blue outline-none transition-all"
               />
             </div>
 
@@ -283,7 +283,7 @@ const Vendors: React.FC<Props> = ({ onSelectVendor }) => {
                 onClick={() => setFilterVerified(!filterVerified)}
                 className={`flex items-center gap-1.5 px-3 h-9 text-xs font-medium rounded-lg border transition-all ${
                   filterVerified
-                    ? 'bg-blue-50 dark:bg-blue-900/20 border-blue-400 dark:border-blue-600 text-blue-600 dark:text-blue-400'
+                    ? 'bg-blue-50 dark:bg-blue-900/20 border-blue dark:border-blue text-blue dark:text-blue'
                     : 'bg-white dark:bg-gray-800 border-gray-200 dark:border-gray-700 text-gray-500 hover:border-gray-300'
                 }`}
               >
@@ -347,7 +347,7 @@ const Vendors: React.FC<Props> = ({ onSelectVendor }) => {
                 {hasActiveFilters && (
                   <button
                     onClick={clearAllFilters}
-                    className="mt-4 text-sm text-blue-500 hover:text-blue-600 font-medium"
+                    className="mt-4 text-sm text-blue hover:text-blue font-medium"
                   >
                     Clear all filters
                   </button>

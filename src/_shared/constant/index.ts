@@ -973,3 +973,260 @@ export const mockSellItems: SellItemType[] = [
     bookMarks: [],
   },
 ];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CREATOR INDUSTRIES — Physical product creation categories
+// ═══════════════════════════════════════════════════════════════════════════
+
+export interface CreatorIndustry {
+  id: string;
+  label: string;
+  description: string;
+  icon: string; // Remix icon class
+  color: string; // Tailwind gradient from
+}
+
+export const CREATOR_INDUSTRIES: CreatorIndustry[] = [
+  {
+    id: 'fashion',
+    label: 'Fashion & Apparel',
+    description: 'Clothing, shoes, bags, and wearable accessories',
+    icon: 'ri-t-shirt-2-line',
+    color: 'from-green-500 to-green-500',
+  },
+  {
+    id: 'jewelry',
+    label: 'Jewelry & Accessories',
+    description: 'Rings, necklaces, bracelets, earrings, and body jewelry',
+    icon: 'ri-vip-diamond-line',
+    color: 'from-indigo-500 to-purple-500',
+  },
+  {
+    id: 'art',
+    label: 'Art & Illustration',
+    description: 'Paintings, prints, sculptures, and mixed media artwork',
+    icon: 'ri-palette-line',
+    color: 'from-orange-500 to-amber-500',
+  },
+  {
+    id: 'fragrance',
+    label: 'Fragrance & Perfumery',
+    description: 'Perfumes, colognes, essential oils, and scented products',
+    icon: 'ri-flask-line',
+    color: 'from-green-500 to-teal-600',
+  },
+  {
+    id: 'skincare',
+    label: 'Skincare & Beauty',
+    description: 'Soaps, creams, serums, makeup, and beauty products',
+    icon: 'ri-heart-pulse-line',
+    color: 'from-rose-500 to-pink-500',
+  },
+  {
+    id: 'haircare',
+    label: 'Hair & Hair Accessories',
+    description: 'Wigs, extensions, hair products, and styling accessories',
+    icon: 'ri-scissors-2-line',
+    color: 'from-orange-500 to-amber-500',
+  },
+  {
+    id: 'leather',
+    label: 'Leather & Crafted Goods',
+    description: 'Wallets, belts, bags, and handcrafted leather items',
+    icon: 'ri-briefcase-4-line',
+    color: 'from-green-500 to-green-500',
+  },
+  {
+    id: 'woodwork',
+    label: 'Woodwork & Carpentry',
+    description: 'Furniture, carvings, decor, and custom wood pieces',
+    icon: 'ri-hammer-line',
+    color: 'from-indigo-500 to-purple-500',
+  },
+  {
+    id: 'ceramics',
+    label: 'Ceramics & Pottery',
+    description: 'Vases, bowls, mugs, tiles, and sculptural ceramics',
+    icon: 'ri-goblet-line',
+    color: 'from-orange-500 to-amber-500',
+  },
+  {
+    id: 'textiles',
+    label: 'Textiles & Fabrics',
+    description: 'Ankara, adire, kente, custom prints, and woven fabrics',
+    icon: 'ri-layout-masonry-line',
+    color: 'from-emerald-500 to-green-500',
+  },
+  {
+    id: 'food',
+    label: 'Food & Beverages',
+    description: 'Baked goods, snacks, sauces, drinks, and packaged foods',
+    icon: 'ri-cake-3-line',
+    color: 'from-orange-500 to-orange-500',
+  },
+  {
+    id: 'candles',
+    label: 'Candles & Home Scents',
+    description: 'Scented candles, diffusers, incense, and wax melts',
+    icon: 'ri-fire-line',
+    color: 'from-green-500 to-green-500',
+  },
+  {
+    id: 'home-decor',
+    label: 'Home Decor & Interiors',
+    description: 'Wall art, planters, pillows, rugs, and decorative items',
+    icon: 'ri-home-smile-2-line',
+    color: 'from-indigo-500 to-purple-500',
+  },
+  {
+    id: 'stationery',
+    label: 'Stationery & Paper Crafts',
+    description: 'Journals, cards, prints, packaging, and paper goods',
+    icon: 'ri-book-open-line',
+    color: 'from-rose-500 to-pink-500',
+  },
+  {
+    id: 'toys',
+    label: 'Toys & Kids Products',
+    description: "Plush toys, puzzles, baby items, and children's crafts",
+    icon: 'ri-bear-smile-line',
+    color: 'from-orange-500 to-amber-500',
+  },
+  {
+    id: 'metalwork',
+    label: 'Metalwork & Smithing',
+    description: 'Iron works, brass items, knives, and metal sculptures',
+    icon: 'ri-tools-line',
+    color: 'from-indigo-500 to-purple-500',
+  },
+  {
+    id: 'beadwork',
+    label: 'Beadwork & Weaving',
+    description: 'Bead jewelry, baskets, mats, and woven accessories',
+    icon: 'ri-rainbow-line',
+    color: 'from-green-500 to-green-500',
+  },
+  {
+    id: 'photography',
+    label: 'Photography & Prints',
+    description: 'Photo prints, frames, albums, and visual art products',
+    icon: 'ri-camera-lens-line',
+    color: 'from-indigo-500 to-purple-500',
+  },
+  {
+    id: 'fitness',
+    label: 'Fitness & Wellness',
+    description: 'Workout gear, supplements, yoga mats, and wellness tools',
+    icon: 'ri-boxing-line',
+    color: 'from-rose-500 to-pink-500',
+  },
+  {
+    id: 'tech-accessories',
+    label: 'Tech & Gadget Accessories',
+    description: 'Phone cases, cable organizers, stands, and custom tech gear',
+    icon: 'ri-smartphone-line',
+    color: 'from-orange-500 to-amber-500',
+  },
+  {
+    id: 'pet-products',
+    label: 'Pet Products',
+    description: 'Collars, beds, treats, toys, and pet accessories',
+    icon: 'ri-empathize-line',
+    color: 'from-green-500 to-teal-600',
+  },
+  {
+    id: 'automotive',
+    label: 'Automotive Accessories',
+    description: 'Custom car parts, seat covers, air fresheners, and mods',
+    icon: 'ri-steering-2-line',
+    color: 'from-indigo-500 to-purple-500',
+  },
+  {
+    id: 'musical',
+    label: 'Musical Instruments & Gear',
+    description: 'Handmade drums, guitars, shakers, and instrument accessories',
+    icon: 'ri-music-2-line',
+    color: 'from-green-500 to-green-500',
+  },
+  {
+    id: 'other',
+    label: 'Other',
+    description: "Something unique that doesn't fit the categories above",
+    icon: 'ri-sparkling-2-line',
+    color: 'from-indigo-500 to-purple-500',
+  },
+];
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CREATOR PLANS
+// ═══════════════════════════════════════════════════════════════════════════
+
+export interface CreatorPlan {
+  id: string;
+  name: string;
+  price: number; // monthly in naira, 0 = free
+  priceLabel: string;
+  description: string;
+  badge?: string;
+  features: string[];
+  limits: string[];
+  highlighted: boolean;
+}
+
+export const CREATOR_PLANS: CreatorPlan[] = [
+  {
+    id: 'starter',
+    name: 'Starter',
+    price: 0,
+    priceLabel: 'Free',
+    description: 'Get started and test the waters — no commitments.',
+    features: [
+      'Up to 10 product listings',
+      'Basic store profile',
+      'WhatsApp integration',
+      'Access to marketplace',
+      'Standard support',
+    ],
+    limits: ['5% transaction fee', 'No featured works', 'No analytics'],
+    highlighted: false,
+  },
+  {
+    id: 'pro',
+    name: 'Pro',
+    price: 300000, // ₦3,000 in kobo
+    priceLabel: '₦3,000/mo',
+    description: 'For serious creators ready to grow their brand.',
+    badge: 'Most Popular',
+    features: [
+      'Unlimited product listings',
+      'Featured Works showcase',
+      'Seller analytics & insights',
+      'Verified badge eligibility',
+      'Priority in search results',
+      'Custom store branding',
+      'Priority support',
+    ],
+    limits: ['3% transaction fee'],
+    highlighted: true,
+  },
+  {
+    id: 'business',
+    name: 'Business',
+    price: 800000, // ₦8,000 in kobo
+    priceLabel: '₦8,000/mo',
+    description: 'For established brands and high-volume sellers.',
+    badge: 'Best Value',
+    features: [
+      'Everything in Pro',
+      'Multiple store support',
+      'Bulk listing tools',
+      'Dedicated account manager',
+      'API access',
+      'Custom domain support',
+      'Super Verified badge',
+      'Featured homepage placement',
+    ],
+    limits: ['1.5% transaction fee'],
+    highlighted: false,
+  },
+];

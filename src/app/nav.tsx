@@ -4,7 +4,7 @@ import { SiderTheme } from 'antd/es/layout/Sider';
 import { NavItem, getFirstCharacter, getRandomColorByString } from '@grc/_shared/helpers';
 import { isEmpty } from 'lodash';
 import { Avatar } from 'antd';
-import { Bookmark, HeartSearch, MoneyChange, Notification, ShopRemove, Bag } from 'iconsax-react';
+import { Bookmark, HeartSearch, MoneyChange, ShopRemove, Bag } from 'iconsax-react';
 import {
   HandCoins,
   ShoppingBag,
@@ -120,18 +120,18 @@ const menuItems: NavItem[] = [
     destination: '/vendors',
     icon: <HeartSearch variant="Bulk" color="#22c55e" />,
   },
-  {
-    label: 'Notifications',
-    key: 'notifications',
-    destination: '',
-    icon: <Notification variant="Bulk" color="#1e88e5" />,
-  },
-  {
-    label: 'Saved',
-    key: 'saved',
-    destination: '/saved',
-    icon: <Bookmark variant="Bulk" color="#ec4899" />,
-  },
+  // {
+  //   label: 'Notifications',
+  //   key: 'notifications',
+  //   destination: '',
+  //   icon: <Notification variant="Bulk" color="#1e88e5" />,
+  // },
+  // {
+  //   label: 'Saved',
+  //   key: 'saved',
+  //   destination: '/saved',
+  //   icon: <Bookmark variant="Bulk" color="#ec4899" />,
+  // },
   {
     label: 'Sell Item',
     key: 'sell-item',

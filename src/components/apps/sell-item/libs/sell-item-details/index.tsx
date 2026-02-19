@@ -55,39 +55,46 @@ interface MobileFullScreenProps {
   children: React.ReactNode;
 }
 
-const MobileFullScreen: React.FC<MobileFullScreenProps> = ({ open, onClose, title, children }) => (
-  <AnimatePresence>
-    {open && (
-      <motion.div
-        initial={{ opacity: 0, y: '100%' }}
-        animate={{ opacity: 1, y: 0 }}
-        exit={{ opacity: 0, y: '100%' }}
-        transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-        className="fixed inset-0 z-[9999] bg-white dark:bg-gray-900 flex flex-col overflow-hidden"
-      >
-        {/* Header */}
-        <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-800 flex-shrink-0">
-          <button
-            onClick={onClose}
-            className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors"
+const MobileFullScreen: React.FC<MobileFullScreenProps> = ({ open, onClose, title, children }) => {
+  const isMobile = useMediaQuery(mediaSize.mobile);
+  return (
+    <AnimatePresence>
+      {open && (
+        <motion.div
+          initial={{ opacity: 0, y: '100%' }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: '100%' }}
+          transition={{ type: 'spring', damping: 28, stiffness: 300 }}
+          className="fixed inset-0 z-[9999] bg-white dark:bg-gray-900 flex flex-col overflow-hidden"
+        >
+          {/* Header — outside scroll area, always pinned */}
+          <div
+            className={`flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-800 flex-shrink-0 ${
+              isMobile ? 'pt-10' : ''
+            }`}
           >
-            <ArrowLeft size={18} />
-            {title || 'Back'}
-          </button>
-          <button
-            onClick={onClose}
-            className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
-          >
-            <X size={16} className="text-gray-500" />
-          </button>
-        </div>
+            <button
+              onClick={onClose}
+              className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors"
+            >
+              <ArrowLeft size={18} />
+              <span className="font-medium">{title || 'Back'}</span>
+            </button>
+            <button
+              onClick={onClose}
+              className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+            >
+              <X size={16} className="text-gray-500" />
+            </button>
+          </div>
 
-        {/* Content */}
-        <div className="flex-1 overflow-y-auto">{children}</div>
-      </motion.div>
-    )}
-  </AnimatePresence>
-);
+          {/* Content — scrolls independently */}
+          <div className="flex-1 overflow-y-auto">{children}</div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+};
 
 // ─── Media Lightbox (Desktop Modal) ───────────────────────────────────────────
 
@@ -348,7 +355,7 @@ const CounterOfferView: React.FC<CounterOfferViewProps> = ({ item, onSubmit }) =
   };
 
   return (
-    <div className="p-5 space-y-6">
+    <div className="pt-10 p-2 space-y-6">
       {/* Header info */}
       <div>
         <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">Counter Offer</h2>
@@ -567,10 +574,14 @@ const SellItemDetail: React.FC<Props> = ({
   return (
     <div className="max-w-3xl mx-auto relative py-0">
       {/* ── Sticky back button ───────────────────────────────────────────── */}
-      <div className="sticky top-0 z-10 bg-white dark:bg-gray-900 pb-3 pt-1 -mx-1 px-1">
+      <div
+        className={`sticky w-full top-0 z-10 bg-white dark:bg-gray-900 pb-3 pt-1 -mx-1 px-1 ${
+          isMobile ? 'pt-9' : ''
+        }`}
+      >
         <button
           onClick={onBack}
-          className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors group"
+          className="flex w-full items-center gap-2 text-sm text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors group"
         >
           <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
           Back to Products
