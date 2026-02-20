@@ -54,6 +54,7 @@ interface AppContextPropType {
     email: string;
     password: string;
   }) => void;
+  handleGoogleSignIn: () => void;
   payoutDetails: Record<string, any>;
   setPayoutdetails: Dispatch<SetStateAction<Record<string, any>>>;
   selectedDashboardTransaction: Record<string, any>;
@@ -100,6 +101,7 @@ export const AppContext = createContext<AppContextPropType>({
   setIsAuthModalOpen: () => {},
   handleLogin: () => {},
   handleSignup: () => {},
+  handleGoogleSignIn: () => {},
   payoutDetails: {},
   setPayoutdetails: () => {},
   selectedDashboardTransaction: {},
@@ -217,6 +219,28 @@ export const AppProvider = (props: AppProviderPropType) => {
     []
   );
 
+  const handleGoogleSignIn = useCallback(() => {
+    // ── TODO: Replace with real Google OAuth flow ─────────────────────
+    // Option A: Redirect-based
+    // window.location.href = '/api/auth/google';
+    //
+    // Option B: Popup-based with @react-oauth/google
+    // const { credential } = await googleLogin();
+    // const res = await fetch('/api/auth/google', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({ idToken: credential }),
+    // });
+    // const result = await res.json();
+    // if (result.success) {
+    //   setAuthData(result.authData);
+    //   setIsAuthModalOpen(false);
+    // }
+    // ──────────────────────────────────────────────────────────────────
+    console.log('Google Sign-In triggered');
+    setIsAuthModalOpen(false);
+  }, []);
+
   // ── Cart helpers ──────────────────────────────────────────────────────
 
   const addToCart = (id: string | number) => {
@@ -316,6 +340,7 @@ export const AppProvider = (props: AppProviderPropType) => {
     setIsAuthModalOpen,
     handleLogin,
     handleSignup,
+    handleGoogleSignIn,
     shopItems,
     setShopItems,
     cartItems,

@@ -40,6 +40,7 @@ const AppBaseLayout: React.FC<AppBaseLayoutProps> = ({ children }) => {
     setIsAuthModalOpen,
     handleLogin,
     handleSignup,
+    handleGoogleSignIn,
   } = useContext(AppContext);
   const [selectedKey, setSelectedKey] = useState('');
   const path = usePathname();
@@ -92,6 +93,7 @@ const AppBaseLayout: React.FC<AppBaseLayoutProps> = ({ children }) => {
         initialView="login"
         onLogin={handleLogin}
         onSignup={handleSignup}
+        onGoogleSignIn={handleGoogleSignIn}
       />
 
       <Layout
