@@ -1,47 +1,39 @@
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
-import { AuthModal } from '@grc/components/apps/auth-modal';
-import { LogOut } from 'lucide-react';
-import React, { useState } from 'react';
+import { AppContext } from '@grc/app-context';
+import { LogIn, LogOut } from 'lucide-react';
+import React, { useContext, useState } from 'react';
 
 interface SideNavAuthButtonProps {}
 
 const SideNavAuthButton = ({}: SideNavAuthButtonProps) => {
-  const [isAuthenticated] = useState<boolean>(true);
+  // ── TODO: Replace with real auth state from context ─────────────────
+  const [isAuthenticated] = useState<boolean>(false);
 
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-
+  const { setIsAuthModalOpen } = useContext(AppContext);
   const isMobile = useMediaQuery(mediaSize.mobile);
 
-  if (isAuthenticated) {
+  if (!isAuthenticated) {
     return (
-      //   <Button
-      //     type="primary"
-      //     className="flex px-8 items-center justify-center bg-blue !h-10 gap-3"
-      //   >
-      //     <LogIn size={16} />
-      //     Sign In
-      //   </Button>
-      <>
-        <span
-          onClick={() => setIsAuthModalOpen(true)}
-          className={`flex items-center gap-2 px-3 rounded-md py-1 ${
-            isMobile ? 'text-sm' : ''
-          } bg-indigo-100 text-blue`}
-        >
-          <LogOut size={isMobile ? 16 : 16} />
-          Sign In
-        </span>
-        <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
-      </>
+      <span
+        onClick={() => setIsAuthModalOpen(true)}
+        className={`flex items-center gap-2 px-3 rounded-md py-1 ${
+          isMobile ? 'text-sm' : ''
+        } bg-indigo-100 dark:bg-indigo-900/30 text-blue-600 dark:text-blue-400 cursor-pointer hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition-colors`}
+      >
+        <LogIn size={16} />
+        Sign In
+      </span>
     );
   }
 
   return (
     <span
       onClick={() => console.log('logout')}
-      className={`flex items-center gap-2 py-1 ${isMobile ? 'text-sm' : ''} text-red-500`}
+      className={`flex items-center gap-2 py-1 ${
+        isMobile ? 'text-sm' : ''
+      } text-red-500 cursor-pointer`}
     >
-      <LogOut size={isMobile ? 16 : 16} />
+      <LogOut size={16} />
       Logout
     </span>
   );

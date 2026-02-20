@@ -12,11 +12,11 @@ import MobileNav from '@grc/components/apps/layout/mobile-nav';
 import { usePathname } from 'next/navigation';
 import SellItemModal from '@grc/components/apps/sell-item-modal';
 import MobileTopBar from '@grc/components/apps/layout/mobile-top-bar';
+import AuthModal from '@grc/components/apps/auth-modal';
 
 const { Content } = Layout;
 
 interface AppBaseLayoutProps {
-  // Add your prop types here
   children?: ReactElement | ReactElement[];
 }
 
@@ -35,6 +35,11 @@ const AppBaseLayout: React.FC<AppBaseLayoutProps> = ({ children }) => {
     isSellItemModalOpen,
     isChatsModalOpen,
     setIsChatsModalOpen,
+    // Auth modal
+    isAuthModalOpen,
+    setIsAuthModalOpen,
+    handleLogin,
+    handleSignup,
   } = useContext(AppContext);
   const [selectedKey, setSelectedKey] = useState('');
   const path = usePathname();
@@ -74,14 +79,19 @@ const AppBaseLayout: React.FC<AppBaseLayoutProps> = ({ children }) => {
         isCreateStoreModalOpen={isCreateStoreModalOpen}
         setIsCreateStoreModalOpen={setIsCreateStoreModalOpen}
       />
-      {/* <SellItemModal
-        isSellItemModalOpen={isSellItemModalOpen}
-        setIsSellItemModalOpen={setIsSellItemModalOpen}
-      /> */}
       <ChatsModal
         setSelectedKey={setSelectedKey}
         isChatsModalOpen={isChatsModalOpen}
         setIsChatsModalOpen={setIsChatsModalOpen}
+      />
+
+      {/* Auth Modal */}
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        initialView="login"
+        onLogin={handleLogin}
+        onSignup={handleSignup}
       />
 
       <Layout
@@ -89,8 +99,6 @@ const AppBaseLayout: React.FC<AppBaseLayoutProps> = ({ children }) => {
         style={{
           marginLeft: `${mobileResponsive ? 0 : tabletResponsive ? 0 : '300px'}`,
           transition: 'margin-left 0.3s ease',
-          // Add padding bottom for mobile to account for bottom navigation
-          // paddingBottom: mobileResponsive ? '0' : '0',
         }}
         onClick={handleLayoutBodyClick}
       >
@@ -108,13 +116,8 @@ const AppBaseLayout: React.FC<AppBaseLayoutProps> = ({ children }) => {
             {mobileResponsive && (
               <MobileTopBar setIsCreateStoreModalOpen={setIsCreateStoreModalOpen} />
             )}
-            <div className={`${mobileResponsive ? '' : ''}`}>{children}</div>
+            <div>{children}</div>
           </div>
-          {/* {!mobileResponsive && (
-            <Footer className="shadow-sm border-t border-border/100 bg-background/95 backdrop-blur supports-[backdrop-filter]:bg-background/60 dark:text-white">
-              Footer
-            </Footer>
-          )} */}
         </Content>
       </Layout>
 

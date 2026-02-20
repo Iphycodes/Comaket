@@ -44,6 +44,16 @@ interface AppContextPropType {
   setIsSellItemModalOpen: Dispatch<SetStateAction<boolean>>;
   isChatsModalOpen: boolean;
   setIsChatsModalOpen: Dispatch<SetStateAction<boolean>>;
+  // Auth modal
+  isAuthModalOpen: boolean;
+  setIsAuthModalOpen: Dispatch<SetStateAction<boolean>>;
+  handleLogin: (data: { email: string; password: string }) => void;
+  handleSignup: (data: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+  }) => void;
   payoutDetails: Record<string, any>;
   setPayoutdetails: Dispatch<SetStateAction<Record<string, any>>>;
   selectedDashboardTransaction: Record<string, any>;
@@ -85,6 +95,11 @@ export const AppContext = createContext<AppContextPropType>({
   setIsSellItemModalOpen: () => {},
   isChatsModalOpen: false,
   setIsChatsModalOpen: () => {},
+  // Auth modal
+  isAuthModalOpen: false,
+  setIsAuthModalOpen: () => {},
+  handleLogin: () => {},
+  handleSignup: () => {},
   payoutDetails: {},
   setPayoutdetails: () => {},
   selectedDashboardTransaction: {},
@@ -141,6 +156,9 @@ export const AppProvider = (props: AppProviderPropType) => {
   const [isSellItemModalOpen, setIsSellItemModalOpen] = useState(false);
   const [isChatsModalOpen, setIsChatsModalOpen] = useState(false);
 
+  // Auth modal
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
   // Shop items — initialised with mock data, will be replaced by API
   const [shopItems, setShopItems] = useState<MarketItem[]>(mockMarketItems);
 
@@ -159,6 +177,45 @@ export const AppProvider = (props: AppProviderPropType) => {
   useEffect(() => {
     isMobile && setToggleSider(true);
   }, [isMobile]);
+
+  // ── Auth handlers ─────────────────────────────────────────────────────
+
+  const handleLogin = useCallback((data: { email: string; password: string }) => {
+    // ── TODO: Replace with real API call ───────────────────────────
+    // const res = await fetch('/api/auth/login', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify(data),
+    // });
+    // const result = await res.json();
+    // if (result.success) {
+    //   setAuthData(result.authData);
+    //   setIsAuthModalOpen(false);
+    // }
+    // ──────────────────────────────────────────────────────────────
+    console.log('Login payload:', data);
+    setIsAuthModalOpen(false);
+  }, []);
+
+  const handleSignup = useCallback(
+    (data: { firstName: string; lastName: string; email: string; password: string }) => {
+      // ── TODO: Replace with real API call ───────────────────────────
+      // const res = await fetch('/api/auth/signup', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify(data),
+      // });
+      // const result = await res.json();
+      // if (result.success) {
+      //   setAuthData(result.authData);
+      //   setIsAuthModalOpen(false);
+      // }
+      // ──────────────────────────────────────────────────────────────
+      console.log('Signup payload:', data);
+      setIsAuthModalOpen(false);
+    },
+    []
+  );
 
   // ── Cart helpers ──────────────────────────────────────────────────────
 
@@ -254,6 +311,11 @@ export const AppProvider = (props: AppProviderPropType) => {
     setIsSellItemModalOpen,
     isChatsModalOpen,
     setIsChatsModalOpen,
+    // Auth modal
+    isAuthModalOpen,
+    setIsAuthModalOpen,
+    handleLogin,
+    handleSignup,
     shopItems,
     setShopItems,
     cartItems,
