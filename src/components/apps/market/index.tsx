@@ -105,8 +105,8 @@ const Market: React.FC<MarketProps> = ({
   isInCart,
   isSaved,
   cartItems,
-  isAddingToCart,
-  isTogglingSave,
+  // isAddingToCart,
+  // isTogglingSave,
 }) => {
   // ── Category navigation data ──
   // Use backend category tree if available, otherwise fall back to CREATOR_INDUSTRIES
@@ -621,8 +621,8 @@ const Market: React.FC<MarketProps> = ({
                 ci.id === selectedProduct.id?.toString()
             )?.quantity || 0
           }
-          isAddingToCart={isAddingToCart}
-          isTogglingSave={isTogglingSave}
+          // isAddingToCart={isAddingToCart}
+          // isTogglingSave={isTogglingSave}
           onAddToCart={() => onAddToCart(selectedProduct)}
           onBuyNow={() => onBuyNow(selectedProduct)}
           onToggleSave={() => onToggleSave(selectedProduct)}
