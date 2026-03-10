@@ -13,7 +13,7 @@ const LeftDrawer: React.FC<LeftDrawerProps> = ({}) => {
     <Sider
       collapsed={true}
       collapsedWidth={0}
-      className="dash-sider rounded-r-2xl border-r border-r-gray-200 rounded-br-3xl p-0 text-lg shadow-2xl shadow-gray-400"
+      className="dash-sider rounded-r-2xl border-r border-r-neutral-200 rounded-br-3xl p-0 text-lg shadow-2xl shadow-neutral-400"
       width={400}
       style={{
         overflow: 'auto',

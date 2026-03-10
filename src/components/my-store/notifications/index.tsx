@@ -113,8 +113,8 @@ const typeConfig: Record<
   },
   system: {
     icon: Info,
-    color: 'text-gray-600 dark:text-gray-400',
-    bg: 'bg-gray-100 dark:bg-gray-700/40',
+    color: 'text-neutral-600 dark:text-neutral-400',
+    bg: 'bg-neutral-100 dark:bg-neutral-700/40',
     label: 'System',
   },
   promotion: {
@@ -375,9 +375,9 @@ const NotificationDetail: React.FC<{
       <div className="flex items-start gap-3">
         <button
           onClick={onBack}
-          className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors mt-0.5"
+          className="p-1.5 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors mt-0.5"
         >
-          <ArrowLeft size={18} className="text-gray-500" />
+          <ArrowLeft size={18} className="text-neutral-500" />
         </button>
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-2 flex-wrap">
@@ -388,29 +388,33 @@ const NotificationDetail: React.FC<{
             </span>
             {!n.read && <span className="w-2 h-2 rounded-full bg-blue flex-shrink-0" />}
           </div>
-          <h2 className="text-lg font-bold text-gray-900 dark:text-white mt-1.5">{n.title}</h2>
-          <p className="text-xs text-gray-400 mt-0.5">{formatFullDate(n.timestamp)}</p>
+          <h2 className="text-lg font-bold text-neutral-900 dark:text-white mt-1.5">{n.title}</h2>
+          <p className="text-xs text-neutral-400 mt-0.5">{formatFullDate(n.timestamp)}</p>
         </div>
       </div>
 
       {/* Body */}
-      <div className="bg-white dark:bg-gray-800/60 rounded-xl p-5 border border-gray-100 dark:border-gray-700/50">
-        <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">{n.message}</p>
+      <div className="bg-white dark:bg-neutral-800/60 rounded-xl p-5 border border-neutral-100 dark:border-neutral-700/50">
+        <p className="text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed">
+          {n.message}
+        </p>
       </div>
 
       {/* Metadata table */}
       {n.meta && Object.keys(n.meta).length > 0 && (
-        <div className="bg-white dark:bg-gray-800/60 rounded-xl border border-gray-100 dark:border-gray-700/50 overflow-hidden">
-          <div className="px-5 py-3 border-b border-gray-100 dark:border-gray-700/50">
-            <h4 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+        <div className="bg-white dark:bg-neutral-800/60 rounded-xl border border-neutral-100 dark:border-neutral-700/50 overflow-hidden">
+          <div className="px-5 py-3 border-b border-neutral-100 dark:border-neutral-700/50">
+            <h4 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">
               Details
             </h4>
           </div>
-          <div className="divide-y divide-gray-50 dark:divide-gray-700/30">
+          <div className="divide-y divide-neutral-50 dark:divide-neutral-700/30">
             {Object.entries(n.meta).map(([key, value]) => (
               <div key={key} className="flex items-center justify-between px-5 py-3">
-                <span className="text-xs text-gray-500">{key}</span>
-                <span className="text-xs font-semibold text-gray-900 dark:text-white">{value}</span>
+                <span className="text-xs text-neutral-500">{key}</span>
+                <span className="text-xs font-semibold text-neutral-900 dark:text-white">
+                  {value}
+                </span>
               </div>
             ))}
           </div>
@@ -431,7 +435,7 @@ const NotificationDetail: React.FC<{
         <div className="flex gap-2">
           <button
             onClick={() => onToggleRead(n.id)}
-            className="flex-1 py-2.5 rounded-xl text-xs font-medium border border-gray-200 dark:border-gray-700 text-gray-600 dark:text-gray-400 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors flex items-center justify-center gap-1.5"
+            className="flex-1 py-2.5 rounded-xl text-xs font-medium border border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors flex items-center justify-center gap-1.5"
           >
             {n.read ? (
               <>
@@ -476,7 +480,7 @@ const NotificationRow: React.FC<{
       onClick={onClick}
       className={`w-full flex items-start gap-3 p-4 rounded-xl text-left transition-all ${
         n.read
-          ? 'bg-white dark:bg-gray-800/40 hover:bg-gray-50 dark:hover:bg-gray-800/60'
+          ? 'bg-white dark:bg-neutral-800/40 hover:bg-neutral-50 dark:hover:bg-neutral-800/60'
           : 'bg-blue-50/50 dark:bg-blue-900/10 hover:bg-blue-50 dark:hover:bg-blue-900/15 border border-blue-100/50 dark:border-blue-800/20'
       }`}
     >
@@ -492,7 +496,7 @@ const NotificationRow: React.FC<{
         <div className="flex items-center gap-2">
           <p
             className={`text-sm font-semibold truncate ${
-              n.read ? 'text-gray-700 dark:text-gray-300' : 'text-gray-900 dark:text-white'
+              n.read ? 'text-neutral-700 dark:text-neutral-300' : 'text-neutral-900 dark:text-white'
             }`}
           >
             {n.title}
@@ -501,7 +505,7 @@ const NotificationRow: React.FC<{
         </div>
         <p
           className={`text-xs mt-0.5 line-clamp-2 leading-relaxed ${
-            n.read ? 'text-gray-400' : 'text-gray-600 dark:text-gray-400'
+            n.read ? 'text-neutral-400' : 'text-neutral-600 dark:text-neutral-400'
           }`}
         >
           {n.message}
@@ -512,7 +516,7 @@ const NotificationRow: React.FC<{
           >
             <Icon size={8} /> {cfg.label}
           </span>
-          <span className="text-[10px] text-gray-400">{formatRelativeTime(n.timestamp)}</span>
+          <span className="text-[10px] text-neutral-400">{formatRelativeTime(n.timestamp)}</span>
         </div>
       </div>
     </motion.button>
@@ -649,8 +653,8 @@ const StoreNotifications: React.FC<StoreNotificationsProps> = ({ storeId }) => {
       label: 'Total',
       value: `${notifications.length}`,
       icon: CheckCheck,
-      iconColor: 'text-gray-600',
-      iconBg: 'bg-gray-100 dark:bg-gray-700/40',
+      iconColor: 'text-neutral-600',
+      iconBg: 'bg-neutral-100 dark:bg-neutral-700/40',
     },
     {
       label: 'Orders',
@@ -686,7 +690,7 @@ const StoreNotifications: React.FC<StoreNotificationsProps> = ({ storeId }) => {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
-            className="bg-white dark:bg-gray-800/60 rounded-xl p-4 border border-gray-100 dark:border-gray-700/50 flex items-center gap-3"
+            className="bg-white dark:bg-neutral-800/60 rounded-xl p-4 border border-neutral-100 dark:border-neutral-700/50 flex items-center gap-3"
           >
             <div
               className={`w-9 h-9 rounded-lg ${m.iconBg} flex items-center justify-center flex-shrink-0`}
@@ -694,8 +698,8 @@ const StoreNotifications: React.FC<StoreNotificationsProps> = ({ storeId }) => {
               <m.icon size={16} className={m.iconColor} />
             </div>
             <div>
-              <p className="text-lg font-bold text-gray-900 dark:text-white">{m.value}</p>
-              <p className="text-[11px] text-gray-500">{m.label}</p>
+              <p className="text-lg font-bold text-neutral-900 dark:text-white">{m.value}</p>
+              <p className="text-[11px] text-neutral-500">{m.label}</p>
             </div>
           </motion.div>
         ))}
@@ -704,8 +708,8 @@ const StoreNotifications: React.FC<StoreNotificationsProps> = ({ storeId }) => {
       {/* ── Header + Actions ─────────────────────────────────────────── */}
       <div className="flex items-center justify-between gap-3 flex-wrap">
         <div>
-          <h1 className="text-xl font-bold text-gray-900 dark:text-white">Notifications</h1>
-          <p className="text-xs text-gray-500 mt-0.5">
+          <h1 className="text-xl font-bold text-neutral-900 dark:text-white">Notifications</h1>
+          <p className="text-xs text-neutral-500 mt-0.5">
             {unreadCount > 0
               ? `${unreadCount} unread notification${unreadCount !== 1 ? 's' : ''}`
               : 'All caught up!'}
@@ -724,7 +728,7 @@ const StoreNotifications: React.FC<StoreNotificationsProps> = ({ storeId }) => {
           {notifications.some((n) => n.read) && (
             <button
               onClick={handleDeleteAllRead}
-              className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-gray-500 bg-gray-100 dark:bg-gray-700/50 rounded-lg hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20 dark:hover:text-red-400 transition-colors"
+              className="flex items-center gap-1.5 px-3 py-2 text-xs font-semibold text-neutral-500 bg-neutral-100 dark:bg-neutral-700/50 rounded-lg hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20 dark:hover:text-red-400 transition-colors"
             >
               <Trash2 size={13} />
               {isMobile ? 'Clear' : 'Clear Read'}
@@ -747,7 +751,7 @@ const StoreNotifications: React.FC<StoreNotificationsProps> = ({ storeId }) => {
                   className={`flex-shrink-0 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
                     isActive
                       ? 'bg-blue text-white shadow-sm shadow-blue/20'
-                      : 'bg-white dark:bg-gray-800 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 border border-gray-200 dark:border-gray-700 hover:border-gray-300'
+                      : 'bg-white dark:bg-neutral-800 text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 border border-neutral-200 dark:border-neutral-700 hover:border-neutral-300'
                   }`}
                 >
                   {opt.label}
@@ -767,7 +771,7 @@ const StoreNotifications: React.FC<StoreNotificationsProps> = ({ storeId }) => {
           ]}
           className={`${
             isMobile ? 'w-full' : 'w-[120px]'
-          } h-9 [&_.ant-select-selector]:!rounded-lg [&_.ant-select-selector]:!border-gray-200 dark:[&_.ant-select-selector]:!border-gray-700 [&_.ant-select-selector]:!text-xs`}
+          } h-9 [&_.ant-select-selector]:!rounded-lg [&_.ant-select-selector]:!border-neutral-200 dark:[&_.ant-select-selector]:!border-neutral-700 [&_.ant-select-selector]:!text-xs`}
         />
       </div>
 
@@ -778,11 +782,11 @@ const StoreNotifications: React.FC<StoreNotificationsProps> = ({ storeId }) => {
             {groupedNotifications.map((group) => (
               <div key={group.label}>
                 <div className="flex items-center gap-3 mb-2">
-                  <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                  <h3 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">
                     {group.label}
                   </h3>
-                  <div className="flex-1 h-px bg-gray-100 dark:bg-gray-800" />
-                  <span className="text-[10px] text-gray-400">{group.items.length}</span>
+                  <div className="flex-1 h-px bg-neutral-100 dark:bg-neutral-800" />
+                  <span className="text-[10px] text-neutral-400">{group.items.length}</span>
                 </div>
                 <div className="space-y-1.5">
                   <AnimatePresence mode="popLayout">
@@ -803,15 +807,15 @@ const StoreNotifications: React.FC<StoreNotificationsProps> = ({ storeId }) => {
           <motion.div
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-center py-20 bg-white dark:bg-gray-800/60 rounded-2xl border border-gray-100 dark:border-gray-700/50"
+            className="text-center py-20 bg-white dark:bg-neutral-800/60 rounded-2xl border border-neutral-100 dark:border-neutral-700/50"
           >
-            <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center mx-auto mb-4">
-              <BellOff size={28} className="text-gray-300 dark:text-gray-600" />
+            <div className="w-16 h-16 rounded-full bg-neutral-100 dark:bg-neutral-700 flex items-center justify-center mx-auto mb-4">
+              <BellOff size={28} className="text-neutral-300 dark:text-neutral-600" />
             </div>
-            <p className="text-sm font-semibold text-gray-500 dark:text-gray-400">
+            <p className="text-sm font-semibold text-neutral-500 dark:text-neutral-400">
               No notifications
             </p>
-            <p className="text-xs text-gray-400 mt-1">
+            <p className="text-xs text-neutral-400 mt-1">
               {filterCategory !== 'all' || readFilter !== 'all'
                 ? 'Try adjusting your filters'
                 : "You're all caught up!"}
@@ -830,7 +834,7 @@ const StoreNotifications: React.FC<StoreNotificationsProps> = ({ storeId }) => {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: '100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-            className="fixed inset-0 z-[100] bg-white dark:bg-gray-900 overflow-y-auto"
+            className="fixed inset-0 z-[100] bg-white dark:bg-neutral-900 overflow-y-auto"
           >
             <div className="px-4 py-4 pt-12 pb-24">
               <NotificationDetail
@@ -865,19 +869,19 @@ const StoreNotifications: React.FC<StoreNotificationsProps> = ({ storeId }) => {
               animate={{ x: 0 }}
               exit={{ x: '100%' }}
               transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className="fixed right-0 top-0 bottom-0 w-[440px] bg-white dark:bg-gray-900 border-l border-gray-200 dark:border-gray-800 shadow-2xl z-[70] overflow-y-auto"
+              className="fixed right-0 top-0 bottom-0 w-[440px] bg-white dark:bg-neutral-900 border-l border-neutral-200 dark:border-neutral-800 shadow-2xl z-[70] overflow-y-auto"
             >
               <div className="p-6">
                 {/* Close button */}
                 <div className="flex items-center justify-between mb-4">
-                  <h3 className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+                  <h3 className="text-xs font-semibold text-neutral-400 uppercase tracking-wider">
                     Notification Detail
                   </h3>
                   <button
                     onClick={handleCloseDetail}
-                    className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                    className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
                   >
-                    <X size={14} className="text-gray-500" />
+                    <X size={14} className="text-neutral-500" />
                   </button>
                 </div>
                 <NotificationDetail

@@ -1,7 +1,7 @@
 'use client';
 
 import React from 'react';
-import { Table, Button, Space, Tooltip, Tag, message } from 'antd';
+import { Table, Button, Space, Tooltip, Tag } from 'antd';
 import { motion } from 'framer-motion';
 import {
   Edit2,
@@ -13,8 +13,8 @@ import {
   ThumbsDown,
   ArrowLeftRight,
   AlertTriangle,
+  Loader2,
 } from 'lucide-react';
-import { usePaystackPayment } from 'react-paystack';
 import type { ColumnsType } from 'antd/es/table';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 import {
@@ -25,6 +25,7 @@ import {
   getStatusColor,
   getSellingModelLabel,
 } from '@grc/_shared/namespace/sell-item';
+import { Pagination } from '@grc/_shared/namespace';
 
 interface Props {
   items: SellItemType[];
@@ -36,6 +37,9 @@ interface Props {
   onRejectOffer: (item: SellItemType) => void;
   onCounterOffer: (item: SellItemType) => void;
   isLoading: boolean;
+  pagination: Pagination;
+  isPayingFee?: boolean;
+  payingFeeId?: string | null;
 }
 
 // ─── Status Badge ─────────────────────────────────────────────────────────────
@@ -46,16 +50,11 @@ const StatusBadge: React.FC<{ status: SellItemStatus; rejectionReason?: string }
 }) => {
   const color = getStatusColor(status);
   const label = getStatusLabel(status);
-
   return (
     <Tooltip title={status === 'rejected' && rejectionReason ? `Reason: ${rejectionReason}` : ''}>
       <span
         className="inline-flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-semibold"
-        style={{
-          backgroundColor: `${color}15`,
-          color: color,
-          border: `1px solid ${color}30`,
-        }}
+        style={{ backgroundColor: `${color}15`, color, border: `1px solid ${color}30` }}
       >
         <span className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: color }} />
         {label}
@@ -86,7 +85,6 @@ const ModelBadge: React.FC<{ model: SellingModel }> = ({ model }) => {
     },
   };
   const c = configs[model];
-
   return (
     <span
       className={`inline-flex items-center gap-1 px-2 py-0.5 rounded-md text-[11px] font-medium ${c.bg} ${c.text}`}
@@ -97,58 +95,16 @@ const ModelBadge: React.FC<{ model: SellingModel }> = ({ model }) => {
   );
 };
 
-// ─── Pay Fee Table Button (Paystack) ──────────────────────────────────────────
+// ─── Pay Fee Button (Backend-initialized Paystack) ────────────────────────────
 
-const PayFeeTableButton: React.FC<{
+const PayFeeButton: React.FC<{
   item: SellItemType;
-  onSuccess: () => void;
-}> = ({ item, onSuccess }) => {
-  const feeKobo = item.listingFee || 0;
-
-  const config = {
-    reference: `CMK-FEE-${item.id}-${Date.now()}`,
-    email: 'ifeanyiemmanuel585@gmail.com', // Populated from user context / auth in production
-    amount: feeKobo,
-    publicKey: process.env.NEXT_PUBLIC_PAYSTACK_PUBLIC_KEY || '',
-    metadata: {
-      custom_fields: [
-        {
-          display_name: 'Payment Type',
-          variable_name: 'payment_type',
-          value: 'listing_fee',
-        },
-        {
-          display_name: 'Item ID',
-          variable_name: 'item_id',
-          value: String(item.id),
-        },
-        {
-          display_name: 'Item Name',
-          variable_name: 'item_name',
-          value: item.itemName,
-        },
-      ],
-    },
-  };
-
-  const initializePayment = usePaystackPayment(config);
-
+  onPayFee: (item: SellItemType) => void;
+  isLoading?: boolean;
+}> = ({ item, onPayFee, isLoading }) => {
   const handlePay = (e: React.MouseEvent) => {
-    e.stopPropagation(); // Prevent row click from firing
-    if (!config.publicKey) {
-      message.error('Payment configuration missing. Please try again later.');
-      return;
-    }
-    initializePayment({
-      onSuccess: (reference: any) => {
-        console.log('Listing fee payment successful:', reference);
-        message.success('Payment successful! Your item is now live.');
-        onSuccess();
-      },
-      onClose: () => {
-        message.info('Payment cancelled. You can pay anytime to go live.');
-      },
-    });
+    e.stopPropagation();
+    onPayFee(item);
   };
 
   return (
@@ -156,11 +112,12 @@ const PayFeeTableButton: React.FC<{
       <Button
         type="primary"
         size="small"
-        icon={<CreditCard size={14} />}
+        icon={isLoading ? <Loader2 size={14} className="animate-spin" /> : <CreditCard size={14} />}
         onClick={handlePay}
+        disabled={isLoading}
         className="!bg-blue !border-blue !text-white !h-7 !text-xs !rounded-lg"
       >
-        Pay Fee
+        {isLoading ? 'Processing...' : 'Pay Fee'}
       </Button>
     </Tooltip>
   );
@@ -173,10 +130,11 @@ const ActionButtons: React.FC<{
   onView: () => void;
   onEdit: () => void;
   onDelete: () => void;
-  onPayFee: () => void;
+  onPayFee: (item: SellItemType) => void;
   onAcceptOffer: () => void;
   onRejectOffer: () => void;
   onCounterOffer: () => void;
+  isPayingFee?: boolean;
 }> = ({
   item,
   onView,
@@ -186,6 +144,7 @@ const ActionButtons: React.FC<{
   onAcceptOffer,
   onRejectOffer,
   onCounterOffer,
+  isPayingFee,
 }) => {
   const { status, sellingModel } = item;
 
@@ -197,7 +156,7 @@ const ActionButtons: React.FC<{
 
       {/* Pay Fee — self-listing, awaiting-fee only */}
       {sellingModel === 'self-listing' && status === 'awaiting-fee' && (
-        <PayFeeTableButton item={item} onSuccess={onPayFee} />
+        <PayFeeButton item={item} onPayFee={onPayFee} isLoading={isPayingFee} />
       )}
 
       {/* Accept/Reject/Counter — direct-sale, price-offered */}
@@ -235,7 +194,7 @@ const ActionButtons: React.FC<{
           </>
         )}
 
-      {/* Edit — only when in-review or rejected (can resubmit) */}
+      {/* Edit — only when in-review or rejected */}
       {(status === 'in-review' || status === 'rejected') && (
         <Tooltip title="Edit">
           <Button
@@ -247,8 +206,8 @@ const ActionButtons: React.FC<{
         </Tooltip>
       )}
 
-      {/* Delete — only when in-review or rejected */}
-      {(status === 'in-review' || status === 'rejected') && (
+      {/* Delete */}
+      {sellingModel === 'direct-sale' && status === 'live' ? null : (
         <Tooltip title="Delete">
           <Button
             type="text"
@@ -269,22 +228,22 @@ const MobileItemCard: React.FC<{
   onView: () => void;
   onEdit: () => void;
   onDelete: () => void;
-  onPayFee: () => void;
+  onPayFee: (item: SellItemType) => void;
   onAcceptOffer: () => void;
   onRejectOffer: () => void;
   onCounterOffer: () => void;
+  isPayingFee?: boolean;
 }> = (props) => {
   const { item, onView } = props;
 
   return (
     <motion.div
       whileTap={{ scale: 0.98 }}
-      className="bg-white dark:bg-gray-800 rounded-2xl border border-gray-200 dark:border-gray-700 overflow-hidden shadow-sm"
+      className="bg-white dark:bg-neutral-800 rounded-2xl border border-neutral-200 dark:border-neutral-700 overflow-hidden shadow-sm"
     >
       <div className="flex gap-3 p-3" onClick={onView}>
-        {/* Thumbnail */}
         {item.postImgUrls?.[0] && (
-          <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100">
+          <div className="w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 bg-neutral-100">
             <img
               src={item.postImgUrls[0]}
               alt={item.itemName}
@@ -292,22 +251,15 @@ const MobileItemCard: React.FC<{
             />
           </div>
         )}
-
-        {/* Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
-            <h3 className="font-semibold text-sm text-gray-900 dark:text-white truncate">
+            <h3 className="font-semibold text-sm text-neutral-900 dark:text-white truncate">
               {item.itemName}
             </h3>
-            {item.sponsored && (
-              <i className="ri-sparkling-fill text-yellow-500 text-lg flex-shrink-0" />
-            )}
           </div>
-
-          <p className="text-lg font-bold text-gray-900 dark:text-white mt-0.5">
+          <p className="text-lg font-bold text-neutral-900 dark:text-white mt-0.5">
             ₦{((item.askingPrice?.price || 0) / 100).toLocaleString()}
           </p>
-
           <div className="flex items-center gap-2 mt-1.5 flex-wrap">
             <ModelBadge model={item.sellingModel} />
             <StatusBadge status={item.status} rejectionReason={item.rejectionReason} />
@@ -315,7 +267,6 @@ const MobileItemCard: React.FC<{
         </div>
       </div>
 
-      {/* Rejection reason banner */}
       {item.status === 'rejected' && item.rejectionReason && (
         <div className="mx-3 mb-2 px-3 py-2 bg-red-50 dark:bg-red-900/20 rounded-lg border border-red-200 dark:border-red-800">
           <p className="text-xs text-red-700 dark:text-red-300 flex items-start gap-1.5">
@@ -325,7 +276,6 @@ const MobileItemCard: React.FC<{
         </div>
       )}
 
-      {/* Price offered banner */}
       {item.status === 'price-offered' && item.platformBid && (
         <div className="mx-3 mb-2 px-3 py-2 bg-indigo-50 dark:bg-blue-900/20 rounded-lg border border-indigo-200 dark:border-blue">
           <p className="text-xs text-blue dark:text-blue">
@@ -335,22 +285,20 @@ const MobileItemCard: React.FC<{
         </div>
       )}
 
-      {/* Counter offer banner */}
       {item.status === 'counter-offer' && item.counterOffer && (
         <div className="mx-3 mb-2 px-3 py-2 bg-orange-50 dark:bg-orange-900/20 rounded-lg border border-orange-200 dark:border-orange-800">
           <p className="text-xs text-orange-700 dark:text-orange-300">
             <span className="font-semibold">Your counter:</span> ₦
             {(item.counterOffer / 100).toLocaleString()}{' '}
-            <span className="text-gray-400">
+            <span className="text-neutral-400">
               (They offered ₦{((item.platformBid || 0) / 100).toLocaleString()})
             </span>
           </p>
         </div>
       )}
 
-      {/* Actions */}
       <div className="px-3 pb-3 flex justify-end">
-        <ActionButtons {...props} item={item} />
+        <ActionButtons {...props} />
       </div>
     </motion.div>
   );
@@ -368,16 +316,21 @@ const MarketItemsTable: React.FC<Props> = ({
   onRejectOffer,
   onCounterOffer,
   isLoading,
+  pagination,
+  isPayingFee,
+  payingFeeId,
 }) => {
   const isMobile = useMediaQuery(mediaSize.mobile);
 
-  // ── Mobile: Card list ────────────────────────────────────────────────
   if (isMobile) {
     return (
       <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} className="space-y-3">
         {isLoading
           ? Array.from({ length: 4 }).map((_, i) => (
-              <div key={i} className="bg-white dark:bg-gray-800 rounded-2xl h-28 animate-pulse" />
+              <div
+                key={i}
+                className="bg-white dark:bg-neutral-800 rounded-2xl h-28 animate-pulse"
+              />
             ))
           : items.map((item) => (
               <MobileItemCard
@@ -386,32 +339,27 @@ const MarketItemsTable: React.FC<Props> = ({
                 onView={() => onView(item)}
                 onEdit={() => onEdit(item)}
                 onDelete={() => onDelete(item)}
-                onPayFee={() => onPayFee(item)}
+                onPayFee={onPayFee}
                 onAcceptOffer={() => onAcceptOffer(item)}
                 onRejectOffer={() => onRejectOffer(item)}
                 onCounterOffer={() => onCounterOffer(item)}
+                isPayingFee={isPayingFee && payingFeeId === item.id}
               />
             ))}
         {!isLoading && items.length === 0 && (
           <div className="text-center py-16">
-            <Package size={40} className="mx-auto text-gray-300 mb-3" />
-            <p className="text-gray-500 dark:text-gray-400 font-medium">No products yet</p>
-            <p className="text-xs text-gray-400 mt-1">Start selling by adding your first product</p>
+            <Package size={40} className="mx-auto text-neutral-300 mb-3" />
+            <p className="text-neutral-500 dark:text-neutral-400 font-medium">No products yet</p>
+            <p className="text-xs text-neutral-400 mt-1">
+              Start selling by adding your first product
+            </p>
           </div>
         )}
       </motion.div>
     );
   }
 
-  // ── Desktop: Ant Table ───────────────────────────────────────────────
   const columns: ColumnsType<SellItemType> = [
-    // {
-    //   title: '',
-    //   key: 'sponsored',
-    //   width: 30,
-    //   render: (_, record) =>
-    //     record.sponsored ? <i className="ri-sparkling-fill text-xl text-yellow-500" /> : null,
-    // },
     {
       title: 'Item',
       dataIndex: 'itemName',
@@ -419,13 +367,15 @@ const MarketItemsTable: React.FC<Props> = ({
       render: (text: string, record) => (
         <div className="flex items-center gap-3 min-w-[200px]">
           {record.postImgUrls?.[0] && (
-            <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100">
+            <div className="w-12 h-12 rounded-lg overflow-hidden flex-shrink-0 bg-neutral-100">
               <img src={record.postImgUrls[0]} alt={text} className="w-full h-full object-cover" />
             </div>
           )}
           <div className="min-w-0">
             <div className="font-semibold text-sm truncate max-w-[200px]">{text}</div>
-            <div className="text-xs text-gray-400 truncate max-w-[200px]">{record.description}</div>
+            <div className="text-xs text-neutral-400 truncate max-w-[200px]">
+              {record.description}
+            </div>
           </div>
         </div>
       ),
@@ -462,7 +412,9 @@ const MarketItemsTable: React.FC<Props> = ({
       render: (condition: string) => (
         <Tag
           className="!rounded-full"
-          color={condition === 'Brand New' ? 'green' : condition === 'Uk Used' ? 'blue' : 'gold'}
+          color={
+            condition === 'Brand New' ? 'green' : condition === 'Refurbished' ? 'blue' : 'gold'
+          }
         >
           {condition}
         </Tag>
@@ -476,24 +428,6 @@ const MarketItemsTable: React.FC<Props> = ({
         <StatusBadge status={record.status} rejectionReason={record.rejectionReason} />
       ),
     },
-    // {
-    //   title: 'Engagement',
-    //   key: 'engagement',
-    //   width: 100,
-    //   render: (_, record) => (
-    //     <div className="flex flex-col gap-0.5 text-xs">
-    //       <span className="flex items-center gap-1">
-    //         <Heart size={12} className="text-red-400" /> {record.likes?.length ?? 0}
-    //       </span>
-    //       <span className="flex items-center gap-1">
-    //         <MessageCircle size={12} className="text-blue" /> {record.comments?.length ?? 0}
-    //       </span>
-    //       <span className="flex items-center gap-1">
-    //         <Bookmark size={12} className="text-purple-400" /> {record.bookMarks?.length ?? 0}
-    //       </span>
-    //     </div>
-    //   ),
-    // },
     {
       title: 'Actions',
       key: 'actions',
@@ -506,10 +440,11 @@ const MarketItemsTable: React.FC<Props> = ({
           onView={() => onView(record)}
           onEdit={() => onEdit(record)}
           onDelete={() => onDelete(record)}
-          onPayFee={() => onPayFee(record)}
+          onPayFee={onPayFee}
           onAcceptOffer={() => onAcceptOffer(record)}
           onRejectOffer={() => onRejectOffer(record)}
           onCounterOffer={() => onCounterOffer(record)}
+          isPayingFee={isPayingFee && payingFeeId === record.id}
         />
       ),
     },
@@ -526,18 +461,13 @@ const MarketItemsTable: React.FC<Props> = ({
         columns={columns}
         dataSource={items}
         rowKey={(record) => String(record.id)}
-        className="bg-white dark:bg-gray-800 rounded-xl shadow-sm [&_.ant-table-thead_th]:!bg-gray-50 [&_.ant-table-thead_th]:!text-xs [&_.ant-table-thead_th]:!font-semibold [&_.ant-table-thead_th]:!text-gray-500 [&_.ant-table-thead_th]:!uppercase [&_.ant-table-thead_th]:!tracking-wider"
-        pagination={{
-          pageSize: 7,
-          showSizeChanger: true,
-          showTotal: (total) => `${total} products`,
-          className: '!mt-4',
-        }}
+        className="bg-white dark:bg-neutral-800 rounded-xl shadow-sm [&_.ant-table-thead_th]:!bg-neutral-50 [&_.ant-table-thead_th]:!text-xs [&_.ant-table-thead_th]:!font-semibold [&_.ant-table-thead_th]:!text-neutral-500 [&_.ant-table-thead_th]:!uppercase [&_.ant-table-thead_th]:!tracking-wider"
+        pagination={pagination}
         scroll={{ x: 1100, y: 600 }}
         onRow={(record) => ({
           onClick: () => onView(record),
           className:
-            'cursor-pointer hover:bg-gray-50/80 dark:hover:bg-gray-700/50 transition-colors',
+            'cursor-pointer hover:bg-neutral-50/80 dark:hover:bg-neutral-700/50 transition-colors',
         })}
       />
     </motion.div>

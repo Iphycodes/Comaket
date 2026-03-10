@@ -1,5 +1,3 @@
-import { Vendor } from './vendor';
-
 export interface AppObject {
   _id: string;
   __v: number;
@@ -27,7 +25,7 @@ export interface Pagination {
   current: number;
   onChange: (page: number, pageSize: number) => void;
   showSizeChanger?: boolean;
-  showTotal: (total: number, range: [number, number]) => ReactNode;
+  totalPages?: number;
 }
 
 export interface TriggeredResponse {
@@ -158,7 +156,7 @@ export interface MarketItem {
   quantity: number;
   category?: string;
   productTags: string[];
-  postUserProfile: Partial<Vendor>;
+  postUserProfile: Record<string, any>;
   sponsored: boolean;
   comments: Record<string, any>[];
   isBuyable: boolean;
@@ -177,13 +175,6 @@ export interface QueryArgs {
 export interface ApiRequest<T = any> {
   data?: T;
   params?: QueryArgs;
-}
-
-export interface Pagination {
-  page: number;
-  limit: number;
-  total: number;
-  totalPages: number;
 }
 
 export interface PaginatedResponse<T = any> {

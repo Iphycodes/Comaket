@@ -58,7 +58,7 @@ const MediaRenderer: React.FC<MediaRendererProps> = ({
         {/* Play icon overlay */}
         <div className="absolute inset-0 flex items-center justify-center bg-black/20">
           <div className="w-10 h-10 rounded-full bg-white/90 flex items-center justify-center shadow-lg">
-            <Play size={18} className="text-gray-800 ml-0.5" fill="currentColor" />
+            <Play size={18} className="text-neutral-800 ml-0.5" fill="currentColor" />
           </div>
         </div>
       </div>

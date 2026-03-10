@@ -18,7 +18,7 @@ const SideNavAuthButton = ({}: SideNavAuthButtonProps) => {
         onClick={() => setIsAuthModalOpen(true)}
         className={`flex items-center gap-2 px-3 rounded-md py-1 ${
           isMobile ? 'text-sm' : ''
-        } bg-indigo-100 dark:bg-indigo-900/30 text-blue-600 dark:text-blue-400 cursor-pointer hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition-colors`}
+        } bg-indigo-100 dark:bg-indigo-900/30 text-blue dark:text-blue cursor-pointer hover:bg-indigo-200 dark:hover:bg-indigo-900/50 transition-colors`}
       >
         <LogIn size={16} />
         Sign In

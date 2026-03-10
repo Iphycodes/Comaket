@@ -1,46 +1,141 @@
-import React, { useEffect, useState, useCallback, useContext } from 'react';
-import { Modal, message, InputNumber, Select } from 'antd';
+import React, { useEffect, useState, useCallback, useContext, useMemo } from 'react';
+import { Modal, message, InputNumber, Select, Input } from 'antd';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Plus, Search, X, ArrowLeft, Send } from 'lucide-react';
+import { Plus, Search, X, ArrowLeft, Send, RefreshCw } from 'lucide-react';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
-// import SellItemModal from '../sell-item-modal';
 import UpdateItemModal from '../update-item-modal';
 import DeleteConfirmModal from '../delete-confirm-modal';
 import TableSkeleton from '../../../_shared/components/table-skeleton';
 import { SellItemType, SellItemStatus, SellingModel } from '@grc/_shared/namespace/sell-item';
-import { mockSellItems } from '@grc/_shared/constant';
 import SellItemDetail from './libs/sell-item-details';
 import MarketItemsTable from './libs/market-item-table';
 import { AppContext } from '@grc/app-context';
+import { useListings } from '@grc/hooks/useListings';
+import { usePayments } from '@grc/hooks/usePayments';
+import type { ListingType, ListingStatus, QueryListingsParams } from '@grc/services/listings';
+import { useSearch } from '@grc/hooks/useSearch';
 
-// ─── Filter option configs ──────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// TRANSFORM: Backend Listing → Frontend SellItemType (display only)
+// ═══════════════════════════════════════════════════════════════════════════
 
-const sellTypeOptions = [
-  { label: 'Self Listing', value: 'self-listing' },
+const TYPE_TO_MODEL: Record<string, SellingModel> = {
+  self_listing: 'self-listing',
+  consignment: 'consignment',
+  direct_purchase: 'direct-sale',
+};
+
+const STATUS_TO_FE: Record<string, SellItemStatus> = {
+  draft: 'in-review',
+  in_review: 'in-review',
+  approved: 'approved',
+  rejected: 'rejected',
+  awaiting_fee: 'awaiting-fee',
+  awaiting_product: 'awaiting-product',
+  price_offered: 'price-offered',
+  counter_offer: 'counter-offer',
+  live: 'live',
+  sold: 'sold',
+  suspended: 'delisted',
+  expired: 'delisted',
+  delisted: 'delisted',
+};
+
+const CONDITION_TO_FE: Record<string, string> = {
+  brand_new: 'Brand New',
+  fairly_used: 'Fairly Used',
+  used: 'Uk Used',
+  refurbished: 'Refurbished',
+};
+
+const CONDITION_TO_BE: Record<string, string> = {
+  'Brand New': 'brand_new',
+  'Fairly Used': 'fairly_used',
+  Refurbished: 'refurbished',
+};
+
+const transformListingToSellItem = (listing: any): SellItemType => {
+  const store = listing.storeId && typeof listing.storeId === 'object' ? listing.storeId : null;
+
+  return {
+    id: listing._id,
+    itemName: listing.itemName || '',
+    description: listing.description || '',
+    condition: CONDITION_TO_FE[listing.condition] || listing.condition || '',
+    sellingModel: TYPE_TO_MODEL[listing.type] || ('self-listing' as SellingModel),
+    status: STATUS_TO_FE[listing.status] || ('in-review' as SellItemStatus),
+    askingPrice: {
+      price: listing.askingPrice?.amount || 0,
+      negotiable: listing.askingPrice?.negotiable ?? false,
+    },
+    platformBid: listing.platformBid || 0,
+    counterOffer: listing.counterOffer || 0,
+    postImgUrls: (listing.media || []).map((m: any) => (typeof m === 'string' ? m : m.url)),
+    media: listing.media || [],
+    location: listing.location || '',
+    live: listing.status === 'live',
+    feePaymentStatus:
+      listing.status === 'live'
+        ? 'processed'
+        : listing.listingFeeStatus === 'paid'
+          ? 'processed'
+          : listing.listingFeeStatus || 'pending',
+    listingFee: listing.listingFee || 0,
+    rejectionReason: listing.reviewInfo?.rejectionReason || '',
+    quantity: listing.quantity || 1,
+    category: listing.category || '',
+    tags: listing.tags || [],
+    whatsappNumber: listing.whatsappNumber || '',
+    storeId: store?._id || (typeof listing.storeId === 'string' ? listing.storeId : ''),
+    storeName: store?.name || '',
+    views: listing.views || 0,
+    likes: listing.likes || [],
+    comments: listing.comments || [],
+    bookMarks: listing.bookMarks || [],
+    totalSales: listing.totalSales || 0,
+    sponsored: false,
+    isBuyable: listing.isBuyable || false,
+    adminPricing: listing.adminPricing,
+    effectivePrice: listing.effectivePrice,
+    createdAt: listing.createdAt || '',
+    updatedAt: listing.updatedAt || '',
+    postUserProfile: {},
+  } as SellItemType;
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FILTER OPTIONS
+// ═══════════════════════════════════════════════════════════════════════════
+
+const sellTypeOptions: { label: string; value: ListingType }[] = [
+  { label: 'Self Listing', value: 'self_listing' },
   { label: 'Consignment', value: 'consignment' },
-  { label: 'Direct Sale', value: 'direct-sale' },
+  { label: 'Direct Purchase', value: 'direct_purchase' },
 ];
 
-const statusOptions: { label: string; value: SellItemStatus }[] = [
-  { label: 'In Review', value: 'in-review' },
+const statusOptions: { label: string; value: ListingStatus }[] = [
+  { label: 'In Review', value: 'in_review' },
   { label: 'Approved', value: 'approved' },
-  { label: 'Awaiting Fee', value: 'awaiting-fee' },
-  { label: 'Awaiting Product', value: 'awaiting-product' },
-  { label: 'Price Offered', value: 'price-offered' },
-  { label: 'Counter Offer', value: 'counter-offer' },
+  { label: 'Rejected', value: 'rejected' },
+  { label: 'Awaiting Fee', value: 'awaiting_fee' },
+  { label: 'Awaiting Product', value: 'awaiting_product' },
+  { label: 'Price Offered', value: 'price_offered' },
+  { label: 'Counter Offer', value: 'counter_offer' },
   { label: 'Live', value: 'live' },
   { label: 'Sold', value: 'sold' },
-  { label: 'Rejected', value: 'rejected' },
   { label: 'Delisted', value: 'delisted' },
 ];
 
 const conditionOptions = [
-  { label: 'Brand New', value: 'Brand New' },
-  { label: 'Uk Used', value: 'Uk Used' },
-  { label: 'Fairly Used', value: 'Fairly Used' },
+  { label: 'Brand New', value: 'brand_new' },
+  { label: 'Fairly Used', value: 'fairly_used' },
+  { label: 'Uk Used', value: 'used' },
+  { label: 'Refurbished', value: 'refurbished' },
 ];
 
-// ─── Mobile Full-Screen Overlay ─────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// MOBILE OVERLAY
+// ═══════════════════════════════════════════════════════════════════════════
 
 interface MobileOverlayProps {
   open: boolean;
@@ -66,34 +161,30 @@ const MobileOverlay: React.FC<MobileOverlayProps> = ({
           animate={{ opacity: 1, x: 0 }}
           exit={{ opacity: 0, x: '100%' }}
           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-          className="fixed inset-0 bg-white dark:bg-gray-900 flex flex-col overflow-hidden"
+          className="fixed inset-0 bg-white dark:bg-neutral-900 flex flex-col overflow-hidden"
           style={{ zIndex }}
         >
-          {/* Header */}
-
           <div
-            className={`sticky top-0 z-10 bg-white dark:bg-gray-900 pb-3 pt-1 -mx-1 px-1 ${
+            className={`sticky top-0 z-10 bg-white dark:bg-neutral-900 pb-3 pt-1 -mx-1 px-1 ${
               isMobile ? 'pt-9' : ''
             }`}
           >
-            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-800 flex-shrink-0 bg-white dark:bg-gray-900">
+            <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-100 dark:border-neutral-800 flex-shrink-0 bg-white dark:bg-neutral-900">
               <button
                 onClick={onClose}
-                className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors"
+                className="flex items-center gap-2 text-sm text-neutral-500 hover:text-neutral-900 dark:hover:text-white transition-colors"
               >
                 <ArrowLeft size={18} />
                 <span className="font-medium">{title || 'Back'}</span>
               </button>
               <button
                 onClick={onClose}
-                className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+                className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
               >
-                <X size={16} className="text-gray-500" />
+                <X size={16} className="text-neutral-500" />
               </button>
             </div>
           </div>
-
-          {/* Content */}
           <div className="flex-1 overflow-y-auto">{children}</div>
         </motion.div>
       )}
@@ -101,62 +192,53 @@ const MobileOverlay: React.FC<MobileOverlayProps> = ({
   );
 };
 
-// ─── Counter Offer View (mobile full-screen content) ────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// COUNTER OFFER VIEW
+// ═══════════════════════════════════════════════════════════════════════════
 
 interface CounterOfferViewProps {
   item: SellItemType;
   onSubmit: (amountKobo: number) => void;
+  isSubmitting?: boolean;
 }
 
-const CounterOfferView: React.FC<CounterOfferViewProps> = ({ item, onSubmit }) => {
+const CounterOfferView: React.FC<CounterOfferViewProps> = ({
+  item,
+  onSubmit,
+  isSubmitting: isSubmittingProp,
+}) => {
   const [amount, setAmount] = useState<number | null>(null);
-  const [isSubmitting, setIsSubmitting] = useState(false);
-
   const platformBidNaira = (item.platformBid || 0) / 100;
   const askingPriceNaira = (item.askingPrice?.price || 0) / 100;
-
-  const handleSubmit = () => {
-    if (!amount || amount <= 0) {
-      message.warning('Please enter a valid counter offer amount');
-      return;
-    }
-    setIsSubmitting(true);
-    setTimeout(() => {
-      onSubmit(amount * 100);
-      setIsSubmitting(false);
-    }, 500);
-  };
 
   return (
     <div className="p-5 space-y-6">
       <div>
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">Counter Offer</h2>
-        <p className="text-sm text-gray-500">
+        <h2 className="text-xl font-bold text-neutral-900 dark:text-white mb-1">Counter Offer</h2>
+        <p className="text-sm text-neutral-500">
           Submit your counter offer for <strong>{item.itemName}</strong>
         </p>
       </div>
-
-      <div className="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-4 space-y-3">
+      <div className="bg-neutral-50 dark:bg-neutral-800/50 rounded-2xl p-4 space-y-3">
         <div className="flex justify-between text-sm">
-          <span className="text-gray-500">Your asking price</span>
+          <span className="text-neutral-500">Your asking price</span>
           <span className="font-semibold">₦{askingPriceNaira.toLocaleString()}</span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-gray-500">Their offer</span>
+          <span className="text-neutral-500">Their offer</span>
           <span className="font-semibold text-blue">₦{platformBidNaira.toLocaleString()}</span>
         </div>
-        <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
+        <div className="border-t border-neutral-200 dark:border-neutral-700 pt-3">
           <div className="flex justify-between text-sm">
-            <span className="text-gray-500">Difference</span>
+            <span className="text-neutral-500">Difference</span>
             <span className="font-semibold text-orange-500">
               ₦{Math.abs(askingPriceNaira - platformBidNaira).toLocaleString()}
             </span>
           </div>
         </div>
       </div>
-
       <div>
-        <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+        <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2 block">
           Your Counter Offer (₦)
         </label>
         <InputNumber
@@ -168,10 +250,10 @@ const CounterOfferView: React.FC<CounterOfferViewProps> = ({ item, onSubmit }) =
           parser={(value) => Number(value?.replace(/\$\s?|(,*)/g, '') || 0)}
           min={1}
           controls={false}
-          prefix={<span className="text-gray-400 text-base mr-1">₦</span>}
+          prefix={<span className="text-neutral-400 text-base mr-1">₦</span>}
         />
         {amount && amount > 0 && (
-          <p className="text-xs text-gray-400 mt-1.5">
+          <p className="text-xs text-neutral-400 mt-1.5">
             {amount > platformBidNaira
               ? `₦${(amount - platformBidNaira).toLocaleString()} above their offer`
               : amount < platformBidNaira
@@ -180,235 +262,234 @@ const CounterOfferView: React.FC<CounterOfferViewProps> = ({ item, onSubmit }) =
           </p>
         )}
       </div>
-
       <button
-        onClick={handleSubmit}
-        disabled={isSubmitting || !amount || amount <= 0}
+        onClick={() => {
+          if (amount && amount > 0) onSubmit(amount * 100);
+          else message.warning('Please enter a valid counter offer amount');
+        }}
+        disabled={isSubmittingProp || !amount || amount <= 0}
         className={`w-full py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
-          isSubmitting || !amount || amount <= 0
-            ? 'bg-gray-200 dark:bg-gray-700 text-gray-400 cursor-not-allowed'
+          isSubmittingProp || !amount || amount <= 0
+            ? 'bg-neutral-200 dark:bg-neutral-700 text-neutral-400 cursor-not-allowed'
             : 'bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-md shadow-orange-500/20 hover:shadow-lg'
         }`}
       >
         <Send size={16} />
-        {isSubmitting ? 'Submitting...' : 'Send Counter Offer'}
+        {isSubmittingProp ? 'Submitting...' : 'Send Counter Offer'}
       </button>
     </div>
   );
 };
 
-// ─── Main Component ─────────────────────────────────────────────────────────
+// ═══════════════════════════════════════════════════════════════════════════
+// MAIN COMPONENT
+// ═══════════════════════════════════════════════════════════════════════════
 
-const SellItem = () => {
+interface SellItemProps {
+  storeId?: string;
+}
+
+const SellItem = ({ storeId }: SellItemProps) => {
   const isMobile = useMediaQuery(mediaSize.mobile);
-  const [isLoading, setIsLoading] = useState(true);
-  const [items, setItems] = useState<SellItemType[]>(mockSellItems);
-  const [searchQuery, setSearchQuery] = useState('');
+  const { setIsSellItemModalOpen } = useContext(AppContext);
 
-  // Filters
-  const [filterSellType, setFilterSellType] = useState<SellingModel | null>(null);
-  const [filterStatus, setFilterStatus] = useState<SellItemStatus | null>(null);
+  // ── Filter State ──────────────────────────────────────────────────────
+  const { searchValue, debouncedChangeHandler } = useSearch();
+  const [filterType, setFilterType] = useState<ListingType | null>(null);
+  const [filterStatus, setFilterStatus] = useState<ListingStatus | null>(null);
   const [filterCondition, setFilterCondition] = useState<string | null>(null);
 
-  // Selected item for detail/edit/delete
-  const [selectedItem, setSelectedItem] = useState<SellItemType | null>(null);
-  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const queryParams: QueryListingsParams = useMemo(() => {
+    const params: QueryListingsParams = {};
+    if (filterType) params.type = filterType;
+    if (filterStatus) params.status = filterStatus;
+    if (filterCondition) params.condition = filterCondition;
+    return params;
+  }, [filterType, filterStatus, filterCondition]);
 
-  // Modals (desktop)
-  // const [isSellItemModalOpen, setIsSellItemModalOpen] = useState(false);
-  const { setIsSellItemModalOpen } = useContext(AppContext);
-  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
-  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
-  const [isCounterOfferModalOpen, setIsCounterOfferModalOpen] = useState(false);
-  const [counterOfferAmount, setCounterOfferAmount] = useState<number>(0);
+  // ── Listings Hook ─────────────────────────────────────────────────────
+  const {
+    myListings,
+    myListingsTotal,
+    isLoadingMyListings,
+    isFetchingMyListings,
+    refetchMyListings,
+    deleteListing: apiDeleteListing,
+    submitCounterOffer: apiCounterOffer,
+    isSubmittingCounterOffer,
+    myListingPagination,
+  } = useListings({
+    fetchMyListings: true,
+    myListingsParams: storeId ? { ...queryParams, storeId } : { ...queryParams },
+    search: searchValue,
+  });
 
-  // Mobile full-screen states
-  const [isMobileCounterOfferOpen, setIsMobileCounterOfferOpen] = useState(false);
+  // ── Payments Hook — for listing fee ───────────────────────────────────
+  const { initializeListingFee, isInitializingListingFee } = usePayments();
 
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 800);
-    return () => clearTimeout(timer);
-  }, []);
+  const [payingFeeId, setPayingFeeId] = useState<string | null>(null);
 
-  // ── Filters ───────────────────────────────────────────────────────────
-  const hasActiveFilters = filterSellType || filterStatus || filterCondition;
+  // ── Filter helpers ────────────────────────────────────────────────────
+  const hasActiveFilters = !!(filterType || filterStatus || filterCondition || searchValue);
 
   const clearAllFilters = () => {
-    setFilterSellType(null);
+    debouncedChangeHandler('');
+    setFilterType(null);
     setFilterStatus(null);
     setFilterCondition(null);
   };
 
-  const filteredItems = items.filter((item) => {
-    if (searchQuery) {
-      const q = searchQuery.toLowerCase();
-      if (!item.itemName.toLowerCase().includes(q) && !item.description.toLowerCase().includes(q)) {
-        return false;
-      }
-    }
-    if (filterSellType && item.sellingModel !== filterSellType) return false;
-    if (filterStatus && item.status !== filterStatus) return false;
-    if (filterCondition && item.condition !== filterCondition) return false;
-    return true;
-  });
+  // ── Transform backend → frontend ─────────────────────────────────────
+  const items: SellItemType[] = useMemo(
+    () => (myListings || []).map(transformListingToSellItem),
+    [myListings]
+  );
 
-  // ── Handlers ──────────────────────────────────────────────────────────
+  // ── Selected item / modal state ───────────────────────────────────────
+  const [selectedItem, setSelectedItem] = useState<SellItemType | null>(null);
+  const [isDetailOpen, setIsDetailOpen] = useState(false);
+  const [isUpdateModalOpen, setIsUpdateModalOpen] = useState(false);
+  const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
+  const [isCounterOfferModalOpen, setIsCounterOfferModalOpen] = useState(false);
+  const [counterOfferAmount, setCounterOfferAmount] = useState<number>(0);
+  const [isMobileCounterOfferOpen, setIsMobileCounterOfferOpen] = useState(false);
+
+  useEffect(() => {
+    if (selectedItem && items.length > 0) {
+      const updated = items.find((i) => i.id === selectedItem.id);
+      if (updated) setSelectedItem(updated);
+    }
+  }, [items]);
+
+  // ══════════════════════════════════════════════════════════════════════
+  // HANDLERS
+  // ══════════════════════════════════════════════════════════════════════
+
+  const refetch = useCallback(() => {
+    refetchMyListings(queryParams);
+  }, [refetchMyListings, queryParams]);
 
   const handleViewItem = (item: SellItemType) => {
     setSelectedItem(item);
     setIsDetailOpen(true);
   };
-
-  /** Edit: UpdateItemModal handles mobile/desktop rendering internally */
   const handleEditItem = useCallback((item: SellItemType) => {
     setSelectedItem(item);
     setIsUpdateModalOpen(true);
   }, []);
-
   const handleCloseEdit = useCallback(() => {
     setIsUpdateModalOpen(false);
-  }, []);
-
+    refetch();
+  }, [refetch]);
   const handleDeleteItem = (item: SellItemType) => {
     setSelectedItem(item);
     setIsDeleteModalOpen(true);
   };
 
-  const handleConfirmDelete = () => {
-    if (selectedItem) {
-      setItems((prev) => prev.filter((i) => i.id !== selectedItem.id));
-      message.success('Product deleted successfully');
+  const handleConfirmDelete = async () => {
+    if (!selectedItem) return;
+    try {
+      await apiDeleteListing(selectedItem.id as string);
       setIsDeleteModalOpen(false);
       setIsDetailOpen(false);
       setSelectedItem(null);
-    }
+      refetch();
+    } catch {}
   };
 
-  const handlePayFee = (item: SellItemType) => {
-    setItems((prev) =>
-      prev.map((i) =>
-        i.id === item.id
-          ? { ...i, status: 'live' as const, live: true, feePaymentStatus: 'processed' as const }
-          : i
-      )
-    );
-    setSelectedItem((prev) =>
-      prev && prev.id === item.id
-        ? { ...prev, status: 'live' as const, live: true, feePaymentStatus: 'processed' as const }
-        : prev
-    );
-  };
+  // ── Pay Listing Fee — backend-initialized Paystack ────────────────────
+  const handlePayFee = useCallback(
+    async (item: SellItemType) => {
+      const listingId = item.id as string;
+      setPayingFeeId(listingId);
+      try {
+        const callbackUrl = `${window.location.origin}/payment/verify?type=listing_fee&listingId=${listingId}`;
+        await initializeListingFee({
+          listingId,
+          callbackUrl,
+        });
+        // initializeListingFee redirects to Paystack automatically via window.location.href
+      } catch (error: any) {
+        const msg = error?.data?.message || 'Failed to initialize payment. Please try again.';
+        message.error(msg);
+        setPayingFeeId(null);
+      }
+    },
+    [initializeListingFee]
+  );
 
-  const handleAcceptOffer = (item: SellItemType) => {
-    Modal.confirm({
-      title: 'Accept Offer',
-      content: `Are you sure you want to accept ₦${(
-        (item.platformBid || 0) / 100
-      ).toLocaleString()} for "${item.itemName}"?`,
-      okText: 'Yes, Accept',
-      okButtonProps: { className: '!bg-emerald-500 !border-emerald-500' },
-      zIndex: 20000,
-      onOk: () => {
-        setItems((prev) =>
-          prev.map((i) => (i.id === item.id ? { ...i, status: 'sold' as const } : i))
-        );
-        setSelectedItem((prev) =>
-          prev && prev.id === item.id ? { ...prev, status: 'sold' as const } : prev
-        );
-        message.success("Offer accepted! We'll arrange payment and pickup.");
-        setIsDetailOpen(false);
-      },
-    });
-  };
+  const handleAcceptOffer = useCallback(
+    (item: SellItemType) => {
+      Modal.confirm({
+        title: 'Accept Offer',
+        content: `Are you sure you want to accept ₦${(
+          (item.platformBid || 0) / 100
+        ).toLocaleString()} for "${item.itemName}"?`,
+        okText: 'Yes, Accept',
+        okButtonProps: { className: '!bg-emerald-500 !border-emerald-500' },
+        zIndex: 20000,
+        onOk: async () => {
+          try {
+            await apiAcceptOffer(item.id as string);
+            setIsDetailOpen(false);
+            refetch();
+          } catch {}
+        },
+      });
+    },
+    [apiAcceptOffer, refetch]
+  );
 
-  const handleRejectOffer = (item: SellItemType) => {
-    Modal.confirm({
-      title: 'Decline Offer',
-      content: `Are you sure you want to decline the offer of ₦${(
-        (item.platformBid || 0) / 100
-      ).toLocaleString()} for "${item.itemName}"? This action cannot be undone.`,
-      okText: 'Yes, Decline',
-      okButtonProps: { danger: true },
-      zIndex: 20000,
-      onOk: () => {
-        setItems((prev) =>
-          prev.map((i) =>
-            i.id === item.id
-              ? { ...i, status: 'rejected' as const, rejectionReason: 'Seller declined the offer' }
-              : i
-          )
-        );
-        setSelectedItem((prev) =>
-          prev && prev.id === item.id
-            ? {
-                ...prev,
-                status: 'rejected' as const,
-                rejectionReason: 'Seller declined the offer',
-              }
-            : prev
-        );
-        message.info('Offer declined');
-        setIsDetailOpen(false);
-      },
-    });
-  };
+  const handleRejectOffer = useCallback(
+    (item: SellItemType) => {
+      Modal.confirm({
+        title: 'Decline Offer',
+        content: `Are you sure you want to decline the offer of ₦${(
+          (item.platformBid || 0) / 100
+        ).toLocaleString()} for "${item.itemName}"? This action cannot be undone.`,
+        okText: 'Yes, Decline',
+        okButtonProps: { danger: true },
+        zIndex: 20000,
+        onOk: async () => {
+          try {
+            await apiRejectOffer(item.id as string);
+            setIsDetailOpen(false);
+            refetch();
+          } catch {}
+        },
+      });
+    },
+    [apiRejectOffer, refetch]
+  );
 
-  /** Counter offer: mobile → MobileOverlay, desktop → modal */
   const handleCounterOffer = useCallback(
     (item: SellItemType) => {
       setSelectedItem(item);
       setCounterOfferAmount((item.platformBid || 0) / 100);
-      if (isMobile) {
-        setIsMobileCounterOfferOpen(true);
-      } else {
-        setIsCounterOfferModalOpen(true);
-      }
+      if (isMobile) setIsMobileCounterOfferOpen(true);
+      else setIsCounterOfferModalOpen(true);
     },
     [isMobile]
   );
 
-  const handleSubmitCounterOffer = () => {
-    if (selectedItem && counterOfferAmount > 0) {
-      setItems((prev) =>
-        prev.map((i) =>
-          i.id === selectedItem.id
-            ? { ...i, status: 'counter-offer' as const, counterOffer: counterOfferAmount * 100 }
-            : i
-        )
-      );
-      setSelectedItem((prev) =>
-        prev && prev.id === selectedItem.id
-          ? {
-              ...prev,
-              status: 'counter-offer' as const,
-              counterOffer: counterOfferAmount * 100,
-            }
-          : prev
-      );
+  const handleSubmitCounterOffer = async () => {
+    if (!selectedItem || counterOfferAmount <= 0) return;
+    try {
+      await apiCounterOffer(selectedItem.id as string, counterOfferAmount * 100);
       setIsCounterOfferModalOpen(false);
       setIsDetailOpen(false);
-      message.success('Counter offer sent!');
-    }
+      refetch();
+    } catch {}
   };
 
-  const handleMobileCounterOfferSubmit = (amountKobo: number) => {
-    if (selectedItem) {
-      setItems((prev) =>
-        prev.map((i) =>
-          i.id === selectedItem.id
-            ? { ...i, status: 'counter-offer' as const, counterOffer: amountKobo }
-            : i
-        )
-      );
-      setSelectedItem((prev) =>
-        prev && prev.id === selectedItem.id
-          ? { ...prev, status: 'counter-offer' as const, counterOffer: amountKobo }
-          : prev
-      );
+  const handleMobileCounterOfferSubmit = async (amountKobo: number) => {
+    if (!selectedItem) return;
+    try {
+      await apiCounterOffer(selectedItem.id as string, amountKobo);
       setIsMobileCounterOfferOpen(false);
       setIsDetailOpen(false);
-      message.success('Counter offer sent!');
-    }
+      refetch();
+    } catch {}
   };
 
   const handleTrackStatus = (id: string | number) => {
@@ -422,78 +503,87 @@ const SellItem = () => {
   };
 
   // ════════════════════════════════════════════════════════════════════════
-  // RENDER — NO EARLY RETURNS.
-  //
-  // Z-index stack (mobile):
-  //   z-20    — sticky header
-  //   z-100   — detail overlay
-  //   z-300   — counter offer overlay
-  //   z-10000 — UpdateItemModal (handles its own full-screen rendering)
-  //   z-20000 — Modal.confirm (accept/reject/delete)
-  //
-  // All modals always exist in the tree so they can portal to <body>.
+  // RENDER
   // ════════════════════════════════════════════════════════════════════════
 
   return (
-    <div className={`dark:bg-gray-900/50 ${isMobile ? 'max-w-[100vw] mb-10' : ''}`}>
-      {/* ── Main list view ─────────────────────────────────────────────── */}
-      {/* Hidden (not unmounted) when mobile detail is showing */}
+    <div className={`dark:bg-neutral-900/50 ${isMobile ? 'max-w-[100vw] mb-10' : ''}`}>
+      {/* ── Main list view ──────────────────────────────────────────── */}
       <div className={isDetailOpen && isMobile ? 'hidden' : ''}>
         <div className={`w-full ${!isMobile ? 'max-w-7xl mx-auto px-4' : 'px-3'}`}>
           {/* Header */}
           <motion.div
             initial={{ y: -20, opacity: 0 }}
             animate={{ y: 0, opacity: 1 }}
-            className="sticky top-0 z-20 bg-white dark:bg-gray-900 pb-2"
+            className="sticky top-0 z-20 bg-white dark:bg-neutral-900 pb-2"
           >
             <div className="flex items-center justify-between py-4">
               <div>
-                <h1 className="text-xl font-bold text-gray-900 dark:text-white">My Products</h1>
-                <p className="text-xs text-gray-400 mt-0.5">
-                  {filteredItems.length} product{filteredItems.length !== 1 ? 's' : ''}
+                <h1 className="text-xl font-bold text-neutral-900 dark:text-white">My Products</h1>
+                <p className="text-xs text-neutral-400 mt-0.5">
+                  {myListingsTotal} product{myListingsTotal !== 1 ? 's' : ''}
                 </p>
               </div>
-              <motion.button
-                whileHover={{ scale: 1.02 }}
-                whileTap={{ scale: 0.98 }}
-                onClick={() => setIsSellItemModalOpen(true)}
-                className="bg-gradient-to-r from-blue to-indigo-500 hover:from-blue hover:to-indigo-600 text-white py-2.5 px-5 rounded-xl font-semibold flex items-center gap-1.5 text-sm shadow-md shadow-blue/20 hover:shadow-lg transition-all"
-              >
-                <Plus size={18} />
-                {isMobile ? 'Sell' : 'New Product'}
-              </motion.button>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={refetch}
+                  disabled={isFetchingMyListings}
+                  className={`w-10 h-10 rounded-xl border border-neutral-200 dark:border-neutral-700 flex items-center justify-center text-neutral-500 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all ${
+                    isFetchingMyListings ? 'animate-spin' : ''
+                  }`}
+                >
+                  <RefreshCw size={16} />
+                </button>
+                <motion.button
+                  whileHover={{ scale: 1.02 }}
+                  whileTap={{ scale: 0.98 }}
+                  onClick={() => setIsSellItemModalOpen(true)}
+                  className="bg-gradient-to-r from-blue to-indigo-500 hover:from-blue hover:to-indigo-600 text-white py-2.5 px-5 rounded-xl font-semibold flex items-center gap-1.5 text-sm shadow-md shadow-blue/20 hover:shadow-lg transition-all"
+                >
+                  <Plus size={18} />
+                  {isMobile ? 'Sell' : 'New Product'}
+                </motion.button>
+              </div>
             </div>
 
+            {/* Filters */}
             <div
-              className={`flex ${isMobile ? 'flex-col items-start gap-1' : 'items-center gap-2'}`}
+              className={`flex w-full ${
+                isMobile ? 'flex-col items-start gap-1' : 'items-center gap-2'
+              }`}
             >
-              <div className="relative mb-3 flex-1 w-full">
-                <Search
-                  size={16}
-                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
-                />
-                <input
-                  type="text"
+              <div className="mb-3 flex-2 w-full relative">
+                <Input
+                  prefix={<Search size={isMobile ? 16 : 18} className="text-neutral-400" />}
                   placeholder="Search your products..."
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
+                  onChange={(e) => debouncedChangeHandler(e.target.value)}
                   className={`w-full ${
                     isMobile ? 'h-10' : 'h-12'
-                  } pl-10 pr-4 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue/20 focus:border-blue outline-none transition-all`}
+                  } !rounded-xl !border-neutral-200 dark:!border-neutral-700`}
                 />
+                {searchValue && (
+                  <button
+                    onClick={() => debouncedChangeHandler('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-neutral-100 dark:bg-neutral-700 flex items-center justify-center text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors"
+                  >
+                    <X size={12} />
+                  </button>
+                )}
               </div>
-
-              <div className={`flex w-full items-center gap-2 mb-3 ${isMobile ? 'flex-wrap' : ''}`}>
+              <div
+                className={`flex flex-1 w-full items-center gap-2 mb-3 ${
+                  isMobile ? 'flex-wrap' : ''
+                }`}
+              >
                 <Select
                   allowClear
                   placeholder="Sell Type"
-                  value={filterSellType}
-                  onChange={(val) => setFilterSellType(val || null)}
+                  value={filterType}
+                  onChange={(val) => setFilterType(val || null)}
                   options={sellTypeOptions}
                   className={`${
                     isMobile ? 'flex-1 min-w-[120px] h-10' : 'w-[160px] h-12'
-                  }  [&_.ant-select-selector]:!rounded-lg [&_.ant-select-selector]:!border-gray-200 dark:[&_.ant-select-selector]:!border-gray-700 [&_.ant-select-selector]:!bg-white dark:[&_.ant-select-selector]:!bg-gray-800`}
-                  popupClassName="!rounded-lg"
+                  } [&_.ant-select-selector]:!rounded-lg [&_.ant-select-selector]:!border-neutral-200 dark:[&_.ant-select-selector]:!border-neutral-700`}
                 />
                 <Select
                   allowClear
@@ -503,8 +593,7 @@ const SellItem = () => {
                   options={statusOptions}
                   className={`${
                     isMobile ? 'flex-1 min-w-[120px] h-10' : 'w-[160px] h-12'
-                  } [&_.ant-select-selector]:!rounded-lg [&_.ant-select-selector]:!border-gray-200 dark:[&_.ant-select-selector]:!border-gray-700 [&_.ant-select-selector]:!bg-white dark:[&_.ant-select-selector]:!bg-gray-800`}
-                  popupClassName="!rounded-lg"
+                  } [&_.ant-select-selector]:!rounded-lg [&_.ant-select-selector]:!border-neutral-200 dark:[&_.ant-select-selector]:!border-neutral-700`}
                 />
                 <Select
                   allowClear
@@ -514,14 +603,12 @@ const SellItem = () => {
                   options={conditionOptions}
                   className={`${
                     isMobile ? 'flex-1 min-w-[120px] h-10' : 'w-[160px] h-12'
-                  } [&_.ant-select-selector]:!rounded-lg [&_.ant-select-selector]:!border-gray-200 dark:[&_.ant-select-selector]:!border-gray-700 [&_.ant-select-selector]:!bg-white dark:[&_.ant-select-selector]:!bg-gray-800`}
-                  popupClassName="!rounded-lg"
+                  } [&_.ant-select-selector]:!rounded-lg [&_.ant-select-selector]:!border-neutral-200 dark:[&_.ant-select-selector]:!border-neutral-700`}
                 />
-
                 {hasActiveFilters && (
                   <button
                     onClick={clearAllFilters}
-                    className="flex items-center gap-1 px-3 h-9 text-xs font-medium text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg border border-gray-200 dark:border-gray-700 transition-colors"
+                    className="flex items-center gap-1 px-3 h-9 text-xs font-medium text-neutral-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg border border-neutral-200 dark:border-neutral-700 transition-colors"
                   >
                     <X size={13} />
                     Clear
@@ -533,13 +620,13 @@ const SellItem = () => {
 
           {/* Product list */}
           <div className="pb-8">
-            {isLoading ? (
+            {isLoadingMyListings ? (
               isMobile ? (
                 <div className="space-y-3">
                   {Array.from({ length: 4 }).map((_, i) => (
                     <div
                       key={i}
-                      className="bg-white dark:bg-gray-800 rounded-2xl h-28 animate-pulse"
+                      className="bg-white dark:bg-neutral-800 rounded-2xl h-28 animate-pulse"
                     />
                   ))}
                 </div>
@@ -548,7 +635,7 @@ const SellItem = () => {
               )
             ) : (
               <MarketItemsTable
-                items={filteredItems}
+                items={items}
                 onView={handleViewItem}
                 onEdit={handleEditItem}
                 onDelete={handleDeleteItem}
@@ -556,16 +643,23 @@ const SellItem = () => {
                 onAcceptOffer={handleAcceptOffer}
                 onRejectOffer={handleRejectOffer}
                 onCounterOffer={handleCounterOffer}
-                isLoading={isLoading}
+                isLoading={isLoadingMyListings || isFetchingMyListings}
+                pagination={myListingPagination}
+                isPayingFee={isInitializingListingFee}
+                payingFeeId={payingFeeId}
               />
+            )}
+            {isFetchingMyListings && !isLoadingMyListings && (
+              <div className="flex items-center justify-center py-4">
+                <div className="w-5 h-5 border-2 border-blue border-t-transparent rounded-full animate-spin" />
+                <span className="text-xs text-neutral-400 ml-2">Updating...</span>
+              </div>
             )}
           </div>
         </div>
       </div>
 
-      {/* ══════════════════════════════════════════════════════════════════ */}
-      {/* MOBILE DETAIL — fixed overlay at z-[100]                         */}
-      {/* ══════════════════════════════════════════════════════════════════ */}
+      {/* ── MOBILE DETAIL ──────────────────────────────────────────── */}
       <AnimatePresence>
         {isDetailOpen && selectedItem && isMobile && (
           <motion.div
@@ -573,7 +667,7 @@ const SellItem = () => {
             animate={{ opacity: 1, x: 0 }}
             exit={{ opacity: 0, x: '100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-            className="fixed inset-0 z-[100] bg-gray-50 dark:bg-gray-900 overflow-y-auto"
+            className="fixed inset-0 z-[100] bg-neutral-50 dark:bg-neutral-900 overflow-y-auto"
           >
             <div className="px-3 py-4 mb-10">
               <SellItemDetail
@@ -591,9 +685,7 @@ const SellItem = () => {
         )}
       </AnimatePresence>
 
-      {/* ══════════════════════════════════════════════════════════════════ */}
-      {/* MOBILE COUNTER OFFER — full-screen overlay at z-[300]            */}
-      {/* ══════════════════════════════════════════════════════════════════ */}
+      {/* ── MOBILE COUNTER OFFER ───────────────────────────────────── */}
       {isMobile && selectedItem && (
         <MobileOverlay
           open={isMobileCounterOfferOpen}
@@ -601,13 +693,15 @@ const SellItem = () => {
           title="Counter Offer"
           zIndex={300}
         >
-          <CounterOfferView item={selectedItem} onSubmit={handleMobileCounterOfferSubmit} />
+          <CounterOfferView
+            item={selectedItem}
+            onSubmit={handleMobileCounterOfferSubmit}
+            isSubmitting={isSubmittingCounterOffer}
+          />
         </MobileOverlay>
       )}
 
-      {/* ══════════════════════════════════════════════════════════════════ */}
-      {/* DESKTOP DETAIL MODAL                                             */}
-      {/* ══════════════════════════════════════════════════════════════════ */}
+      {/* ── DESKTOP DETAIL ─────────────────────────────────────────── */}
       {!isMobile && selectedItem && (
         <Modal
           open={isDetailOpen}
@@ -631,18 +725,7 @@ const SellItem = () => {
         </Modal>
       )}
 
-      {/* ══════════════════════════════════════════════════════════════════ */}
-      {/* ALL MODALS — always in the tree, never gated by early return     */}
-      {/* ══════════════════════════════════════════════════════════════════ */}
-
-      {/* Sell Item Modal */}
-      {/* <SellItemModal
-        isSellItemModalOpen={isSellItemModalOpen}
-        setIsSellItemModalOpen={setIsSellItemModalOpen}
-        handleTrackStatus={handleTrackStatus}
-      /> */}
-
-      {/* Update Item Modal — handles mobile/desktop rendering internally */}
+      {/* ── ALL MODALS ─────────────────────────────────────────────── */}
       {selectedItem && (
         <UpdateItemModal
           isModalOpen={isUpdateModalOpen}
@@ -650,18 +733,21 @@ const SellItem = () => {
           initialData={{
             productId: selectedItem.id,
             itemName: selectedItem.itemName,
-            condition: selectedItem.condition,
+            condition: CONDITION_TO_BE[selectedItem.condition] || selectedItem.condition,
             description: selectedItem.description,
-            location: selectedItem.location,
+            state: selectedItem.location?.state || '',
+            city: selectedItem.location?.city || '',
             askPrice: (selectedItem.askingPrice?.price ?? 0) / 100,
             negotiable: selectedItem.askingPrice?.negotiable,
             images: selectedItem.postImgUrls || [],
+            status: selectedItem.status,
+            sellingModel: selectedItem.sellingModel,
+            listingFee: selectedItem.listingFee || 0,
           }}
           handleTrackStatus={handleTrackStatus}
         />
       )}
 
-      {/* Delete Confirm Modal — confirmations stay as modals */}
       {selectedItem && (
         <DeleteConfirmModal
           isOpen={isDeleteModalOpen}
@@ -671,14 +757,13 @@ const SellItem = () => {
         />
       )}
 
-      {/* Counter Offer Modal (desktop only) */}
       <Modal
         open={isCounterOfferModalOpen}
         onCancel={() => setIsCounterOfferModalOpen(false)}
         title={
           <div>
             <h3 className="text-lg font-bold">Counter Offer</h3>
-            <p className="text-xs text-gray-400 font-normal mt-1">
+            <p className="text-xs text-neutral-400 font-normal mt-1">
               Their offer: ₦{((selectedItem?.platformBid || 0) / 100).toLocaleString()} · Your ask:
               ₦{((selectedItem?.askingPrice?.price || 0) / 100).toLocaleString()}
             </p>
@@ -689,14 +774,14 @@ const SellItem = () => {
       >
         <div className="space-y-4 pt-4">
           <div>
-            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 block mb-2">
+            <label className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 block mb-2">
               Your Counter Price (₦)
             </label>
             <InputNumber
               className="w-full h-14 !rounded-xl"
               size="large"
               controls={false}
-              prefix={<span className="text-gray-400">₦</span>}
+              prefix={<span className="text-neutral-400">₦</span>}
               placeholder="Enter your counter offer"
               formatter={(value) => `${value}`.replace(/\B(?=(\d{3})+(?!\d))/g, ',')}
               parser={(value: any) => value?.replace(/,/g, '')}
@@ -707,20 +792,20 @@ const SellItem = () => {
           <div className="flex gap-3 pt-2">
             <button
               onClick={() => setIsCounterOfferModalOpen(false)}
-              className="flex-1 py-3 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
+              className="flex-1 py-3 text-sm font-medium text-neutral-600 hover:bg-neutral-100 rounded-xl transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleSubmitCounterOffer}
-              disabled={counterOfferAmount <= 0}
+              disabled={counterOfferAmount <= 0 || isSubmittingCounterOffer}
               className={`flex-1 py-3 text-sm font-semibold rounded-xl transition-all ${
-                counterOfferAmount > 0
+                counterOfferAmount > 0 && !isSubmittingCounterOffer
                   ? 'bg-gradient-to-r from-orange-500 to-amber-500 text-white shadow-md hover:shadow-lg'
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  : 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
               }`}
             >
-              Send Counter Offer
+              {isSubmittingCounterOffer ? 'Sending...' : 'Send Counter Offer'}
             </button>
           </div>
         </div>

@@ -9,14 +9,15 @@ import {
   Star,
   Settings,
   Eye,
-  Bell,
   ChevronDown,
   Plus,
-  Store,
   ArrowLeft,
   Check,
 } from 'lucide-react';
 import { usePathname, useRouter } from 'next/navigation';
+import { getFirstCharacter, getRandomColorByString } from '@grc/_shared/helpers';
+
+const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || 'Comaket';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -25,8 +26,8 @@ import { usePathname, useRouter } from 'next/navigation';
 export interface PortalStore {
   id: string;
   name: string;
-  avatar?: string;
-  status: 'live' | 'offline' | 'paused';
+  avatar?: string | null;
+  status: 'active' | 'pending' | 'suspended' | 'live' | 'offline' | 'paused';
 }
 
 export interface NavBadgeCounts {
@@ -45,7 +46,26 @@ interface StoreSidebarProps {
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// NAV ITEM DEFINITION
+// HELPERS
+// ═══════════════════════════════════════════════════════════════════════════
+
+/** Map backend store status to display status */
+const normalizeStatus = (status: string): 'live' | 'offline' | 'paused' => {
+  if (status === 'active' || status === 'live') return 'live';
+  if (status === 'pending' || status === 'paused') return 'paused';
+  return 'offline';
+};
+
+/** Convert a raw backend store object to PortalStore */
+export const toPortalStore = (store: any): PortalStore => ({
+  id: store._id || store.id || '',
+  name: store.name || 'Store',
+  avatar: store.logo || store.avatar || null,
+  status: store.status || 'active',
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// NAV ITEMS
 // ═══════════════════════════════════════════════════════════════════════════
 
 interface NavItemDef {
@@ -61,32 +81,32 @@ const navItems: NavItemDef[] = [
   { key: 'products', label: 'Products', icon: Package, path: '/products', badgeKey: 'products' },
   { key: 'orders', label: 'Orders', icon: ShoppingCart, path: '/orders', badgeKey: 'orders' },
   { key: 'reviews', label: 'Reviews', icon: Star, path: '/reviews', badgeKey: 'reviews' },
-  {
-    key: 'notifications',
-    label: 'Notifications',
-    icon: Bell,
-    path: '/notifications',
-    badgeKey: 'notifications',
-  },
+  // {
+  //   key: 'notifications',
+  //   label: 'Notifications',
+  //   icon: Bell,
+  //   path: '/notifications',
+  //   badgeKey: 'notifications',
+  // },
   { key: 'settings', label: 'Settings', icon: Settings, path: '/settings' },
 ];
 
 const mobileNavItems: NavItemDef[] = [
   { key: 'dashboard', label: 'Home', icon: LayoutDashboard, path: '' },
   { key: 'orders', label: 'Orders', icon: ShoppingCart, path: '/orders', badgeKey: 'orders' },
-  {
-    key: 'notifications',
-    label: 'Alerts',
-    icon: Bell,
-    path: '/notifications',
-    badgeKey: 'notifications',
-  },
+  // {
+  //   key: 'notifications',
+  //   label: 'Alerts',
+  //   icon: Bell,
+  //   path: '/notifications',
+  //   badgeKey: 'notifications',
+  // },
   { key: 'products', label: 'Products', icon: Package, path: '/products', badgeKey: 'products' },
   { key: 'settings', label: 'Settings', icon: Settings, path: '/settings' },
 ];
 
 // ═══════════════════════════════════════════════════════════════════════════
-// BADGE COUNT PILL
+// BADGE COUNT
 // ═══════════════════════════════════════════════════════════════════════════
 
 const BadgeCount: React.FC<{ count?: number; compact?: boolean }> = ({ count, compact }) => {
@@ -110,26 +130,55 @@ const BadgeCount: React.FC<{ count?: number; compact?: boolean }> = ({ count, co
 // STATUS DOT
 // ═══════════════════════════════════════════════════════════════════════════
 
-const StatusDot: React.FC<{ status: PortalStore['status']; size?: number }> = ({
-  status,
-  size = 8,
-}) => {
+const StatusDot: React.FC<{ status: string; size?: number }> = ({ status, size = 8 }) => {
+  const normalized = normalizeStatus(status);
   const colors = {
     live: 'bg-emerald-400 shadow-[0_0_8px_rgba(52,211,153,0.6)]',
-    offline: 'bg-gray-400',
+    offline: 'bg-neutral-400',
     paused: 'bg-amber-400 shadow-[0_0_8px_rgba(251,191,36,0.5)]',
   };
   return (
     <div
-      className={`rounded-full ${colors[status]} ${status === 'live' ? 'animate-pulse' : ''}`}
+      className={`rounded-full ${colors[normalized]} ${
+        normalized === 'live' ? 'animate-pulse' : ''
+      }`}
       style={{ width: size, height: size }}
     />
   );
 };
 
-const statusLabel = (status: PortalStore['status']) => {
-  const map = { live: 'Live', offline: 'Offline', paused: 'Paused' };
-  return map[status];
+const statusLabel = (status: string) => {
+  const normalized = normalizeStatus(status);
+  const map = { live: 'Live', offline: 'Offline', paused: 'Pending' };
+  return map[normalized];
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// STORE AVATAR
+// ═══════════════════════════════════════════════════════════════════════════
+
+const StoreAvatar: React.FC<{ store: PortalStore; size?: string; className?: string }> = ({
+  store,
+  size = 'w-9 h-9',
+  className = '',
+}) => {
+  if (store.avatar) {
+    return (
+      <img
+        src={store.avatar}
+        alt={store.name}
+        className={`${size} rounded-lg object-cover ${className}`}
+      />
+    );
+  }
+  return (
+    <div
+      className={`${size} rounded-lg flex items-center justify-center text-white text-sm font-bold ${className}`}
+      style={{ backgroundColor: getRandomColorByString(store.name) }}
+    >
+      {getFirstCharacter(store.name)}
+    </div>
+  );
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -155,27 +204,19 @@ const StoreSwitcher: React.FC<{
             : 'p-3 bg-white/5 hover:bg-white/10 border border-white/10'
         }`}
       >
-        <div className="w-9 h-9 rounded-lg bg-gradient-to-br from-blue to-indigo-500 flex items-center justify-center flex-shrink-0 shadow-md">
-          {currentStore.avatar ? (
-            <img
-              src={currentStore.avatar}
-              alt=""
-              className="w-full h-full rounded-lg object-cover"
-            />
-          ) : (
-            <Store size={16} className="text-white" />
-          )}
-        </div>
+        <StoreAvatar store={currentStore} className="shadow-md flex-shrink-0" />
         <div className="flex-1 min-w-0 text-left">
           <p className="text-sm font-semibold text-white truncate">{currentStore.name}</p>
           <div className="flex items-center gap-1.5">
             <StatusDot status={currentStore.status} size={6} />
-            <span className="text-[11px] text-gray-400">{statusLabel(currentStore.status)}</span>
+            <span className="text-[11px] text-neutral-400">{statusLabel(currentStore.status)}</span>
           </div>
         </div>
         <ChevronDown
           size={16}
-          className={`text-gray-400 transition-transform flex-shrink-0 ${open ? 'rotate-180' : ''}`}
+          className={`text-neutral-400 transition-transform flex-shrink-0 ${
+            open ? 'rotate-180' : ''
+          }`}
         />
       </button>
 
@@ -188,7 +229,7 @@ const StoreSwitcher: React.FC<{
               animate={{ opacity: 1, y: 0, scale: 1 }}
               exit={{ opacity: 0, y: -8, scale: 0.95 }}
               transition={{ duration: 0.15 }}
-              className="absolute left-0 right-0 mt-2 bg-gray-800 border border-gray-700 rounded-xl shadow-2xl z-50 overflow-hidden"
+              className="absolute left-0 right-0 mt-2 bg-neutral-800 border border-neutral-700 rounded-xl shadow-2xl z-50 overflow-hidden"
             >
               <div className="p-1.5 max-h-64 overflow-y-auto">
                 {stores.map((store) => {
@@ -204,24 +245,18 @@ const StoreSwitcher: React.FC<{
                         isActive ? 'bg-blue/15 border border-blue/20' : 'hover:bg-white/5'
                       }`}
                     >
-                      <div
-                        className={`w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0 ${
-                          isActive ? 'bg-gradient-to-br from-blue to-indigo-500' : 'bg-gray-700'
-                        }`}
-                      >
-                        <Store size={14} className="text-white" />
-                      </div>
+                      <StoreAvatar store={store} size="w-8 h-8" className="flex-shrink-0" />
                       <div className="flex-1 min-w-0">
                         <p
                           className={`text-sm font-medium truncate ${
-                            isActive ? 'text-white' : 'text-gray-300'
+                            isActive ? 'text-white' : 'text-neutral-300'
                           }`}
                         >
                           {store.name}
                         </p>
                         <div className="flex items-center gap-1.5">
                           <StatusDot status={store.status} size={5} />
-                          <span className="text-[10px] text-gray-500">
+                          <span className="text-[10px] text-neutral-500">
                             {statusLabel(store.status)}
                           </span>
                         </div>
@@ -231,7 +266,7 @@ const StoreSwitcher: React.FC<{
                   );
                 })}
               </div>
-              <div className="border-t border-gray-700 p-1.5">
+              <div className="border-t border-neutral-700 p-1.5">
                 <button
                   onClick={() => {
                     onCreate();
@@ -239,10 +274,10 @@ const StoreSwitcher: React.FC<{
                   }}
                   className="w-full flex items-center gap-2.5 p-2.5 rounded-lg hover:bg-white/5 transition-colors text-left"
                 >
-                  <div className="w-8 h-8 rounded-lg border-2 border-dashed border-gray-600 flex items-center justify-center">
-                    <Plus size={14} className="text-gray-500" />
+                  <div className="w-8 h-8 rounded-lg border-2 border-dashed border-neutral-600 flex items-center justify-center">
+                    <Plus size={14} className="text-neutral-500" />
                   </div>
-                  <span className="text-sm font-medium text-gray-400">Add New Store</span>
+                  <span className="text-sm font-medium text-neutral-400">Add New Store</span>
                 </button>
               </div>
             </motion.div>
@@ -274,23 +309,22 @@ const DesktopSidebar: React.FC<StoreSidebarProps & { storeId: string }> = ({
     if (sub === '' || sub === '/') return 'dashboard';
     return sub.replace('/', '');
   };
-
   const activeKey = getActiveKey();
 
+  console.log('found storessss::::', stores);
+
   return (
-    <div className="fixed left-0 top-0 bottom-0 w-[240px] bg-gray-900 border-r border-gray-800 flex flex-col z-30">
-      {/* Back to marketplace */}
+    <div className="fixed left-0 top-0 bottom-0 w-[240px] bg-neutral-900 border-r border-neutral-800 flex flex-col z-30">
       <div className="px-4 pt-4 pb-2">
         <button
           onClick={() => router.push('/')}
-          className="flex items-center gap-2 text-xs font-medium text-gray-500 hover:text-gray-300 transition-colors"
+          className="flex items-center gap-2 text-xs font-medium text-neutral-500 hover:text-neutral-300 transition-colors"
         >
           <ArrowLeft size={14} />
           Back to Marketplace
         </button>
       </div>
 
-      {/* Store Switcher */}
       <div className="px-3 pb-4 pt-1">
         <StoreSwitcher
           stores={stores}
@@ -300,15 +334,13 @@ const DesktopSidebar: React.FC<StoreSidebarProps & { storeId: string }> = ({
         />
       </div>
 
-      <div className="mx-4 h-px bg-gray-800" />
+      <div className="mx-4 h-px bg-neutral-800" />
 
-      {/* Nav Items */}
       <nav className="flex-1 px-3 py-4 space-y-1">
         {navItems.map((item) => {
           const isActive = activeKey === item.key;
           const Icon = item.icon;
           const badgeVal = item.badgeKey ? badgeCounts[item.badgeKey] : undefined;
-
           return (
             <button
               key={item.key}
@@ -316,11 +348,11 @@ const DesktopSidebar: React.FC<StoreSidebarProps & { storeId: string }> = ({
               className={`w-full flex items-center gap-3 px-3 py-2.5 mb-3 rounded-xl text-sm font-medium transition-all ${
                 isActive
                   ? 'bg-blue/15 text-white border border-blue/20'
-                  : 'text-gray-400 hover:text-white hover:bg-white/5'
+                  : 'text-neutral-400 hover:text-white hover:bg-white/5'
               }`}
             >
               <div className="relative flex-shrink-0">
-                <Icon size={18} className={isActive ? 'text-blue' : 'text-gray-500'} />
+                <Icon size={18} className={isActive ? 'text-blue' : 'text-neutral-500'} />
               </div>
               <span className="flex-1 text-left">{item.label}</span>
               {badgeVal && badgeVal > 0 ? (
@@ -333,28 +365,27 @@ const DesktopSidebar: React.FC<StoreSidebarProps & { storeId: string }> = ({
         })}
       </nav>
 
-      <div className="mx-4 h-px bg-gray-800" />
+      <div className="mx-4 h-px bg-neutral-800" />
 
-      {/* Preview & Footer */}
       <div className="px-3 py-4 space-y-1">
         <button
           onClick={() => router.push(`${basePath}/preview`)}
           className={`w-full flex items-center gap-3 px-3 py-2.5 rounded-xl text-sm font-medium transition-all ${
             activeKey === 'preview'
               ? 'bg-emerald-500/15 text-emerald-400 border border-emerald-500/20'
-              : 'text-gray-400 hover:text-white hover:bg-white/5'
+              : 'text-neutral-400 hover:text-white hover:bg-white/5'
           }`}
         >
           <Eye
             size={18}
-            className={activeKey === 'preview' ? 'text-emerald-400' : 'text-gray-500'}
+            className={activeKey === 'preview' ? 'text-emerald-400' : 'text-neutral-500'}
           />
           Store Preview
         </button>
       </div>
 
-      <div className="px-4 py-3 border-t border-gray-800">
-        <p className="text-[10px] text-gray-600 font-medium">Comaket Store Portal</p>
+      <div className="px-4 py-3 border-t border-neutral-800">
+        <p className="text-[10px] text-neutral-600 font-medium">{APP_NAME} Store Portal</p>
       </div>
     </div>
   );
@@ -372,17 +403,15 @@ const MobileTopBar: React.FC<StoreSidebarProps & { storeId: string }> = ({
   storeId,
 }) => {
   const router = useRouter();
-
   return (
-    <div className="sticky top-0 z-30 bg-gray-900 border-b border-gray-800 px-4 py-3 pt-12">
+    <div className="sticky top-0 z-30 bg-neutral-900 border-b border-neutral-800 px-4 py-3 pt-12">
       <div className="flex items-center justify-between gap-3">
         <button
           onClick={() => router.push('/')}
           className="p-1.5 rounded-lg hover:bg-white/10 transition-colors"
         >
-          <ArrowLeft size={18} className="text-gray-400" />
+          <ArrowLeft size={18} className="text-neutral-400" />
         </button>
-
         <div className="flex-1">
           <StoreSwitcher
             stores={stores}
@@ -392,12 +421,11 @@ const MobileTopBar: React.FC<StoreSidebarProps & { storeId: string }> = ({
             compact
           />
         </div>
-
         <button
           onClick={() => router.push(`/my-store/${storeId}/preview`)}
           className="p-1.5 rounded-lg hover:bg-white/10 transition-colors"
         >
-          <Eye size={18} className="text-gray-400" />
+          <Eye size={18} className="text-neutral-400" />
         </button>
       </div>
     </div>
@@ -421,17 +449,15 @@ const MobileBottomNav: React.FC<{ storeId: string; badgeCounts?: NavBadgeCounts 
     if (sub === '' || sub === '/') return 'dashboard';
     return sub.replace('/', '');
   };
-
   const activeKey = getActiveKey();
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-30 bg-gray-900 border-t border-gray-800 px-2 pb-6 pt-2">
+    <div className="fixed bottom-0 left-0 right-0 z-30 bg-neutral-900 border-t border-neutral-800 px-2 pb-6 pt-2">
       <div className="flex items-center justify-around">
         {mobileNavItems.map((item) => {
           const isActive = activeKey === item.key;
           const Icon = item.icon;
           const badgeVal = item.badgeKey ? badgeCounts[item.badgeKey] : undefined;
-
           return (
             <button
               key={item.key}
@@ -443,15 +469,15 @@ const MobileBottomNav: React.FC<{ storeId: string; badgeCounts?: NavBadgeCounts 
                   isActive ? 'bg-blue/20' : ''
                 }`}
               >
-                <Icon size={20} className={isActive ? 'text-blue' : 'text-gray-500'} />
+                <Icon size={20} className={isActive ? 'text-blue' : 'text-neutral-500'} />
                 {!!badgeVal && badgeVal > 0 && (
-                  <span className="absolute -top-1 -right-1.5 flex items-center justify-center min-w-[16px] h-4 px-1 text-[9px] font-bold bg-red-500 text-white rounded-full shadow-sm shadow-red-500/40 ring-2 ring-gray-900">
+                  <span className="absolute -top-1 -right-1.5 flex items-center justify-center min-w-[16px] h-4 px-1 text-[9px] font-bold bg-red-500 text-white rounded-full shadow-sm shadow-red-500/40 ring-2 ring-neutral-900">
                     {badgeVal > 99 ? '99+' : badgeVal}
                   </span>
                 )}
               </div>
               <span
-                className={`text-[10px] font-medium ${isActive ? 'text-blue' : 'text-gray-500'}`}
+                className={`text-[10px] font-medium ${isActive ? 'text-blue' : 'text-neutral-500'}`}
               >
                 {item.label}
               </span>
@@ -475,4 +501,5 @@ export {
   StatusDot,
   statusLabel,
   BadgeCount,
+  StoreAvatar,
 };

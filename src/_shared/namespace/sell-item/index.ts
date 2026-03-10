@@ -22,19 +22,27 @@ export type SellItemStatus =
 // Read from env with fallbacks
 
 export const LISTING_FEE_PERCENT = Number(process.env.NEXT_PUBLIC_LISTING_FEE_PERCENT ?? 5);
+export const LISTING_FEE_CAP_KOBO = Number(process.env.NEXT_PUBLIC_LISTING_FEE_CAP_KOBO ?? 500000); // ₦5,000
 export const CONSIGNMENT_COMMISSION_PERCENT = Number(
   process.env.NEXT_PUBLIC_CONSIGNMENT_COMMISSION_PERCENT ?? 10
 );
+export const CONSIGNMENT_COMMISSION_CAP_KOBO = Number(
+  process.env.NEXT_PUBLIC_CONSIGNMENT_COMMISSION_CAP_KOBO ?? 2000000
+); // ₦20,000
 
 // ─── Helper to calculate listing fee ─────────────────────────────────────────
-
-export const calculateListingFee = (priceInKobo: number): number => {
-  return Math.round((priceInKobo * LISTING_FEE_PERCENT) / 100);
+export const calculateListingFee = (priceKobo: number): number => {
+  const fee = Math.round((priceKobo * LISTING_FEE_PERCENT) / 100);
+  return Math.min(fee, LISTING_FEE_CAP_KOBO);
 };
 
-export const calculateConsignmentCut = (priceInKobo: number) => {
-  const platformCut = Math.round((priceInKobo * CONSIGNMENT_COMMISSION_PERCENT) / 100);
-  const sellerCut = priceInKobo - platformCut;
+/** Returns { platformCut, sellerCut } in kobo, commission capped at CONSIGNMENT_COMMISSION_CAP_KOBO */
+export const calculateConsignmentCut = (priceKobo: number) => {
+  const platformCut = Math.min(
+    Math.round((priceKobo * CONSIGNMENT_COMMISSION_PERCENT) / 100),
+    CONSIGNMENT_COMMISSION_CAP_KOBO
+  );
+  const sellerCut = priceKobo - platformCut;
   return { platformCut, sellerCut };
 };
 
@@ -67,7 +75,7 @@ export const getStatusColor = (status: SellItemStatus): string => {
     'counter-offer': '#f97316', // orange
     live: '#22c55e', // green
     sold: '#06b6d4', // cyan
-    delisted: '#6b7280', // gray
+    delisted: '#6b7280', // neutral
   };
   return colors[status] || '#6b7280';
 };
@@ -97,7 +105,11 @@ export interface SellItemType {
   itemName: string;
   description: string;
   condition: string;
-  location: string;
+  location: {
+    country: string;
+    state: string;
+    city: string;
+  };
   postImgUrls: string[];
   askingPrice: {
     price: number; // in kobo

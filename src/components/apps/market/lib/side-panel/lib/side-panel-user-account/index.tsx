@@ -17,7 +17,7 @@ const SidePanelUserAccount: React.FC<Props> = ({ userProfile }) => {
     return (
       <div className="drop-down-content w-60">
         <div
-          className="cursor-pointer border-b text-center rounded-sm px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-400"
+          className="cursor-pointer border-b text-center rounded-sm px-3 py-2 hover:bg-neutral-100 dark:hover:bg-zinc-400"
           onClick={() => handleMenuClick('chat')}
         >
           <Space className="p-1" size={15}>
@@ -25,7 +25,7 @@ const SidePanelUserAccount: React.FC<Props> = ({ userProfile }) => {
           </Space>
         </div>
         <div
-          className="cursor-pointer border-b text-center rounded-sm px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-400"
+          className="cursor-pointer border-b text-center rounded-sm px-3 py-2 hover:bg-neutral-100 dark:hover:bg-zinc-400"
           onClick={() => handleMenuClick('visit-store')}
         >
           <Space className="p-1" size={15}>
@@ -33,7 +33,7 @@ const SidePanelUserAccount: React.FC<Props> = ({ userProfile }) => {
           </Space>
         </div>
         <div
-          className="cursor-pointer border-b text-center rounded-sm px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-400"
+          className="cursor-pointer border-b text-center rounded-sm px-3 py-2 hover:bg-neutral-100 dark:hover:bg-zinc-400"
           onClick={() => handleMenuClick('add-to-saved')}
         >
           <Space className="p-1" size={15}>
@@ -41,7 +41,7 @@ const SidePanelUserAccount: React.FC<Props> = ({ userProfile }) => {
           </Space>
         </div>
         <div
-          className="cursor-pointer border-b text-center rounded-sm px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-400"
+          className="cursor-pointer border-b text-center rounded-sm px-3 py-2 hover:bg-neutral-100 dark:hover:bg-zinc-400"
           onClick={() => handleMenuClick('share')}
         >
           <Space className="p-1" size={15}>
@@ -49,7 +49,7 @@ const SidePanelUserAccount: React.FC<Props> = ({ userProfile }) => {
           </Space>
         </div>
         <div
-          className="cursor-pointer border-b text-center rounded-sm px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-400"
+          className="cursor-pointer border-b text-center rounded-sm px-3 py-2 hover:bg-neutral-100 dark:hover:bg-zinc-400"
           onClick={() => handleMenuClick('copy-link')}
         >
           <Space className="p-1" size={15}>
@@ -57,7 +57,7 @@ const SidePanelUserAccount: React.FC<Props> = ({ userProfile }) => {
           </Space>
         </div>
         <div
-          className="cursor-pointer text-center rounded-sm px-3 py-2 hover:bg-gray-100 dark:hover:bg-zinc-400"
+          className="cursor-pointer text-center rounded-sm px-3 py-2 hover:bg-neutral-100 dark:hover:bg-zinc-400"
           onClick={() => handleMenuClick('cancel')}
         >
           <Space className="p-1" size={15}>

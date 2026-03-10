@@ -1,58 +1,46 @@
 'use client';
 
-import React, { useState, useEffect, useCallback } from 'react';
+import React, { useState, useEffect, useCallback, useRef } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Input } from 'antd';
-import { ArrowRight, Eye, EyeOff, Lock, Mail, Sparkles, User, X } from 'lucide-react';
+import {
+  ArrowLeft,
+  ArrowRight,
+  CheckCircle,
+  Eye,
+  EyeOff,
+  KeyRound,
+  Lock,
+  Mail,
+  MailCheck,
+  RefreshCw,
+  Sparkles,
+  User,
+  X,
+} from 'lucide-react';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
+import { useAuth } from '@grc/hooks/useAuth';
+import { GoogleAuthButton } from './lib/google-auth-btn';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TYPES
 // ═══════════════════════════════════════════════════════════════════════════
 
-export type AuthView = 'login' | 'signup';
+export type AuthView = 'login' | 'signup' | 'verify-email' | 'forgot-password';
 
 interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
-  initialView?: AuthView;
-  onLogin: (data: { email: string; password: string }) => void;
-  onSignup: (data: {
-    firstName: string;
-    lastName: string;
-    email: string;
-    password: string;
-  }) => void;
-  onGoogleSignIn: () => void;
+  initialView?: 'login' | 'signup';
+  // onAuthSuccess?: () => void;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
 // GOOGLE ICON
 // ═══════════════════════════════════════════════════════════════════════════
 
-const GoogleIcon = ({ size = 18 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="none">
-    <path
-      d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92a5.06 5.06 0 0 1-2.2 3.32v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.1z"
-      fill="#4285F4"
-    />
-    <path
-      d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-      fill="#34A853"
-    />
-    <path
-      d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18A10.96 10.96 0 0 0 1 12c0 1.77.42 3.45 1.18 4.93l3.66-2.84z"
-      fill="#FBBC05"
-    />
-    <path
-      d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-      fill="#EA4335"
-    />
-  </svg>
-);
-
 // ═══════════════════════════════════════════════════════════════════════════
-// FLOATING SHAPES (Decorative background)
+// FLOATING SHAPES
 // ═══════════════════════════════════════════════════════════════════════════
 
 const FloatingShapes = () => (
@@ -94,7 +82,7 @@ const PasswordInput = ({
     <div className="relative">
       <Lock
         size={16}
-        className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 z-10 pointer-events-none"
+        className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 z-10 pointer-events-none"
       />
       <Input
         type={visible ? 'text' : 'password'}
@@ -106,7 +94,7 @@ const PasswordInput = ({
       <button
         type="button"
         onClick={() => setVisible(!visible)}
-        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 dark:hover:text-gray-300 transition-colors z-10"
+        className="absolute right-3.5 top-1/2 -translate-y-1/2 text-neutral-400 hover:text-neutral-600 dark:hover:text-neutral-300 transition-colors z-10"
       >
         {visible ? <EyeOff size={16} /> : <Eye size={16} />}
       </button>
@@ -129,7 +117,7 @@ const getPasswordStrength = (password: string) => {
 
 const strengthLabels = ['', 'Weak', 'Fair', 'Good', 'Strong'];
 const strengthColors = [
-  'bg-gray-200 dark:bg-gray-700',
+  'bg-neutral-200 dark:bg-neutral-700',
   'bg-red-400',
   'bg-amber-400',
   'bg-blue',
@@ -147,7 +135,7 @@ const PasswordStrength = ({ password }: { password: string }) => {
           <div
             key={i}
             className={`h-1 flex-1 rounded-full transition-all duration-300 ${
-              i <= strength ? strengthColors[strength] : 'bg-gray-200 dark:bg-gray-700'
+              i <= strength ? strengthColors[strength] : 'bg-neutral-200 dark:bg-neutral-700'
             }`}
           />
         ))}
@@ -170,14 +158,487 @@ const PasswordStrength = ({ password }: { password: string }) => {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
+// OTP INPUT — 6 individual digit boxes
+// ═══════════════════════════════════════════════════════════════════════════
+
+const OtpInput = ({
+  length = 6,
+  onComplete,
+  disabled = false,
+  error = false,
+}: {
+  length?: number;
+  onComplete: (otp: string) => void;
+  disabled?: boolean;
+  error?: boolean;
+}) => {
+  const [values, setValues] = useState<string[]>(Array(length).fill(''));
+  const inputRefs = useRef<(HTMLInputElement | null)[]>([]);
+
+  // Reset values when error changes or disabled changes
+  useEffect(() => {
+    if (error) {
+      setValues(Array(length).fill(''));
+      inputRefs.current[0]?.focus();
+    }
+  }, [error, length]);
+
+  const focusInput = (index: number) => {
+    if (index >= 0 && index < length) {
+      inputRefs.current[index]?.focus();
+      inputRefs.current[index]?.select();
+    }
+  };
+
+  const handleChange = (index: number, value: string) => {
+    // Only allow single digit
+    const digit = value.replace(/[^0-9]/g, '').slice(-1);
+    const newValues = [...values];
+    newValues[index] = digit;
+    setValues(newValues);
+
+    if (digit && index < length - 1) {
+      focusInput(index + 1);
+    }
+
+    // Auto-submit when all filled
+    const otp = newValues.join('');
+    if (otp.length === length && !newValues.includes('')) {
+      onComplete(otp);
+    }
+  };
+
+  const handleKeyDown = (index: number, e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Backspace') {
+      if (!values[index] && index > 0) {
+        // Move to previous and clear it
+        const newValues = [...values];
+        newValues[index - 1] = '';
+        setValues(newValues);
+        focusInput(index - 1);
+        e.preventDefault();
+      } else {
+        // Clear current
+        const newValues = [...values];
+        newValues[index] = '';
+        setValues(newValues);
+      }
+    } else if (e.key === 'ArrowLeft' && index > 0) {
+      focusInput(index - 1);
+      e.preventDefault();
+    } else if (e.key === 'ArrowRight' && index < length - 1) {
+      focusInput(index + 1);
+      e.preventDefault();
+    }
+  };
+
+  const handlePaste = (e: React.ClipboardEvent) => {
+    e.preventDefault();
+    const pasted = e.clipboardData
+      .getData('text')
+      .replace(/[^0-9]/g, '')
+      .slice(0, length);
+    if (!pasted) return;
+
+    const newValues = [...values];
+    for (let i = 0; i < pasted.length; i++) {
+      newValues[i] = pasted[i];
+    }
+    setValues(newValues);
+
+    // Focus the next empty or last
+    const nextEmpty = newValues.findIndex((v) => !v);
+    focusInput(nextEmpty >= 0 ? nextEmpty : length - 1);
+
+    // Auto-submit if complete
+    if (pasted.length === length) {
+      onComplete(pasted);
+    }
+  };
+
+  return (
+    <div className="flex gap-2.5 justify-center">
+      {Array.from({ length }).map((_, i) => (
+        <motion.div
+          key={i}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ delay: i * 0.05 }}
+        >
+          <input
+            ref={(el) => {
+              inputRefs.current[i] = el;
+            }}
+            type="text"
+            inputMode="numeric"
+            maxLength={1}
+            value={values[i]}
+            disabled={disabled}
+            onChange={(e) => handleChange(i, e.target.value)}
+            onKeyDown={(e) => handleKeyDown(i, e)}
+            onPaste={i === 0 ? handlePaste : undefined}
+            onFocus={(e) => e.target.select()}
+            className={`w-12 h-14 text-center text-xl font-bold rounded-xl border-2 outline-none transition-all duration-200 bg-white dark:bg-neutral-800 disabled:opacity-50 disabled:cursor-not-allowed ${
+              error
+                ? 'border-red-400 text-red-500 shake'
+                : values[i]
+                  ? 'border-blue text-neutral-900 dark:text-white shadow-sm shadow-blue/10'
+                  : 'border-neutral-200 dark:border-neutral-700 text-neutral-900 dark:text-white focus:border-blue focus:shadow-sm focus:shadow-blue/10'
+            }`}
+            style={{ caretColor: 'transparent', fontSize: '16px' }}
+          />
+        </motion.div>
+      ))}
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RESEND COUNTDOWN
+// ═══════════════════════════════════════════════════════════════════════════
+
+const useResendCountdown = (seconds: number = 30) => {
+  const [countdown, setCountdown] = useState(seconds);
+  const [isActive, setIsActive] = useState(true);
+
+  useEffect(() => {
+    if (!isActive) return;
+    if (countdown <= 0) {
+      setIsActive(false);
+      return;
+    }
+    const timer = setTimeout(() => setCountdown((c) => c - 1), 1000);
+    return () => clearTimeout(timer);
+  }, [countdown, isActive]);
+
+  const restart = () => {
+    setCountdown(seconds);
+    setIsActive(true);
+  };
+
+  return { countdown, canResend: !isActive, restart };
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// VERIFY EMAIL VIEW
+// ═══════════════════════════════════════════════════════════════════════════
+
+const VerifyEmailView = ({
+  email,
+  onVerify,
+  onResend,
+  onBack,
+  isVerifying,
+  isResending,
+}: {
+  email: string;
+  onVerify: (otp: string) => void;
+  onResend: () => void;
+  onBack: () => void;
+  isVerifying: boolean;
+  isResending: boolean;
+}) => {
+  const [otpError, setOtpError] = useState(false);
+  const [errorMessage, setErrorMessage] = useState('');
+  const { countdown, canResend, restart } = useResendCountdown(30);
+
+  const handleComplete = (otp: string) => {
+    setOtpError(false);
+    setErrorMessage('');
+    onVerify(otp);
+  };
+
+  const handleResend = () => {
+    if (!canResend || isResending) return;
+    onResend();
+    restart();
+  };
+
+  // Mask email: e****@example.com
+  const maskedEmail = email
+    ? email.replace(/^(.)(.*)(@.+)$/, (_, first, middle, domain) => {
+        return first + '*'.repeat(Math.min(middle.length, 4)) + domain;
+      })
+    : '';
+
+  return (
+    <motion.div
+      key="verify-email"
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -20 }}
+      transition={{ duration: 0.25 }}
+      className="space-y-6"
+    >
+      {/* Back button */}
+      <button
+        type="button"
+        onClick={onBack}
+        className="flex items-center gap-1.5 text-sm text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors -mb-2"
+      >
+        <ArrowLeft size={16} />
+        Back
+      </button>
+
+      {/* Header */}
+      <div className="text-center space-y-3">
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
+          className="w-16 h-16 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center mx-auto shadow-lg shadow-emerald-400/25"
+        >
+          <MailCheck size={28} className="text-white" />
+        </motion.div>
+        <div>
+          <h2 className="text-xl font-bold text-neutral-900 dark:text-white">Verify your email</h2>
+          <p className="text-sm text-neutral-500 mt-1">
+            We sent a 6-digit code to{' '}
+            <span className="font-medium text-neutral-700 dark:text-neutral-300">
+              {maskedEmail}
+            </span>
+          </p>
+        </div>
+      </div>
+
+      {/* OTP Input */}
+      <div className="py-2">
+        <OtpInput onComplete={handleComplete} disabled={isVerifying} error={otpError} />
+        {errorMessage && (
+          <motion.p
+            initial={{ opacity: 0, y: -5 }}
+            animate={{ opacity: 1, y: 0 }}
+            className="text-center text-sm text-red-500 mt-3"
+          >
+            {errorMessage}
+          </motion.p>
+        )}
+      </div>
+
+      {/* Verifying indicator */}
+      {isVerifying && (
+        <div className="flex items-center justify-center gap-2 text-sm text-blue">
+          <div className="w-4 h-4 border-2 border-blue/30 border-t-blue rounded-full animate-spin" />
+          Verifying...
+        </div>
+      )}
+
+      {/* Resend */}
+      <div className="text-center">
+        <p className="text-sm text-neutral-500">
+          Didn&apos;t receive the code?{' '}
+          {canResend ? (
+            <button
+              type="button"
+              onClick={handleResend}
+              disabled={isResending}
+              className="font-semibold text-blue hover:text-blue transition-colors inline-flex items-center gap-1"
+            >
+              {isResending ? (
+                <>
+                  <RefreshCw size={13} className="animate-spin" />
+                  Sending...
+                </>
+              ) : (
+                'Resend code'
+              )}
+            </button>
+          ) : (
+            <span className="font-medium text-neutral-400">
+              Resend in{' '}
+              <span className="tabular-nums text-neutral-600 dark:text-neutral-300">
+                {countdown}s
+              </span>
+            </span>
+          )}
+        </p>
+      </div>
+
+      {/* Help text */}
+      <p className="text-center text-[11px] text-neutral-400 leading-relaxed">
+        Check your spam folder if you don&apos;t see the email. The code expires in 10 minutes.
+      </p>
+    </motion.div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FORGOT PASSWORD VIEW
+// ═══════════════════════════════════════════════════════════════════════════
+
+const ForgotPasswordView = ({
+  onSubmit,
+  onBackToLogin,
+  isSubmitting,
+}: {
+  onSubmit: (email: string) => void;
+  onBackToLogin: () => void;
+  isSubmitting: boolean;
+}) => {
+  const [email, setEmail] = useState('');
+  const [error, setError] = useState('');
+  const [sent, setSent] = useState(false);
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!email.trim()) {
+      setError('Email is required');
+      return;
+    }
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+      setError('Enter a valid email');
+      return;
+    }
+    setError('');
+    onSubmit(email.trim().toLowerCase());
+    setSent(true);
+  };
+
+  if (sent && !isSubmitting) {
+    return (
+      <motion.div
+        key="forgot-sent"
+        initial={{ opacity: 0, scale: 0.95 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.3 }}
+        className="space-y-6 text-center"
+      >
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.15, type: 'spring', stiffness: 200 }}
+          className="w-16 h-16 rounded-full bg-gradient-to-br from-emerald-400 to-green-500 flex items-center justify-center mx-auto shadow-lg shadow-emerald-400/25"
+        >
+          <CheckCircle size={30} className="text-white" />
+        </motion.div>
+        <div>
+          <h2 className="text-xl font-bold text-neutral-900 dark:text-white">Check your email</h2>
+          <p className="text-sm text-neutral-500 mt-2 leading-relaxed max-w-[280px] mx-auto">
+            We&apos;ve sent a password reset link to{' '}
+            <span className="font-medium text-neutral-700 dark:text-neutral-300">{email}</span>
+          </p>
+        </div>
+        <div className="space-y-3">
+          <button
+            type="button"
+            onClick={() => {
+              setSent(false);
+              setEmail('');
+            }}
+            className="text-sm text-blue hover:text-blue font-medium transition-colors"
+          >
+            Try a different email
+          </button>
+          <div>
+            <button
+              type="button"
+              onClick={onBackToLogin}
+              className="flex items-center gap-1.5 mx-auto text-sm text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors"
+            >
+              <ArrowLeft size={14} />
+              Back to sign in
+            </button>
+          </div>
+        </div>
+      </motion.div>
+    );
+  }
+
+  return (
+    <motion.form
+      key="forgot-password"
+      initial={{ opacity: 0, x: 20 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -20 }}
+      transition={{ duration: 0.25 }}
+      onSubmit={handleSubmit}
+      className="space-y-5"
+    >
+      {/* Back */}
+      <button
+        type="button"
+        onClick={onBackToLogin}
+        className="flex items-center gap-1.5 text-sm text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 transition-colors -mb-2"
+      >
+        <ArrowLeft size={16} />
+        Back to sign in
+      </button>
+
+      {/* Header */}
+      <div className="text-center space-y-3">
+        <motion.div
+          initial={{ scale: 0 }}
+          animate={{ scale: 1 }}
+          transition={{ delay: 0.1, type: 'spring', stiffness: 200 }}
+          className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center mx-auto shadow-lg shadow-amber-400/25"
+        >
+          <KeyRound size={24} className="text-white" />
+        </motion.div>
+        <div>
+          <h2 className="text-xl font-bold text-neutral-900 dark:text-white">Forgot password?</h2>
+          <p className="text-sm text-neutral-500 mt-1">
+            Enter your email and we&apos;ll send you a reset link
+          </p>
+        </div>
+      </div>
+
+      {/* Email */}
+      <div>
+        <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-1 block">
+          Email
+        </label>
+        <div className="relative">
+          <Mail
+            size={16}
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 z-10 pointer-events-none"
+          />
+          <Input
+            type="email"
+            value={email}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              error && setError('');
+            }}
+            placeholder="you@example.com"
+            className="!rounded-xl h-12 !pl-10 !text-base"
+            status={error ? 'error' : undefined}
+          />
+        </div>
+        {error && <p className="text-[11px] text-red-400 mt-1">{error}</p>}
+      </div>
+
+      {/* Submit */}
+      <button
+        type="submit"
+        disabled={isSubmitting}
+        className="w-full py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 bg-gradient-to-r from-amber-500 to-orange-500 hover:from-amber-600 hover:to-orange-600 text-white shadow-md shadow-amber-500/20 hover:shadow-lg transition-all disabled:opacity-60"
+      >
+        {isSubmitting ? (
+          <>
+            <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
+            Sending...
+          </>
+        ) : (
+          <>
+            Send Reset Link
+            <ArrowRight size={16} />
+          </>
+        )}
+      </button>
+    </motion.form>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
 // SIGNUP FORM
 // ═══════════════════════════════════════════════════════════════════════════
 
 const SignupForm = ({
   onSubmit,
   onSwitchToLogin,
-  onGoogleSignIn,
+  onGoogleSignInCompleted,
   isSubmitting,
+  authError,
 }: {
   onSubmit: (data: {
     firstName: string;
@@ -186,8 +647,9 @@ const SignupForm = ({
     password: string;
   }) => void;
   onSwitchToLogin: () => void;
-  onGoogleSignIn: () => void;
+  onGoogleSignInCompleted: () => void;
   isSubmitting: boolean;
+  authError?: string;
 }) => {
   const [firstName, setFirstName] = useState('');
   const [lastName, setLastName] = useState('');
@@ -240,20 +702,31 @@ const SignupForm = ({
         >
           <Sparkles size={24} className="text-white" />
         </motion.div>
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white">Create your account</h2>
-        <p className="text-sm text-gray-500">Join the Comaket community</p>
+        <h2 className="text-xl font-bold text-neutral-900 dark:text-white">Create your account</h2>
+        <p className="text-sm text-neutral-500">Join the Comaket community</p>
       </div>
+
+      {/* Auth error */}
+      {authError && (
+        <motion.div
+          initial={{ opacity: 0, y: -5 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 rounded-xl px-4 py-3"
+        >
+          <p className="text-sm text-red-600 dark:text-red-400">{authError}</p>
+        </motion.div>
+      )}
 
       {/* Name fields */}
       <div className={`grid ${isMobile ? 'grid-cols-1' : 'grid-cols-2'} gap-3`}>
         <div>
-          <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1 block">
+          <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-1 block">
             First Name
           </label>
           <div className="relative">
             <User
               size={16}
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 z-10 pointer-events-none"
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 z-10 pointer-events-none"
             />
             <Input
               value={firstName}
@@ -269,13 +742,13 @@ const SignupForm = ({
           {errors.firstName && <p className="text-[11px] text-red-400 mt-1">{errors.firstName}</p>}
         </div>
         <div>
-          <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1 block">
+          <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-1 block">
             Last Name
           </label>
           <div className="relative">
             <User
               size={16}
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 z-10 pointer-events-none"
+              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 z-10 pointer-events-none"
             />
             <Input
               value={lastName}
@@ -294,13 +767,13 @@ const SignupForm = ({
 
       {/* Email */}
       <div>
-        <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1 block">
+        <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-1 block">
           Email
         </label>
         <div className="relative">
           <Mail
             size={16}
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 z-10 pointer-events-none"
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 z-10 pointer-events-none"
           />
           <Input
             type="email"
@@ -319,7 +792,7 @@ const SignupForm = ({
 
       {/* Password */}
       <div>
-        <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1 block">
+        <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-1 block">
           Password
         </label>
         <PasswordInput
@@ -358,25 +831,18 @@ const SignupForm = ({
       {/* Divider */}
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-200 dark:border-gray-700" />
+          <div className="w-full border-t border-neutral-200 dark:border-neutral-700" />
         </div>
         <div className="relative flex justify-center text-xs">
-          <span className="bg-white dark:bg-gray-900 px-3 text-gray-400">or</span>
+          <span className="bg-white dark:bg-neutral-900 px-3 text-neutral-400">or</span>
         </div>
       </div>
 
-      {/* Google Sign In */}
-      <button
-        type="button"
-        onClick={onGoogleSignIn}
-        className="w-full py-3 rounded-xl text-sm font-medium flex items-center justify-center gap-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-750 hover:border-gray-300 dark:hover:border-gray-600 transition-all shadow-sm"
-      >
-        <GoogleIcon size={18} />
-        Continue with Google
-      </button>
+      {/* Google */}
+      <GoogleAuthButton onSuccess={onGoogleSignInCompleted} />
 
-      {/* Switch to login */}
-      <p className="text-center text-sm text-gray-500">
+      {/* Switch */}
+      <p className="text-center text-sm text-neutral-500">
         Already have an account?{' '}
         <button
           type="button"
@@ -397,13 +863,17 @@ const SignupForm = ({
 const LoginForm = ({
   onSubmit,
   onSwitchToSignup,
-  onGoogleSignIn,
+  onGoogleSignInCompleted,
+  onForgotPassword,
   isSubmitting,
+  authError,
 }: {
   onSubmit: (data: { email: string; password: string }) => void;
   onSwitchToSignup: () => void;
-  onGoogleSignIn: () => void;
+  onGoogleSignInCompleted: () => void;
+  onForgotPassword: () => void;
   isSubmitting: boolean;
+  authError?: string;
 }) => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
@@ -444,19 +914,30 @@ const LoginForm = ({
         >
           <Lock size={24} className="text-white" />
         </motion.div>
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white">Welcome back</h2>
-        <p className="text-sm text-gray-500">Sign in to your Comaket account</p>
+        <h2 className="text-xl font-bold text-neutral-900 dark:text-white">Welcome back</h2>
+        <p className="text-sm text-neutral-500">Sign in to your Comaket account</p>
       </div>
+
+      {/* Auth error */}
+      {authError && (
+        <motion.div
+          initial={{ opacity: 0, y: -5 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800/40 rounded-xl px-4 py-3"
+        >
+          <p className="text-sm text-red-600 dark:text-red-400">{authError}</p>
+        </motion.div>
+      )}
 
       {/* Email */}
       <div>
-        <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1 block">
+        <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-1 block">
           Email
         </label>
         <div className="relative">
           <Mail
             size={16}
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 z-10 pointer-events-none"
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 z-10 pointer-events-none"
           />
           <Input
             type="email"
@@ -476,9 +957,12 @@ const LoginForm = ({
       {/* Password */}
       <div>
         <div className="flex items-center justify-between mb-1">
-          <label className="text-xs font-semibold text-gray-600 dark:text-gray-400">Password</label>
+          <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-400">
+            Password
+          </label>
           <button
             type="button"
+            onClick={onForgotPassword}
             className="text-[11px] font-medium text-blue hover:text-blue transition-colors"
           >
             Forgot password?
@@ -517,25 +1001,17 @@ const LoginForm = ({
       {/* Divider */}
       <div className="relative">
         <div className="absolute inset-0 flex items-center">
-          <div className="w-full border-t border-gray-200 dark:border-gray-700" />
+          <div className="w-full border-t border-neutral-200 dark:border-neutral-700" />
         </div>
         <div className="relative flex justify-center text-xs">
-          <span className="bg-white dark:bg-gray-900 px-3 text-gray-400">or</span>
+          <span className="bg-white dark:bg-neutral-900 px-3 text-neutral-400">or</span>
         </div>
       </div>
 
-      {/* Google Sign In */}
-      <button
-        type="button"
-        onClick={onGoogleSignIn}
-        className="w-full py-3 rounded-xl text-sm font-medium flex items-center justify-center gap-3 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-200 hover:bg-gray-50 dark:hover:bg-gray-750 hover:border-gray-300 dark:hover:border-gray-600 transition-all shadow-sm"
-      >
-        <GoogleIcon size={18} />
-        Continue with Google
-      </button>
+      <GoogleAuthButton onSuccess={onGoogleSignInCompleted} />
 
-      {/* Switch to signup */}
-      <p className="text-center text-sm text-gray-500">
+      {/* Switch */}
+      <p className="text-center text-sm text-neutral-500">
         Don&apos;t have an account?{' '}
         <button
           type="button"
@@ -550,30 +1026,47 @@ const LoginForm = ({
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
-// AUTH MODAL — Desktop modal / Mobile full-screen
+// AUTH MODAL — Manages full auth flow internally
 // ═══════════════════════════════════════════════════════════════════════════
 
 export const AuthModal: React.FC<AuthModalProps> = ({
   isOpen,
   onClose,
   initialView = 'login',
-  onLogin,
-  onSignup,
-  onGoogleSignIn,
+  // onAuthSuccess,
 }) => {
   const isMobile = useMediaQuery(mediaSize.mobile);
-  const [view, setView] = useState<AuthView>(initialView);
-  const [isSubmitting, setIsSubmitting] = useState(false);
 
-  // Reset view when modal opens
+  // ── Auth hook (all API calls managed here) ──────────────────────────
+  const {
+    signIn,
+    signUp,
+    verifyOtp,
+    resendOtp,
+    forgotPassword,
+    isSigningIn,
+    isSigningUp,
+    isVerifyingOtp,
+    isResendingOtp,
+    isSendingForgotPassword,
+  } = useAuth();
+
+  // ── State ───────────────────────────────────────────────────────────
+  const [view, setView] = useState<AuthView>(initialView);
+  const [pendingEmail, setPendingEmail] = useState(''); // email for verify / forgot
+  const [authError, setAuthError] = useState('');
+  const [previousView, setPreviousView] = useState<AuthView>('login');
+
+  // Reset state when modal opens
   useEffect(() => {
     if (isOpen) {
       setView(initialView);
-      setIsSubmitting(false);
+      setPendingEmail('');
+      setAuthError('');
     }
   }, [isOpen, initialView]);
 
-  // Lock body scroll when open
+  // Lock body scroll
   useEffect(() => {
     if (isOpen) {
       document.body.style.overflow = 'hidden';
@@ -585,28 +1078,204 @@ export const AuthModal: React.FC<AuthModalProps> = ({
     };
   }, [isOpen]);
 
-  const handleLogin = useCallback(
-    async (data: { email: string; password: string }) => {
-      setIsSubmitting(true);
-      try {
-        await onLogin(data);
-      } finally {
-        setIsSubmitting(false);
-      }
-    },
-    [onLogin]
-  );
+  // ── Complete auth (close modal + notify layout) ─────────────────────
+  const handleAuthComplete = () => {
+    onClose();
+    console.log('google auth done::::::');
+  };
 
+  // ── Signup ──────────────────────────────────────────────────────────
   const handleSignup = useCallback(
     async (data: { firstName: string; lastName: string; email: string; password: string }) => {
-      setIsSubmitting(true);
+      setAuthError('');
       try {
-        await onSignup(data);
-      } finally {
-        setIsSubmitting(false);
+        await signUp(data);
+        // Backend auto-sends OTP on signup — go to verify
+        setPendingEmail(data.email);
+        setPreviousView('signup');
+        setView('verify-email');
+      } catch (error: any) {
+        const msg =
+          error?.data?.message ||
+          error?.data?.meta?.error?.message ||
+          error?.message ||
+          'Signup failed. Please try again.';
+        setAuthError(msg);
       }
     },
-    [onSignup]
+    [signUp]
+  );
+
+  // ── Login ───────────────────────────────────────────────────────────
+  const handleLogin = useCallback(
+    async (data: { email: string; password: string }) => {
+      setAuthError('');
+      try {
+        const result = await signIn(data);
+
+        // Check if email is verified from the response
+        // Handle different response structures
+        const user = result?.data?.user || result?.data || result?.user || result;
+        const isVerified = user?.isEmailVerified ?? user?.emailVerified ?? true;
+
+        if (!isVerified) {
+          // Email not verified — send OTP and go to verify view
+          setPendingEmail(data.email);
+          setPreviousView('login');
+          try {
+            await resendOtp({ email: data.email });
+          } catch {
+            // Silently continue — OTP might have already been sent
+          }
+          setView('verify-email');
+          return;
+        }
+
+        // Fully authenticated
+        handleAuthComplete();
+      } catch (error: any) {
+        const errMsg =
+          error?.data?.message || error?.data?.meta?.error?.message || error?.message || '';
+
+        // Check if the error is about email verification
+        const isVerificationError =
+          errMsg.toLowerCase().includes('verify') ||
+          errMsg.toLowerCase().includes('not verified') ||
+          errMsg.toLowerCase().includes('email verification') ||
+          error?.data?.code === 'EMAIL_NOT_VERIFIED';
+
+        if (isVerificationError) {
+          setPendingEmail(data.email);
+          setPreviousView('login');
+          try {
+            await resendOtp({ email: data.email });
+          } catch {
+            // Continue anyway
+          }
+          setView('verify-email');
+          return;
+        }
+
+        setAuthError(errMsg || 'Login failed. Please try again.');
+      }
+    },
+    [signIn, resendOtp, handleAuthComplete]
+  );
+
+  // ── Verify OTP ──────────────────────────────────────────────────────
+  const handleVerifyOtp = useCallback(
+    async (otp: string) => {
+      try {
+        await verifyOtp({ email: pendingEmail, otp });
+        handleAuthComplete();
+      } catch (error: any) {
+        const msg =
+          error?.data?.message ||
+          error?.data?.meta?.error?.message ||
+          error?.message ||
+          'Invalid verification code. Please try again.';
+        setAuthError(msg);
+      }
+    },
+    [verifyOtp, pendingEmail, handleAuthComplete]
+  );
+
+  // ── Resend OTP ──────────────────────────────────────────────────────
+  const handleResendOtp = useCallback(async () => {
+    try {
+      await resendOtp({ email: pendingEmail });
+    } catch {
+      // Error handled by RTK middleware toast
+    }
+  }, [resendOtp, pendingEmail]);
+
+  // ── Forgot Password ─────────────────────────────────────────────────
+  const handleForgotPassword = useCallback(
+    async (email: string) => {
+      try {
+        await forgotPassword({ email });
+      } catch {
+        // Error handled by RTK middleware toast
+      }
+    },
+    [forgotPassword]
+  );
+
+  // ── Get top bar title ───────────────────────────────────────────────
+  const getTopBarTitle = () => {
+    switch (view) {
+      case 'login':
+        return 'Sign In';
+      case 'signup':
+        return 'Sign Up';
+      case 'verify-email':
+        return 'Verify Email';
+      case 'forgot-password':
+        return 'Reset Password';
+      default:
+        return '';
+    }
+  };
+
+  // ── Render current view ─────────────────────────────────────────────
+  const renderView = () => (
+    <AnimatePresence mode="wait">
+      {view === 'signup' && (
+        <SignupForm
+          key="signup"
+          onSubmit={handleSignup}
+          onSwitchToLogin={() => {
+            setAuthError('');
+            setView('login');
+          }}
+          onGoogleSignInCompleted={handleAuthComplete}
+          isSubmitting={isSigningUp}
+          authError={authError}
+        />
+      )}
+      {view === 'login' && (
+        <LoginForm
+          key="login"
+          onSubmit={handleLogin}
+          onSwitchToSignup={() => {
+            setAuthError('');
+            setView('signup');
+          }}
+          onGoogleSignInCompleted={handleAuthComplete}
+          onForgotPassword={() => {
+            setAuthError('');
+            setView('forgot-password');
+          }}
+          isSubmitting={isSigningIn}
+          authError={authError}
+        />
+      )}
+      {view === 'verify-email' && (
+        <VerifyEmailView
+          key="verify-email"
+          email={pendingEmail}
+          onVerify={handleVerifyOtp}
+          onResend={handleResendOtp}
+          onBack={() => {
+            setAuthError('');
+            setView(previousView === 'signup' ? 'signup' : 'login');
+          }}
+          isVerifying={isVerifyingOtp}
+          isResending={isResendingOtp}
+        />
+      )}
+      {view === 'forgot-password' && (
+        <ForgotPasswordView
+          key="forgot-password"
+          onSubmit={handleForgotPassword}
+          onBackToLogin={() => {
+            setAuthError('');
+            setView('login');
+          }}
+          isSubmitting={isSendingForgotPassword}
+        />
+      )}
+    </AnimatePresence>
   );
 
   // ── MOBILE: Full-screen view ──────────────────────────────────────
@@ -620,50 +1289,28 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: '100%' }}
             transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-            className="fixed inset-0 z-[10000] bg-white dark:bg-gray-900 flex flex-col"
+            className="fixed inset-0 z-[10000] bg-white dark:bg-neutral-900 flex flex-col"
           >
             {/* Top bar */}
-            <div className="flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-800">
-              <span className="text-sm font-semibold text-gray-400">
-                {view === 'login' ? 'Sign In' : 'Sign Up'}
-              </span>
+            <div className="flex items-center justify-between px-4 py-3 border-b border-neutral-100 dark:border-neutral-800">
+              <span className="text-sm font-semibold text-neutral-400">{getTopBarTitle()}</span>
               <button
                 onClick={onClose}
-                className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
               >
-                <X size={18} className="text-gray-500" />
+                <X size={18} className="text-neutral-500" />
               </button>
             </div>
 
             {/* Content */}
             <div className="flex-1 overflow-y-auto px-5 py-6 relative">
               <FloatingShapes />
-              <div className="relative z-10">
-                <AnimatePresence mode="wait">
-                  {view === 'signup' ? (
-                    <SignupForm
-                      key="signup"
-                      onSubmit={handleSignup}
-                      onSwitchToLogin={() => setView('login')}
-                      onGoogleSignIn={onGoogleSignIn}
-                      isSubmitting={isSubmitting}
-                    />
-                  ) : (
-                    <LoginForm
-                      key="login"
-                      onSubmit={handleLogin}
-                      onSwitchToSignup={() => setView('signup')}
-                      onGoogleSignIn={onGoogleSignIn}
-                      isSubmitting={isSubmitting}
-                    />
-                  )}
-                </AnimatePresence>
-              </div>
+              <div className="relative z-10">{renderView()}</div>
             </div>
 
             {/* Bottom brand */}
-            <div className="px-5 py-4 border-t border-gray-100 dark:border-gray-800">
-              <p className="text-center text-[11px] text-gray-400">
+            <div className="px-5 py-4 border-t border-neutral-100 dark:border-neutral-800">
+              <p className="text-center text-[11px] text-neutral-400">
                 By continuing, you agree to Comaket&apos;s Terms of Service & Privacy Policy
               </p>
             </div>
@@ -695,45 +1342,24 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             animate={{ opacity: 1, scale: 1, y: 0 }}
             exit={{ opacity: 0, scale: 0.95, y: 20 }}
             transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-            className="relative w-full max-w-md mx-4 bg-white dark:bg-gray-900 rounded-2xl shadow-2xl overflow-hidden"
+            className="relative w-full max-w-md mx-4 bg-white dark:bg-neutral-900 rounded-2xl shadow-2xl overflow-hidden"
           >
-            {/* Decorative shapes */}
             <FloatingShapes />
 
             {/* Close button */}
             <button
               onClick={onClose}
-              className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+              className="absolute top-4 right-4 z-20 w-8 h-8 rounded-full flex items-center justify-center hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
             >
-              <X size={16} className="text-gray-400" />
+              <X size={16} className="text-neutral-400" />
             </button>
 
             {/* Form content */}
-            <div className="relative z-10 px-8 py-8">
-              <AnimatePresence mode="wait">
-                {view === 'signup' ? (
-                  <SignupForm
-                    key="signup"
-                    onSubmit={handleSignup}
-                    onSwitchToLogin={() => setView('login')}
-                    onGoogleSignIn={onGoogleSignIn}
-                    isSubmitting={isSubmitting}
-                  />
-                ) : (
-                  <LoginForm
-                    key="login"
-                    onSubmit={handleLogin}
-                    onSwitchToSignup={() => setView('signup')}
-                    onGoogleSignIn={onGoogleSignIn}
-                    isSubmitting={isSubmitting}
-                  />
-                )}
-              </AnimatePresence>
-            </div>
+            <div className="relative z-10 px-8 py-8">{renderView()}</div>
 
             {/* Bottom terms */}
             <div className="px-8 pb-6">
-              <p className="text-center text-[11px] text-gray-400">
+              <p className="text-center text-[11px] text-neutral-400">
                 By continuing, you agree to Comaket&apos;s Terms of Service & Privacy Policy
               </p>
             </div>

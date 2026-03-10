@@ -30,14 +30,14 @@ const ComingSoon = ({ header }: ComingSoonProps) => {
       </motion.div>
 
       <motion.h3
-        className="text-xl font-semibold text-gray-800 dark:text-gray-200"
+        className="text-xl font-semibold text-neutral-800 dark:text-neutral-200"
         animate={{ opacity: [0.5, 1] }}
         transition={{ duration: 2, repeat: Infinity, repeatType: 'reverse' }}
       >
         Coming Soon
       </motion.h3>
 
-      <p className="text-sm text-gray-600 dark:text-gray-400">
+      <p className="text-sm text-neutral-600 dark:text-neutral-400">
         We're working on something exciting! Stay tuned for updates.
       </p>
     </motion.div>

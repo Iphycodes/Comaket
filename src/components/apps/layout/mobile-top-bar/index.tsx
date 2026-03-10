@@ -1,26 +1,58 @@
 'use client';
 
-import React, { Dispatch, SetStateAction } from 'react';
+import React, { Dispatch, SetStateAction, useContext } from 'react';
 import { Dropdown } from 'antd';
 import type { MenuProps } from 'antd';
 import { useRouter } from 'next/navigation';
-import { Store, ChevronDown, MoreVertical, Settings, ShieldAlert, Plus } from 'lucide-react';
-import { mockUserVendorStores } from '@grc/app/nav';
-import SideNavAuthButton from '@grc/components/apps/layout/side-nav/lib/side-nav-auth-button';
+import {
+  Store,
+  ChevronDown,
+  Crown,
+  Settings,
+  ShieldAlert,
+  Plus,
+  LogOut,
+  LogIn,
+  Sun,
+  Moon,
+} from 'lucide-react';
+import { AppContext } from '@grc/app-context';
+import { getFirstCharacter, getRandomColorByString } from '@grc/_shared/helpers';
+import { useTheme } from 'next-themes';
 
 interface MobileTopBarProps {
   setIsCreateStoreModalOpen: Dispatch<SetStateAction<boolean>>;
+  userProfile?: any;
+  onLogout?: () => void;
+  stores?: Record<string, any>[];
+  isCreatorAccount?: boolean;
 }
 
-const MobileTopBar: React.FC<MobileTopBarProps> = ({ setIsCreateStoreModalOpen }) => {
+const MobileTopBar: React.FC<MobileTopBarProps> = ({
+  setIsCreateStoreModalOpen,
+  userProfile,
+  onLogout,
+  stores = [],
+  isCreatorAccount = false,
+}) => {
   const router = useRouter();
+  const { setIsAuthModalOpen } = useContext(AppContext);
+  const { theme, setTheme } = useTheme();
+
+  const firstName = userProfile?.firstName || '';
+  const avatarUrl = userProfile?.avatarUrl;
+  const email = userProfile?.email || '';
+  const fullName = `${userProfile?.firstName || ''} ${userProfile?.lastName || ''}`.trim();
+
+  // Only show stores section if user is a creator with at least one store
+  const hasStores = isCreatorAccount && stores.length > 0;
 
   // ── My Stores dropdown items ────────────────────────────────────────
 
   const storeMenuItems: MenuProps['items'] = [
-    ...mockUserVendorStores.map((store) => ({
+    ...stores.map((store: any) => ({
       key: `my-store-${store.id}`,
-      label: <span className="text-sm text-gray-700 dark:text-gray-200">{store.name}</span>,
+      label: <span className="text-sm text-neutral-700 dark:text-neutral-200">{store.name}</span>,
       onClick: () => router.push(`/my-store/${store.id}`),
     })),
     { type: 'divider' as const },
@@ -36,46 +68,143 @@ const MobileTopBar: React.FC<MobileTopBarProps> = ({ setIsCreateStoreModalOpen }
     },
   ];
 
-  // ── More dropdown items ─────────────────────────────────────────────
+  // ── User/More dropdown items ────────────────────────────────────────
 
-  const moreMenuItems: MenuProps['items'] = [
+  const userMenuItems: MenuProps['items'] = [
+    ...(userProfile
+      ? [
+          {
+            key: 'user-info',
+            label: (
+              <div className="flex items-center gap-3 py-1">
+                <div className="relative flex-shrink-0">
+                  {avatarUrl ? (
+                    <img
+                      src={avatarUrl}
+                      alt={fullName}
+                      className="w-9 h-9 rounded-full object-cover"
+                    />
+                  ) : (
+                    <div
+                      className="w-9 h-9 rounded-full flex items-center justify-center text-white text-xs font-bold"
+                      style={{ backgroundColor: getRandomColorByString(firstName || 'U') }}
+                    >
+                      {getFirstCharacter(firstName || 'U')}
+                    </div>
+                  )}
+                  <div className="absolute -bottom-px -right-px w-3 h-3 rounded-full bg-emerald-400 border-2 border-white dark:border-neutral-800" />
+                </div>
+                <div className="min-w-0">
+                  <p className="text-sm font-semibold text-neutral-900 dark:text-white truncate">
+                    {fullName}
+                  </p>
+                  <p className="text-[11px] text-neutral-500 truncate">{email}</p>
+                </div>
+              </div>
+            ),
+            onClick: () => router.push('/profile'),
+          },
+          { type: 'divider' as const },
+        ]
+      : []),
     {
       key: 'settings',
       label: <span className="text-sm">Settings</span>,
-      icon: <Settings size={16} className="text-gray-500" />,
+      icon: <Settings size={16} className="text-neutral-500" />,
       onClick: () => router.push('/settings'),
     },
+    ...(isCreatorAccount
+      ? [
+          {
+            key: 'subscription',
+            label: <span className="text-sm">Subscription</span>,
+            icon: <Crown size={16} className="text-neutral-500" />,
+            onClick: () => router.push('/creator-account/subscription'),
+          },
+        ]
+      : []),
     {
       key: 'disputes',
       label: <span className="text-sm">Disputes</span>,
-      icon: <ShieldAlert size={16} className="text-gray-500" />,
+      icon: <ShieldAlert size={16} className="text-neutral-500" />,
       onClick: () => router.push('/disputes'),
     },
-    // { type: 'divider' as const },
-    {
-      key: 'auth',
-      label: <SideNavAuthButton />,
-    },
+    { type: 'divider' as const },
+    userProfile
+      ? {
+          key: 'logout',
+          label: (
+            <span className="flex items-center gap-2 text-sm font-medium text-red-500">
+              <LogOut size={15} />
+              Sign out
+            </span>
+          ),
+          onClick: () => onLogout?.(),
+        }
+      : {
+          key: 'signin',
+          label: (
+            <span className="flex items-center gap-2 text-sm font-semibold text-blue">
+              <LogIn size={15} />
+              Sign in
+            </span>
+          ),
+          onClick: () => setIsAuthModalOpen(true),
+        },
   ];
 
   // ── Render ──────────────────────────────────────────────────────────
 
   return (
-    <div className="fixed w-full top-0 z-[1000] bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700/60">
+    <div className="fixed w-full top-0 z-[1000] bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700/60">
       <div className="flex items-center justify-end gap-1 px-3 h-8">
-        {/* Left: My Stores dropdown */}
-        <Dropdown menu={{ items: storeMenuItems }} trigger={['click']} placement="bottomLeft">
-          <button className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-semibold text-gray-800 dark:text-gray-100 hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-            <Store size={16} className="text-purple-500" />
-            <span>My Stores</span>
-            <ChevronDown size={14} className="text-gray-400" />
-          </button>
-        </Dropdown>
+        {/* Left: My Stores dropdown — only if user is a creator WITH stores */}
+        {hasStores && (
+          <Dropdown menu={{ items: storeMenuItems }} trigger={['click']} placement="bottomLeft">
+            <button className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-semibold text-neutral-800 dark:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
+              <Store size={16} className="text-purple-500" />
+              <span>My Stores</span>
+              <ChevronDown size={14} className="text-neutral-400" />
+            </button>
+          </Dropdown>
+        )}
 
-        {/* Right: More dropdown */}
-        <Dropdown menu={{ items: moreMenuItems }} trigger={['click']} placement="bottomRight">
-          <button className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors">
-            <MoreVertical size={18} className="text-gray-600 dark:text-gray-300" />
+        {/* Theme toggle */}
+        <button
+          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+          className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+          aria-label="Toggle theme"
+        >
+          {theme === 'dark' ? (
+            <Sun size={16} className="text-amber-400" />
+          ) : (
+            <Moon size={16} className="text-neutral-500" />
+          )}
+        </button>
+
+        {/* Right: User avatar / emoji dropdown */}
+        <Dropdown menu={{ items: userMenuItems }} trigger={['click']} placement="bottomRight">
+          <button className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors overflow-hidden">
+            {userProfile ? (
+              avatarUrl ? (
+                <img
+                  src={avatarUrl}
+                  alt={fullName}
+                  className="w-7 h-7 rounded-full object-cover ring-1 ring-neutral-200 dark:ring-neutral-700"
+                />
+              ) : (
+                <div
+                  className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[11px] font-bold"
+                  style={{ backgroundColor: getRandomColorByString(firstName || 'U') }}
+                >
+                  {getFirstCharacter(firstName || 'U')}
+                </div>
+              )
+            ) : (
+              <span className="text-lg leading-none" role="img" aria-label="user">
+                👤
+              </span>
+            )}
           </button>
         </Dropdown>
       </div>

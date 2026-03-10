@@ -57,7 +57,7 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
         <button
           key="cancel"
           onClick={handleCancel}
-          className="px-6 py-2 text-gray-600 hover:bg-gray-100 rounded-md transition-colors"
+          className="px-6 py-2 text-neutral-600 hover:bg-neutral-100 rounded-md transition-colors"
         >
           Cancel
         </button>,
@@ -68,7 +68,7 @@ const DeleteConfirmModal: React.FC<DeleteConfirmModalProps> = ({
           className={`px-6 py-2 rounded-md transition-colors ml-2 ${
             isConfirmEnabled
               ? 'bg-red-500 hover:bg-red-600 text-white'
-              : 'bg-gray-300 text-gray-500 cursor-not-allowed'
+              : 'bg-neutral-300 text-neutral-500 cursor-not-allowed'
           }`}
         >
           Delete

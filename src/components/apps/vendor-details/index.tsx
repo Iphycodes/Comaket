@@ -65,7 +65,7 @@ const StarRating: React.FC<{ rating: number; size?: number }> = ({ rating, size 
               ? 'text-amber-400 fill-amber-400'
               : i === fullStars && hasHalf
                 ? 'text-amber-400 fill-amber-400/50'
-                : 'text-gray-200 dark:text-gray-700'
+                : 'text-neutral-200 dark:text-neutral-700'
           }
         />
       ))}
@@ -90,7 +90,7 @@ const ReviewCard: React.FC<{ review: VendorReview; index: number }> = ({ review,
     initial={{ opacity: 0, y: 10 }}
     animate={{ opacity: 1, y: 0 }}
     transition={{ delay: index * 0.05 }}
-    className="bg-white dark:bg-gray-800/60 rounded-xl p-4 border border-gray-100 dark:border-gray-700/50"
+    className="bg-white dark:bg-neutral-800/60 rounded-xl p-4 border border-neutral-100 dark:border-neutral-700/50"
   >
     <div className="flex items-start gap-3">
       {review.buyerAvatar ? (
@@ -100,8 +100,8 @@ const ReviewCard: React.FC<{ review: VendorReview; index: number }> = ({ review,
           className="w-9 h-9 rounded-full object-cover flex-shrink-0"
         />
       ) : (
-        <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
-          <span className="text-xs font-bold text-gray-500 dark:text-gray-400">
+        <div className="w-9 h-9 rounded-full bg-neutral-100 dark:bg-neutral-700 flex items-center justify-center flex-shrink-0">
+          <span className="text-xs font-bold text-neutral-500 dark:text-neutral-400">
             {review.buyerName.charAt(0)}
           </span>
         </div>
@@ -109,10 +109,10 @@ const ReviewCard: React.FC<{ review: VendorReview; index: number }> = ({ review,
 
       <div className="flex-1 min-w-0">
         <div className="flex items-center justify-between gap-2">
-          <span className="text-sm font-semibold text-gray-900 dark:text-white">
+          <span className="text-sm font-semibold text-neutral-900 dark:text-white">
             {review.buyerName}
           </span>
-          <span className="text-[11px] text-gray-400 flex-shrink-0">
+          <span className="text-[11px] text-neutral-400 flex-shrink-0">
             {new Date(review.date).toLocaleDateString('en-NG', {
               month: 'short',
               day: 'numeric',
@@ -125,13 +125,13 @@ const ReviewCard: React.FC<{ review: VendorReview; index: number }> = ({ review,
           <StarRating rating={review.rating} size={12} />
           {review.productName && (
             <>
-              <span className="text-gray-300 dark:text-gray-600">·</span>
-              <span className="text-[11px] text-gray-400 truncate">{review.productName}</span>
+              <span className="text-neutral-300 dark:text-neutral-600">·</span>
+              <span className="text-[11px] text-neutral-400 truncate">{review.productName}</span>
             </>
           )}
         </div>
 
-        <p className="text-sm text-gray-600 dark:text-gray-300 mt-2 leading-relaxed">
+        <p className="text-sm text-neutral-600 dark:text-neutral-300 mt-2 leading-relaxed">
           {review.comment}
         </p>
       </div>
@@ -152,15 +152,15 @@ const RatingBreakdown: React.FC<{ reviews: VendorReview[] }> = ({ reviews }) => 
     <div className="space-y-1.5">
       {counts.map(({ star, count }) => (
         <div key={star} className="flex items-center gap-2.5">
-          <span className="text-xs text-gray-500 w-3 text-right">{star}</span>
+          <span className="text-xs text-neutral-500 w-3 text-right">{star}</span>
           <Star size={11} className="text-amber-400 fill-amber-400" />
-          <div className="flex-1 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
+          <div className="flex-1 h-2 bg-neutral-100 dark:bg-neutral-700 rounded-full overflow-hidden">
             <div
               className="h-full bg-amber-400 rounded-full transition-all duration-500"
               style={{ width: total > 0 ? `${(count / total) * 100}%` : '0%' }}
             />
           </div>
-          <span className="text-[11px] text-gray-400 w-6 text-right">{count}</span>
+          <span className="text-[11px] text-neutral-400 w-6 text-right">{count}</span>
         </div>
       ))}
     </div>
@@ -195,11 +195,13 @@ const WriteReviewForm: React.FC<{
   };
 
   return (
-    <div className="bg-white dark:bg-gray-800/60 rounded-xl p-5 border border-gray-100 dark:border-gray-700/50">
-      <h4 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Write a Review</h4>
+    <div className="bg-white dark:bg-neutral-800/60 rounded-xl p-5 border border-neutral-100 dark:border-neutral-700/50">
+      <h4 className="text-sm font-semibold text-neutral-900 dark:text-white mb-4">
+        Write a Review
+      </h4>
       <div className="space-y-4">
         <div>
-          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5 block">
+          <label className="text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-1.5 block">
             Your Rating
           </label>
           <Rate
@@ -209,7 +211,7 @@ const WriteReviewForm: React.FC<{
           />
         </div>
         <div>
-          <label className="text-xs font-medium text-gray-500 dark:text-gray-400 mb-1.5 block">
+          <label className="text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-1.5 block">
             Your Experience
           </label>
           <TextArea
@@ -227,7 +229,7 @@ const WriteReviewForm: React.FC<{
           disabled={isSubmitting || rating === 0 || !comment.trim()}
           className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
             isSubmitting || rating === 0 || !comment.trim()
-              ? 'bg-gray-200 dark:bg-gray-700 text-gray-400 cursor-not-allowed'
+              ? 'bg-neutral-200 dark:bg-neutral-700 text-neutral-400 cursor-not-allowed'
               : 'bg-gradient-to-r from-blue to-indigo-500 hover:from-blue hover:to-indigo-600 text-white shadow-md shadow-blue/20 hover:shadow-lg'
           }`}
         >
@@ -345,7 +347,7 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
     }
     const formattedPrice = numberFormat(item.askingPrice?.price / 100, Currencies.NGN);
     const sellerName =
-      item.postUserProfile?.businessName || item.postUserProfile?.userName || 'Seller';
+      item.postUserProfile?.displayName || item.postUserProfile?.userName || 'Seller';
     const message = `Hi, ${sellerName},\nI am interested in this item on Comaket.\n\n${item.itemName}\n${item.description}\nPrice: ${formattedPrice}`;
     window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, '_blank');
   };
@@ -372,7 +374,7 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
       image: getFirstImageUrl(item?.media || []),
       condition: item?.condition || '',
       negotiable: item?.askingPrice?.negotiable || false,
-      sellerName: item?.postUserProfile?.businessName || item?.postUserProfile?.userName || '',
+      sellerName: item?.postUserProfile?.displayName || item?.postUserProfile?.userName || '',
     };
     addToCart(cartItem?.id);
     antMessage.success('Added to cart!');
@@ -389,7 +391,7 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
       image: getFirstImageUrl(item?.media || []),
       condition: item?.condition || '',
       negotiable: item?.askingPrice?.negotiable || false,
-      sellerName: item?.postUserProfile?.businessName || item?.postUserProfile?.userName || '',
+      sellerName: item?.postUserProfile?.displayName || item?.postUserProfile?.userName || '',
     };
     setBuyNowItem(buyItem);
     router.push('/checkout?mode=buynow');
@@ -454,7 +456,7 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
             key={item.id}
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col"
+            className="bg-white dark:bg-neutral-800 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col"
           >
             {/* Image / Video Container */}
             <div
@@ -474,19 +476,19 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
                 className={`absolute top-2 left-2 backdrop-blur-md !rounded-lg shadow-lg z-[5] ${
                   item?.availability
                     ? 'bg-white/10 border border-emerald-300/30'
-                    : 'bg-white/10 border border-gray-300/30'
+                    : 'bg-white/10 border border-neutral-300/30'
                 }`}
                 count={
                   <div
                     className={`px-1 py-1 text-[10px] !flex gap-1 items-center font-semibold ${
-                      item?.availability ? 'text-emerald-100' : 'text-gray-200'
+                      item?.availability ? 'text-emerald-100' : 'text-neutral-200'
                     }`}
                   >
                     <div
                       className={`w-1 h-1 rounded-full ${
                         item?.availability
                           ? 'bg-emerald-400 animate-pulse shadow-[0_0_12px_rgba(52,211,153,0.8)]'
-                          : 'bg-gray-300'
+                          : 'bg-neutral-300'
                       }`}
                     />
                     <span>{item?.availability ? 'Available' : 'Sold Out'}</span>
@@ -562,7 +564,7 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
                 )}
               </div>
 
-              <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 mb-3 flex-grow">
+              <p className="text-xs text-neutral-500 dark:text-neutral-400 line-clamp-2 mb-3 flex-grow">
                 {item?.description}
               </p>
 
@@ -571,13 +573,13 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
                   {item.productTags.slice(0, 2).map((tag: string, idx: number) => (
                     <span
                       key={idx}
-                      className="px-2 py-0.5 text-[9px] font-medium bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-400 rounded-full"
+                      className="px-2 py-0.5 text-[9px] font-medium bg-neutral-100 dark:bg-zinc-800 text-neutral-600 dark:text-neutral-400 rounded-full"
                     >
                       {tag}
                     </span>
                   ))}
                   {item.productTags.length > 2 && (
-                    <span className="px-2 py-0.5 text-[9px] font-medium bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-400 rounded-full">
+                    <span className="px-2 py-0.5 text-[9px] font-medium bg-neutral-100 dark:bg-zinc-800 text-neutral-600 dark:text-neutral-400 rounded-full">
                       +{item.productTags.length - 2}
                     </span>
                   )}
@@ -597,7 +599,7 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
                         disabled={isSoldOut}
                         className={`flex-1 py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all shadow-sm ${
                           isSoldOut
-                            ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                            ? 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
                             : 'bg-gradient-to-r from-blue to-indigo-700 hover:from-blue hover:to-indigo-800 text-white hover:shadow-md'
                         }`}
                       >
@@ -623,10 +625,10 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
                           disabled={isSoldOut || isMaxQty}
                           className={`p-2 rounded-lg border shadow-sm transition-colors ${
                             isSoldOut || isMaxQty
-                              ? 'bg-gray-100 border-gray-200 text-gray-300 cursor-not-allowed'
+                              ? 'bg-neutral-100 border-neutral-200 text-neutral-300 cursor-not-allowed'
                               : itemInCart
                                 ? 'bg-blue-50 border-blue text-blue'
-                                : 'bg-neutral-50 border-neutral-200 dark:bg-gray-700 dark:border-gray-600 text-gray-500 hover:border-blue hover:text-blue'
+                                : 'bg-neutral-50 border-neutral-200 dark:bg-neutral-700 dark:border-neutral-600 text-neutral-500 hover:border-blue hover:text-blue'
                           }`}
                         >
                           <ShoppingCart size={14} />
@@ -650,12 +652,12 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
                           e.stopPropagation();
                           handleBookmark(item);
                         }}
-                        className="p-2 rounded-lg border border-neutral-200 dark:border-gray-600 bg-neutral-50 dark:bg-gray-700 shadow-sm"
+                        className="p-2 rounded-lg border border-neutral-200 dark:border-neutral-600 bg-neutral-50 dark:bg-neutral-700 shadow-sm"
                       >
                         <Bookmark
                           size={16}
                           className={`${
-                            isSaved ? 'fill-pink-500 text-pink-500' : 'text-gray-400'
+                            isSaved ? 'fill-pink-500 text-pink-500' : 'text-neutral-400'
                           } transition-colors`}
                         />
                       </motion.button>
@@ -679,12 +681,12 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
                         e.stopPropagation();
                         handleBookmark(item);
                       }}
-                      className="w-full p-2 rounded-lg border border-neutral-200 dark:border-gray-600 bg-neutral-50 dark:bg-gray-700 shadow-sm flex items-center justify-center gap-1.5 text-xs text-gray-500"
+                      className="w-full p-2 rounded-lg border border-neutral-200 dark:border-neutral-600 bg-neutral-50 dark:bg-neutral-700 shadow-sm flex items-center justify-center gap-1.5 text-xs text-neutral-500"
                     >
                       <Bookmark
                         size={14}
                         className={`${
-                          isSaved ? 'fill-pink-500 text-pink-500' : 'text-gray-400'
+                          isSaved ? 'fill-pink-500 text-pink-500' : 'text-neutral-400'
                         } transition-colors`}
                       />
                       Save
@@ -721,23 +723,6 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
             isBuyable={item?.isBuyable ?? false}
             listingType={item?.listingType ?? 'self-listing'}
           />
-          <ModernItemPost
-            postUserProfile={item?.postUserProfile ?? {}}
-            sponsored={item?.sponsored ?? false}
-            description={item?.description ?? ''}
-            media={item?.media ?? []}
-            askingPrice={item?.askingPrice ?? {}}
-            condition={item?.condition ?? 'Brand New'}
-            itemName={item?.itemName ?? ''}
-            comments={item?.comments ?? []}
-            productTags={item?.productTags ?? []}
-            id={item?.id ?? ''}
-            quantity={item?.quantity ?? 1}
-            setSelectedProductId={setSelectedProductId}
-            availability={item?.availability ?? true}
-            isBuyable={item?.isBuyable ?? false}
-            listingType={item?.listingType ?? 'self-listing'}
-          />
         </div>
       ))}
     </div>
@@ -745,11 +730,13 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
 
   return (
     <div
-      className={`dark:bg-gray-900/50 min-h-screen ${isMobile ? 'max-w-[100vw] mb-14 pt-8' : ''}`}
+      className={`dark:bg-neutral-900/50 min-h-screen ${
+        isMobile ? 'max-w-[100vw] mb-14 pt-8' : ''
+      }`}
     >
       <div className={`w-full ${!isMobile ? 'max-w-4xl mx-auto px-4' : ''}`}>
         {/* ── Cover Image ──────────────────────────────────────────────── */}
-        <div className="relative h-44 sm:h-56 bg-gradient-to-br from-gray-200 to-gray-100 dark:from-gray-800 dark:to-gray-900 overflow-hidden sm:rounded-b-2xl">
+        <div className="relative h-44 sm:h-56 bg-gradient-to-br from-neutral-200 to-neutral-100 dark:from-neutral-800 dark:to-neutral-900 overflow-hidden sm:rounded-b-2xl">
           {vendor.coverImageUrl && (
             <img
               src={vendor.coverImageUrl}
@@ -772,7 +759,7 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
               {vendor.badges.map((badge) => (
                 <span
                   key={badge}
-                  className="flex items-center gap-1 px-2.5 py-1 bg-white/90 dark:bg-gray-900/80 backdrop-blur-sm rounded-full text-[11px] font-semibold text-gray-700 dark:text-gray-300 shadow-sm"
+                  className="flex items-center gap-1 px-2.5 py-1 bg-white/90 dark:bg-neutral-900/80 backdrop-blur-sm rounded-full text-[11px] font-semibold text-neutral-700 dark:text-neutral-300 shadow-sm"
                 >
                   <Award size={11} className="text-amber-500" />
                   {badge}
@@ -785,7 +772,7 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
         {/* ── Profile Header ───────────────────────────────────────────── */}
         <div className={`${isMobile ? 'px-4' : ''} -mt-24 relative z-10`}>
           <div className="flex items-end justify-between gap-4">
-            <div className="w-40 h-40 rounded-full border-4 border-white dark:border-gray-900 overflow-hidden shadow-lg bg-gray-200 dark:bg-gray-700 flex-shrink-0">
+            <div className="w-40 h-40 rounded-full border-4 border-white dark:border-neutral-900 overflow-hidden shadow-lg bg-neutral-200 dark:bg-neutral-700 flex-shrink-0">
               <img
                 src={vendor.profilePicUrl}
                 alt={vendor.businessName}
@@ -798,7 +785,7 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
                 onClick={toggleFollow}
                 className={`flex items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
                   isFollowing
-                    ? 'bg-gray-100 dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:border-red-300 hover:text-red-500 dark:hover:border-red-700 dark:hover:text-red-400 group'
+                    ? 'bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-red-300 hover:text-red-500 dark:hover:border-red-700 dark:hover:text-red-400 group'
                     : 'bg-gradient-to-r from-blue to-indigo-500 hover:from-blue hover:to-indigo-600 text-white shadow-md shadow-blue/20 hover:shadow-lg'
                 }`}
               >
@@ -821,7 +808,7 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
           <div className="flex items-center gap-4 mt-3 flex-wrap">
             <div className="flex-1 min-w-0 pb-1">
               <div className="flex items-center gap-2 flex-wrap">
-                <h1 className="text-xl sm:text-2xl font-bold text-gray-900 dark:text-white">
+                <h1 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white">
                   {vendor.businessName}
                 </h1>
                 {vendor.isVerified && (
@@ -830,11 +817,11 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
                   </Tooltip>
                 )}
               </div>
-              <p className="text-sm text-gray-500 dark:text-gray-400 mt-0.5">
+              <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-0.5">
                 {vendor.name}
                 {vendor.tagline && (
                   <>
-                    <span className="mx-1.5 text-gray-300 dark:text-gray-600">·</span>
+                    <span className="mx-1.5 text-neutral-300 dark:text-neutral-600">·</span>
                     <span className="italic">{vendor.tagline}</span>
                   </>
                 )}
@@ -842,35 +829,35 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
             </div>
           </div>
 
-          <div className="flex items-center gap-4 mt-1 text-sm text-gray-500">
+          <div className="flex items-center gap-4 mt-1 text-sm text-neutral-500">
             <span>
-              <strong className="text-gray-900 dark:text-white">
+              <strong className="text-neutral-900 dark:text-white">
                 {localFollowersCount.toLocaleString()}
               </strong>{' '}
               followers
             </span>
             <span>
-              <strong className="text-gray-900 dark:text-white">{vendor.productCount}</strong>{' '}
+              <strong className="text-neutral-900 dark:text-white">{vendor.productCount}</strong>{' '}
               products
             </span>
             <span>
-              <strong className="text-gray-900 dark:text-white">{localReviews.length}</strong>{' '}
+              <strong className="text-neutral-900 dark:text-white">{localReviews.length}</strong>{' '}
               reviews
             </span>
           </div>
 
           <div className="mt-3">
-            <span className="flex items-center gap-1.5 text-sm text-gray-500">
-              <MapPin size={14} className="text-gray-400" />
-              {vendor.location}
+            <span className="flex items-center gap-1.5 text-sm text-neutral-500">
+              <MapPin size={14} className="text-neutral-400" />
+              {vendor.location ?? ''}
             </span>
-            <span className="flex items-center gap-1.5 text-sm text-gray-500">
-              <Calendar size={14} className="text-gray-400" />
+            <span className="flex items-center gap-1.5 text-sm text-neutral-500">
+              <Calendar size={14} className="text-neutral-400" />
               Joined {formatJoinDate(vendor.joinedDate)}
             </span>
             {vendor.operatingHours && (
-              <span className="flex items-center gap-1.5 text-sm text-gray-500">
-                <Clock size={14} className="text-gray-400" />
+              <span className="flex items-center gap-1.5 text-sm text-neutral-500">
+                <Clock size={14} className="text-neutral-400" />
                 {vendor.operatingHours}
               </span>
             )}
@@ -898,7 +885,7 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
             </button>
             <button
               onClick={handleCall}
-              className="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
+              className="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-xl text-sm font-semibold hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-all"
             >
               <Phone size={16} />
               Call
@@ -910,7 +897,7 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
                 )}&body=${encodeURIComponent(
                   `Hi ${vendor.name},\n\nI found your store on Comaket and I'm interested in your products.\n\nLooking forward to hearing from you.`
                 )}`}
-                className="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
+                className="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-xl text-sm font-semibold hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-all"
               >
                 <Mail size={16} />
                 Email
@@ -922,7 +909,7 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
                   href={vendor.socialLinks.website}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 rounded-xl text-sm font-semibold hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
+                  className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-xl text-sm font-semibold hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-all"
                 >
                   <Globe size={16} />
                 </a>
@@ -937,7 +924,7 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
             defaultActiveKey="products"
             className={`[&_.ant-tabs-nav]:!mb-4 [&_.ant-tabs-tab]:!text-sm [&_.ant-tabs-tab]:!font-medium [&_.ant-tabs-tab-active]:!font-semibold [&_.ant-tabs-ink-bar]:!bg-blue [&_.ant-tabs-nav]:!px-4 ${
               isMobile
-                ? '[&_.ant-tabs-nav-list]:!w-full [&_.ant-tabs-nav-list]:!justify-around [&_.ant-tabs-nav]:!sticky [&_.ant-tabs-nav]:!z-[100] [&_.ant-tabs-nav]:!top-[30px] [&_.ant-tabs-nav]:!bg-white [&_.ant-tabs-nav]:dark:!bg-gray-900'
+                ? '[&_.ant-tabs-nav-list]:!w-full [&_.ant-tabs-nav-list]:!justify-around [&_.ant-tabs-nav]:!sticky [&_.ant-tabs-nav]:!z-[100] [&_.ant-tabs-nav]:!top-[30px] [&_.ant-tabs-nav]:!bg-white [&_.ant-tabs-nav]:dark:!bg-neutral-900'
                 : ''
             }`}
             items={[
@@ -959,7 +946,7 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors text-sm ${
                           productsViewType === 'grid'
                             ? 'bg-blue-50 text-blue dark:bg-blue/30 dark:text-blue'
-                            : 'text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700'
+                            : 'text-neutral-500 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-700'
                         }`}
                       >
                         <Grid size={16} />
@@ -970,7 +957,7 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
                         className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors text-sm ${
                           productsViewType === 'list'
                             ? 'bg-blue-50 text-blue dark:bg-blue/30 dark:text-blue'
-                            : 'text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700'
+                            : 'text-neutral-500 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-700'
                         }`}
                       >
                         <List size={16} />
@@ -985,15 +972,15 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
                         renderProductList()
                       )
                     ) : (
-                      <div className="text-center py-16 bg-gray-50 dark:bg-gray-800/30 rounded-2xl">
+                      <div className="text-center py-16 bg-neutral-50 dark:bg-neutral-800/30 rounded-2xl">
                         <Package
                           size={36}
-                          className="mx-auto text-gray-200 dark:text-gray-700 mb-3"
+                          className="mx-auto text-neutral-200 dark:text-neutral-700 mb-3"
                         />
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                        <p className="text-sm text-neutral-500 dark:text-neutral-400">
                           No products listed yet
                         </p>
-                        <p className="text-xs text-gray-400 mt-1">
+                        <p className="text-xs text-neutral-400 mt-1">
                           Check back soon — this vendor may add new items.
                         </p>
                       </div>
@@ -1017,13 +1004,13 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
                     {localReviews.length > 0 ? (
                       <div className={`${isMobile ? '' : 'grid grid-cols-3 gap-6'}`}>
                         <div className="col-span-1 mb-6 sm:mb-0">
-                          <div className="bg-white dark:bg-gray-800/60 rounded-xl p-5 border border-gray-100 dark:border-gray-700/50 sticky top-4">
+                          <div className="bg-white dark:bg-neutral-800/60 rounded-xl p-5 border border-neutral-100 dark:border-neutral-700/50 sticky top-4">
                             <div className="text-center mb-4">
-                              <p className="text-4xl font-bold text-gray-900 dark:text-white">
+                              <p className="text-4xl font-bold text-neutral-900 dark:text-white">
                                 {computedRating}
                               </p>
                               <StarRating rating={computedRating} size={16} />
-                              <p className="text-xs text-gray-400 mt-1.5">
+                              <p className="text-xs text-neutral-400 mt-1.5">
                                 {getRatingLabel(computedRating)} · {localReviews.length} review
                                 {localReviews.length !== 1 ? 's' : ''}
                               </p>
@@ -1038,9 +1025,12 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
                         </div>
                       </div>
                     ) : (
-                      <div className="text-center py-12 bg-gray-50 dark:bg-gray-800/30 rounded-2xl">
-                        <Star size={36} className="mx-auto text-gray-200 dark:text-gray-700 mb-3" />
-                        <p className="text-sm text-gray-500 dark:text-gray-400">
+                      <div className="text-center py-12 bg-neutral-50 dark:bg-neutral-800/30 rounded-2xl">
+                        <Star
+                          size={36}
+                          className="mx-auto text-neutral-200 dark:text-neutral-700 mb-3"
+                        />
+                        <p className="text-sm text-neutral-500 dark:text-neutral-400">
                           No reviews yet — be the first!
                         </p>
                       </div>
@@ -1060,24 +1050,24 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
                 ),
                 children: (
                   <div className="space-y-5">
-                    <div className="bg-white dark:bg-gray-800/60 rounded-xl p-5 border border-gray-100 dark:border-gray-700/50">
-                      <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+                    <div className="bg-white dark:bg-neutral-800/60 rounded-xl p-5 border border-neutral-100 dark:border-neutral-700/50">
+                      <h3 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-3">
                         About {vendor.businessName}
                       </h3>
-                      <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed">
+                      <p className="text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed">
                         {vendor.description}
                       </p>
                     </div>
 
-                    <div className="bg-white dark:bg-gray-800/60 rounded-xl p-5 border border-gray-100 dark:border-gray-700/50">
-                      <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+                    <div className="bg-white dark:bg-neutral-800/60 rounded-xl p-5 border border-neutral-100 dark:border-neutral-700/50">
+                      <h3 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-3">
                         Categories
                       </h3>
                       <div className="flex flex-wrap gap-2">
                         {vendor.categories.map((cat) => (
                           <span
                             key={cat}
-                            className="px-3 py-1.5 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-sm font-medium text-gray-600 dark:text-gray-300"
+                            className="px-3 py-1.5 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg text-sm font-medium text-neutral-600 dark:text-neutral-300"
                           >
                             {cat}
                           </span>
@@ -1087,13 +1077,13 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
 
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       {vendor.operatingHours && (
-                        <div className="bg-white dark:bg-gray-800/60 rounded-xl p-5 border border-gray-100 dark:border-gray-700/50">
-                          <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+                        <div className="bg-white dark:bg-neutral-800/60 rounded-xl p-5 border border-neutral-100 dark:border-neutral-700/50">
+                          <h3 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-3">
                             Operating Hours
                           </h3>
                           <div className="flex items-center gap-2">
-                            <Clock size={16} className="text-gray-400" />
-                            <span className="text-sm text-gray-700 dark:text-gray-300">
+                            <Clock size={16} className="text-neutral-400" />
+                            <span className="text-sm text-neutral-700 dark:text-neutral-300">
                               {vendor.operatingHours}
                             </span>
                           </div>
@@ -1101,17 +1091,17 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
                       )}
 
                       {vendor.acceptedPayments && vendor.acceptedPayments.length > 0 && (
-                        <div className="bg-white dark:bg-gray-800/60 rounded-xl p-5 border border-gray-100 dark:border-gray-700/50">
-                          <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+                        <div className="bg-white dark:bg-neutral-800/60 rounded-xl p-5 border border-neutral-100 dark:border-neutral-700/50">
+                          <h3 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-3">
                             Accepted Payments
                           </h3>
                           <div className="flex flex-wrap gap-2">
                             {vendor.acceptedPayments.map((pm) => (
                               <span
                                 key={pm}
-                                className="flex items-center gap-1 px-2.5 py-1 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-xs font-medium text-gray-600 dark:text-gray-300"
+                                className="flex items-center gap-1 px-2.5 py-1 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg text-xs font-medium text-neutral-600 dark:text-neutral-300"
                               >
-                                <CreditCard size={12} className="text-gray-400" />
+                                <CreditCard size={12} className="text-neutral-400" />
                                 {pm}
                               </span>
                             ))}
@@ -1121,8 +1111,8 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
                     </div>
 
                     {vendor.socialLinks && Object.keys(vendor.socialLinks).length > 0 && (
-                      <div className="bg-white dark:bg-gray-800/60 rounded-xl p-5 border border-gray-100 dark:border-gray-700/50">
-                        <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+                      <div className="bg-white dark:bg-neutral-800/60 rounded-xl p-5 border border-neutral-100 dark:border-neutral-700/50">
+                        <h3 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-3">
                           Social & Links
                         </h3>
                         <div className="flex flex-wrap gap-3">
@@ -1142,7 +1132,7 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
                               href={`https://x.com/${vendor.socialLinks.twitter}`}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="flex items-center gap-2 px-3 py-2 bg-gray-50 dark:bg-gray-700/50 rounded-lg text-sm font-medium text-gray-700 dark:text-gray-300 hover:shadow-sm transition-all"
+                              className="flex items-center gap-2 px-3 py-2 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:shadow-sm transition-all"
                             >
                               <i className="ri-twitter-x-line text-base" />@
                               {vendor.socialLinks.twitter}

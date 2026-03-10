@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useCallback } from 'react';
-import { Input, Switch, Modal, message as antMessage } from 'antd';
+import React, { useState, useCallback, useEffect, useMemo } from 'react';
+import { Input, Select, Switch, Modal, message as antMessage } from 'antd';
 import { motion } from 'framer-motion';
 import {
   Store,
@@ -11,86 +11,21 @@ import {
   Shield,
   Camera,
   MapPin,
-  Phone,
   Globe,
   Trash2,
   Save,
   AlertTriangle,
   ChevronRight,
-  Pause,
   Power,
-  Clock,
   User,
+  Loader2,
+  CheckCircle,
 } from 'lucide-react';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
+import PhoneInput from '@grc/_shared/components/phone-input';
 
 const { TextArea } = Input;
-
-// ═══════════════════════════════════════════════════════════════════════════
-// TYPES
-// ═══════════════════════════════════════════════════════════════════════════
-
-type StoreStatus = 'live' | 'offline' | 'paused';
-
-interface StoreSettings {
-  storeName: string;
-  tagline: string;
-  bio: string;
-  phoneNumber: string;
-  whatsappNumber: string;
-  email: string;
-  state: string;
-  city: string;
-  website: string;
-  instagramHandle: string;
-  twitterHandle: string;
-  tiktokHandle: string;
-  operatingHours: string;
-  returnPolicy: string;
-  status: StoreStatus;
-  profileImage: string | null;
-  coverImage: string | null;
-  // Notifications
-  notifyNewOrder: boolean;
-  notifyNewReview: boolean;
-  notifyLowStock: boolean;
-  notifyPromotions: boolean;
-  // Payment
-  bankName: string;
-  accountNumber: string;
-  accountName: string;
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// MOCK DATA
-// ═══════════════════════════════════════════════════════════════════════════
-
-const initialSettings: StoreSettings = {
-  storeName: 'EmTech Store',
-  tagline: 'Your trusted gadget plug 🔌',
-  bio: 'We sell authentic gadgets at the best prices in Lagos. Original products only with warranty.',
-  phoneNumber: '2348012345678',
-  whatsappNumber: '2348012345678',
-  email: 'emtech@gmail.com',
-  state: 'Lagos',
-  city: 'Ikeja',
-  website: 'https://emtech.ng',
-  instagramHandle: 'emtech.ng',
-  twitterHandle: 'emtechng',
-  tiktokHandle: 'emtech.ng',
-  operatingHours: 'Mon-Sat: 9AM - 7PM',
-  returnPolicy: '7-day return policy for unopened items. Buyer covers return shipping.',
-  status: 'live',
-  profileImage: null,
-  coverImage: null,
-  notifyNewOrder: true,
-  notifyNewReview: true,
-  notifyLowStock: true,
-  notifyPromotions: false,
-  bankName: 'GTBank',
-  accountNumber: '0123456789',
-  accountName: 'Emmanuel Okafor',
-};
+const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || 'Comaket';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // SECTION CARD
@@ -107,7 +42,7 @@ const SectionCard: React.FC<{
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
-    className="bg-white dark:bg-gray-800/60 rounded-2xl border border-gray-100 dark:border-gray-700/50 overflow-hidden"
+    className="bg-white dark:bg-neutral-800/60 rounded-2xl border border-neutral-100 dark:border-neutral-700/50 overflow-hidden"
   >
     <div className="p-5 pb-0">
       <div className="flex items-center gap-3 mb-4">
@@ -117,8 +52,8 @@ const SectionCard: React.FC<{
           <Icon size={16} className={iconColor} />
         </div>
         <div>
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">{title}</h3>
-          {description && <p className="text-[11px] text-gray-500">{description}</p>}
+          <h3 className="text-sm font-semibold text-neutral-900 dark:text-white">{title}</h3>
+          {description && <p className="text-[11px] text-neutral-500">{description}</p>}
         </div>
       </div>
     </div>
@@ -127,42 +62,101 @@ const SectionCard: React.FC<{
 );
 
 // ═══════════════════════════════════════════════════════════════════════════
-// STATUS CONFIG
+// TYPES
 // ═══════════════════════════════════════════════════════════════════════════
 
-const statusOptions: {
-  value: StoreStatus;
-  label: string;
-  desc: string;
-  icon: React.ElementType;
-  color: string;
-  bg: string;
-}[] = [
-  {
-    value: 'live',
-    label: 'Live',
-    desc: 'Your store is visible to everyone',
-    icon: Power,
-    color: 'text-emerald-600 border-emerald-500',
-    bg: 'bg-emerald-50 dark:bg-emerald-900/20',
+interface FormData {
+  name: string;
+  tagline: string;
+  bio: string;
+  phoneNumber: string;
+  whatsappNumber: string;
+  email: string;
+  state: string;
+  city: string;
+  website: string;
+  instagramHandle: string;
+  twitterHandle: string;
+  tiktokHandle: string;
+  // operatingHours: string;
+  returnPolicy: string;
+  isActive: boolean;
+  logo: string | null;
+  // Notifications
+  // notifyNewOrder: boolean;
+  // notifyNewReview: boolean;
+  // notifyLowStock: boolean;
+  // notifyPromotions: boolean;
+  // Payment
+  bankName: string;
+  bankCode: string;
+  accountNumber: string;
+  accountName: string;
+  isVisible: boolean;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// HELPERS
+// ═══════════════════════════════════════════════════════════════════════════
+
+const buildFormFromStore = (store: any): FormData => ({
+  name: store?.name || '',
+  tagline: store?.tagline || store?.slogan || '',
+  bio: store?.bio || store?.description || '',
+  phoneNumber: store?.phoneNumber || store?.phone || '',
+  whatsappNumber: store?.whatsappNumber || '',
+  email: store?.email || '',
+  state: store?.location?.state || '',
+  city: store?.location?.city || '',
+  website: store?.website || store?.socialLinks?.website || '',
+  instagramHandle: store?.socialLinks?.instagram || store?.instagramHandle || '',
+  twitterHandle: store?.socialLinks?.twitter || store?.twitterHandle || '',
+  tiktokHandle: store?.socialLinks?.tiktok || store?.tiktokHandle || '',
+  // operatingHours: store?.operatingHours || '',
+  returnPolicy: store?.returnPolicy || '',
+  isActive: store?.status === 'active' || store?.status === 'live' || store?.isActive === true,
+  logo: store?.logo || null,
+  // notifyNewOrder: store?.notifications?.newOrder ?? true,
+  // notifyNewReview: store?.notifications?.newReview ?? true,
+  // notifyLowStock: store?.notifications?.lowStock ?? true,
+  // notifyPromotions: store?.notifications?.promotions ?? false,
+  bankName: store?.bankDetails?.bankName || store?.paymentInfo?.bankName || '',
+  bankCode: store?.bankDetails?.bankCode || store?.paymentInfo?.bankCode || '',
+  accountNumber: store?.bankDetails?.accountNumber || store?.paymentInfo?.accountNumber || '',
+  accountName: store?.bankDetails?.accountName || store?.paymentInfo?.accountName || '',
+  isVisible: store?.isVisible,
+});
+
+const buildPayload = (form: FormData): Record<string, any> => ({
+  name: form.name,
+  tagline: form.tagline,
+  bio: form.bio,
+  phoneNumber: form.phoneNumber,
+  whatsappNumber: form.whatsappNumber,
+  email: form.email,
+  location: { state: form.state, city: form.city, country: 'Nigeria' },
+  website: form.website,
+  socialLinks: {
+    instagram: form.instagramHandle,
+    twitter: form.twitterHandle,
+    tiktok: form.tiktokHandle,
   },
-  {
-    value: 'paused',
-    label: 'Paused',
-    desc: 'Temporarily hidden from marketplace',
-    icon: Pause,
-    color: 'text-amber-600 border-amber-500',
-    bg: 'bg-amber-50 dark:bg-amber-900/20',
+  // operatingHours: form.operatingHours,
+  returnPolicy: form.returnPolicy,
+  logo: form.logo,
+  // notifications: {
+  //   newOrder: form.notifyNewOrder,
+  //   newReview: form.notifyNewReview,
+  //   lowStock: form.notifyLowStock,
+  //   promotions: form.notifyPromotions,
+  // },
+  bankDetails: {
+    bankName: form.bankName,
+    bankCode: form.bankCode,
+    accountNumber: form.accountNumber,
+    accountName: form.accountName,
   },
-  {
-    value: 'offline',
-    label: 'Offline',
-    desc: 'Store is not visible to anyone',
-    icon: Eye,
-    color: 'text-gray-600 border-gray-400',
-    bg: 'bg-gray-100 dark:bg-gray-700/50',
-  },
-];
+});
 
 // ═══════════════════════════════════════════════════════════════════════════
 // MAIN COMPONENT
@@ -170,56 +164,116 @@ const statusOptions: {
 
 interface StoreSettingsProps {
   storeId: string;
+  store: any;
+  onUpdateStore: (data: Record<string, any>) => Promise<void>;
+  isSaving: boolean;
+  onToggleVisibility: (visible: boolean) => Promise<void>;
+  isTogglingVisibility?: boolean;
+  onDeleteStore: () => Promise<void>;
+  isDeleting?: boolean;
+  onUploadImage: (file: File) => Promise<string | null>;
+  isUploadingImage?: boolean;
+  banks?: any[];
+  isLoadingBanks?: boolean;
+  onVerifyBankAccount?: (params: { account_number: string; bank_code: string }) => Promise<any>;
+  bankAccountInfo?: any;
+  isVerifyingBankAccount?: boolean;
 }
 
-const StoreSettingsPage: React.FC<StoreSettingsProps> = ({}) => {
+const StoreSettingsPage: React.FC<StoreSettingsProps> = ({
+  store,
+  onUpdateStore,
+  isSaving,
+  onToggleVisibility,
+  isTogglingVisibility,
+  onDeleteStore,
+  isDeleting,
+  onUploadImage,
+  isUploadingImage,
+  banks = [],
+  isLoadingBanks,
+  onVerifyBankAccount,
+  bankAccountInfo,
+  isVerifyingBankAccount,
+}) => {
   const isMobile = useMediaQuery(mediaSize.mobile);
-  const [settings, setSettings] = useState<StoreSettings>(initialSettings);
-  const [isSaving, setIsSaving] = useState(false);
+  const [form, setForm] = useState<FormData>(() => buildFormFromStore(store));
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
   const [activeSection, setActiveSection] = useState<string | null>(isMobile ? null : 'details');
 
-  const update = useCallback((partial: Partial<StoreSettings>) => {
-    setSettings((prev) => ({ ...prev, ...partial }));
+  // ── Sync form when store data changes ───────────────────────────────
+  useEffect(() => {
+    if (store) setForm(buildFormFromStore(store));
+  }, [store]);
+
+  // ── Bank options ────────────────────────────────────────────────────
+  const bankOptions = useMemo(() => {
+    return banks
+      .filter((b: any) => b.active !== false)
+      .map((b: any) => ({ label: b.name, value: b.code }));
+  }, [banks]);
+
+  // ── Auto-verify bank account when number is 10 digits + bank selected ─
+  useEffect(() => {
+    if (form.accountNumber.length === 10 && form.bankCode && onVerifyBankAccount) {
+      onVerifyBankAccount({ account_number: form.accountNumber, bank_code: form.bankCode });
+    }
+  }, [form.accountNumber, form.bankCode]);
+
+  // ── Sync verified account name ──────────────────────────────────────
+  useEffect(() => {
+    if (bankAccountInfo?.account_name) {
+      setForm((prev) => ({ ...prev, accountName: bankAccountInfo.account_name }));
+    }
+  }, [bankAccountInfo]);
+
+  const update = useCallback((partial: Partial<FormData>) => {
+    setForm((prev) => ({ ...prev, ...partial }));
   }, []);
 
+  // ── Save ────────────────────────────────────────────────────────────
   const handleSave = useCallback(async () => {
-    setIsSaving(true);
-    // ── TODO: Replace with real API call ───────────────────────────
-    await new Promise((r) => setTimeout(r, 1000));
-    setIsSaving(false);
-    antMessage.success('Settings saved!');
-  }, [settings]);
+    if (!form.name.trim()) {
+      antMessage.warning('Store name is required');
+      return;
+    }
+    const payload = buildPayload(form);
+    await onUpdateStore(payload);
+  }, [form, onUpdateStore]);
 
-  const handleDeleteStore = useCallback(() => {
-    if (deleteConfirmText !== settings.storeName) {
+  // ── Delete ──────────────────────────────────────────────────────────
+  const handleDeleteStore = useCallback(async () => {
+    if (deleteConfirmText !== form.name) {
       antMessage.error("Store name doesn't match");
       return;
     }
-    // ── TODO: Replace with real API call ───────────────────────────
-    antMessage.success('Store deletion request submitted');
+    await onDeleteStore();
     setIsDeleteModalOpen(false);
-  }, [deleteConfirmText, settings.storeName]);
+  }, [deleteConfirmText, form.name, onDeleteStore]);
 
+  // ── Image Upload ────────────────────────────────────────────────────
   const profileInputRef = React.useRef<HTMLInputElement>(null);
 
-  const handleImageUpload =
-    (type: 'profile' | 'cover') => (e: React.ChangeEvent<HTMLInputElement>) => {
+  const handleLogoUpload = useCallback(
+    async (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (!file) return;
-      const reader = new FileReader();
-      reader.onload = () =>
-        update(
-          type === 'profile'
-            ? { profileImage: reader.result as string }
-            : { coverImage: reader.result as string }
-        );
-      reader.readAsDataURL(file);
       e.target.value = '';
-    };
 
-  // Mobile: section navigation
+      // Preview immediately
+      const reader = new FileReader();
+      reader.onload = () => update({ logo: reader.result as string });
+      reader.readAsDataURL(file);
+
+      // Upload to get real URL
+      const url = await onUploadImage(file);
+      if (url) update({ logo: url });
+    },
+    [onUploadImage, update]
+  );
+
+  // ── Sections ────────────────────────────────────────────────────────
   const sections = [
     {
       key: 'details',
@@ -230,18 +284,18 @@ const StoreSettingsPage: React.FC<StoreSettingsProps> = ({}) => {
     },
     {
       key: 'visibility',
-      label: 'Visibility & Status',
+      label: 'Visibility',
       icon: Eye,
       color: 'text-emerald-600',
       bg: 'bg-emerald-50 dark:bg-emerald-900/20',
     },
-    {
-      key: 'notifications',
-      label: 'Notifications',
-      icon: Bell,
-      color: 'text-violet-600',
-      bg: 'bg-violet-50 dark:bg-violet-900/20',
-    },
+    // {
+    //   key: 'notifications',
+    //   label: 'Notifications',
+    //   icon: Bell,
+    //   color: 'text-violet-600',
+    //   bg: 'bg-violet-50 dark:bg-violet-900/20',
+    // },
     {
       key: 'payment',
       label: 'Payment & Payout',
@@ -249,13 +303,13 @@ const StoreSettingsPage: React.FC<StoreSettingsProps> = ({}) => {
       color: 'text-orange-600',
       bg: 'bg-orange-50 dark:bg-orange-900/20',
     },
-    {
-      key: 'policies',
-      label: 'Policies',
-      icon: Shield,
-      color: 'text-cyan-600',
-      bg: 'bg-cyan-50 dark:bg-cyan-900/20',
-    },
+    // {
+    //   key: 'policies',
+    //   label: 'Policies',
+    //   icon: Shield,
+    //   color: 'text-cyan-600',
+    //   bg: 'bg-cyan-50 dark:bg-cyan-900/20',
+    // },
     {
       key: 'danger',
       label: 'Danger Zone',
@@ -265,27 +319,27 @@ const StoreSettingsPage: React.FC<StoreSettingsProps> = ({}) => {
     },
   ];
 
-  // If mobile and no section selected, show section picker
+  // ── Mobile section picker ───────────────────────────────────────────
   if (isMobile && !activeSection) {
     return (
       <div className="space-y-4">
-        <h1 className="text-xl font-bold text-gray-900 dark:text-white">Settings</h1>
+        <h1 className="text-xl font-bold text-neutral-900 dark:text-white">Settings</h1>
         <div className="space-y-2">
           {sections.map((sec) => (
             <button
               key={sec.key}
               onClick={() => setActiveSection(sec.key)}
-              className="w-full flex items-center gap-3 p-4 bg-white dark:bg-gray-800/60 rounded-xl border border-gray-100 dark:border-gray-700/50 text-left hover:shadow-sm transition-shadow"
+              className="w-full flex items-center gap-3 p-4 bg-white dark:bg-neutral-800/60 rounded-xl border border-neutral-100 dark:border-neutral-700/50 text-left hover:shadow-sm transition-shadow"
             >
               <div
                 className={`w-9 h-9 rounded-lg ${sec.bg} flex items-center justify-center flex-shrink-0`}
               >
                 <sec.icon size={16} className={sec.color} />
               </div>
-              <span className="text-sm font-medium text-gray-900 dark:text-white flex-1">
+              <span className="text-sm font-medium text-neutral-900 dark:text-white flex-1">
                 {sec.label}
               </span>
-              <ChevronRight size={16} className="text-gray-300" />
+              <ChevronRight size={16} className="text-neutral-300" />
             </button>
           ))}
         </div>
@@ -293,6 +347,7 @@ const StoreSettingsPage: React.FC<StoreSettingsProps> = ({}) => {
     );
   }
 
+  // ── Render section ──────────────────────────────────────────────────
   const renderSection = (key: string) => {
     switch (key) {
       case 'details':
@@ -305,60 +360,66 @@ const StoreSettingsPage: React.FC<StoreSettingsProps> = ({}) => {
             description="Basic information about your store"
           >
             <div className="space-y-5">
-              {/* Images */}
+              {/* Logo */}
               <div className="flex items-center gap-4">
                 <input
                   ref={profileInputRef}
                   type="file"
                   accept="image/*"
                   className="hidden"
-                  onChange={handleImageUpload('profile')}
+                  onChange={handleLogoUpload}
                 />
                 <button
                   onClick={() => profileInputRef.current?.click()}
                   className="relative group flex-shrink-0"
+                  disabled={isUploadingImage}
                 >
-                  {settings.profileImage ? (
+                  {form.logo ? (
                     <img
-                      src={settings.profileImage}
+                      src={form.logo}
                       alt=""
-                      className="w-16 h-16 rounded-full object-cover border-2 border-gray-100 dark:border-gray-700"
+                      className="w-16 h-16 rounded-full object-cover border-2 border-neutral-100 dark:border-neutral-700"
                     />
                   ) : (
-                    <div className="w-16 h-16 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center border-2 border-gray-50 dark:border-gray-600">
-                      <Store size={24} className="text-gray-300" />
+                    <div className="w-16 h-16 rounded-full bg-neutral-100 dark:bg-neutral-700 flex items-center justify-center border-2 border-neutral-50 dark:border-neutral-600">
+                      <Store size={24} className="text-neutral-300" />
                     </div>
                   )}
-                  <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue rounded-full flex items-center justify-center border-2 border-white dark:border-gray-900 group-hover:scale-110 transition-transform">
-                    <Camera size={10} className="text-white" />
+                  <div className="absolute -bottom-1 -right-1 w-6 h-6 bg-blue rounded-full flex items-center justify-center border-2 border-white dark:border-neutral-900 group-hover:scale-110 transition-transform">
+                    {isUploadingImage ? (
+                      <Loader2 size={10} className="text-white animate-spin" />
+                    ) : (
+                      <Camera size={10} className="text-white" />
+                    )}
                   </div>
                 </button>
                 <div>
-                  <p className="text-sm font-semibold text-gray-900 dark:text-white">Store Logo</p>
-                  <p className="text-[11px] text-gray-400">Recommended: 400×400px, PNG or JPG</p>
+                  <p className="text-sm font-semibold text-neutral-900 dark:text-white">
+                    Store Logo
+                  </p>
+                  <p className="text-[11px] text-neutral-400">Recommended: 400×400px, PNG or JPG</p>
                 </div>
               </div>
 
-              {/* Fields */}
               <div>
-                <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5 block">
+                <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-1.5 block">
                   Store Name
                 </label>
                 <Input
-                  value={settings.storeName}
-                  onChange={(e) => update({ storeName: e.target.value })}
+                  value={form.name}
+                  onChange={(e) => update({ name: e.target.value })}
                   maxLength={40}
                   showCount
                   className="!rounded-xl h-11"
-                  prefix={<Store size={14} className="text-gray-400" />}
+                  prefix={<Store size={14} className="text-neutral-400" />}
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5 block">
+                <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-1.5 block">
                   Tagline
                 </label>
                 <Input
-                  value={settings.tagline}
+                  value={form.tagline}
                   onChange={(e) => update({ tagline: e.target.value })}
                   maxLength={80}
                   showCount
@@ -366,11 +427,11 @@ const StoreSettingsPage: React.FC<StoreSettingsProps> = ({}) => {
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5 block">
+                <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-1.5 block">
                   About Your Store
                 </label>
                 <TextArea
-                  value={settings.bio}
+                  value={form.bio}
                   onChange={(e) => update({ bio: e.target.value })}
                   rows={3}
                   maxLength={500}
@@ -380,107 +441,105 @@ const StoreSettingsPage: React.FC<StoreSettingsProps> = ({}) => {
               </div>
               <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-2'}`}>
                 <div>
-                  <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5 block">
+                  <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-1.5 block">
                     Phone
                   </label>
-                  <Input
-                    value={settings.phoneNumber}
-                    onChange={(e) => update({ phoneNumber: e.target.value })}
-                    className="!rounded-xl h-11"
-                    prefix={<Phone size={14} className="text-gray-400" />}
+                  <PhoneInput
+                    value={form.phoneNumber}
+                    onChange={(val) => update({ phoneNumber: val })}
+                    placeholder="Phone number"
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5 block">
+                  <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-1.5 block">
                     WhatsApp
                   </label>
-                  <Input
-                    value={settings.whatsappNumber}
-                    onChange={(e) => update({ whatsappNumber: e.target.value })}
-                    className="!rounded-xl h-11"
-                    prefix={<Phone size={14} className="text-gray-400" />}
+                  <PhoneInput
+                    value={form.whatsappNumber}
+                    onChange={(val) => update({ whatsappNumber: val })}
+                    placeholder="WhatsApp number"
                   />
                 </div>
               </div>
               <div>
-                <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5 block">
+                <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-1.5 block">
                   Store Email
                 </label>
                 <Input
-                  value={settings.email}
+                  value={form.email}
                   onChange={(e) => update({ email: e.target.value })}
                   className="!rounded-xl h-11"
-                  prefix={<User size={14} className="text-gray-400" />}
+                  prefix={<User size={14} className="text-neutral-400" />}
                 />
               </div>
               <div className={`grid gap-4 ${isMobile ? 'grid-cols-1' : 'grid-cols-2'}`}>
                 <div>
-                  <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5 block">
+                  <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-1.5 block">
                     State
                   </label>
                   <Input
-                    value={settings.state}
+                    value={form.state}
                     onChange={(e) => update({ state: e.target.value })}
                     className="!rounded-xl h-11"
-                    prefix={<MapPin size={14} className="text-gray-400" />}
+                    prefix={<MapPin size={14} className="text-neutral-400" />}
                   />
                 </div>
                 <div>
-                  <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5 block">
+                  <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-1.5 block">
                     City
                   </label>
                   <Input
-                    value={settings.city}
+                    value={form.city}
                     onChange={(e) => update({ city: e.target.value })}
                     className="!rounded-xl h-11"
-                    prefix={<MapPin size={14} className="text-gray-400" />}
+                    prefix={<MapPin size={14} className="text-neutral-400" />}
                   />
                 </div>
               </div>
-              <div>
-                <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5 block">
+              {/* <div>
+                <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-1.5 block">
                   Operating Hours
                 </label>
                 <Input
-                  value={settings.operatingHours}
+                  value={form.operatingHours}
                   onChange={(e) => update({ operatingHours: e.target.value })}
                   className="!rounded-xl h-11"
-                  prefix={<Clock size={14} className="text-gray-400" />}
+                  prefix={<Clock size={14} className="text-neutral-400" />}
                   placeholder="e.g. Mon-Sat: 9AM - 7PM"
                 />
-              </div>
+              </div> */}
 
               <div className="pt-2">
-                <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-2.5 block">
+                <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-2.5 block">
                   Social Links
                 </label>
                 <div className="space-y-3">
                   <Input
-                    value={settings.website}
+                    value={form.website}
                     onChange={(e) => update({ website: e.target.value })}
                     className="!rounded-xl h-11"
-                    prefix={<Globe size={14} className="text-gray-400" />}
+                    prefix={<Globe size={14} className="text-neutral-400" />}
                     placeholder="https://your-website.com"
                   />
                   <Input
-                    value={settings.instagramHandle}
+                    value={form.instagramHandle}
                     onChange={(e) => update({ instagramHandle: e.target.value })}
                     className="!rounded-xl h-11"
-                    prefix={<span className="text-gray-400 text-xs">IG</span>}
+                    prefix={<span className="text-neutral-400 text-xs">IG</span>}
                     placeholder="Instagram handle"
                   />
                   <Input
-                    value={settings.twitterHandle}
+                    value={form.twitterHandle}
                     onChange={(e) => update({ twitterHandle: e.target.value })}
                     className="!rounded-xl h-11"
-                    prefix={<span className="text-gray-400 text-xs">X</span>}
+                    prefix={<span className="text-neutral-400 text-xs">X</span>}
                     placeholder="Twitter/X handle"
                   />
                   <Input
-                    value={settings.tiktokHandle}
+                    value={form.tiktokHandle}
                     onChange={(e) => update({ tiktokHandle: e.target.value })}
                     className="!rounded-xl h-11"
-                    prefix={<span className="text-gray-400 text-xs">TT</span>}
+                    prefix={<span className="text-neutral-400 text-xs">TT</span>}
                     placeholder="TikTok handle"
                   />
                 </div>
@@ -498,45 +557,73 @@ const StoreSettingsPage: React.FC<StoreSettingsProps> = ({}) => {
             title="Store Visibility"
             description="Control who can see your store"
           >
-            <div className="space-y-3">
-              {statusOptions.map((opt) => {
-                const isActive = settings.status === opt.value;
-                const Icon = opt.icon;
-                return (
-                  <button
-                    key={opt.value}
-                    onClick={() => update({ status: opt.value })}
-                    className={`w-full flex items-center gap-3 p-4 rounded-xl border-2 text-left transition-all ${
-                      isActive
-                        ? `${opt.bg} ${opt.color} border-current`
-                        : 'border-gray-100 dark:border-gray-700/50 hover:border-gray-200'
+            <div className="space-y-4">
+              {/* On / Off toggle */}
+              <div className="flex items-center justify-between gap-4 p-4 rounded-xl border border-neutral-100 dark:border-neutral-700/50">
+                <div className="flex items-center gap-3">
+                  <div
+                    className={`w-10 h-10 rounded-xl flex items-center justify-center ${
+                      form.isVisible
+                        ? 'bg-emerald-50 dark:bg-emerald-900/20'
+                        : 'bg-neutral-100 dark:bg-neutral-700/50'
                     }`}
                   >
-                    <Icon size={18} className={isActive ? '' : 'text-gray-400'} />
-                    <div className="flex-1">
-                      <p
-                        className={`text-sm font-semibold ${
-                          isActive ? '' : 'text-gray-700 dark:text-gray-300'
-                        }`}
-                      >
-                        {opt.label}
-                      </p>
-                      <p className={`text-[11px] ${isActive ? 'opacity-70' : 'text-gray-400'}`}>
-                        {opt.desc}
-                      </p>
-                    </div>
-                    <div
-                      className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
-                        isActive
-                          ? 'border-current bg-current'
-                          : 'border-gray-300 dark:border-gray-600'
-                      }`}
-                    >
-                      {isActive && <div className="w-2 h-2 rounded-full bg-white" />}
-                    </div>
-                  </button>
-                );
-              })}
+                    {isTogglingVisibility ? (
+                      <Loader2 size={18} className="text-neutral-400 animate-spin" />
+                    ) : (
+                      <Power
+                        size={18}
+                        className={form.isVisible ? 'text-emerald-600' : 'text-neutral-400'}
+                      />
+                    )}
+                  </div>
+                  <div>
+                    <p className="text-sm font-semibold text-neutral-900 dark:text-white">
+                      {form.isVisible ? 'Store is Live' : 'Store is Offline'}
+                    </p>
+                    <p className="text-[11px] text-neutral-500">
+                      {form.isVisible
+                        ? `Visible to everyone on ${APP_NAME}`
+                        : 'Hidden from marketplace — only you can see it'}
+                    </p>
+                  </div>
+                </div>
+                <Switch
+                  checked={form.isVisible}
+                  loading={isTogglingVisibility}
+                  onChange={async (value) => {
+                    await onToggleVisibility(value);
+                    update({ isActive: !form.isVisible });
+                  }}
+                  className={form.isVisible ? '!bg-emerald-500' : ''}
+                />
+              </div>
+
+              {/* Status indicator */}
+              <div
+                className={`flex items-center gap-2.5 px-4 py-3 rounded-xl ${
+                  form.isVisible
+                    ? 'bg-emerald-50 dark:bg-emerald-900/10 border border-emerald-100 dark:border-emerald-900/20'
+                    : 'bg-neutral-50 dark:bg-neutral-800/50 border border-neutral-100 dark:border-neutral-700/50'
+                }`}
+              >
+                <div
+                  className={`w-2.5 h-2.5 rounded-full ${
+                    form.isVisible
+                      ? 'bg-emerald-400 animate-pulse shadow-[0_0_8px_rgba(52,211,153,0.6)]'
+                      : 'bg-neutral-400'
+                  }`}
+                />
+                <span
+                  className={`text-sm font-medium ${
+                    form.isVisible ? 'text-emerald-700 dark:text-emerald-400' : 'text-neutral-500'
+                  }`}
+                >
+                  {form.isVisible
+                    ? 'Customers can find and browse your store'
+                    : 'Your store is currently hidden'}
+                </span>
+              </div>
             </div>
           </SectionCard>
         );
@@ -575,13 +662,13 @@ const StoreSettingsPage: React.FC<StoreSettingsProps> = ({}) => {
               ].map((item) => (
                 <div key={item.key} className="flex items-center justify-between gap-4 py-1">
                   <div>
-                    <p className="text-sm font-medium text-gray-900 dark:text-white">
+                    <p className="text-sm font-medium text-neutral-900 dark:text-white">
                       {item.label}
                     </p>
-                    <p className="text-[11px] text-gray-500">{item.desc}</p>
+                    <p className="text-[11px] text-neutral-500">{item.desc}</p>
                   </div>
                   <Switch
-                    checked={(settings as any)[item.key]}
+                    checked={(form as any)[item.key]}
                     onChange={(checked) => update({ [item.key]: checked })}
                   />
                 </div>
@@ -601,39 +688,93 @@ const StoreSettingsPage: React.FC<StoreSettingsProps> = ({}) => {
           >
             <div className="space-y-4">
               <div>
-                <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5 block">
+                <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-1.5 block">
                   Bank Name
                 </label>
-                <Input
-                  value={settings.bankName}
-                  onChange={(e) => update({ bankName: e.target.value })}
-                  className="!rounded-xl h-11"
-                  placeholder="e.g. GTBank, Access Bank"
+                <Select
+                  showSearch
+                  value={form.bankCode || undefined}
+                  onChange={(code) => {
+                    const bank = banks.find((b: any) => b.code === code);
+                    update({ bankCode: code, bankName: bank?.name || '', accountName: '' });
+                  }}
+                  options={bankOptions}
+                  loading={isLoadingBanks}
+                  placeholder="Search and select your bank"
+                  filterOption={(input, option) =>
+                    (option?.label ?? '').toString().toLowerCase().includes(input.toLowerCase())
+                  }
+                  className="w-full h-11 [&_.ant-select-selector]:!rounded-xl"
+                  notFoundContent={isLoadingBanks ? 'Loading banks...' : 'No banks found'}
                 />
               </div>
               <div>
-                <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5 block">
+                <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-1.5 block">
                   Account Number
                 </label>
                 <Input
-                  value={settings.accountNumber}
-                  onChange={(e) => update({ accountNumber: e.target.value })}
+                  value={form.accountNumber}
+                  onChange={(e) => {
+                    const val = e.target.value.replace(/\D/g, '').slice(0, 10);
+                    update({ accountNumber: val, accountName: '' });
+                  }}
                   maxLength={10}
                   className="!rounded-xl h-11"
                   placeholder="10-digit account number"
+                  suffix={
+                    isVerifyingBankAccount ? (
+                      <Loader2 size={14} className="animate-spin text-blue" />
+                    ) : form.accountNumber.length === 10 && form.bankCode ? (
+                      form.accountName ? (
+                        <CheckCircle size={14} className="text-emerald-500" />
+                      ) : null
+                    ) : null
+                  }
                 />
+                {form.accountNumber.length > 0 && form.accountNumber.length < 10 && (
+                  <p className="text-[10px] text-neutral-400 mt-1">
+                    {10 - form.accountNumber.length} more digit
+                    {10 - form.accountNumber.length !== 1 ? 's' : ''} needed
+                  </p>
+                )}
+                {form.accountNumber.length === 10 && !form.bankCode && (
+                  <p className="text-[10px] text-amber-500 mt-1">Select a bank to verify</p>
+                )}
               </div>
               <div>
-                <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5 block">
+                <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-1.5 block">
                   Account Name
                 </label>
                 <Input
-                  value={settings.accountName}
-                  onChange={(e) => update({ accountName: e.target.value })}
+                  value={form.accountName}
                   className="!rounded-xl h-11"
                   disabled
+                  placeholder={
+                    isVerifyingBankAccount ? 'Verifying...' : 'Auto-verified from your bank'
+                  }
+                  prefix={
+                    isVerifyingBankAccount ? (
+                      <Loader2 size={14} className="text-blue animate-spin" />
+                    ) : form.accountName ? (
+                      <CheckCircle size={14} className="text-emerald-500" />
+                    ) : (
+                      <User size={14} className="text-neutral-400" />
+                    )
+                  }
                 />
-                <p className="text-[11px] text-gray-400 mt-1">Auto-verified from your bank</p>
+                {form.accountName && (
+                  <p className="text-[11px] text-emerald-600 mt-1 flex items-center gap-1">
+                    <CheckCircle size={10} /> Account verified
+                  </p>
+                )}
+                {!form.accountName &&
+                  !isVerifyingBankAccount &&
+                  form.accountNumber.length === 10 &&
+                  form.bankCode && (
+                    <p className="text-[11px] text-red-500 mt-1">
+                      Could not verify account. Please check details.
+                    </p>
+                  )}
               </div>
             </div>
           </SectionCard>
@@ -650,11 +791,11 @@ const StoreSettingsPage: React.FC<StoreSettingsProps> = ({}) => {
           >
             <div className="space-y-4">
               <div>
-                <label className="text-xs font-semibold text-gray-600 dark:text-gray-400 mb-1.5 block">
+                <label className="text-xs font-semibold text-neutral-600 dark:text-neutral-400 mb-1.5 block">
                   Return Policy
                 </label>
                 <TextArea
-                  value={settings.returnPolicy}
+                  value={form.returnPolicy}
                   onChange={(e) => update({ returnPolicy: e.target.value })}
                   rows={4}
                   maxLength={1000}
@@ -686,7 +827,7 @@ const StoreSettingsPage: React.FC<StoreSettingsProps> = ({}) => {
                 <p className="text-sm font-semibold text-red-600 dark:text-red-400 mb-1">
                   Delete This Store
                 </p>
-                <p className="text-xs text-gray-500 mb-3">
+                <p className="text-xs text-neutral-500 mb-3">
                   This will permanently delete your store, all products, and order history. This
                   action cannot be undone.
                 </p>
@@ -714,7 +855,7 @@ const StoreSettingsPage: React.FC<StoreSettingsProps> = ({}) => {
           {isMobile && activeSection && (
             <button
               onClick={() => setActiveSection(null)}
-              className="p-1.5 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800"
+              className="p-1.5 rounded-lg hover:bg-neutral-100 dark:hover:bg-neutral-800"
             >
               <svg
                 width="18"
@@ -725,16 +866,16 @@ const StoreSettingsPage: React.FC<StoreSettingsProps> = ({}) => {
                 strokeWidth="2"
                 strokeLinecap="round"
                 strokeLinejoin="round"
-                className="text-gray-500"
+                className="text-neutral-500"
               >
                 <path d="M15 18l-6-6 6-6" />
               </svg>
             </button>
           )}
           <div>
-            <h1 className="text-xl font-bold text-gray-900 dark:text-white">Settings</h1>
+            <h1 className="text-xl font-bold text-neutral-900 dark:text-white">Settings</h1>
             {isMobile && activeSection && (
-              <p className="text-xs text-gray-500">
+              <p className="text-xs text-neutral-500">
                 {sections.find((s) => s.key === activeSection)?.label}
               </p>
             )}
@@ -745,16 +886,12 @@ const StoreSettingsPage: React.FC<StoreSettingsProps> = ({}) => {
           disabled={isSaving}
           className="flex items-center gap-1.5 px-4 py-2 rounded-xl text-sm font-semibold bg-gradient-to-r from-blue to-indigo-500 hover:from-blue hover:to-indigo-600 text-white shadow-md shadow-blue/20 hover:shadow-lg transition-all disabled:opacity-60"
         >
-          {isSaving ? (
-            <div className="w-3.5 h-3.5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-          ) : (
-            <Save size={14} />
-          )}
+          {isSaving ? <Loader2 size={14} className="animate-spin" /> : <Save size={14} />}
           {isSaving ? 'Saving...' : 'Save'}
         </button>
       </div>
 
-      {/* Desktop: all sections stacked, Mobile: single section */}
+      {/* Desktop: all sections, Mobile: single section */}
       {isMobile ? (
         activeSection && renderSection(activeSection)
       ) : (
@@ -779,12 +916,12 @@ const StoreSettingsPage: React.FC<StoreSettingsProps> = ({}) => {
         }
         footer={null}
         width={isMobile ? '95%' : 440}
+        rootClassName="modal-with-backdrop"
         className="[&_.ant-modal-content]:!rounded-2xl"
       >
         <div className="space-y-4 pt-2">
-          <p className="text-sm text-gray-600 dark:text-gray-400">
-            To confirm, type <strong className="text-red-500">{settings.storeName}</strong> in the
-            box below.
+          <p className="text-sm text-neutral-600 dark:text-neutral-400">
+            To confirm, type <strong className="text-red-500">{form.name}</strong> in the box below.
           </p>
           <Input
             value={deleteConfirmText}
@@ -798,20 +935,21 @@ const StoreSettingsPage: React.FC<StoreSettingsProps> = ({}) => {
                 setIsDeleteModalOpen(false);
                 setDeleteConfirmText('');
               }}
-              className="flex-1 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
+              className="flex-1 py-2.5 text-sm font-medium text-neutral-600 hover:bg-neutral-100 rounded-xl transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleDeleteStore}
-              disabled={deleteConfirmText !== settings.storeName}
+              disabled={deleteConfirmText !== form.name || isDeleting}
               className={`flex-1 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
-                deleteConfirmText === settings.storeName
+                deleteConfirmText === form.name && !isDeleting
                   ? 'bg-red-500 hover:bg-red-600 text-white'
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  : 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
               }`}
             >
-              <Trash2 size={14} /> Delete Permanently
+              {isDeleting ? <Loader2 size={14} className="animate-spin" /> : <Trash2 size={14} />}
+              {isDeleting ? 'Deleting...' : 'Delete Permanently'}
             </button>
           </div>
         </div>

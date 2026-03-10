@@ -2,25 +2,24 @@
 
 import React from 'react';
 import { motion } from 'framer-motion';
-import { Tooltip } from 'antd';
 import {
-  TrendingUp,
-  TrendingDown,
   DollarSign,
   ShoppingCart,
   Package,
   Star,
   Eye,
   Users,
-  ArrowUpRight,
   Clock,
   CheckCircle,
   AlertCircle,
   ExternalLink,
+  Truck,
+  Store,
 } from 'lucide-react';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 import { numberFormat } from '@grc/_shared/helpers';
 import { Currencies } from '@grc/_shared/constant';
+import { useRouter } from 'next/navigation';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -29,89 +28,11 @@ import { Currencies } from '@grc/_shared/constant';
 interface MetricCardProps {
   label: string;
   value: string;
-  change?: number; // percentage
   icon: React.ElementType;
   iconColor: string;
   iconBg: string;
   subtitle?: string;
 }
-
-interface RecentOrder {
-  id: string;
-  customerName: string;
-  productName: string;
-  amount: number; // kobo
-  status: 'pending' | 'processing' | 'shipped' | 'delivered' | 'cancelled';
-  date: string;
-  avatar?: string;
-}
-
-interface TopProduct {
-  id: string;
-  name: string;
-  image?: string;
-  revenue: number;
-  unitsSold: number;
-  views: number;
-}
-
-// ═══════════════════════════════════════════════════════════════════════════
-// MOCK DATA
-// ═══════════════════════════════════════════════════════════════════════════
-
-const mockRecentOrders: RecentOrder[] = [
-  {
-    id: 'ORD-001',
-    customerName: 'Chidera Nwosu',
-    productName: 'iPhone 14 Pro Max',
-    amount: 85000000,
-    status: 'processing',
-    date: '2025-02-18T14:30:00Z',
-  },
-  {
-    id: 'ORD-002',
-    customerName: 'Amaka Eze',
-    productName: 'Samsung Galaxy S24',
-    amount: 62000000,
-    status: 'pending',
-    date: '2025-02-18T12:15:00Z',
-  },
-  {
-    id: 'ORD-003',
-    customerName: 'Tunde Bakare',
-    productName: 'AirPods Pro 2',
-    amount: 15000000,
-    status: 'delivered',
-    date: '2025-02-17T16:45:00Z',
-  },
-  {
-    id: 'ORD-004',
-    customerName: 'Ngozi Okafor',
-    productName: 'MacBook Air M2',
-    amount: 120000000,
-    status: 'shipped',
-    date: '2025-02-17T09:20:00Z',
-  },
-  {
-    id: 'ORD-005',
-    customerName: 'Ibrahim Musa',
-    productName: 'PS5 Console',
-    amount: 45000000,
-    status: 'cancelled',
-    date: '2025-02-16T20:10:00Z',
-  },
-];
-
-const mockTopProducts: TopProduct[] = [
-  { id: 'p1', name: 'iPhone 14 Pro Max', revenue: 425000000, unitsSold: 5, views: 234 },
-  { id: 'p2', name: 'Samsung Galaxy S24', revenue: 310000000, unitsSold: 5, views: 189 },
-  { id: 'p3', name: 'AirPods Pro 2', revenue: 150000000, unitsSold: 10, views: 312 },
-  { id: 'p4', name: 'MacBook Air M2', revenue: 240000000, unitsSold: 2, views: 156 },
-];
-
-// Weekly revenue data (last 7 days)
-const weeklyRevenue = [32, 45, 28, 62, 51, 73, 58];
-const weekLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 
 // ═══════════════════════════════════════════════════════════════════════════
 // METRIC CARD
@@ -120,7 +41,6 @@ const weekLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
 const MetricCard: React.FC<MetricCardProps> = ({
   label,
   value,
-  change,
   icon: Icon,
   iconColor,
   iconBg,
@@ -129,55 +49,18 @@ const MetricCard: React.FC<MetricCardProps> = ({
   <motion.div
     initial={{ opacity: 0, y: 20 }}
     animate={{ opacity: 1, y: 0 }}
-    className="bg-white dark:bg-gray-800/60 rounded-2xl p-5 border border-gray-100 dark:border-gray-700/50 hover:shadow-md transition-shadow"
+    className="bg-white dark:bg-neutral-800/60 rounded-2xl p-5 border border-neutral-100 dark:border-neutral-700/50 hover:shadow-md transition-shadow"
   >
     <div className="flex items-start justify-between">
       <div className={`w-10 h-10 rounded-xl ${iconBg} flex items-center justify-center`}>
         <Icon size={20} className={iconColor} />
       </div>
-      {change !== undefined && (
-        <div
-          className={`flex items-center gap-0.5 text-xs font-semibold px-2 py-0.5 rounded-full ${
-            change >= 0
-              ? 'text-emerald-600 bg-emerald-50 dark:bg-emerald-900/20 dark:text-emerald-400'
-              : 'text-red-600 bg-red-50 dark:bg-red-900/20 dark:text-red-400'
-          }`}
-        >
-          {change >= 0 ? <TrendingUp size={12} /> : <TrendingDown size={12} />}
-          {Math.abs(change)}%
-        </div>
-      )}
     </div>
-    <p className="text-2xl font-bold text-gray-900 dark:text-white mt-3">{value}</p>
-    <p className="text-xs text-gray-500 mt-1">{label}</p>
-    {subtitle && <p className="text-[11px] text-gray-400 mt-0.5">{subtitle}</p>}
+    <p className="text-2xl font-bold text-neutral-900 dark:text-white mt-3">{value}</p>
+    <p className="text-xs text-neutral-500 mt-1">{label}</p>
+    {subtitle && <p className="text-[11px] text-neutral-400 mt-0.5">{subtitle}</p>}
   </motion.div>
 );
-
-// ═══════════════════════════════════════════════════════════════════════════
-// MINI BAR CHART
-// ═══════════════════════════════════════════════════════════════════════════
-
-const MiniBarChart: React.FC<{ data: number[]; labels: string[] }> = ({ data, labels }) => {
-  const max = Math.max(...data);
-  return (
-    <div className="flex items-end gap-1.5 h-24">
-      {data.map((val, i) => (
-        <Tooltip key={i} title={`${labels[i]}: ₦${(val * 1000).toLocaleString()}`}>
-          <div className="flex-1 flex flex-col items-center gap-1">
-            <motion.div
-              initial={{ height: 0 }}
-              animate={{ height: `${(val / max) * 100}%` }}
-              transition={{ delay: i * 0.05, duration: 0.4, ease: 'easeOut' }}
-              className="w-full rounded-t-md bg-gradient-to-t from-blue to-blue dark:from-blue dark:to-blue min-h-[4px] cursor-pointer hover:from-blue hover:to-blue transition-colors"
-            />
-            <span className="text-[9px] text-gray-400">{labels[i]}</span>
-          </div>
-        </Tooltip>
-      ))}
-    </div>
-  );
-};
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ORDER STATUS BADGE
@@ -198,7 +81,7 @@ const orderStatusConfig: Record<string, { label: string; color: string; icon: Re
     shipped: {
       label: 'Shipped',
       color: 'bg-indigo-50 text-indigo-600 dark:bg-indigo-900/20 dark:text-indigo-400',
-      icon: ArrowUpRight,
+      icon: Truck,
     },
     delivered: {
       label: 'Delivered',
@@ -232,12 +115,41 @@ const OrderStatusBadge: React.FC<{ status: string }> = ({ status }) => {
 interface StoreDashboardProps {
   storeId: string;
   storeName: string;
+  store: any;
+  totalProducts: number;
+  isLoadingProducts: boolean;
+  recentOrders: any[];
+  totalOrders: number;
+  isLoadingOrders: boolean;
 }
 
-const StoreDashboard: React.FC<StoreDashboardProps> = ({ storeName }) => {
+const StoreDashboard: React.FC<StoreDashboardProps> = ({
+  storeId,
+  storeName,
+  store,
+  totalProducts,
+  recentOrders,
+  totalOrders,
+  isLoadingOrders,
+}) => {
   const isMobile = useMediaQuery(mediaSize.mobile);
+  const router = useRouter();
+
+  // ── Derive metrics from store data ──────────────────────────────────
+  const totalRevenue = store?.totalRevenue || store?.analytics?.totalRevenue || 0;
+  const totalSales = store?.totalSales || store?.analytics?.totalSales || 0;
+  const storeRating = store?.rating || store?.averageRating || 0;
+  const totalReviews = store?.totalReviews || 0;
+  const totalViews = store?.views || store?.analytics?.totalViews || 0;
+  const totalFollowers = store?.followersCount || store?.totalFollowers || 0;
+
+  // Count orders by status from recent orders
+  const pendingOrders = recentOrders.filter((o: any) => o.status === 'pending').length;
+  const liveProducts = store?.totalListings || totalProducts;
+  const inReviewProducts = store?.pendingListings || 0;
 
   const formatRelativeTime = (dateStr: string) => {
+    if (!dateStr) return '';
     const diff = Date.now() - new Date(dateStr).getTime();
     const mins = Math.floor(diff / 60000);
     if (mins < 60) return `${mins}m ago`;
@@ -246,264 +158,231 @@ const StoreDashboard: React.FC<StoreDashboardProps> = ({ storeName }) => {
     return `${Math.floor(hrs / 24)}d ago`;
   };
 
+  // ── Extract order display data ──────────────────────────────────────
+  const getOrderDisplayData = (order: any) => {
+    const items = order?.items || order?.orderItems || [];
+    const firstItem = items[0];
+    const listing =
+      firstItem?.listingId && typeof firstItem.listingId === 'object' ? firstItem.listingId : null;
+    const buyer = order?.buyerId && typeof order.buyerId === 'object' ? order.buyerId : null;
+
+    return {
+      id: order?.orderNumber || order?._id || '',
+      customerName: buyer
+        ? `${buyer.firstName || ''} ${buyer.lastName || ''}`.trim()
+        : order?.customerName || 'Customer',
+      productName: listing?.itemName || firstItem?.itemName || 'Order',
+      amount: order?.totalAmount || order?.total || 0,
+      status: order?.status || 'pending',
+      date: order?.createdAt || '',
+      itemCount: items.length,
+    };
+  };
+
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-xl font-bold text-gray-900 dark:text-white">Dashboard</h1>
-        <p className="text-sm text-gray-500 mt-0.5">Overview of {storeName}&apos;s performance</p>
+        <h1 className="text-xl font-bold text-neutral-900 dark:text-white">Dashboard</h1>
+        <p className="text-sm text-neutral-500 mt-0.5">
+          Overview of {storeName}&apos;s performance
+        </p>
       </div>
 
-      {/* Metric Cards */}
+      {/* Primary Metrics */}
       <div className={`grid gap-4 ${isMobile ? 'grid-cols-2' : 'grid-cols-4'}`}>
         <MetricCard
           label="Total Revenue"
-          value={numberFormat(1125000000 / 100, Currencies.NGN)}
-          change={12.5}
+          value={totalRevenue > 0 ? numberFormat(totalRevenue / 100, Currencies.NGN) : '₦0'}
           icon={DollarSign}
           iconColor="text-emerald-600"
           iconBg="bg-emerald-50 dark:bg-emerald-900/20"
-          subtitle="This month"
+          subtitle={totalSales > 0 ? `${totalSales} sale${totalSales !== 1 ? 's' : ''}` : undefined}
         />
         <MetricCard
           label="Total Orders"
-          value="48"
-          change={8.3}
+          value={`${totalOrders}`}
           icon={ShoppingCart}
           iconColor="text-blue"
           iconBg="bg-blue-50 dark:bg-blue-900/20"
-          subtitle="12 pending"
+          subtitle={pendingOrders > 0 ? `${pendingOrders} pending` : undefined}
         />
         <MetricCard
           label="Active Products"
-          value="24"
-          change={-2.1}
+          value={`${liveProducts}`}
           icon={Package}
           iconColor="text-violet-600"
           iconBg="bg-violet-50 dark:bg-violet-900/20"
-          subtitle="3 in review"
+          subtitle={inReviewProducts > 0 ? `${inReviewProducts} in review` : undefined}
         />
         <MetricCard
           label="Store Rating"
-          value="4.8"
-          change={1.2}
+          value={storeRating > 0 ? storeRating.toFixed(1) : '—'}
           icon={Star}
           iconColor="text-amber-500"
           iconBg="bg-amber-50 dark:bg-amber-900/20"
-          subtitle="36 reviews"
+          subtitle={
+            totalReviews > 0
+              ? `${totalReviews} review${totalReviews !== 1 ? 's' : ''}`
+              : 'No reviews yet'
+          }
         />
       </div>
 
-      {/* Secondary metrics */}
+      {/* Secondary Metrics */}
       <div className={`grid gap-4 ${isMobile ? 'grid-cols-2' : 'grid-cols-3'}`}>
         <MetricCard
           label="Store Views"
-          value="1,247"
-          change={24.7}
+          value={totalViews > 0 ? totalViews.toLocaleString() : '0'}
           icon={Eye}
           iconColor="text-cyan-600"
           iconBg="bg-cyan-50 dark:bg-cyan-900/20"
-          subtitle="This week"
         />
         <MetricCard
-          label="Unique Visitors"
-          value="892"
-          change={15.3}
+          label="Followers"
+          value={totalFollowers > 0 ? totalFollowers.toLocaleString() : '0'}
           icon={Users}
           iconColor="text-pink-600"
           iconBg="bg-pink-50 dark:bg-pink-900/20"
-          subtitle="This week"
         />
         {!isMobile && (
           <MetricCard
-            label="Conversion Rate"
-            value="3.8%"
-            change={0.6}
-            icon={TrendingUp}
+            label="Total Products"
+            value={`${totalProducts}`}
+            icon={Store}
             iconColor="text-orange-600"
             iconBg="bg-orange-50 dark:bg-orange-900/20"
-            subtitle="Orders / Views"
           />
         )}
-      </div>
-
-      {/* Charts + Recent Activity Row */}
-      <div className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-5'}`}>
-        {/* Revenue Chart */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className={`bg-white dark:bg-gray-800/60 rounded-2xl p-5 border border-gray-100 dark:border-gray-700/50 ${
-            isMobile ? '' : 'col-span-3'
-          }`}
-        >
-          <div className="flex items-center justify-between mb-4">
-            <div>
-              <h3 className="text-sm font-semibold text-gray-900 dark:text-white">
-                Revenue This Week
-              </h3>
-              <p className="text-xs text-gray-500 mt-0.5">Daily breakdown</p>
-            </div>
-            <div className="text-right">
-              <p className="text-lg font-bold text-gray-900 dark:text-white">
-                {numberFormat(349000000 / 100, Currencies.NGN)}
-              </p>
-              <p className="text-[11px] text-emerald-500 font-semibold flex items-center gap-0.5 justify-end">
-                <TrendingUp size={10} /> +18.2% vs last week
-              </p>
-            </div>
-          </div>
-          <MiniBarChart data={weeklyRevenue} labels={weekLabels} />
-        </motion.div>
-
-        {/* Top Products */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.3 }}
-          className={`bg-white dark:bg-gray-800/60 rounded-2xl p-5 border border-gray-100 dark:border-gray-700/50 ${
-            isMobile ? '' : 'col-span-2'
-          }`}
-        >
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white mb-4">Top Products</h3>
-          <div className="space-y-3">
-            {mockTopProducts.map((product, i) => {
-              const maxRev = Math.max(...mockTopProducts.map((p) => p.revenue));
-              return (
-                <div key={product.id} className="flex items-center gap-3">
-                  <span className="text-xs font-bold text-gray-400 w-4">#{i + 1}</span>
-                  <div className="w-8 h-8 rounded-lg bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
-                    <Package size={14} className="text-gray-400" />
-                  </div>
-                  <div className="flex-1 min-w-0">
-                    <p className="text-xs font-semibold text-gray-900 dark:text-white truncate">
-                      {product.name}
-                    </p>
-                    <div className="w-full h-1.5 bg-gray-100 dark:bg-gray-700 rounded-full mt-1">
-                      <div
-                        className="h-full bg-gradient-to-r from-blue to-indigo-500 rounded-full"
-                        style={{ width: `${(product.revenue / maxRev) * 100}%` }}
-                      />
-                    </div>
-                  </div>
-                  <span className="text-xs font-semibold text-gray-600 dark:text-gray-300 flex-shrink-0">
-                    {numberFormat(product.revenue / 100, Currencies.NGN)}
-                  </span>
-                </div>
-              );
-            })}
-          </div>
-        </motion.div>
       </div>
 
       {/* Recent Orders */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
-        transition={{ delay: 0.4 }}
-        className="bg-white dark:bg-gray-800/60 rounded-2xl border border-gray-100 dark:border-gray-700/50"
+        transition={{ delay: 0.3 }}
+        className="bg-white dark:bg-neutral-800/60 rounded-2xl border border-neutral-100 dark:border-neutral-700/50"
       >
         <div className="flex items-center justify-between p-5 pb-0">
-          <h3 className="text-sm font-semibold text-gray-900 dark:text-white">Recent Orders</h3>
-          <button className="text-xs font-semibold text-blue hover:text-blue flex items-center gap-1">
+          <h3 className="text-sm font-semibold text-neutral-900 dark:text-white">Recent Orders</h3>
+          <button
+            onClick={() => router.push(`/my-store/${storeId}/orders`)}
+            className="text-xs font-semibold text-blue hover:text-blue flex items-center gap-1"
+          >
             View All <ExternalLink size={10} />
           </button>
         </div>
 
-        {/* Desktop table */}
-        {!isMobile ? (
+        {isLoadingOrders ? (
+          <div className="p-8 text-center">
+            <div className="w-6 h-6 border-2 border-blue/30 border-t-blue rounded-full animate-spin mx-auto mb-2" />
+            <p className="text-xs text-neutral-400">Loading orders...</p>
+          </div>
+        ) : recentOrders.length === 0 ? (
+          <div className="text-center py-12 px-4">
+            <ShoppingCart
+              size={32}
+              className="mx-auto text-neutral-200 dark:text-neutral-700 mb-3"
+            />
+            <p className="text-sm text-neutral-400">No orders yet</p>
+            <p className="text-xs text-neutral-400 mt-1">Orders from customers will appear here</p>
+          </div>
+        ) : !isMobile ? (
           <div className="overflow-x-auto mt-4">
             <table className="w-full">
               <thead>
-                <tr className="border-b border-gray-100 dark:border-gray-700">
-                  <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-5 pb-3">
+                <tr className="border-b border-neutral-100 dark:border-neutral-700">
+                  <th className="text-left text-[11px] font-semibold text-neutral-400 uppercase tracking-wider px-5 pb-3">
                     Order
                   </th>
-                  <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-5 pb-3">
+                  <th className="text-left text-[11px] font-semibold text-neutral-400 uppercase tracking-wider px-5 pb-3">
                     Customer
                   </th>
-                  <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-5 pb-3">
+                  <th className="text-left text-[11px] font-semibold text-neutral-400 uppercase tracking-wider px-5 pb-3">
                     Product
                   </th>
-                  <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-5 pb-3">
+                  <th className="text-left text-[11px] font-semibold text-neutral-400 uppercase tracking-wider px-5 pb-3">
                     Amount
                   </th>
-                  <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-5 pb-3">
+                  <th className="text-left text-[11px] font-semibold text-neutral-400 uppercase tracking-wider px-5 pb-3">
                     Status
                   </th>
-                  <th className="text-left text-[11px] font-semibold text-gray-400 uppercase tracking-wider px-5 pb-3">
+                  <th className="text-left text-[11px] font-semibold text-neutral-400 uppercase tracking-wider px-5 pb-3">
                     Time
                   </th>
                 </tr>
               </thead>
               <tbody>
-                {mockRecentOrders.map((order) => (
-                  <tr
-                    key={order.id}
-                    className="border-b border-gray-50 dark:border-gray-700/30 hover:bg-gray-50/50 dark:hover:bg-gray-700/20 transition-colors cursor-pointer"
-                  >
-                    <td className="px-5 py-3.5 text-xs font-semibold text-blue dark:text-blue">
-                      {order.id}
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <div className="flex items-center gap-2.5">
-                        <div className="w-7 h-7 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center">
-                          <span className="text-[10px] font-bold text-gray-500">
-                            {order.customerName.charAt(0)}
+                {recentOrders.slice(0, 5).map((order: any) => {
+                  const d = getOrderDisplayData(order);
+                  return (
+                    <tr
+                      key={order._id || order.id}
+                      className="border-b border-neutral-50 dark:border-neutral-700/30 hover:bg-neutral-50/50 dark:hover:bg-neutral-700/20 transition-colors cursor-pointer"
+                    >
+                      <td className="px-5 py-3.5 text-xs font-semibold text-blue">{d.id}</td>
+                      <td className="px-5 py-3.5">
+                        <div className="flex items-center gap-2.5">
+                          <div className="w-7 h-7 rounded-full bg-neutral-100 dark:bg-neutral-700 flex items-center justify-center">
+                            <span className="text-[10px] font-bold text-neutral-500">
+                              {d.customerName.charAt(0)}
+                            </span>
+                          </div>
+                          <span className="text-xs font-medium text-neutral-900 dark:text-white">
+                            {d.customerName}
                           </span>
                         </div>
-                        <span className="text-xs font-medium text-gray-900 dark:text-white">
-                          {order.customerName}
-                        </span>
-                      </div>
-                    </td>
-                    <td className="px-5 py-3.5 text-xs text-gray-600 dark:text-gray-400">
-                      {order.productName}
-                    </td>
-                    <td className="px-5 py-3.5 text-xs font-semibold text-gray-900 dark:text-white">
-                      {numberFormat(order.amount / 100, Currencies.NGN)}
-                    </td>
-                    <td className="px-5 py-3.5">
-                      <OrderStatusBadge status={order.status} />
-                    </td>
-                    <td className="px-5 py-3.5 text-[11px] text-gray-400">
-                      {formatRelativeTime(order.date)}
-                    </td>
-                  </tr>
-                ))}
+                      </td>
+                      <td className="px-5 py-3.5 text-xs text-neutral-600 dark:text-neutral-400">
+                        {d.productName}
+                        {d.itemCount > 1 ? ` +${d.itemCount - 1}` : ''}
+                      </td>
+                      <td className="px-5 py-3.5 text-xs font-semibold text-neutral-900 dark:text-white">
+                        {numberFormat(d.amount / 100, Currencies.NGN)}
+                      </td>
+                      <td className="px-5 py-3.5">
+                        <OrderStatusBadge status={d.status} />
+                      </td>
+                      <td className="px-5 py-3.5 text-[11px] text-neutral-400">
+                        {formatRelativeTime(d.date)}
+                      </td>
+                    </tr>
+                  );
+                })}
               </tbody>
             </table>
           </div>
         ) : (
-          /* Mobile order cards */
           <div className="p-4 space-y-3">
-            {mockRecentOrders.map((order) => (
-              <div
-                key={order.id}
-                className="flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-800 rounded-xl"
-              >
-                <div className="w-9 h-9 rounded-full bg-gray-200 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
-                  <span className="text-xs font-bold text-gray-500">
-                    {order.customerName.charAt(0)}
-                  </span>
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-xs font-semibold text-gray-900 dark:text-white truncate">
-                      {order.productName}
-                    </p>
-                    <span className="text-xs font-bold text-gray-900 dark:text-white flex-shrink-0">
-                      {numberFormat(order.amount / 100, Currencies.NGN)}
+            {recentOrders.slice(0, 5).map((order: any) => {
+              const d = getOrderDisplayData(order);
+              return (
+                <div
+                  key={order._id || order.id}
+                  className="flex items-center gap-3 p-3 bg-neutral-50 dark:bg-neutral-800 rounded-xl"
+                >
+                  <div className="w-9 h-9 rounded-full bg-neutral-200 dark:bg-neutral-700 flex items-center justify-center flex-shrink-0">
+                    <span className="text-xs font-bold text-neutral-500">
+                      {d.customerName.charAt(0)}
                     </span>
                   </div>
-                  <div className="flex items-center justify-between gap-2 mt-1">
-                    <span className="text-[11px] text-gray-400">{order.customerName}</span>
-                    <OrderStatusBadge status={order.status} />
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center justify-between gap-2">
+                      <p className="text-xs font-semibold text-neutral-900 dark:text-white truncate">
+                        {d.productName}
+                      </p>
+                      <span className="text-xs font-bold text-neutral-900 dark:text-white flex-shrink-0">
+                        {numberFormat(d.amount / 100, Currencies.NGN)}
+                      </span>
+                    </div>
+                    <div className="flex items-center justify-between gap-2 mt-1">
+                      <span className="text-[11px] text-neutral-400">{d.customerName}</span>
+                      <OrderStatusBadge status={d.status} />
+                    </div>
                   </div>
                 </div>
-              </div>
-            ))}
+              );
+            })}
           </div>
         )}
       </motion.div>

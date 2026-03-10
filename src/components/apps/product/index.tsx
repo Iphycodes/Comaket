@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useContext } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Currencies } from '@grc/_shared/constant';
 import {
@@ -15,46 +15,58 @@ import {
   ShoppingBag,
   ShoppingCart,
 } from 'lucide-react';
-import { useRouter } from 'next/navigation';
 import { MarketItem, MediaItem } from '@grc/_shared/namespace';
 import { numberFormat } from '@grc/_shared/helpers';
-import { Badge, Tooltip, message } from 'antd';
+import { Badge, Tooltip } from 'antd';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
-import MediaRenderer, { getFirstImageUrl } from '../media-renderer';
-import { AppContext } from '@grc/app-context';
-import { CartItem } from '@grc/_shared/namespace/cart';
-import { setBuyNowItem } from '@grc/_shared/namespace/buy';
+import MediaRenderer from '../media-renderer';
 
 interface ProductProps {
-  /** The full product item data — passed from parent */
-  item: Partial<MarketItem> & {
-    media?: MediaItem[];
-  };
+  item: Partial<MarketItem> & { media?: MediaItem[] };
+
+  // State from parent
+  isInCart: boolean;
+  isSaved: boolean;
+  cartQuantity: number;
+  // Handlers from parent
+  onAddToCart: () => void;
+  onBuyNow: () => void;
+  onToggleSave: () => void;
+  onWhatsAppMessage: () => void;
+  onShare: () => void;
+  onGoBack: () => void;
+
+  // Legacy support — if rendered from Market list view with setSelectedProductId
   setSelectedProductId?: React.Dispatch<React.SetStateAction<string>>;
 }
 
-const Product = ({ item, setSelectedProductId }: ProductProps) => {
-  const router = useRouter();
+const Product = ({
+  item,
+  isInCart: itemInCart,
+  isSaved,
+  cartQuantity,
+  onAddToCart,
+  onBuyNow,
+  onToggleSave,
+  onWhatsAppMessage,
+  onShare,
+  onGoBack,
+  setSelectedProductId,
+}: ProductProps) => {
   const isMobile = useMediaQuery(mediaSize.mobile);
-  const { addToCart, isInCart, cartItems } = useContext(AppContext);
 
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [slideDirection, setSlideDirection] = useState(0);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
-  const [isSaved, setIsSaved] = useState(false);
 
   const imageContainerRef = useRef<HTMLDivElement>(null);
   const touchStartXRef = useRef<number | null>(null);
 
-  // Media array from item
+  // Media
   const media: MediaItem[] = item.media && item.media.length > 0 ? item.media : [];
   const currentMedia = media[currentMediaIndex];
 
-  // Cart state
-  const itemId = item.id ?? '';
-  const itemInCart = isInCart(itemId);
-  const cartItem = cartItems?.find((i: CartItem) => i.id === itemId);
-  const cartQuantity = cartItem?.quantity || 0;
+  // Derived
   const isSoldOut = item.availability === false;
   const quantity = item.quantity ?? 1;
   const isMaxQuantityReached = cartQuantity >= quantity;
@@ -62,102 +74,12 @@ const Product = ({ item, setSelectedProductId }: ProductProps) => {
 
   // ─── Handlers ───────────────────────────────────────────────
 
-  const buildCartItem = (): CartItem => ({
-    id: itemId,
-    itemName: item.itemName || '',
-    description: item.description || '',
-    price: item.askingPrice?.price || 0,
-    quantity: 1,
-    maxQuantity: quantity,
-    image: getFirstImageUrl(media),
-    condition: item.condition || 'Brand New',
-    negotiable: item.askingPrice?.negotiable || false,
-    sellerName: item.postUserProfile?.businessName || item.postUserProfile?.userName || '',
-  });
-
-  const handleAddToCart = () => {
-    if (isSoldOut) return;
-    if (isMaxQuantityReached) {
-      message.warning(`Maximum quantity (${quantity}) reached for this item`);
-      return;
-    }
-    if (itemInCart) {
-      message.info('Item is already in your cart');
-      return;
-    }
-    addToCart(buildCartItem()?.id);
-    message.success('Added to cart!');
-  };
-
-  const handleBuyNow = () => {
-    if (isSoldOut) return;
-    setBuyNowItem(buildCartItem());
-    router.push('/checkout?mode=buynow');
-  };
-
-  const handleWhatsAppMessage = () => {
-    const phoneNumber = item.postUserProfile?.phoneNumber || '';
-    if (!phoneNumber) {
-      message.error('Seller phone number not available');
-      return;
-    }
-    const formattedPrice = numberFormat((item.askingPrice?.price ?? 0) / 100, Currencies.NGN);
-    const sellerName =
-      item.postUserProfile?.businessName || item.postUserProfile?.userName || 'Seller';
-
-    const msg = `Hi, ${sellerName},
-I am interested in this item on Comaket.
-
-Item Id: ${itemId}
-Name: ${item.itemName}
-Description: ${item.description}
-Price: ${formattedPrice}`;
-
-    const encodedMessage = encodeURIComponent(msg);
-    window.open(`https://wa.me/${phoneNumber}?text=${encodedMessage}`, '_blank');
-  };
-
-  const handleBookmark = () => {
-    try {
-      const savedItems = JSON.parse(localStorage.getItem('savedItems') || '[]');
-      if (isSaved) {
-        const updated = savedItems.filter((id: string | number) => id !== itemId);
-        localStorage.setItem('savedItems', JSON.stringify(updated));
-        setIsSaved(false);
-      } else {
-        if (!savedItems.includes(itemId)) savedItems.push(itemId);
-        localStorage.setItem('savedItems', JSON.stringify(savedItems));
-        setIsSaved(true);
-      }
-      window.dispatchEvent(new Event('savedItemsChanged'));
-    } catch (err) {
-      console.error('Error managing bookmarks:', err);
-    }
-  };
-
-  const handleShare = async () => {
-    const shareData = {
-      title: item.itemName || '',
-      text: `Check out this item: ${item.itemName} - ${numberFormat(
-        (item.askingPrice?.price ?? 0) / 100,
-        Currencies.NGN
-      )}`,
-      url: `${window.location.origin}/product/${itemId}`,
-    };
-    try {
-      if (navigator.share) {
-        await navigator.share(shareData);
-      } else {
-        await navigator.clipboard.writeText(shareData.url);
-        message.success('Link copied to clipboard!');
-      }
-    } catch (err) {
-      console.error('Error sharing:', err);
-    }
-  };
-
   const handleGoBack = () => {
-    setSelectedProductId?.('');
+    if (setSelectedProductId) {
+      setSelectedProductId('');
+    } else {
+      onGoBack();
+    }
   };
 
   // ─── Media navigation ──────────────────────────────────────
@@ -176,19 +98,7 @@ Price: ${formattedPrice}`;
     }
   };
 
-  // ─── Effects ────────────────────────────────────────────────
-
-  // Load saved state
-  useEffect(() => {
-    try {
-      const savedItems = JSON.parse(localStorage.getItem('savedItems') || '[]');
-      setIsSaved(savedItems.includes(itemId));
-    } catch (err) {
-      console.error('Error loading bookmarks:', err);
-    }
-  }, [itemId]);
-
-  // Touch swipe for mobile media carousel
+  // Touch swipe for mobile
   useEffect(() => {
     const container = imageContainerRef.current;
     if (!container || !isMobile) return;
@@ -223,20 +133,20 @@ Price: ${formattedPrice}`;
       animate={{ opacity: 1, y: 0 }}
       exit={{ opacity: 0, y: 20 }}
       transition={{ duration: 0.3 }}
-      className={`bg-white dark:bg-gray-800 ${
+      className={`bg-white dark:bg-neutral-800 ${
         isMobile ? 'fixed inset-0 z-[100] overflow-y-auto' : 'rounded-lg mt-10'
       }`}
     >
-      {/* ─── Sticky back header ─── */}
+      {/* Sticky back header */}
       <div
-        className={`sticky top-0 left-0 w-full py-3 z-50 bg-white dark:bg-gray-800 border-b border-gray-100 dark:border-zinc-800 ${
+        className={`sticky top-0 left-0 w-full py-3 z-50 bg-white dark:bg-neutral-800 border-b border-neutral-100 dark:border-zinc-800 ${
           isMobile ? 'px-3 pt-9' : 'px-0'
         }`}
       >
         <motion.button
           whileTap={{ scale: 0.95 }}
           onClick={handleGoBack}
-          className="text-neutral-500 dark:text-gray-400 hover:text-blue font-semibold flex text-base gap-1.5 items-center"
+          className="text-neutral-500 dark:text-neutral-400 hover:text-blue font-semibold flex text-base gap-1.5 items-center"
         >
           <ArrowLeft size={20} />
           <span>Back</span>
@@ -244,24 +154,29 @@ Price: ${formattedPrice}`;
       </div>
 
       <div className={`${isMobile ? 'px-3 mb-48' : 'pb-6'}`}>
-        {/* ─── Seller Info ─── */}
+        {/* Seller Info */}
         <div className="flex items-center gap-3 my-4">
           <div className="relative w-11 h-11">
             <img
               src={item.postUserProfile?.profilePicUrl ?? ''}
               alt="Seller"
               className="rounded-full object-cover w-full h-full"
+              onError={(e) => {
+                (e.target as HTMLImageElement).src = '/default-avatar.png';
+              }}
             />
-            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white dark:border-gray-800" />
+            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white dark:border-neutral-800" />
           </div>
           <div className="flex-1">
             <div className="flex items-center gap-2">
-              <h3 className="font-medium text-gray-900 dark:text-white">
-                {item.postUserProfile?.businessName || item.postUserProfile?.userName}
+              <h3 className="font-medium text-neutral-900 dark:text-white">
+                {item.postUserProfile?.displayName || item.postUserProfile?.userName}
               </h3>
-              {item.postUserProfile?.isVerified && <span className="text-blue text-xs">✓</span>}
+              {item.postUserProfile?.isVerified && (
+                <i className="ri-verified-badge-fill text-[#1D9BF0] text-[14px]" />
+              )}
             </div>
-            <div className="flex items-center gap-3 text-[12px] text-gray-500 dark:text-gray-400">
+            <div className="flex items-center gap-3 text-[12px] text-neutral-500 dark:text-neutral-400">
               <span className="flex items-center gap-1">
                 <MapPin size={14} />
                 {item.postUserProfile?.location || 'Nigeria'}
@@ -276,7 +191,7 @@ Price: ${formattedPrice}`;
           </div>
         </div>
 
-        {/* ─── Main content: Image + Details ─── */}
+        {/* Main content: Image + Details */}
         <div className={`flex ${isMobile ? 'flex-col gap-4' : 'gap-8'}`}>
           {/* Left — Media Carousel */}
           <div
@@ -329,7 +244,7 @@ Price: ${formattedPrice}`;
                     </button>
                   )}
 
-                  {/* Dots indicator */}
+                  {/* Dots */}
                   <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1.5 z-10">
                     {media.map((m, index) => (
                       <button
@@ -373,7 +288,7 @@ Price: ${formattedPrice}`;
                     className={`px-2 py-1 text-[10px] !flex gap-2 items-center font-semibold ${
                       !isSoldOut
                         ? 'text-white drop-shadow-[0_2px_12px_rgba(16,185,129,0.8)]'
-                        : 'text-gray-200 drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]'
+                        : 'text-neutral-200 drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]'
                     }`}
                   >
                     <div
@@ -393,7 +308,7 @@ Price: ${formattedPrice}`;
                 color={!isSoldOut ? 'green' : 'default'}
               />
 
-              {/* Low stock warning */}
+              {/* Low stock */}
               {!isSoldOut && quantity > 0 && quantity <= 5 && (
                 <div className="absolute bottom-4 right-3 bg-black/60 backdrop-blur-sm text-white text-[10px] font-semibold px-2 py-1 rounded-full z-10">
                   Only {quantity} left
@@ -407,7 +322,7 @@ Price: ${formattedPrice}`;
             <div className="space-y-4">
               {/* Title + Price */}
               <div>
-                <h2 className="text-xl font-semibold mb-1 text-gray-900 dark:text-white">
+                <h2 className="text-xl font-semibold mb-1 text-neutral-900 dark:text-white">
                   {item.itemName}
                 </h2>
 
@@ -435,7 +350,7 @@ Price: ${formattedPrice}`;
                   {item.productTags.map((tag, index) => (
                     <span
                       key={index}
-                      className="px-3 py-1 text-xs font-medium bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-gray-300 rounded-full"
+                      className="px-3 py-1 text-xs font-medium bg-neutral-100 dark:bg-zinc-800 text-neutral-700 dark:text-neutral-300 rounded-full"
                     >
                       {tag}
                     </span>
@@ -444,10 +359,10 @@ Price: ${formattedPrice}`;
               )}
 
               {/* Description */}
-              <div className="bg-gray-50 dark:bg-zinc-900/50 rounded-lg p-3">
-                <h4 className="font-medium mb-2 text-gray-900 dark:text-white">Description</h4>
+              <div className="bg-neutral-50 dark:bg-zinc-900/50 rounded-lg p-3">
+                <h4 className="font-medium mb-2 text-neutral-900 dark:text-white">Description</h4>
                 <p
-                  className={`text-gray-600 dark:text-gray-400 text-sm ${
+                  className={`text-neutral-600 dark:text-neutral-400 text-sm ${
                     !isDescriptionExpanded && 'line-clamp-3'
                   }`}
                 >
@@ -470,35 +385,19 @@ Price: ${formattedPrice}`;
                 isMobile
                   ? 'fixed bottom-0 left-0 right-0 px-3 py-3 pb-20'
                   : 'sticky bottom-0 pt-4 mt-6'
-              } bg-white dark:bg-gray-800 border-t border-gray-100 dark:border-zinc-800 z-40`}
+              } bg-white dark:bg-neutral-800 border-t border-neutral-100 dark:border-zinc-800 z-40`}
             >
-              {/* Comment input */}
-              {/* <div className="mb-3 w-full">
-                <div className="flex gap-3 w-full items-start">
-                  <img
-                    src={item.postUserProfile?.profilePicUrl ?? ''}
-                    alt="user"
-                    className="w-8 h-8 rounded-full object-cover"
-                  />
-                  <div className="flex-1">
-                    <CommentBox />
-                  </div>
-                </div>
-              </div> */}
-
-              {/* CTA buttons — conditional on isBuyable */}
               {isBuyable ? (
                 <div className="space-y-2">
-                  {/* Buy Now + Add to Cart */}
                   <div className="flex items-center gap-1.5">
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={handleBuyNow}
+                      onClick={onBuyNow}
                       disabled={isSoldOut}
                       className={`flex-1 py-3 rounded-lg font-medium flex items-center justify-center gap-1.5 shadow-sm text-sm transition-all ${
                         isSoldOut
-                          ? 'bg-gray-200 dark:bg-zinc-700 text-gray-400 cursor-not-allowed'
+                          ? 'bg-neutral-200 dark:bg-zinc-700 text-neutral-400 cursor-not-allowed'
                           : 'bg-gradient-to-r from-blue to-indigo-700 hover:from-blue hover:to-indigo-800 text-white hover:shadow-md'
                       }`}
                     >
@@ -520,14 +419,14 @@ Price: ${formattedPrice}`;
                       <motion.button
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
-                        onClick={handleAddToCart}
+                        onClick={onAddToCart}
                         disabled={isSoldOut || isMaxQuantityReached}
                         className={`p-3 rounded-lg border shadow-sm transition-colors ${
                           isSoldOut || isMaxQuantityReached
-                            ? 'bg-gray-100 dark:bg-zinc-800 border-gray-200 dark:border-zinc-700 text-gray-300 cursor-not-allowed'
+                            ? 'bg-neutral-100 dark:bg-zinc-800 border-neutral-200 dark:border-zinc-700 text-neutral-300 cursor-not-allowed'
                             : itemInCart
                               ? 'bg-indigo-50 border-blue text-blue dark:bg-blue/20 dark:border-blue'
-                              : 'bg-neutral-100 border-neutral-200 dark:bg-gray-700 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-blue hover:text-blue'
+                              : 'bg-neutral-100 border-neutral-200 dark:bg-neutral-700 dark:border-neutral-600 text-neutral-600 dark:text-neutral-400 hover:border-blue hover:text-blue'
                         }`}
                       >
                         <ShoppingCart size={18} />
@@ -539,7 +438,7 @@ Price: ${formattedPrice}`;
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={handleWhatsAppMessage}
+                      onClick={onWhatsAppMessage}
                       className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-1.5 shadow-sm text-sm"
                     >
                       <MessageCircle size={16} />
@@ -550,11 +449,11 @@ Price: ${formattedPrice}`;
                       <motion.button
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
-                        onClick={handleBookmark}
+                        onClick={onToggleSave}
                         className={`p-3 rounded-lg border shadow-sm transition-colors ${
                           isSaved
                             ? 'bg-pink-50 border-pink-200 dark:bg-pink-900/20 dark:border-pink-800'
-                            : 'bg-neutral-100 border-neutral-200 dark:bg-gray-700 dark:border-gray-600'
+                            : 'bg-neutral-100 border-neutral-200 dark:bg-neutral-700 dark:border-neutral-600'
                         }`}
                       >
                         <Bookmark
@@ -562,7 +461,7 @@ Price: ${formattedPrice}`;
                           className={`${
                             isSaved
                               ? 'fill-pink-500 text-pink-500'
-                              : 'text-gray-500 dark:text-gray-400'
+                              : 'text-neutral-500 dark:text-neutral-400'
                           } transition-colors`}
                         />
                       </motion.button>
@@ -572,21 +471,20 @@ Price: ${formattedPrice}`;
                       <motion.button
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
-                        onClick={handleShare}
-                        className="p-3 rounded-lg border border-neutral-200 dark:border-gray-600 bg-neutral-100 dark:bg-gray-700 shadow-sm"
+                        onClick={onShare}
+                        className="p-3 rounded-lg border border-neutral-200 dark:border-neutral-600 bg-neutral-100 dark:bg-neutral-700 shadow-sm"
                       >
-                        <Share2 size={18} className="text-gray-500 dark:text-gray-400" />
+                        <Share2 size={18} className="text-neutral-500 dark:text-neutral-400" />
                       </motion.button>
                     </Tooltip>
                   </div>
                 </div>
               ) : (
                 <div className="space-y-2">
-                  {/* NOT BUYABLE: WhatsApp as primary */}
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={handleWhatsAppMessage}
+                    onClick={onWhatsAppMessage}
                     className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-1.5 shadow-sm text-sm"
                   >
                     <MessageCircle size={16} />
@@ -598,11 +496,11 @@ Price: ${formattedPrice}`;
                       <motion.button
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
-                        onClick={handleBookmark}
+                        onClick={onToggleSave}
                         className={`flex-1 p-3 rounded-lg border shadow-sm transition-colors flex items-center justify-center gap-1.5 text-sm ${
                           isSaved
                             ? 'bg-pink-50 border-pink-200 dark:bg-pink-900/20 dark:border-pink-800 text-pink-500'
-                            : 'bg-neutral-100 border-neutral-200 dark:bg-gray-700 dark:border-gray-600 text-gray-500'
+                            : 'bg-neutral-100 border-neutral-200 dark:bg-neutral-700 dark:border-neutral-600 text-neutral-500'
                         }`}
                       >
                         <Bookmark
@@ -610,7 +508,7 @@ Price: ${formattedPrice}`;
                           className={
                             isSaved
                               ? 'fill-pink-500 text-pink-500'
-                              : 'text-gray-500 dark:text-gray-400'
+                              : 'text-neutral-500 dark:text-neutral-400'
                           }
                         />
                         Save
@@ -621,10 +519,10 @@ Price: ${formattedPrice}`;
                       <motion.button
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
-                        onClick={handleShare}
-                        className="flex-1 p-3 rounded-lg border border-neutral-200 dark:border-gray-600 bg-neutral-100 dark:bg-gray-700 shadow-sm flex items-center justify-center gap-1.5 text-sm text-gray-500"
+                        onClick={onShare}
+                        className="flex-1 p-3 rounded-lg border border-neutral-200 dark:border-neutral-600 bg-neutral-100 dark:bg-neutral-700 shadow-sm flex items-center justify-center gap-1.5 text-sm text-neutral-500"
                       >
-                        <Share2 size={16} className="text-gray-500 dark:text-gray-400" />
+                        <Share2 size={16} className="text-neutral-500 dark:text-neutral-400" />
                         Share
                       </motion.button>
                     </Tooltip>

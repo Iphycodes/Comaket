@@ -1,6 +1,6 @@
 'use client';
-import React, { useContext, useEffect, useMemo, useState } from 'react';
-import { Badge, Input, Tooltip, message as antMessage } from 'antd';
+import React, { useContext, useEffect, useMemo, useState, useRef, useCallback } from 'react';
+import { Badge, Input, Tooltip, message as antMessage, Empty } from 'antd';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search,
@@ -8,54 +8,226 @@ import {
   List,
   X,
   MessageCircle,
-  Bookmark,
   ShoppingCart,
   ShoppingBag,
+  Loader2,
+  BookmarkX,
 } from 'lucide-react';
 import { useSearchParams, useRouter } from 'next/navigation';
-import { mockMarketItems, Currencies } from '@grc/_shared/constant';
+import { Currencies } from '@grc/_shared/constant';
 import ModernItemPost from '@grc/components/apps/item-post-new';
 import { useSearch } from '@grc/hooks/useSearch';
 import ProductListingSkeleton from '../item-post-new/lib/product-listing-skeleton';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 import { MarketItem } from '@grc/_shared/namespace';
 import { CartItem } from '@grc/_shared/namespace/cart';
-import { setBuyNowItem } from '@grc/_shared/namespace/buy';
 import { numberFormat } from '@grc/_shared/helpers';
-import MediaRenderer, { getFirstImageUrl } from '../media-renderer';
+import MediaRenderer from '../media-renderer';
 import { AppContext } from '@grc/app-context';
 import Product from '../product';
 import ItemDetailModal from '../item-detail-modal';
 import { Shop } from 'iconsax-react';
-import { Empty } from 'antd';
+import { useSavedProducts } from '@grc/hooks/useSavedProducts';
+import { isEmpty } from 'lodash';
 
-const SavedItems = () => {
+// ═══════════════════════════════════════════════════════════════════════════
+// TRANSFORM: Backend saved → MarketItem
+// ═══════════════════════════════════════════════════════════════════════════
+
+const formatConditionLabel = (condition?: string): string => {
+  if (!condition) return '';
+  const map: Record<string, string> = {
+    brand_new: 'Brand New',
+    fairly_used: 'Fairly Used',
+    uk_used: 'Uk Used',
+    refurbished: 'Refurbished',
+  };
+  return map[condition] || condition.replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase());
+};
+
+const transformSavedToMarketItem = (saved: any): MarketItem | null => {
+  const listing = saved?.listing;
+  if (!listing) return null;
+  const store = listing.storeId && typeof listing.storeId === 'object' ? listing.storeId : null;
+  const creator =
+    listing.creatorId && typeof listing.creatorId === 'object' ? listing.creatorId : null;
+  const user = listing?.userId;
+  return {
+    id: listing._id,
+    itemName: listing.itemName || '',
+    description: listing.description || '',
+    condition: formatConditionLabel(listing.condition),
+    askingPrice: {
+      price: listing.askingPrice?.amount ?? 0,
+      negotiable: listing.askingPrice?.negotiable ?? false,
+    },
+    media: listing.media || [],
+    postUserProfile: {
+      isStore: !isEmpty(store),
+      displayName: !isEmpty(store) ? store?.name : `${user?.firstName} ${user?.lastName}`,
+      userName: creator?.username,
+      profilePicUrl: !isEmpty(store)
+        ? store?.logo
+        : creator?.profileImageUrl ?? listing?.userId?.avatar,
+      id: !isEmpty(store) ? store?._id : creator?._id,
+      isVerified: !isEmpty(store) ? store?.isVerified : creator?.isVerified,
+      isSuperVerified: !isEmpty(store) ? store?.isSuperVerified : creator?.isSuperVerified,
+      phoneNumber:
+        listing.whatsappNumber || !isEmpty(store)
+          ? store?.whatsappNumber ?? store?.phoneNumber
+          : creator?.whatsappNumber ?? listing?.phoneNumber,
+      location: !isEmpty(store)
+        ? `${store?.location?.city}, ${store?.location?.state}`
+        : `${creator?.location?.city}, ${creator?.location?.state}`,
+    },
+    productTags: listing.tags || [],
+    quantity: listing.quantity ?? 1,
+    availability: listing.status === 'live',
+    isBuyable: listing.type === 'direct_purchase',
+    sponsored: false,
+    comments: [],
+    listingType: listing.type === 'consignment' ? 'consignment' : 'self-listing',
+  } as MarketItem;
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// CONSTANTS
+// ═══════════════════════════════════════════════════════════════════════════
+
+const PER_PAGE = 20;
+
+// ═══════════════════════════════════════════════════════════════════════════
+// MAIN COMPONENT
+// ═══════════════════════════════════════════════════════════════════════════
+
+const SavedItems: React.FC = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const [isLoading, setIsLoading] = useState(true);
-  const [viewType, setViewType] = useState(searchParams?.get('view') || 'list');
+  const [viewType, setViewType] = useState(searchParams?.get('view') || 'grid');
   const { searchValue, debouncedChangeHandler } = useSearch();
   const isMobile = useMediaQuery(mediaSize.mobile);
   const { addToCart, isInCart, cartItems } = useContext(AppContext);
+
+  useEffect(() => {
+    setViewType('grid');
+  }, []);
 
   // Product detail states
   const [selectedProductId, setSelectedProductId] = useState<string>('');
   const [gridModalOpen, setGridModalOpen] = useState(false);
   const [gridModalItem, setGridModalItem] = useState<MarketItem | null>(null);
-  const [isSaved, setIsSaved] = useState<boolean>(false);
 
-  // TODO: Replace with actual saved items from API/localStorage
-  const savedItemsList = mockMarketItems;
+  // Track which item is being removed
+  const [removingId, setRemovingId] = useState<string | null>(null);
+
+  // Infinite scroll sentinel
+  const loadMoreRef = useRef<HTMLDivElement>(null);
+
+  // ── Pagination state (accumulative for infinite scroll) ────────────
+  const [currentPage, setCurrentPage] = useState(1);
+  const [allRawItems, setAllRawItems] = useState<any[]>([]);
+  const [hasMore, setHasMore] = useState(true);
+
+  // ══════════════════════════════════════════════════════════════════════
+  // HOOK — fetch saved products from backend
+  // ══════════════════════════════════════════════════════════════════════
+
+  const {
+    getSavedResponse,
+    isLoadingSaved,
+    isFetchingSaved,
+    removeSavedProduct,
+    refetchSaved,
+    refetchCount,
+    getCountResponse,
+  } = useSavedProducts({
+    fetchSaved: true,
+    savedParams: { page: 1, perPage: PER_PAGE },
+    fetchCount: true,
+  });
+
+  const savedCount = getCountResponse?.data?.data?.count || 0;
+
+  // ── Initial data load ───────────────────────────────────────────────
+  useEffect(() => {
+    const data = getSavedResponse?.data?.data;
+    if (data && Array.isArray(data)) {
+      setAllRawItems(data);
+      setHasMore(data.length >= PER_PAGE);
+      setCurrentPage(1);
+    }
+  }, [getSavedResponse?.data?.data]);
+
+  // ── Load more handler ───────────────────────────────────────────────
+  const handleLoadMore = useCallback(async () => {
+    if (isFetchingSaved || !hasMore) return;
+    const nextPage = currentPage + 1;
+    try {
+      const result = await refetchSaved({ page: nextPage, perPage: PER_PAGE });
+      const newItems = result?.data?.data || [];
+      if (newItems.length > 0) {
+        setAllRawItems((prev) => {
+          // Deduplicate by _id
+          const existingIds = new Set(prev.map((p: any) => p._id));
+          const unique = newItems.filter((n: any) => !existingIds.has(n._id));
+          return [...prev, ...unique];
+        });
+        setCurrentPage(nextPage);
+        setHasMore(newItems.length >= PER_PAGE);
+      } else {
+        setHasMore(false);
+      }
+    } catch {
+      // Error handled by RTK
+    }
+  }, [currentPage, isFetchingSaved, hasMore, refetchSaved]);
+
+  // ── Infinite scroll with IntersectionObserver ───────────────────────
+  useEffect(() => {
+    const sentinel = loadMoreRef.current;
+    if (!sentinel) return;
+
+    const observer = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isFetchingSaved && !isLoadingSaved) {
+          handleLoadMore();
+        }
+      },
+      { rootMargin: '200px' }
+    );
+
+    observer.observe(sentinel);
+    return () => observer.disconnect();
+  }, [handleLoadMore, hasMore, isFetchingSaved, isLoadingSaved]);
+
+  // ── Transform to MarketItem ─────────────────────────────────────────
+  const savedItemsList: MarketItem[] = useMemo(
+    () => allRawItems.map(transformSavedToMarketItem).filter(Boolean) as MarketItem[],
+    [allRawItems]
+  );
+
+  // ── Client-side search filter ───────────────────────────────────────
+  const filteredItems = useMemo(() => {
+    if (!searchValue) return savedItemsList;
+    const query = searchValue.toLowerCase();
+    return savedItemsList.filter(
+      (item) =>
+        item.itemName?.toLowerCase().includes(query) ||
+        item.description?.toLowerCase().includes(query) ||
+        item.postUserProfile?.displayName?.toLowerCase().includes(query) ||
+        item.postUserProfile?.userName?.toLowerCase().includes(query) ||
+        item.productTags?.some((tag: string) => tag.toLowerCase().includes(query))
+    );
+  }, [savedItemsList, searchValue]);
 
   const selectedProduct = useMemo(
     () => savedItemsList?.find((item) => item.id?.toString() === selectedProductId),
     [selectedProductId, savedItemsList]
   );
 
-  useEffect(() => {
-    const timer = setTimeout(() => setIsLoading(false), 1000);
-    return () => clearTimeout(timer);
-  }, []);
+  // ══════════════════════════════════════════════════════════════════════
+  // HANDLERS
+  // ══════════════════════════════════════════════════════════════════════
 
   const handleViewChange = (view: string) => {
     setViewType(view);
@@ -66,9 +238,7 @@ const SavedItems = () => {
 
   const handleVendorClick = (item: MarketItem) => {
     const vendorId = item.postUserProfile?.id || item.postUserProfile?.userName;
-    if (vendorId) {
-      router.push(`/vendors/${encodeURIComponent(vendorId)}`);
-    }
+    if (vendorId) router.push(`/vendors/${encodeURIComponent(vendorId)}`);
   };
 
   const handleGridItemClick = (item: MarketItem) => {
@@ -80,23 +250,49 @@ const SavedItems = () => {
     }
   };
 
-  const handleBookmark = (item: MarketItem) => {
+  const handleBookmark = async (item: MarketItem) => {
+    const listingId = item?.id?.toString();
+    if (!listingId) return;
+    setRemovingId(listingId);
     try {
-      const savedItems = JSON.parse(localStorage.getItem('savedItems') || '[]');
-      if (isSaved) {
-        const updatedItems = savedItems.filter((itemId: string | number) => itemId !== item?.id);
-        localStorage.setItem('savedItems', JSON.stringify(updatedItems));
-        setIsSaved(false);
-      } else {
-        if (!savedItems.includes(item?.id)) savedItems.push(item?.id);
-        localStorage.setItem('savedItems', JSON.stringify(savedItems));
-        setIsSaved(true);
-      }
-      window.dispatchEvent(new Event('savedItemsChanged'));
-    } catch (error) {
-      console.error('Error managing bookmarks:', error);
+      await removeSavedProduct(listingId);
+      // Remove from local state immediately for instant UI feedback
+      setAllRawItems((prev) => prev.filter((p: any) => p.listing?._id !== listingId));
+      refetchCount();
+    } catch {
+      // Error handled by RTK
+    } finally {
+      setRemovingId(null);
     }
   };
+
+  // const handleAddToCart = (item: MarketItem) => {
+  //   const maxQty = item?.quantity ?? 1;
+  //   const existing = cartItems?.find((i: CartItem) => i.id === item?.id);
+  //   const currentQty = existing?.quantity || 0;
+  //   if (currentQty >= maxQty) {
+  //     antMessage.warning(`Maximum quantity (${maxQty}) reached for this item`);
+  //     return;
+  //   }
+  //   if (isInCart(item?.id)) {
+  //     antMessage.info('Item is already in your cart');
+  //     return;
+  //   }
+  //   const cartItem: CartItem = {
+  //     id: item?.id,
+  //     itemName: item?.itemName || '',
+  //     description: item?.description || '',
+  //     price: item?.askingPrice?.price || 0,
+  //     quantity: 1,
+  //     maxQuantity: maxQty,
+  //     image: getFirstImageUrl(item?.media || []),
+  //     condition: item?.condition || '',
+  //     negotiable: item?.askingPrice?.negotiable || false,
+  //     sellerName: item?.postUserProfile?.displayName || item?.postUserProfile?.userName || '',
+  //   };
+  //   addToCart(cartItem?.id);
+  //   antMessage.success('Added to cart!');
+  // };
 
   const handleAddToCart = (item: MarketItem) => {
     const maxQty = item?.quantity ?? 1;
@@ -110,37 +306,13 @@ const SavedItems = () => {
       antMessage.info('Item is already in your cart');
       return;
     }
-    const cartItem: CartItem = {
-      id: item?.id,
-      itemName: item?.itemName || '',
-      description: item?.description || '',
-      price: item?.askingPrice?.price || 0,
-      quantity: 1,
-      maxQuantity: maxQty,
-      image: getFirstImageUrl(item?.media || []),
-      condition: item?.condition || '',
-      negotiable: item?.askingPrice?.negotiable || false,
-      sellerName: item?.postUserProfile?.businessName || item?.postUserProfile?.userName || '',
-    };
-    addToCart(cartItem?.id);
+    addToCart(item?.id);
     antMessage.success('Added to cart!');
   };
 
   const handleBuyNow = (item: MarketItem) => {
-    const buyItem: CartItem = {
-      id: item?.id,
-      itemName: item?.itemName || '',
-      description: item?.description || '',
-      price: item?.askingPrice?.price || 0,
-      quantity: 1,
-      maxQuantity: item?.quantity ?? 1,
-      image: getFirstImageUrl(item?.media || []),
-      condition: item?.condition || '',
-      negotiable: item?.askingPrice?.negotiable || false,
-      sellerName: item?.postUserProfile?.businessName || item?.postUserProfile?.userName || '',
-    };
-    setBuyNowItem(buyItem);
-    router.push('/checkout?mode=buynow');
+    const listingId = (item?.id || '').toString();
+    router.push(`/cart?select=${listingId}`);
   };
 
   const handleWhatsAppMessage = (item: MarketItem) => {
@@ -151,10 +323,33 @@ const SavedItems = () => {
     }
     const formattedPrice = numberFormat(item.askingPrice?.price / 100, Currencies.NGN);
     const sellerName =
-      item.postUserProfile?.businessName || item.postUserProfile?.userName || 'Seller';
+      item.postUserProfile?.displayName || item.postUserProfile?.userName || 'Seller';
     const message = `Hi, ${sellerName},\nI am interested in this item on Comaket.\n\n${item.itemName}\n${item.description}\nPrice: ${formattedPrice}`;
     window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, '_blank');
   };
+
+  const handleShare = async (item: MarketItem) => {
+    const shareData = {
+      title: item.itemName,
+      text: `Check out: ${item.itemName} - ${numberFormat(
+        item.askingPrice?.price / 100,
+        Currencies.NGN
+      )}`,
+      url: `${window.location.origin}/product/${item.id}`,
+    };
+    try {
+      if (navigator.share) {
+        await navigator.share(shareData);
+      } else {
+        await navigator.clipboard.writeText(shareData.url);
+        antMessage.success('Link copied!');
+      }
+    } catch {}
+  };
+
+  // ══════════════════════════════════════════════════════════════════════
+  // ANIMATIONS
+  // ══════════════════════════════════════════════════════════════════════
 
   const containerVariants = {
     hidden: { opacity: 0 },
@@ -166,6 +361,44 @@ const SavedItems = () => {
     visible: { opacity: 1, y: 0, transition: { duration: 0.5 } },
   };
 
+  // ══════════════════════════════════════════════════════════════════════
+  // LOADING MORE SKELETON
+  // ══════════════════════════════════════════════════════════════════════
+
+  const LoadMoreSkeleton = () => (
+    <div
+      className={
+        viewType === 'grid'
+          ? 'grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4'
+          : 'space-y-6 max-w-4xl mx-auto'
+      }
+    >
+      {[1, 2, 3].map((i) =>
+        viewType === 'grid' ? (
+          <div
+            key={i}
+            className="bg-white dark:bg-neutral-800 rounded-lg overflow-hidden animate-pulse"
+          >
+            <div className="aspect-square bg-neutral-200 dark:bg-neutral-700" />
+            <div className="p-3 space-y-2">
+              <div className="h-3 bg-neutral-200 dark:bg-neutral-700 rounded w-3/4" />
+              <div className="h-4 bg-neutral-200 dark:bg-neutral-700 rounded w-1/2" />
+              <div className="h-8 bg-neutral-200 dark:bg-neutral-700 rounded" />
+            </div>
+          </div>
+        ) : (
+          <div key={i}>
+            <ProductListingSkeleton />
+          </div>
+        )
+      )}
+    </div>
+  );
+
+  // ══════════════════════════════════════════════════════════════════════
+  // EMPTY STATE
+  // ══════════════════════════════════════════════════════════════════════
+
   const renderEmptyState = () => (
     <motion.div
       initial={{ opacity: 0, y: 20 }}
@@ -174,316 +407,354 @@ const SavedItems = () => {
     >
       <Empty
         image={
-          <Shop size={80} className="mx-auto text-gray-300 dark:text-gray-600" strokeWidth={1} />
+          <Shop
+            size={80}
+            className="mx-auto text-neutral-300 dark:text-neutral-600"
+            strokeWidth={1}
+          />
         }
         description={
           <div className="text-center">
-            <h3 className="text-lg font-medium text-gray-900 dark:text-gray-100 mb-2">
-              No saved items
+            <h3 className="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-2">
+              {searchValue ? 'No items match your search' : 'No saved items'}
             </h3>
-            <p className="text-gray-500 dark:text-gray-400">Items you save will appear here</p>
+            <p className="text-neutral-500 dark:text-neutral-400">
+              {searchValue ? 'Try a different search term' : 'Items you save will appear here'}
+            </p>
+            {searchValue && (
+              <button
+                onClick={() => debouncedChangeHandler('')}
+                className="text-sm text-blue hover:underline mt-2"
+              >
+                Clear search
+              </button>
+            )}
           </div>
         }
       />
     </motion.div>
   );
 
-  /** Grid view — identical to Market grid */
+  // ══════════════════════════════════════════════════════════════════════
+  // GRID VIEW
+  // ══════════════════════════════════════════════════════════════════════
+
   const renderProductGrid = () => {
-    if (savedItemsList?.length === 0) return renderEmptyState();
+    if (filteredItems?.length === 0) return renderEmptyState();
 
     return (
-      <motion.div
-        variants={containerVariants}
-        initial="hidden"
-        animate="visible"
-        className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4"
-      >
-        {savedItemsList.map((item: MarketItem) => {
-          const itemInCart = isInCart(item?.id ?? '');
-          const isSoldOut = !item?.availability;
-          const maxQty = item?.quantity ?? 1;
-          const existing = cartItems?.find((i: CartItem) => i.id === item?.id);
-          const currentQty = existing?.quantity || 0;
-          const isMaxQty = currentQty >= maxQty;
-          const firstMedia = item?.media?.[0];
+      <>
+        <motion.div
+          variants={containerVariants}
+          initial="hidden"
+          animate="visible"
+          className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4"
+        >
+          {filteredItems.map((item: MarketItem) => {
+            const itemInCart = isInCart(item?.id ?? '');
+            const isSoldOut = !item?.availability;
+            const maxQty = item?.quantity ?? 1;
+            const existing = cartItems?.find((i: CartItem) => i.id === item?.id);
+            const currentQty = existing?.quantity || 0;
+            const isMaxQty = currentQty >= maxQty;
+            const firstMedia = item?.media?.[0];
+            const isItemRemoving = removingId === item?.id?.toString();
 
-          return (
-            <motion.div
-              key={item.id}
-              variants={itemVariants}
-              className="bg-white dark:bg-gray-800 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col"
-            >
-              {/* Image / Video Container */}
-              <div
-                className="relative aspect-square cursor-pointer group overflow-hidden"
-                onClick={() => handleGridItemClick(item)}
+            return (
+              <motion.div
+                key={item.id}
+                variants={itemVariants}
+                layout
+                className="bg-white dark:bg-neutral-800 overflow-hidden shadow-sm hover:shadow-lg transition-all duration-300 flex flex-col"
               >
-                {firstMedia && (
-                  <MediaRenderer
-                    media={firstMedia}
-                    alt={item?.itemName ?? ''}
-                    thumbnailMode={firstMedia.type === 'video'}
-                    className="group-hover:scale-110 transition-transform duration-300"
-                  />
-                )}
-
-                <Badge
-                  className={`absolute top-2 left-2 backdrop-blur-md !rounded-lg shadow-lg z-[5] ${
-                    item?.availability
-                      ? 'bg-white/10 border border-emerald-300/30'
-                      : 'bg-white/10 border border-gray-300/30'
-                  }`}
-                  count={
-                    <div
-                      className={`px-1 py-1 text-[10px] !flex gap-1 items-center font-semibold ${
-                        item?.availability ? 'text-emerald-100' : 'text-gray-200'
-                      }`}
-                    >
-                      <div
-                        className={`w-1 h-1 rounded-full ${
-                          item?.availability
-                            ? 'bg-emerald-400 animate-pulse shadow-[0_0_12px_rgba(52,211,153,0.8)]'
-                            : 'bg-gray-300'
-                        }`}
-                      />
-                      <span>{item?.availability ? 'Available' : 'Sold Out'}</span>
-                    </div>
-                  }
-                />
-
-                <div className="absolute top-2 right-2 z-[5]">
-                  <span
-                    className={`px-2 py-1 rounded-full text-[10px] font-semibold backdrop-blur-sm ${
-                      item?.condition === 'Brand New'
-                        ? 'bg-green-500/90 text-white'
-                        : item?.condition === 'Uk Used'
-                          ? 'bg-blue/90 text-white'
-                          : 'bg-yellow-500/90 text-white'
-                    }`}
-                  >
-                    {item?.condition}
-                  </span>
-                </div>
-
-                {item?.sponsored && (
-                  <div className="absolute bottom-2 left-2 z-[5]">
-                    <span className="bg-gradient-to-r from-blue to-indigo-500 text-white px-2 py-1 rounded-full text-[10px] font-semibold shadow-lg">
-                      Sponsored
-                    </span>
-                  </div>
-                )}
-
-                {item?.availability && maxQty > 0 && maxQty <= 5 && (
-                  <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm text-white text-[9px] font-semibold px-1.5 py-0.5 rounded-full z-[5]">
-                    {maxQty} left
-                  </div>
-                )}
-
-                {item?.media?.length > 1 && (
-                  <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1 z-[5]">
-                    {item.media.slice(0, 5).map((m, idx) => (
-                      <div
-                        key={idx}
-                        className={`w-1.5 h-1.5 rounded-full ${
-                          idx === 0 ? 'bg-white' : 'bg-white/40'
-                        }`}
-                      />
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* Product Details */}
-              <div className="p-3 flex flex-col flex-grow">
+                {/* Image / Video Container */}
                 <div
-                  className="flex items-center gap-1.5 mb-1.5 cursor-pointer"
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    handleVendorClick(item);
-                  }}
-                >
-                  <img
-                    src={item.postUserProfile?.profilePicUrl}
-                    alt=""
-                    className="w-5 h-5 rounded-full object-cover"
-                  />
-                  <span className="text-[11px] text-gray-500 dark:text-gray-400 font-medium truncate hover:text-blue transition-colors">
-                    {item.postUserProfile?.businessName || item.postUserProfile?.userName}
-                  </span>
-                  {item.postUserProfile?.isVerified && (
-                    <i
-                      className={`ri-verified-badge-fill ${
-                        item.postUserProfile?.isSuperVerified ? 'text-[#D4A017]' : 'text-[#1D9BF0]'
-                      } text-[14px] flex-shrink-0`}
-                    />
-                  )}
-                </div>
-
-                <h3
-                  className="font-semibold text-sm dark:text-white mb-1 line-clamp-2 cursor-pointer hover:text-blue transition-colors"
+                  className="relative aspect-square cursor-pointer group overflow-hidden"
                   onClick={() => handleGridItemClick(item)}
                 >
-                  {item?.itemName}
-                </h3>
+                  {firstMedia && (
+                    <MediaRenderer
+                      media={firstMedia}
+                      alt={item?.itemName ?? ''}
+                      thumbnailMode={firstMedia.type === 'video'}
+                      className="group-hover:scale-110 transition-transform duration-300"
+                    />
+                  )}
 
-                {!item?.isBuyable && (
-                  <span className="inline-flex items-center self-start px-1.5 py-0.5 text-[9px] font-medium bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 rounded-full mb-1">
-                    Seller Listing
-                  </span>
-                )}
+                  <Badge
+                    className={`absolute top-2 left-2 backdrop-blur-md !rounded-lg shadow-lg z-[5] ${
+                      item?.availability
+                        ? 'bg-white/10 border border-emerald-300/30'
+                        : 'bg-white/10 border border-neutral-300/30'
+                    }`}
+                    count={
+                      <div
+                        className={`px-1 py-1 text-[10px] !flex gap-1 items-center font-semibold ${
+                          item?.availability ? 'text-emerald-100' : 'text-neutral-200'
+                        }`}
+                      >
+                        <div
+                          className={`w-1 h-1 rounded-full ${
+                            item?.availability
+                              ? 'bg-emerald-400 animate-pulse shadow-[0_0_12px_rgba(52,211,153,0.8)]'
+                              : 'bg-neutral-300'
+                          }`}
+                        />
+                        <span>{item?.availability ? 'Available' : 'Sold Out'}</span>
+                      </div>
+                    }
+                  />
 
-                <div className="flex items-center gap-2 mb-2">
-                  <span className="text-lg font-bold bg-gradient-to-r from-orange-500 to-rose-500 bg-clip-text text-transparent">
-                    {numberFormat((item?.askingPrice?.price ?? 0) / 100, Currencies.NGN)}
-                  </span>
-                  {item?.askingPrice?.negotiable && (
-                    <span className="text-[9px] bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 px-1.5 py-0.5 rounded-full font-medium">
-                      Negotiable
+                  <div className="absolute top-2 right-2 z-[5]">
+                    <span
+                      className={`px-2 py-1 rounded-full text-[10px] font-semibold backdrop-blur-sm ${
+                        item?.condition === 'Brand New'
+                          ? 'bg-green-500/90 text-white'
+                          : item?.condition === 'Uk Used'
+                            ? 'bg-blue/90 text-white'
+                            : 'bg-yellow-500/90 text-white'
+                      }`}
+                    >
+                      {item?.condition}
                     </span>
+                  </div>
+
+                  {item?.sponsored && (
+                    <div className="absolute bottom-2 left-2 z-[5]">
+                      <span className="bg-gradient-to-r from-blue to-indigo-500 text-white px-2 py-1 rounded-full text-[10px] font-semibold shadow-lg">
+                        Sponsored
+                      </span>
+                    </div>
+                  )}
+
+                  {item?.availability && maxQty > 0 && maxQty <= 5 && (
+                    <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm text-white text-[9px] font-semibold px-1.5 py-0.5 rounded-full z-[5]">
+                      {maxQty} left
+                    </div>
+                  )}
+
+                  {item?.media?.length > 1 && (
+                    <div className="absolute bottom-2 left-1/2 -translate-x-1/2 flex items-center gap-1 z-[5]">
+                      {item.media.slice(0, 5).map((m: any, idx: number) => (
+                        <div
+                          key={idx}
+                          className={`w-1.5 h-1.5 rounded-full ${
+                            idx === 0 ? 'bg-white' : 'bg-white/40'
+                          }`}
+                        />
+                      ))}
+                    </div>
                   )}
                 </div>
 
-                <p className="text-xs text-gray-500 dark:text-gray-400 line-clamp-2 mb-3 flex-grow">
-                  {item?.description}
-                </p>
+                {/* Product Details */}
+                <div className="p-3 flex flex-col flex-grow">
+                  <div
+                    className="flex items-center gap-1.5 mb-1.5 cursor-pointer"
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleVendorClick(item);
+                    }}
+                  >
+                    {item.postUserProfile?.profilePicUrl ? (
+                      <img
+                        src={item.postUserProfile?.profilePicUrl || ''}
+                        alt=""
+                        className="w-5 h-5 rounded-full object-cover"
+                        onError={(e) => {
+                          const img = e.target as HTMLImageElement;
+                          img.onerror = null; // ← prevent infinite loop
+                          img.style.display = 'none';
+                        }}
+                      />
+                    ) : (
+                      <div className="w-5 h-5 rounded-full bg-neutral-200 dark:bg-neutral-700 flex-shrink-0" />
+                    )}
+                    <span className="text-[11px] text-neutral-500 dark:text-neutral-400 font-medium truncate hover:text-blue transition-colors">
+                      {item.postUserProfile?.displayName || item.postUserProfile?.userName}
+                    </span>
+                    {item.postUserProfile?.isVerified && (
+                      <i
+                        className={`ri-verified-badge-fill ${
+                          item.postUserProfile?.isSuperVerified
+                            ? 'text-[#D4A017]'
+                            : 'text-[#1D9BF0]'
+                        } text-[14px] flex-shrink-0`}
+                      />
+                    )}
+                  </div>
 
-                {item?.productTags && item.productTags.length > 0 && (
-                  <div className="flex flex-wrap gap-1 mb-3">
-                    {item.productTags.slice(0, 2).map((tag: string, idx: number) => (
-                      <span
-                        key={idx}
-                        className="px-2 py-0.5 text-[9px] font-medium bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-400 rounded-full"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                    {item.productTags.length > 2 && (
-                      <span className="px-2 py-0.5 text-[9px] font-medium bg-gray-100 dark:bg-zinc-800 text-gray-600 dark:text-gray-400 rounded-full">
-                        +{item.productTags.length - 2}
+                  <h3
+                    className="font-semibold text-sm dark:text-white mb-1 line-clamp-2 cursor-pointer hover:text-blue transition-colors"
+                    onClick={() => handleGridItemClick(item)}
+                  >
+                    {item?.itemName}
+                  </h3>
+
+                  {!item?.isBuyable && (
+                    <span className="inline-flex items-center self-start px-1.5 py-0.5 text-[9px] font-medium bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400 rounded-full mb-1">
+                      Seller Listing
+                    </span>
+                  )}
+
+                  <div className="flex items-center gap-2 mb-2">
+                    <span className="text-lg font-bold bg-gradient-to-r from-orange-500 to-rose-500 bg-clip-text text-transparent">
+                      {numberFormat((item?.askingPrice?.price ?? 0) / 100, Currencies.NGN)}
+                    </span>
+                    {item?.askingPrice?.negotiable && (
+                      <span className="text-[9px] bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 px-1.5 py-0.5 rounded-full font-medium">
+                        Negotiable
                       </span>
                     )}
                   </div>
-                )}
 
-                {/* Action Buttons — identical to Market */}
-                <div className="space-y-1.5">
-                  {item?.isBuyable ? (
-                    <>
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleBuyNow(item);
-                          }}
-                          disabled={isSoldOut}
-                          className={`flex-1 py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all shadow-sm ${
-                            isSoldOut
-                              ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
-                              : 'bg-gradient-to-r from-blue to-indigo-700 hover:from-blue hover:to-indigo-800 text-white hover:shadow-md'
-                          }`}
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400 line-clamp-2 mb-3 flex-grow">
+                    {item?.description}
+                  </p>
+
+                  {item?.productTags && item.productTags.length > 0 && (
+                    <div className="flex flex-wrap gap-1 mb-3">
+                      {item.productTags.slice(0, 2).map((tag: string, idx: number) => (
+                        <span
+                          key={idx}
+                          className="px-2 py-0.5 text-[9px] font-medium bg-neutral-100 dark:bg-zinc-800 text-neutral-600 dark:text-neutral-400 rounded-full"
                         >
-                          <ShoppingBag size={14} />
-                          Buy Now
-                        </button>
-                        <Tooltip
-                          title={
-                            isSoldOut
-                              ? 'Sold out'
-                              : isMaxQty
-                                ? `Max qty (${maxQty})`
-                                : itemInCart
-                                  ? 'In cart'
-                                  : 'Add to cart'
-                          }
-                        >
+                          {tag}
+                        </span>
+                      ))}
+                      {item.productTags.length > 2 && (
+                        <span className="px-2 py-0.5 text-[9px] font-medium bg-neutral-100 dark:bg-zinc-800 text-neutral-600 dark:text-neutral-400 rounded-full">
+                          +{item.productTags.length - 2}
+                        </span>
+                      )}
+                    </div>
+                  )}
+
+                  {/* Action Buttons */}
+                  <div className="space-y-1.5">
+                    {item?.isBuyable ? (
+                      <>
+                        <div className="flex items-center gap-1.5">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              handleAddToCart(item);
+                              handleBuyNow(item);
                             }}
-                            disabled={isSoldOut || isMaxQty}
-                            className={`p-2 rounded-lg border shadow-sm transition-colors ${
-                              isSoldOut || isMaxQty
-                                ? 'bg-gray-100 border-gray-200 text-gray-300 cursor-not-allowed'
-                                : itemInCart
-                                  ? 'bg-blue-50 border-blue text-blue'
-                                  : 'bg-neutral-50 border-neutral-200 dark:bg-gray-700 dark:border-gray-600 text-gray-500 hover:border-blue hover:text-blue'
+                            disabled={isSoldOut}
+                            className={`flex-1 py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all shadow-sm ${
+                              isSoldOut
+                                ? 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
+                                : 'bg-gradient-to-r from-blue to-indigo-700 hover:from-blue hover:to-indigo-800 text-white hover:shadow-md'
                             }`}
                           >
-                            <ShoppingCart size={14} />
+                            <ShoppingBag size={14} /> Buy Now
                           </button>
-                        </Tooltip>
-                      </div>
-                      <div className="flex items-center gap-1.5">
+                          <Tooltip
+                            title={
+                              isSoldOut
+                                ? 'Sold out'
+                                : isMaxQty
+                                  ? `Max qty (${maxQty})`
+                                  : itemInCart
+                                    ? 'In cart'
+                                    : 'Add to cart'
+                            }
+                          >
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleAddToCart(item);
+                              }}
+                              disabled={isSoldOut || isMaxQty}
+                              className={`p-2 rounded-lg border shadow-sm transition-colors ${
+                                isSoldOut || isMaxQty
+                                  ? 'bg-neutral-100 border-neutral-200 text-neutral-300 cursor-not-allowed'
+                                  : itemInCart
+                                    ? 'bg-blue-50 border-blue text-blue'
+                                    : 'bg-neutral-50 border-neutral-200 dark:bg-neutral-700 dark:border-neutral-600 text-neutral-500 hover:border-blue hover:text-blue'
+                              }`}
+                            >
+                              <ShoppingCart size={14} />
+                            </button>
+                          </Tooltip>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleWhatsAppMessage(item);
+                            }}
+                            className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all shadow-sm hover:shadow-md"
+                          >
+                            <MessageCircle size={14} /> WhatsApp
+                          </button>
+                          <Tooltip title="Remove from saved">
+                            <motion.button
+                              whileTap={{ scale: 0.9 }}
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                handleBookmark(item);
+                              }}
+                              disabled={isItemRemoving}
+                              className="p-2 rounded-lg border border-neutral-200 dark:border-neutral-600 bg-neutral-50 dark:bg-neutral-700 shadow-sm disabled:opacity-50"
+                            >
+                              {isItemRemoving ? (
+                                <Loader2 size={16} className="animate-spin text-neutral-400" />
+                              ) : (
+                                <BookmarkX size={16} className="text-pink-500" />
+                              )}
+                            </motion.button>
+                          </Tooltip>
+                        </div>
+                      </>
+                    ) : (
+                      <>
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             handleWhatsAppMessage(item);
                           }}
-                          className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all shadow-sm hover:shadow-md"
+                          className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all shadow-sm hover:shadow-md"
                         >
-                          <MessageCircle size={14} />
-                          WhatsApp
+                          <MessageCircle size={14} /> Message on WhatsApp
                         </button>
-                        <motion.button
-                          whileTap={{ scale: 0.9 }}
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            handleBookmark(item);
-                          }}
-                          className="p-2 rounded-lg border border-neutral-200 dark:border-gray-600 bg-neutral-50 dark:bg-gray-700 shadow-sm"
-                        >
-                          <Bookmark
-                            size={16}
-                            className={`${
-                              isSaved ? 'fill-pink-500 text-pink-500' : 'text-gray-400'
-                            } transition-colors`}
-                          />
-                        </motion.button>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleWhatsAppMessage(item);
-                        }}
-                        className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all shadow-sm hover:shadow-md"
-                      >
-                        <MessageCircle size={14} />
-                        Message on WhatsApp
-                      </button>
-                      <motion.button
-                        whileTap={{ scale: 0.9 }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          handleBookmark(item);
-                        }}
-                        className="w-full p-2 rounded-lg border border-neutral-200 dark:border-gray-600 bg-neutral-50 dark:bg-gray-700 shadow-sm flex items-center justify-center gap-1.5 text-xs text-gray-500"
-                      >
-                        <Bookmark
-                          size={14}
-                          className={`${
-                            isSaved ? 'fill-pink-500 text-pink-500' : 'text-gray-400'
-                          } transition-colors`}
-                        />
-                        Save
-                      </motion.button>
-                    </>
-                  )}
+                        <Tooltip title="Remove from saved">
+                          <motion.button
+                            whileTap={{ scale: 0.9 }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              handleBookmark(item);
+                            }}
+                            disabled={isItemRemoving}
+                            className="w-full p-2 rounded-lg border border-neutral-200 dark:border-neutral-600 bg-neutral-50 dark:bg-neutral-700 shadow-sm flex items-center justify-center gap-1.5 text-xs text-neutral-500 disabled:opacity-50"
+                          >
+                            {isItemRemoving ? (
+                              <Loader2 size={14} className="animate-spin text-neutral-400" />
+                            ) : (
+                              <>
+                                <BookmarkX size={14} className="text-pink-500" /> Remove
+                              </>
+                            )}
+                          </motion.button>
+                        </Tooltip>
+                      </>
+                    )}
+                  </div>
                 </div>
-              </div>
-            </motion.div>
-          );
-        })}
-      </motion.div>
+              </motion.div>
+            );
+          })}
+        </motion.div>
+      </>
     );
   };
 
+  // ══════════════════════════════════════════════════════════════════════
+  // LIST VIEW
+  // ══════════════════════════════════════════════════════════════════════
+
   const renderProductList = () => {
-    if (savedItemsList?.length === 0) return renderEmptyState();
+    if (filteredItems?.length === 0) return renderEmptyState();
 
     return (
       <motion.div
@@ -492,68 +763,80 @@ const SavedItems = () => {
         animate="visible"
         className="space-y-6 max-w-4xl mx-auto"
       >
-        {isLoading ? (
-          <div className="space-y-6">
-            {[1, 2, 3].map((i) => (
-              <div key={i}>
-                <ProductListingSkeleton />
-              </div>
-            ))}
-          </div>
-        ) : (
-          <>
-            {savedItemsList.map((item, idx) => (
-              <motion.div
-                key={idx}
-                variants={itemVariants}
-                className="bg-white dark:bg-gray-800 rounded-lg transition-all duration-300"
-              >
-                <ModernItemPost
-                  postUserProfile={item?.postUserProfile ?? {}}
-                  sponsored={item?.sponsored ?? false}
-                  description={item?.description ?? ''}
-                  media={item?.media ?? []}
-                  askingPrice={item?.askingPrice ?? {}}
-                  condition={item?.condition ?? 'Brand New'}
-                  itemName={item?.itemName ?? ''}
-                  comments={item?.comments ?? []}
-                  productTags={item?.productTags ?? []}
-                  id={item?.id ?? ''}
-                  quantity={item?.quantity ?? 1}
-                  setSelectedProductId={setSelectedProductId}
-                  availability={item?.availability ?? true}
-                  isBuyable={item?.isBuyable ?? false}
-                  listingType={item?.listingType ?? 'self-listing'}
-                />
-              </motion.div>
-            ))}
-          </>
-        )}
+        {filteredItems.map((item, idx) => (
+          <motion.div
+            key={item?.id ?? idx}
+            variants={itemVariants}
+            className="bg-white dark:bg-neutral-800 rounded-lg transition-all duration-300"
+          >
+            <ModernItemPost
+              postUserProfile={item?.postUserProfile ?? {}}
+              sponsored={item?.sponsored ?? false}
+              description={item?.description ?? ''}
+              media={item?.media ?? []}
+              askingPrice={item?.askingPrice ?? {}}
+              condition={item?.condition ?? 'Brand New'}
+              itemName={item?.itemName ?? ''}
+              comments={item?.comments ?? []}
+              productTags={item?.productTags ?? []}
+              id={item?.id ?? ''}
+              quantity={item?.quantity ?? 1}
+              setSelectedProductId={setSelectedProductId}
+              availability={item?.availability ?? true}
+              isBuyable={item?.isBuyable ?? false}
+              listingType={item?.listingType ?? 'self-listing'}
+            />
+          </motion.div>
+        ))}
       </motion.div>
     );
   };
 
-  // ─── Mobile full-screen Product view ───
+  // ── Skeleton loading state ───
+  const renderSkeletons = () => (
+    <div className="space-y-6 max-w-4xl mx-auto">
+      {[1, 2, 3].map((i) => (
+        <div key={i}>
+          <ProductListingSkeleton />
+        </div>
+      ))}
+    </div>
+  );
+
+  // ── Mobile full-screen Product view ───
   if (selectedProductId !== '' && selectedProduct && isMobile) {
+    const cartItem = cartItems?.find((i: CartItem) => i.id === selectedProduct.id);
+
     return (
       <AnimatePresence mode="wait">
         <Product
           key={selectedProductId}
           item={selectedProduct}
+          isInCart={isInCart(selectedProduct.id ?? '')}
+          isSaved={true}
+          cartQuantity={cartItem?.quantity || 0}
+          onAddToCart={() => handleAddToCart(selectedProduct)}
+          onBuyNow={() => handleBuyNow(selectedProduct)}
+          onToggleSave={() => handleBookmark(selectedProduct)}
+          onWhatsAppMessage={() => handleWhatsAppMessage(selectedProduct)}
+          onShare={() => handleShare(selectedProduct)}
+          onGoBack={() => setSelectedProductId('')}
           setSelectedProductId={setSelectedProductId}
         />
       </AnimatePresence>
     );
   }
 
+  const totalCount = savedCount || savedItemsList.length || 0;
+
   return (
-    <div className="min-h-screen dark:bg-gray-900/50">
-      <div className={`w-full !max-w-7xl mx-auto`}>
+    <div className="min-h-screen dark:bg-neutral-900/50">
+      <div className="w-full !max-w-7xl mx-auto">
         <div className="mb-8">
           <div
             className={`py-5 ${
               isMobile ? 'px-2' : ''
-            } sticky top-0 z-20 backdrop-blur-sm bg-white dark:bg-gray-800`}
+            } sticky top-12 z-20 backdrop-blur-sm bg-white dark:bg-neutral-800`}
           >
             <div className="flex justify-between items-center mb-6">
               <h2 className="text-xl font-semibold dark:text-white">My Saved Products</h2>
@@ -563,7 +846,7 @@ const SavedItems = () => {
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors text-sm ${
                     viewType === 'grid'
                       ? 'bg-blue-50 text-blue dark:bg-blue/30 dark:text-blue'
-                      : 'text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700'
+                      : 'text-neutral-500 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-700'
                   }`}
                 >
                   <Grid size={16} />
@@ -574,7 +857,7 @@ const SavedItems = () => {
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors text-sm ${
                     viewType === 'list'
                       ? 'bg-blue-50 text-blue dark:bg-blue/30 dark:text-blue'
-                      : 'text-gray-500 hover:bg-gray-100 dark:text-gray-400 dark:hover:bg-gray-700'
+                      : 'text-neutral-500 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-700'
                   }`}
                 >
                   <List size={16} />
@@ -589,12 +872,12 @@ const SavedItems = () => {
                 placeholder="Search Saved Products..."
                 className={`${
                   isMobile ? 'h-10' : 'h-12'
-                } !w-full pl-11 pr-4 rounded-xl border-gray-200 hover:border-blue focus:border-blue transition-colors`}
+                } !w-full pl-11 pr-4 rounded-xl border-neutral-200 hover:border-blue focus:border-blue transition-colors`}
                 suffix={
                   searchValue && (
                     <X
                       size={16}
-                      className="text-gray-400 hover:text-gray-600 cursor-pointer"
+                      className="text-neutral-400 hover:text-neutral-600 cursor-pointer"
                       onClick={() => debouncedChangeHandler('')}
                     />
                   )
@@ -602,14 +885,33 @@ const SavedItems = () => {
                 style={{ width: '100%' }}
               />
               <Search
-                className="absolute left-4 top-1/2 -translate-y-1/2 text-gray-400"
+                className="absolute left-4 top-1/2 -translate-y-1/2 text-neutral-400 z-10"
                 size={18}
               />
             </div>
           </div>
 
           <div className={`${isMobile ? 'px-0 mb-10' : ''} py-6`}>
-            {viewType === 'grid' ? renderProductGrid() : renderProductList()}
+            {isLoadingSaved
+              ? renderSkeletons()
+              : viewType === 'grid'
+                ? renderProductGrid()
+                : renderProductList()}
+
+            {/* Infinite scroll sentinel + loading skeleton */}
+            {!isLoadingSaved && hasMore && !searchValue && (
+              <>
+                <div ref={loadMoreRef} className="h-1" />
+                {isFetchingSaved && <LoadMoreSkeleton />}
+              </>
+            )}
+
+            {/* End of list indicator */}
+            {!isLoadingSaved && !hasMore && savedItemsList.length > 0 && !searchValue && (
+              <p className="text-center text-xs text-neutral-400 py-6">
+                You've seen all {totalCount} saved item{totalCount !== 1 ? 's' : ''}
+              </p>
+            )}
           </div>
         </div>
 

@@ -2,7 +2,7 @@
 import { Modal, message } from 'antd';
 import { useId, useRef, useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { ArrowLeft, X, Crop } from 'lucide-react';
+import { ArrowLeft, X, Crop, Check } from 'lucide-react';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 import { ImageCropper } from '../image-cropper';
 
@@ -12,13 +12,11 @@ interface ImageUploadSectionProps {
   maxImages?: number;
 }
 
-// ── Helpers ─────────────────────────────────────────────────────────────────
-
 const isVideo = (dataUrl: string): boolean =>
   dataUrl.startsWith('data:video/') || dataUrl.endsWith('.mp4');
 
-const MAX_IMAGE_SIZE = 5 * 1024 * 1024; // 5MB
-const MAX_VIDEO_SIZE = 15 * 1024 * 1024; // 15MB
+const MAX_IMAGE_SIZE = 5 * 1024 * 1024;
+const MAX_VIDEO_SIZE = 15 * 1024 * 1024;
 const ACCEPTED_TYPES = 'image/*,video/mp4';
 
 export const ImageUploadSection: React.FC<ImageUploadSectionProps> = ({
@@ -30,46 +28,35 @@ export const ImageUploadSection: React.FC<ImageUploadSectionProps> = ({
   const inputId = useId();
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // Crop state
-  const [cropVisible, setCropVisible] = useState(false);
+  // Preview/crop state
+  const [previewVisible, setPreviewVisible] = useState(false);
+  const [isCropping, setIsCropping] = useState(false);
   const [currentImage, setCurrentImage] = useState<string>('');
   const [pendingImages, setPendingImages] = useState<string[]>([]);
   const [currentImageIndex, setCurrentImageIndex] = useState(0);
 
-  // Guard against double-trigger of file input
   const fileInputOpenRef = useRef(false);
-
-  // Track images accumulated during a batch crop session
   const batchRef = useRef<string[]>([]);
 
   // ── File selection ──────────────────────────────────────────────────────
 
   const triggerFileInput = (e: React.MouseEvent | React.KeyboardEvent) => {
-    // Prevent the event from bubbling up to the Form which could cause submission
     e.preventDefault();
     e.stopPropagation();
-
-    // Guard: don't open the file dialog if it's already opening
     if (fileInputOpenRef.current) return;
     fileInputOpenRef.current = true;
-
-    // Reset the guard after a short delay (covers cancel + selection)
     setTimeout(() => {
       fileInputOpenRef.current = false;
     }, 1000);
-
     inputRef.current?.click();
   };
 
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
-    // Prevent any form submission from the change event
     e.stopPropagation();
-
     const files = Array.from(e.target.files || []);
     if (files.length === 0) return;
 
     const remainingSlots = maxImages - images.length;
-
     if (files.length > remainingSlots) {
       message.warning(
         `You can only add ${remainingSlots} more file${remainingSlots > 1 ? 's' : ''}`
@@ -80,100 +67,102 @@ export const ImageUploadSection: React.FC<ImageUploadSectionProps> = ({
     const validFiles = files.filter((file) => {
       const isVideoFile = file.type === 'video/mp4';
       const isImageFile = file.type.startsWith('image/');
-
       if (!isVideoFile && !isImageFile) {
-        message.error(`${file.name} is not a supported format. Use images or MP4 video.`);
+        message.error(`${file.name} is not a supported format.`);
         return false;
       }
-
       if (isVideoFile && file.size > MAX_VIDEO_SIZE) {
-        message.error(`${file.name} is too large (max 15MB for videos)`);
+        message.error(`${file.name} is too large (max 15MB)`);
         return false;
       }
-
       if (isImageFile && file.size > MAX_IMAGE_SIZE) {
-        message.error(`${file.name} is too large (max 5MB for images)`);
+        message.error(`${file.name} is too large (max 5MB)`);
         return false;
       }
-
       return true;
     });
 
-    // Reset the input value BEFORE processing so re-selecting the same file works
     e.target.value = '';
-
     if (validFiles.length === 0) return;
 
-    // Read all files
     Promise.all(
-      validFiles.map((file) => {
-        return new Promise<{ dataUrl: string; isVideo: boolean }>((resolve) => {
-          const reader = new FileReader();
-          reader.onloadend = () =>
-            resolve({
-              dataUrl: reader.result as string,
-              isVideo: file.type === 'video/mp4',
-            });
-          reader.readAsDataURL(file);
-        });
-      })
+      validFiles.map(
+        (file) =>
+          new Promise<{ dataUrl: string; isVideo: boolean }>((resolve) => {
+            const reader = new FileReader();
+            reader.onloadend = () =>
+              resolve({ dataUrl: reader.result as string, isVideo: file.type === 'video/mp4' });
+            reader.readAsDataURL(file);
+          })
+      )
     ).then((results) => {
       const videoDataUrls = results.filter((r) => r.isVideo).map((r) => r.dataUrl);
       const imageDataUrls = results.filter((r) => !r.isVideo).map((r) => r.dataUrl);
 
-      // Videos skip cropping — add them directly
       const updatedImages = [...images, ...videoDataUrls];
 
       if (imageDataUrls.length > 0) {
-        // Start crop flow for images only
         batchRef.current = updatedImages;
         setPendingImages(imageDataUrls);
         setCurrentImage(imageDataUrls[0]);
         setCurrentImageIndex(0);
-        setCropVisible(true);
+        setIsCropping(false); // Start in preview mode, not crop mode
+        setPreviewVisible(true);
 
-        // If there were videos too, update state now so they show up
-        if (videoDataUrls.length > 0) {
-          onImagesChange(updatedImages);
-        }
+        if (videoDataUrls.length > 0) onImagesChange(updatedImages);
       } else {
-        // Only videos — just add them all
         onImagesChange(updatedImages);
       }
     });
   };
 
-  // ── Crop handlers ───────────────────────────────────────────────────────
+  // ── Preview/Crop handlers ───────────────────────────────────────────────
 
   const advanceOrFinish = () => {
     if (currentImageIndex < pendingImages.length - 1) {
       const nextIndex = currentImageIndex + 1;
       setCurrentImageIndex(nextIndex);
       setCurrentImage(pendingImages[nextIndex]);
+      setIsCropping(false); // Reset to preview for next image
     } else {
-      setCropVisible(false);
+      setPreviewVisible(false);
       setPendingImages([]);
       setCurrentImageIndex(0);
+      setIsCropping(false);
     }
   };
 
-  const handleCropComplete = (croppedImageUrl: string) => {
-    batchRef.current = [...batchRef.current, croppedImageUrl];
-    onImagesChange(batchRef.current);
-    advanceOrFinish();
-  };
-
-  const handleCropCancel = () => {
-    setCropVisible(false);
-    setPendingImages([]);
-    setCurrentImageIndex(0);
-  };
-
-  const handleSkipCrop = () => {
-    // Add the current image uncropped
+  /** Use the image as-is (no crop) */
+  const handleProceed = () => {
     batchRef.current = [...batchRef.current, currentImage];
     onImagesChange(batchRef.current);
     advanceOrFinish();
+  };
+
+  /** Enter crop mode for current image */
+  const handleStartCrop = () => {
+    setIsCropping(true);
+  };
+
+  /** Crop completed — use the cropped version */
+  const handleCropComplete = (croppedImageUrl: string) => {
+    batchRef.current = [...batchRef.current, croppedImageUrl];
+    onImagesChange(batchRef.current);
+    setIsCropping(false);
+    advanceOrFinish();
+  };
+
+  /** Cancel crop — go back to preview */
+  const handleCropCancel = () => {
+    setIsCropping(false);
+  };
+
+  /** Cancel entire preview flow */
+  const handleClosePreview = () => {
+    setPreviewVisible(false);
+    setPendingImages([]);
+    setCurrentImageIndex(0);
+    setIsCropping(false);
   };
 
   // ── Remove media ────────────────────────────────────────────────────────
@@ -181,14 +170,86 @@ export const ImageUploadSection: React.FC<ImageUploadSectionProps> = ({
   const handleRemoveMedia = (index: number, e: React.MouseEvent) => {
     e.preventDefault();
     e.stopPropagation();
-    const newMedia = images.filter((_, i) => i !== index);
-    onImagesChange(newMedia);
+    onImagesChange(images.filter((_, i) => i !== index));
   };
-
-  // ── Thumbnail size ──────────────────────────────────────────────────────
 
   const thumbSize = isMobile ? 'w-20 h-20' : 'w-24 h-24';
   const addBtnSize = isMobile ? 'w-20 h-20' : 'w-24 h-24';
+
+  // ── Preview content (shared between mobile & desktop) ───────────────────
+
+  const renderPreviewContent = () => {
+    if (isCropping) {
+      return (
+        <ImageCropper
+          imageSrc={currentImage}
+          onComplete={handleCropComplete}
+          onCancel={handleCropCancel}
+        />
+      );
+    }
+
+    // Preview mode — show image with Proceed / Crop buttons
+    return (
+      <div className="flex flex-col h-full">
+        <div
+          className={`flex-1 flex items-center justify-center min-h-0 ${isMobile ? 'px-3' : 'p-4'}`}
+        >
+          <img
+            src={currentImage}
+            alt={`Preview ${currentImageIndex + 1}`}
+            className={`max-w-full object-contain rounded-lg ${
+              isMobile ? 'max-h-[60vh]' : 'max-h-[400px]'
+            }`}
+          />
+        </div>
+
+        <div
+          className={`flex gap-3 ${isMobile ? 'flex-col px-4 pb-4' : 'justify-end px-2 pb-2 mt-4'}`}
+        >
+          {isMobile ? (
+            <div className="pb-20 flex flex-col gap-y-2">
+              <button
+                type="button"
+                onClick={handleStartCrop}
+                className="w-full py-3 rounded-xl text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 transition-colors flex items-center justify-center gap-2"
+              >
+                <Crop size={16} />
+                Crop Image
+              </button>
+              <button
+                type="button"
+                onClick={handleProceed}
+                className="w-full py-3.5 rounded-xl text-sm font-semibold bg-gradient-to-r from-blue to-indigo-500 hover:from-blue hover:to-indigo-600 text-white shadow-md shadow-blue/20 flex items-center justify-center gap-2"
+              >
+                <Check size={16} />
+                Use This Image
+              </button>
+            </div>
+          ) : (
+            <>
+              <button
+                type="button"
+                onClick={handleStartCrop}
+                className="px-6 py-3 rounded-xl text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 transition-colors flex items-center gap-2"
+              >
+                <Crop size={16} />
+                Crop
+              </button>
+              <button
+                type="button"
+                onClick={handleProceed}
+                className="px-8 py-3 rounded-xl text-sm font-semibold bg-gradient-to-r from-blue to-indigo-500 hover:from-blue hover:to-indigo-600 text-white shadow-md shadow-blue/20 flex items-center gap-2"
+              >
+                <Check size={16} />
+                Use This Image
+              </button>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  };
 
   // ════════════════════════════════════════════════════════════════════════
   // RENDER
@@ -196,7 +257,6 @@ export const ImageUploadSection: React.FC<ImageUploadSectionProps> = ({
 
   return (
     <div>
-      {/* Hidden file input — OUTSIDE of any clickable container to prevent double triggers */}
       <input
         id={inputId}
         ref={inputRef}
@@ -208,40 +268,37 @@ export const ImageUploadSection: React.FC<ImageUploadSectionProps> = ({
         onClick={(e) => e.stopPropagation()}
       />
 
-      {/* Single horizontal row — scrollable on overflow */}
-      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
-        {/* Upload button — type="button" prevents form submission */}
+      {/* Thumbnail row */}
+      <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-600">
         {images.length < maxImages && (
           <button
             type="button"
             className={`flex-shrink-0 ${addBtnSize} cursor-pointer bg-transparent border-none p-0`}
             onClick={triggerFileInput}
           >
-            <div className="w-full h-full border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl flex flex-col items-center justify-center hover:border-blue dark:hover:border-blue hover:bg-indigo-50/50 dark:hover:bg-blue/10 transition-colors">
-              <i className="ri-add-circle-line text-2xl text-gray-400 dark:text-gray-500 mb-0.5" />
-              <span className="text-[10px] text-gray-400 dark:text-gray-500 text-center leading-tight px-1">
+            <div className="w-full h-full border-2 border-dashed border-neutral-300 dark:border-neutral-600 rounded-xl flex flex-col items-center justify-center hover:border-blue dark:hover:border-blue hover:bg-indigo-50/50 dark:hover:bg-blue/10 transition-colors">
+              <i className="ri-add-circle-line text-2xl text-neutral-400 dark:text-neutral-500 mb-0.5" />
+              <span className="text-[10px] text-neutral-400 dark:text-neutral-500 text-center leading-tight px-1">
                 {images.length === 0 ? 'Add media' : `${maxImages - images.length} left`}
               </span>
             </div>
           </button>
         )}
 
-        {/* Media thumbnails */}
         {images.map((media, index) => (
           <div
             key={`${index}-${media.slice(-20)}`}
             className={`relative group flex-shrink-0 ${thumbSize}`}
           >
             {isVideo(media) ? (
-              <div className="w-full h-full rounded-xl border-2 border-gray-200 dark:border-gray-700 overflow-hidden bg-gray-900 relative">
+              <div className="w-full h-full rounded-xl border-2 border-neutral-200 dark:border-neutral-700 overflow-hidden bg-neutral-900 relative">
                 <video
                   src={media}
                   className="w-full h-full object-cover"
                   muted
                   preload="metadata"
                   onLoadedMetadata={(e) => {
-                    const video = e.currentTarget;
-                    video.currentTime = 1;
+                    e.currentTarget.currentTime = 1;
                   }}
                 />
                 <div className="absolute inset-0 flex items-center justify-center pointer-events-none">
@@ -257,11 +314,9 @@ export const ImageUploadSection: React.FC<ImageUploadSectionProps> = ({
               <img
                 src={media}
                 alt={`Upload ${index + 1}`}
-                className="w-full h-full object-cover rounded-xl border-2 border-gray-200 dark:border-gray-700"
+                className="w-full h-full object-cover rounded-xl border-2 border-neutral-200 dark:border-neutral-700"
               />
             )}
-
-            {/* Delete button */}
             {isMobile ? (
               <button
                 type="button"
@@ -281,8 +336,6 @@ export const ImageUploadSection: React.FC<ImageUploadSectionProps> = ({
                 </button>
               </div>
             )}
-
-            {/* Cover badge on first image */}
             {index === 0 && !isVideo(media) && (
               <span className="absolute bottom-1 left-1 text-[9px] font-bold bg-blue text-white px-1.5 py-0.5 rounded shadow">
                 Cover
@@ -293,50 +346,48 @@ export const ImageUploadSection: React.FC<ImageUploadSectionProps> = ({
       </div>
 
       {/* ══════════════════════════════════════════════════════════════════ */}
-      {/* CROP — Mobile: full-screen view, Desktop: modal                  */}
+      {/* PREVIEW / CROP — Mobile: full-screen, Desktop: modal             */}
       {/* ══════════════════════════════════════════════════════════════════ */}
 
       {isMobile ? (
         <AnimatePresence>
-          {cropVisible && currentImage && (
+          {previewVisible && currentImage && (
             <motion.div
               initial={{ opacity: 0, y: '100%' }}
               animate={{ opacity: 1, y: 0 }}
               exit={{ opacity: 0, y: '100%' }}
               transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-              className="fixed inset-0 z-[10000] bg-white dark:bg-gray-900"
+              className="fixed inset-0 z-[10000] bg-white dark:bg-neutral-900"
             >
-              {/* Header — absolute top */}
-              <div className="absolute top-0 left-0 right-0 z-10 bg-white dark:bg-gray-900 border-b border-gray-200 dark:border-gray-700">
+              {/* Header */}
+              <div className="absolute top-0 left-0 right-0 z-10 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700">
                 <div className="flex items-center justify-between px-4 py-3">
                   <div className="flex items-center gap-3">
                     <button
                       type="button"
-                      onClick={handleCropCancel}
-                      className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors"
+                      onClick={isCropping ? handleCropCancel : handleClosePreview}
+                      className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
                     >
                       <ArrowLeft size={18} />
                     </button>
                     <div>
-                      <h2 className="text-base font-bold text-gray-900 dark:text-white flex items-center gap-2">
-                        <Crop size={16} />
-                        Crop Image
+                      <h2 className="text-base font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+                        {isCropping ? (
+                          <>
+                            <Crop size={16} />
+                            Crop Image
+                          </>
+                        ) : (
+                          'Preview'
+                        )}
                       </h2>
-                      <p className="text-[11px] text-gray-400 mt-0.5">
+                      <p className="text-[11px] text-neutral-400 mt-0.5">
                         {currentImageIndex + 1} of {pendingImages.length}
                       </p>
                     </div>
                   </div>
-                  <button
-                    type="button"
-                    onClick={handleSkipCrop}
-                    className="text-sm font-medium text-blue hover:text-indigo-600 transition-colors px-3 py-1.5 rounded-lg hover:bg-blue-50 dark:hover:bg-blue/10"
-                  >
-                    Skip
-                  </button>
                 </div>
 
-                {/* Image counter dots */}
                 {pendingImages.length > 1 && (
                   <div className="flex items-center justify-center gap-1.5 pb-2">
                     {pendingImages.map((_, idx) => (
@@ -347,7 +398,7 @@ export const ImageUploadSection: React.FC<ImageUploadSectionProps> = ({
                             ? 'w-6 bg-blue'
                             : idx < currentImageIndex
                               ? 'w-1.5 bg-blue/40'
-                              : 'w-1.5 bg-gray-300 dark:bg-gray-600'
+                              : 'w-1.5 bg-neutral-300 dark:bg-neutral-600'
                         }`}
                       />
                     ))}
@@ -355,54 +406,42 @@ export const ImageUploadSection: React.FC<ImageUploadSectionProps> = ({
                 )}
               </div>
 
-              {/* Cropper area */}
+              {/* Content */}
               <div
                 className="absolute left-0 right-0 overflow-y-auto"
-                style={{
-                  top: pendingImages.length > 1 ? 80 : 60,
-                  bottom: 0,
-                }}
+                style={{ top: pendingImages.length > 1 ? 80 : 60, bottom: 0 }}
               >
-                <div className="h-full flex items-center justify-center px-3">
-                  <ImageCropper
-                    imageSrc={currentImage}
-                    onComplete={handleCropComplete}
-                    onCancel={handleCropCancel}
-                  />
-                </div>
+                <div className="h-full flex flex-col">{renderPreviewContent()}</div>
               </div>
             </motion.div>
           )}
         </AnimatePresence>
       ) : (
         <Modal
-          open={cropVisible}
-          onCancel={handleCropCancel}
+          open={previewVisible}
+          onCancel={handleClosePreview}
           width={800}
           title={
-            <div className="flex items-center justify-between pr-8">
+            <div className="flex items-center gap-2">
+              {isCropping && (
+                <button
+                  type="button"
+                  onClick={handleCropCancel}
+                  className="w-7 h-7 rounded-full flex items-center justify-center hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+                >
+                  <ArrowLeft size={16} />
+                </button>
+              )}
               <span>
-                Crop Image {currentImageIndex + 1} of {pendingImages.length}
+                {isCropping ? 'Crop Image' : 'Preview'} {currentImageIndex + 1} of{' '}
+                {pendingImages.length}
               </span>
-              <button
-                type="button"
-                onClick={handleSkipCrop}
-                className="text-sm font-medium text-blue hover:text-indigo-600 transition-colors px-3 py-1 rounded-lg hover:bg-blue-50 dark:hover:bg-blue/10"
-              >
-                Skip Crop
-              </button>
             </div>
           }
           footer={null}
           destroyOnClose
         >
-          {currentImage && (
-            <ImageCropper
-              imageSrc={currentImage}
-              onComplete={handleCropComplete}
-              onCancel={handleCropCancel}
-            />
-          )}
+          {currentImage && renderPreviewContent()}
         </Modal>
       )}
     </div>

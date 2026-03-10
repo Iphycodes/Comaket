@@ -17,6 +17,7 @@ import { mockMarketItems } from '@grc/_shared/constant';
 import { CartItem } from '@grc/_shared/namespace/cart';
 import { MarketItem } from '@grc/_shared/namespace';
 import { getFirstImageUrl } from '@grc/components/apps/media-renderer';
+import { useCart } from '@grc/hooks/useCart';
 
 type AppProviderPropType = {
   children: ReactNode;
@@ -267,7 +268,7 @@ export const AppProvider = (props: AppProviderPropType) => {
         condition: shopItem.condition,
         negotiable: shopItem.askingPrice?.negotiable || false,
         sellerName:
-          shopItem.postUserProfile?.businessName || shopItem.postUserProfile?.userName || '',
+          shopItem.postUserProfile?.displayName || shopItem.postUserProfile?.userName || '',
       };
       return [...prev, newCartItem];
     });
@@ -295,7 +296,8 @@ export const AppProvider = (props: AppProviderPropType) => {
 
   const isInCart = (id: string | number): boolean => cartItems.some((item) => item.id === id);
 
-  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  // const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const { cartItemCount: cartCount } = useCart({ fetchCount: true, fetchCart: true });
 
   const getCartTotal = useCallback(
     () => cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0),

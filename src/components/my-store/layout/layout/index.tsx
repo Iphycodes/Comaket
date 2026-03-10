@@ -80,7 +80,7 @@ const StorePortalLayout: React.FC<StorePortalLayoutProps> = ({ children }) => {
   };
 
   return (
-    <div className="min-h-screen bg-gray-50 dark:bg-gray-950">
+    <div className="min-h-screen bg-neutral-50 dark:bg-neutral-950">
       {/* Desktop sidebar */}
       {!isMobile && <DesktopSidebar {...sidebarProps} />}
 
