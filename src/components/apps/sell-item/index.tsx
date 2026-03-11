@@ -315,6 +315,8 @@ const SellItem = ({ storeId }: SellItemProps) => {
     isFetchingMyListings,
     refetchMyListings,
     deleteListing: apiDeleteListing,
+    acceptOffer: apiAcceptOffer,
+    rejectOffer: apiRejectOffer,
     submitCounterOffer: apiCounterOffer,
     isSubmittingCounterOffer,
     myListingPagination,

@@ -434,7 +434,6 @@ interface CreatorDetailsProps {
   isLoadingListings: boolean;
   isFetchingListings?: boolean;
   onLoadMoreListings?: (page: number) => void;
-  listingsPagination?: any;
   reviews: any[];
   reviewsTotal: number;
   isLoadingReviews: boolean;
@@ -462,7 +461,6 @@ const CreatorDetails: React.FC<CreatorDetailsProps> = ({
   isLoadingListings,
   isFetchingListings,
   onLoadMoreListings,
-  listingsPagination,
   reviews,
   reviewsTotal,
   isLoadingReviews,
@@ -594,7 +592,6 @@ const CreatorDetails: React.FC<CreatorDetailsProps> = ({
           isFetching={isFetchingListings}
           isMobile={isMobile}
           onLoadMore={onLoadMoreListings}
-          pagination={listingsPagination}
           creatorName={fullName}
           creatorWhatsApp={whatsappNumber || phoneNumber}
         />

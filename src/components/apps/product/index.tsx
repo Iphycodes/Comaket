@@ -25,16 +25,16 @@ interface ProductProps {
   item: Partial<MarketItem> & { media?: MediaItem[] };
 
   // State from parent
-  isInCart: boolean;
-  isSaved: boolean;
-  cartQuantity: number;
+  isInCart?: boolean;
+  isSaved?: boolean;
+  cartQuantity?: number;
   // Handlers from parent
-  onAddToCart: () => void;
-  onBuyNow: () => void;
-  onToggleSave: () => void;
-  onWhatsAppMessage: () => void;
-  onShare: () => void;
-  onGoBack: () => void;
+  onAddToCart?: () => void;
+  onBuyNow?: () => void;
+  onToggleSave?: () => void;
+  onWhatsAppMessage?: () => void;
+  onShare?: () => void;
+  onGoBack?: () => void;
 
   // Legacy support — if rendered from Market list view with setSelectedProductId
   setSelectedProductId?: React.Dispatch<React.SetStateAction<string>>;
@@ -42,9 +42,9 @@ interface ProductProps {
 
 const Product = ({
   item,
-  isInCart: itemInCart,
-  isSaved,
-  cartQuantity,
+  isInCart: itemInCart = false,
+  isSaved = false,
+  cartQuantity = 0,
   onAddToCart,
   onBuyNow,
   onToggleSave,
@@ -78,7 +78,7 @@ const Product = ({
     if (setSelectedProductId) {
       setSelectedProductId('');
     } else {
-      onGoBack();
+      onGoBack?.();
     }
   };
 

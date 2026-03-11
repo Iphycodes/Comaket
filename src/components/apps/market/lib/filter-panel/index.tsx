@@ -1,6 +1,6 @@
 import { CREATOR_INDUSTRIES, Currencies } from '@grc/_shared/constant';
 import { numberFormat } from '@grc/_shared/helpers';
-import { MarketFilters } from '@grc/app/(ui)/(apps)/(home)/page';
+import { MarketFilters } from '@grc/_shared/helpers/transform-listing';
 import { Slider } from 'antd';
 import { AnimatePresence, motion } from 'framer-motion';
 import { X, Check, RotateCcw } from 'lucide-react';

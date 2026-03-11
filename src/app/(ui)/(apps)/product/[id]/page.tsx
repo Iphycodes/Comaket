@@ -9,7 +9,7 @@ import { useSavedProducts } from '@grc/hooks/useSavedProducts';
 import { numberFormat } from '@grc/_shared/helpers';
 import { Currencies } from '@grc/_shared/constant';
 import Product from '@grc/components/apps/product';
-import { transformListing } from '../../(home)/page';
+import { transformListing } from '@grc/_shared/helpers/transform-listing';
 
 interface ProductPageProps {
   params: { id: string };
@@ -26,13 +26,13 @@ const ProductPage = ({ params }: ProductPageProps) => {
   });
 
   // ── Cart API ──────────────────────────────────────────────────────────
-  const { addToCart, isInCart, cartItems, refetchCount, isAddingToCart } = useCart({
+  const { addToCart, isInCart, cartItems, refetchCount } = useCart({
     fetchCart: true,
     fetchCount: true,
   });
 
   // ── Saved Products API ────────────────────────────────────────────────
-  const { toggleSave, checkSavedStatus, savedStatusMap, isToggling } = useSavedProducts({});
+  const { toggleSave, checkSavedStatus, savedStatusMap } = useSavedProducts({});
 
   // ── Check saved status on mount ───────────────────────────────────────
   useEffect(() => {
@@ -171,8 +171,6 @@ const ProductPage = ({ params }: ProductPageProps) => {
       isInCart={itemInCart}
       isSaved={itemIsSaved}
       cartQuantity={cartQuantity}
-      isAddingToCart={isAddingToCart}
-      isTogglingSave={isToggling}
       onAddToCart={handleAddToCart}
       onBuyNow={handleBuyNow}
       onToggleSave={handleToggleSave}

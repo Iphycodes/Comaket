@@ -116,6 +116,7 @@ const SavedItems: React.FC = () => {
     refetchSaved,
     refetchCount,
     savedTotal,
+    getSavedResponse,
   } = useSavedProducts({
     fetchSaved: true,
     savedParams: { page: 1, perPage: PER_PAGE },

@@ -67,17 +67,11 @@ const CreatorDetailPage = () => {
   }, [creatorId, toggleFollow, isFollowing, followersCount]);
 
   // ── 3. Fetch creator's listings ─────────────────────────────────────
-  const {
-    listings,
-    listingsTotal,
-    isLoadingListings,
-    isFetchingListings,
-    refetchListings,
-    listingPagination,
-  } = useListings({
-    fetchListings: !!creatorId,
-    listingsParams: { creatorId },
-  });
+  const { listings, listingsTotal, isLoadingListings, isFetchingListings, refetchListings } =
+    useListings({
+      fetchListings: !!creatorId,
+      listingsParams: { creatorId },
+    });
 
   // ── 4. Fetch reviews ────────────────────────────────────────────────
   const {
@@ -164,7 +158,6 @@ const CreatorDetailPage = () => {
       isLoadingListings={isLoadingListings || false}
       isFetchingListings={isFetchingListings}
       onLoadMoreListings={handleLoadMoreListings}
-      listingsPagination={listingPagination}
       reviews={reviews || []}
       reviewsTotal={reviewsTotal || 0}
       isLoadingReviews={isLoadingReviews || false}

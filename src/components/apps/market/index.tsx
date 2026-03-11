@@ -22,7 +22,7 @@ import NotificationsDrawer from '../notification-drawer';
 import { Shop } from 'iconsax-react';
 import MediaRenderer from '../media-renderer';
 import ModernItemPost from '../item-post-new';
-import { MarketFilters } from '@grc/app/(ui)/(apps)/(home)/page';
+import { MarketFilters } from '@grc/_shared/helpers/transform-listing';
 import { Category } from '@grc/services/categories';
 
 // ═══════════════════════════════════════════════════════════════════════════

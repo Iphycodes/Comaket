@@ -24,7 +24,7 @@ const StoreDetailPage = () => {
   const creatorSlug = typeof store?.creatorId === 'object' ? store?.creatorId?.slug : creatorId;
 
   // ── 2. Fetch creator profile ────────────────────────────────────────
-  const { creatorBySlug: creatorProfile, isLoadingCreatorBySlug: isLoadingCreator } = useCreators({
+  const { creatorBySlug: creatorProfile } = useCreators({
     creatorSlug: creatorSlug || undefined,
   });
 
@@ -60,17 +60,11 @@ const StoreDetailPage = () => {
   }, [storeId, toggleFollow, isFollowing, followersCount]);
 
   // ── 4. Fetch store listings ─────────────────────────────────────────
-  const {
-    listings,
-    listingsTotal,
-    isLoadingListings,
-    isFetchingListings,
-    refetchListings,
-    listingPagination,
-  } = useListings({
-    fetchListings: !!storeId,
-    listingsParams: { storeId },
-  });
+  const { listings, listingsTotal, isLoadingListings, isFetchingListings, refetchListings } =
+    useListings({
+      fetchListings: !!storeId,
+      listingsParams: { storeId },
+    });
 
   // ── 5. Fetch reviews ────────────────────────────────────────────────
   const {
@@ -149,13 +143,11 @@ const StoreDetailPage = () => {
       creatorProfile={
         creatorProfile || (typeof store?.creatorId === 'object' ? store.creatorId : null)
       }
-      isLoadingCreator={isLoadingCreator}
       listings={listings || []}
       listingsTotal={listingsTotal || 0}
       isLoadingListings={isLoadingListings || false}
       isFetchingListings={isFetchingListings}
       onLoadMoreListings={handleLoadMoreListings}
-      listingsPagination={listingPagination}
       reviews={reviews || []}
       reviewsTotal={reviewsTotal || 0}
       isLoadingReviews={isLoadingReviews || false}

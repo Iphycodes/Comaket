@@ -72,6 +72,7 @@ export const dateFormat = 'DD-MM-YYYY';
 // }
 
 import { MarketItem } from '@grc/_shared/namespace';
+import { Vendor } from '@grc/_shared/namespace/vendor';
 
 export enum Currencies {
   NGN = 'NGN',

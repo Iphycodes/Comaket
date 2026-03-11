@@ -302,7 +302,6 @@ interface StoreDetailsProps {
   isLoadingListings: boolean;
   isFetchingListings?: boolean;
   onLoadMoreListings?: (page: number) => void;
-  listingsPagination?: any;
   reviews: any[];
   reviewsTotal: number;
   isLoadingReviews: boolean;
@@ -330,7 +329,6 @@ const StoreDetails: React.FC<StoreDetailsProps> = ({
   isLoadingListings,
   isFetchingListings,
   onLoadMoreListings,
-  listingsPagination,
   reviews,
   reviewsTotal,
   isLoadingReviews,
@@ -452,7 +450,6 @@ const StoreDetails: React.FC<StoreDetailsProps> = ({
           isFetching={isFetchingListings}
           isMobile={isMobile}
           onLoadMore={onLoadMoreListings}
-          pagination={listingsPagination}
           storeName={storeName}
           storeWhatsApp={whatsappNumber || phoneNumber}
         />
