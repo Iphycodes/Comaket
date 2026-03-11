@@ -13,7 +13,7 @@ const ProfileDrawer: React.FC<ProfileDrawerProps> = ({ toggleProfileDrawer }) =>
     <Sider
       collapsed={toggleProfileDrawer}
       collapsedWidth={0}
-      className="dash-sider rounded-r-2xl border-r border-r-gray-200 rounded-br-3xl p-0 text-lg shadow-xl shadow-gray-400"
+      className="dash-sider rounded-r-2xl border-r border-r-neutral-200 rounded-br-3xl p-0 text-lg shadow-xl shadow-neutral-400"
       width={350}
       style={{
         overflow: 'auto',

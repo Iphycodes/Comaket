@@ -1,19 +1,18 @@
 'use client';
-import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
-import { AppContext } from '@grc/app-context';
-import dynamic from 'next/dynamic';
-import React, { useContext } from 'react';
 
-const SellItem = dynamic(() => import('@grc/components/apps/sell-item'), { ssr: false });
+import React from 'react';
+import dynamic from 'next/dynamic';
+
+const SellItem = dynamic(() => import('@grc/components/apps/sell-item'), {
+  ssr: false,
+  loading: () => (
+    <div className="min-h-[60vh] flex items-center justify-center">
+      <div className="w-8 h-8 border-2 border-blue border-t-transparent rounded-full animate-spin" />
+    </div>
+  ),
+});
 
 const SellItemPage = () => {
-  const isMobile = useMediaQuery(mediaSize.mobile);
-  const { setIsSellItemModalOpen } = useContext(AppContext);
-
-  if (isMobile) {
-    setIsSellItemModalOpen(true);
-  }
-
   return <SellItem />;
 };
 

@@ -17,7 +17,7 @@ export const metadata: Metadata = {
   title: 'Comaket',
   description: 'Biggest Network of Buyers and Sellers',
   viewport: { width: 'device-width', initialScale: 1, maximumScale: 1, userScalable: false },
-  icons: { icon: '/favicon.ico' },
+  icons: { icon: '/kraft-logo-icon.ico' },
 };
 
 export interface LayoutProps {

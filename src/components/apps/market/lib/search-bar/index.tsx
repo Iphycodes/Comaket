@@ -1,88 +1,110 @@
-import React, { useState } from 'react';
-import { Button, Input, Select } from 'antd';
-import { Search, X, ChevronDown } from 'lucide-react';
+import React, { useState, useCallback, useRef } from 'react';
+import { Button, Input } from 'antd';
+import { Search, X } from 'lucide-react';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 
-// Interface for the SearchBar props
 interface SearchBarProps {
   onSearch: (searchValue: string, category: string) => void;
-  className?: string; // Allow custom className to be passed for positioning/styling
+  className?: string;
   section: 'sell-item' | 'market';
 }
 
-// Interface for category options
-interface CategoryOption {
-  value: string;
-  label: string;
-}
-
-const SearchBar: React.FC<SearchBarProps> = ({ onSearch, className, section }) => {
+const SearchBar: React.FC<SearchBarProps> = ({ onSearch, className }) => {
   const [searchValue, setSearchValue] = useState<string>('');
-  const [searchCategory, setSearchCategory] = useState<string>('all');
+  const [searchCategory] = useState<string>('all');
   const isMobile = useMediaQuery(mediaSize.mobile);
-  const isDesktop = useMediaQuery(mediaSize.desktop);
+  const debounceRef = useRef<NodeJS.Timeout | null>(null);
+  const inputRef = useRef<any>(null);
 
-  const categories: CategoryOption[] = [
-    { value: 'all', label: 'All Categories' },
-    { value: 'electronics', label: 'Electronics' },
-    { value: 'fashion', label: 'Fashion' },
-    { value: 'home', label: 'Home & Living' },
-  ];
+  // Debounced search on typing
+  const handleChange = useCallback(
+    (value: string) => {
+      setSearchValue(value);
 
-  const statusOptions: CategoryOption[] = [
-    { value: 'all', label: 'All Status' },
-    { value: 'approved', label: 'Approved' },
-    { value: 'pending', label: 'Pending' },
-    { value: 'rejected', label: 'Rejected' },
-  ];
+      if (value === '') {
+        handleClear();
+      }
+      // if (debounceRef.current) clearTimeout(debounceRef.current);
+      // debounceRef.current = setTimeout(() => {
+      //   onSearch(value, searchCategory);
+      // }, 500);
+    },
+    [searchCategory]
+  );
+
+  const handleClear = useCallback(() => {
+    setSearchValue('');
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    onSearch('', searchCategory);
+    inputRef.current?.focus();
+  }, [onSearch, searchCategory]);
+
+  const handleSubmit = useCallback(() => {
+    if (debounceRef.current) clearTimeout(debounceRef.current);
+    onSearch(searchValue, searchCategory);
+  }, [onSearch, searchValue, searchCategory]);
+
+  const handleKeyDown = useCallback(
+    (e: React.KeyboardEvent) => {
+      if (e.key === 'Enter') {
+        if (debounceRef.current) clearTimeout(debounceRef.current);
+        onSearch(searchValue, searchCategory);
+      }
+    },
+    [onSearch, searchValue, searchCategory]
+  );
 
   return (
     <div className={`w-full ${className}`}>
       <div className="flex gap-2 w-full">
-        {isDesktop && (
+        {/* {isDesktop && (
           <Select
-            defaultValue="all"
-            onChange={setSearchCategory}
+            value={searchCategory}
+            onChange={handleCategoryChange}
             className={`category-select w-[200px] ${isMobile ? 'h-10' : 'h-12'}`}
             options={section === 'market' ? categories : statusOptions}
             suffixIcon={<ChevronDown size={16} />}
           />
-        )}
+        )} */}
 
         <div className={`flex-1 flex ${isMobile ? 'gap-0' : 'gap-2'}`}>
           <div className="flex-1 relative">
             <Input
+              ref={inputRef}
               value={searchValue}
-              onChange={(e) => setSearchValue(e.target.value)}
+              onChange={(e) => handleChange(e.target.value)}
+              onKeyDown={handleKeyDown}
               placeholder="Search for anything..."
               className={`${isMobile ? 'h-10' : 'h-12'} !w-full ${
                 isMobile ? 'pl-7' : 'pl-11'
               } pr-4 ${
                 isMobile ? 'rounded-lg rounded-r-none border-r-0' : 'rounded-xl'
-              } border-gray-200 hover:border-blue focus:border-blue transition-colors`}
+              } border-neutral-200 dark:border-neutral-700 hover:border-blue focus:border-blue transition-colors`}
               suffix={
-                searchValue && (
-                  <X
-                    size={16}
-                    className="text-gray-400 hover:text-gray-600 cursor-pointer"
-                    onClick={() => setSearchValue('')}
-                  />
-                )
+                <X
+                  size={16}
+                  className={`cursor-pointer transition-opacity ${
+                    searchValue
+                      ? 'text-neutral-400 hover:text-neutral-600 opacity-100'
+                      : 'opacity-0 pointer-events-none'
+                  }`}
+                  onClick={handleClear}
+                />
               }
               style={{ width: '100%' }}
             />
             <Search
               className={`absolute ${
                 isMobile ? 'left-2' : 'left-4'
-              } top-1/2 -translate-y-1/2 text-gray-400`}
+              } top-1/2 -translate-y-1/2 text-neutral-400 z-10 pointer-events-none`}
               size={isMobile ? 16 : 18}
             />
           </div>
           <Button
-            onClick={() => onSearch(searchValue, searchCategory)}
+            onClick={handleSubmit}
             className={`${
               isMobile ? 'h-10' : 'h-12 px-6'
-            } !bg-blue hover:bg-blue !text-white hover:!text-white  ${
+            } !bg-blue hover:bg-blue !text-white hover:!text-white ${
               isMobile ? 'rounded-lg rounded-l-none border-l-0' : 'rounded-xl'
             } transition-colors flex items-center gap-2`}
           >

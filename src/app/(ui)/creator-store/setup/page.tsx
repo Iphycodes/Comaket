@@ -3,9 +3,12 @@
 import React, { useState, useCallback, useEffect } from 'react';
 import { message as antMessage } from 'antd';
 import { fetchData } from '@grc/_shared/helpers';
+import { useStores } from '@grc/hooks/useStores';
+import { useMedia } from '@grc/hooks/useMedia';
+import { useCreators } from '@grc/hooks/useCreators';
 import CreatorStoreSetup, {
-  type CreatorStoreSetupData,
-  type LocationOption,
+  CreatorStoreSetupData,
+  LocationOption,
 } from '@grc/components/apps/creator-store-setup';
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -15,7 +18,7 @@ import CreatorStoreSetup, {
 const NIGERIA_ISO2 = 'NG';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// INITIAL STATE
+// INITIAL STATE — includes tags
 // ═══════════════════════════════════════════════════════════════════════════
 
 const INITIAL_DATA: CreatorStoreSetupData = {
@@ -23,59 +26,18 @@ const INITIAL_DATA: CreatorStoreSetupData = {
   tagline: '',
   bio: '',
   phoneNumber: '',
+  whatsappNumber: '',
+  address: '',
   state: '',
   city: '',
   profileImage: null,
+  profileImageFile: null,
   selectedIndustries: [],
-  selectedPlan: 'starter',
+  tags: [],
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
-// BACKEND INTEGRATION HELPERS
-// ═══════════════════════════════════════════════════════════════════════════
-
-const uploadProfileImage = async (base64Image: string): Promise<string> => {
-  // ── TODO: Replace with real upload ──────────────────────────────────
-  // const formData = new FormData();
-  // formData.append('file', dataURItoBlob(base64Image));
-  // const res = await fetch('/api/upload/profile-image', {
-  //   method: 'POST',
-  //   body: formData,
-  // });
-  // const data = await res.json();
-  // return data.url;
-  // ────────────────────────────────────────────────────────────────────
-  await new Promise((r) => setTimeout(r, 500));
-  return base64Image;
-};
-
-const submitCreatorStoreSetup = async (payload: {
-  storeName: string;
-  tagline: string;
-  bio: string;
-  phoneNumber: string;
-  state: string;
-  city: string;
-  profileImageUrl: string | null;
-  industries: string[];
-  planId: string;
-}): Promise<{ success: boolean; storeId?: string }> => {
-  // ── TODO: Replace with real API call ───────────────────────────────
-  // const res = await fetch('/api/creator/store-setup', {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify(payload),
-  // });
-  // if (!res.ok) throw new Error('Failed to create store');
-  // return await res.json();
-  // ────────────────────────────────────────────────────────────────────
-  await new Promise((r) => setTimeout(r, 1500));
-  console.log('Store setup payload:', payload);
-  return { success: true, storeId: 'store_mock_123' };
-};
-
-// ═══════════════════════════════════════════════════════════════════════════
-// VALIDATION
+// VALIDATION — 3 active steps (stores inherit creator's plan)
 // ═══════════════════════════════════════════════════════════════════════════
 
 const validateStep = (step: number, data: CreatorStoreSetupData): string | null => {
@@ -89,7 +51,8 @@ const validateStep = (step: number, data: CreatorStoreSetupData): string | null 
       if (data.selectedIndustries.length > 5) return 'You can select up to 5 industries';
       return null;
     case 3:
-      if (!data.selectedPlan) return 'Please select a plan';
+      if (data.tags.length === 0) return 'Please add at least one tag';
+      if (data.tags.length > 15) return 'You can select up to 15 tags';
       return null;
     default:
       return null;
@@ -104,6 +67,11 @@ const CreatorStoreSetupPage = () => {
   const [currentStep, setCurrentStep] = useState(1);
   const [formData, setFormData] = useState<CreatorStoreSetupData>(INITIAL_DATA);
   const [isSubmitting, setIsSubmitting] = useState(false);
+
+  // ── Hooks ───────────────────────────────────────────────────────────
+  const { createStore, isCreatingStore } = useStores();
+  const { uploadImage, isUploadingGeneral } = useMedia();
+  const { creatorProfile, isLoadingProfile } = useCreators({ fetchProfile: true });
 
   // ── Location state ──────────────────────────────────────────────────
   const [states, setStates] = useState<LocationOption[]>([]);
@@ -142,7 +110,6 @@ const CreatorStoreSetupPage = () => {
     }
 
     const selectedState = states.find((s) => s.name.toLowerCase() === formData.state.toLowerCase());
-
     if (!selectedState?.iso2) return;
 
     const loadCities = async () => {
@@ -196,6 +163,7 @@ const CreatorStoreSetupPage = () => {
   );
 
   const handleSubmit = useCallback(async () => {
+    // Validate tags step (step 3)
     const error = validateStep(3, formData);
     if (error) {
       antMessage.error(error);
@@ -205,39 +173,59 @@ const CreatorStoreSetupPage = () => {
     setIsSubmitting(true);
 
     try {
-      let profileImageUrl: string | null = null;
-      if (formData.profileImage) {
-        profileImageUrl = await uploadProfileImage(formData.profileImage);
+      // 1. Upload logo if a file was selected
+      let logoUrl: string | null = null;
+      if (formData.profileImageFile) {
+        logoUrl = await uploadImage(formData.profileImageFile, true);
+        if (!logoUrl) {
+          antMessage.error('Failed to upload store logo');
+          setIsSubmitting(false);
+          return;
+        }
       }
 
-      const result = await submitCreatorStoreSetup({
-        storeName: formData.storeName.trim(),
-        tagline: formData.tagline.trim(),
-        bio: formData.bio.trim(),
-        phoneNumber: formData.phoneNumber.trim(),
-        state: formData.state,
-        city: formData.city,
-        profileImageUrl,
-        industries: formData.selectedIndustries,
-        planId: formData.selectedPlan,
-      });
+      // 2. Build the create store payload
+      const payload: Record<string, any> = {
+        name: formData.storeName.trim(),
+        ...(formData.bio.trim() && { description: formData.bio.trim() }),
+        ...(formData.tagline.trim() && { tagline: formData.tagline.trim() }),
+        ...(formData.phoneNumber.trim() && { phoneNumber: formData.phoneNumber.trim() }), // "+2349076141362"
+        ...(formData.whatsappNumber.trim() && { whatsappNumber: formData.whatsappNumber.trim() }), // "+2349076141362"
+        categories: formData.selectedIndustries, // IDs: ["fashion", "jewelry"]
+        tags: formData.tags, // ["ankara", "bespoke", "custom-jewelry"]
+      };
 
-      if (result.success) {
-        setCurrentStep(4);
-        // ── TODO: Post-setup actions ─────────────────────────────
-        // await queryClient.invalidateQueries(['user-profile']);
-        // updateUserContext({ hasStore: true, storeId: result.storeId });
-        // ─────────────────────────────────────────────────────────
+      if (logoUrl) {
+        payload.logo = logoUrl;
+      }
+
+      // Location
+      if (formData.state) {
+        payload.location = {
+          country: 'Nigeria',
+          state: formData.state,
+          ...(formData.city && { city: formData.city }),
+          ...(formData.address.trim() && { street: formData.address.trim() }),
+        };
+      }
+
+      // 3. Create store
+      const result = await createStore(payload);
+
+      if (result) {
+        setCurrentStep(4); // Success step
       } else {
         antMessage.error('Something went wrong. Please try again.');
       }
-    } catch (err) {
+    } catch (err: any) {
       console.error('Store setup failed:', err);
-      antMessage.error('Failed to set up your store. Please try again.');
+      const errorMsg =
+        err?.data?.message || err?.message || 'Failed to set up your store. Please try again.';
+      antMessage.error(errorMsg);
     } finally {
       setIsSubmitting(false);
     }
-  }, [formData]);
+  }, [formData, createStore, uploadImage]);
 
   // ── Render ──────────────────────────────────────────────────────────
 
@@ -245,11 +233,13 @@ const CreatorStoreSetupPage = () => {
     <CreatorStoreSetup
       initialData={formData}
       currentStep={currentStep}
-      isSubmitting={isSubmitting}
+      isSubmitting={isSubmitting || isCreatingStore || isUploadingGeneral}
       states={states}
       cities={cities}
       loadingStates={loadingStates}
       loadingCities={loadingCities}
+      creatorIndustries={creatorProfile?.industries}
+      isLoadingCreatorProfile={isLoadingProfile}
       onStepChange={handleStepChange}
       onDataChange={handleDataChange}
       onStateChange={handleStateChange}

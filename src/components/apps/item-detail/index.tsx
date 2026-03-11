@@ -7,7 +7,6 @@ import {
   ChevronLeft,
   ChevronRight,
   MapPin,
-  Clock,
   MessageCircle,
   ShoppingCart,
   ShoppingBag,
@@ -72,15 +71,15 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ item, isSellerView }) => {
 
   const buildCartItem = (): CartItem => ({
     id: item.id,
-    itemName: item.itemName,
-    description: item.description,
-    price: item.askingPrice?.price || 0,
+    itemName: item?.itemName,
+    description: item?.description,
+    price: item?.askingPrice?.price || 0,
     quantity: 1,
     maxQuantity,
     image: getFirstImageUrl(item.media),
     condition: item.condition,
     negotiable: item.askingPrice?.negotiable || false,
-    sellerName: item.postUserProfile?.businessName || item.postUserProfile?.userName || '',
+    sellerName: item?.postUserProfile?.displayName || '',
   });
 
   const handleAddToCart = () => {
@@ -108,8 +107,7 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ item, isSellerView }) => {
       return;
     }
     const formattedPrice = numberFormat(item?.askingPrice?.price / 100, Currencies.NGN);
-    const sellerName =
-      item.postUserProfile?.businessName || item.postUserProfile?.userName || 'Seller';
+    const sellerName = item.postUserProfile?.displayName || 'Seller';
 
     const message = `Hi, ${sellerName},
 I am interested in this item on Comaket.
@@ -229,9 +227,18 @@ Price: ${formattedPrice}`;
     }
   };
 
+  const handleCreatorOrStoreClick = () => {
+    console.log('post user data::::::', item?.postUserProfile);
+    if (item?.postUserProfile?.isStore) {
+      router.push(`/stores/${encodeURIComponent(item?.postUserProfile?.id)}`);
+    } else {
+      router.push(`/creators/${encodeURIComponent(item?.postUserProfile?.userName)}`);
+    }
+  };
+
   return (
     <div
-      className={`relative bg-white dark:bg-gray-800 rounded-lg transition-all duration-300 ${
+      className={`relative bg-white dark:bg-neutral-800 rounded-lg transition-all duration-300 ${
         isMobile ? 'px-3' : ''
       }`}
     >
@@ -250,18 +257,14 @@ Price: ${formattedPrice}`;
           <div>
             <div className="flex items-center gap-2">
               <h3 className="font-medium text-lg">
-                {item.postUserProfile?.businessName || item.postUserProfile?.userName}
+                {item.postUserProfile?.displayName || item.postUserProfile?.userName}
               </h3>
               {item.postUserProfile?.isVerified && <span className="text-blue text-xs">✓</span>}
             </div>
-            <div className="flex items-center gap-3 text-sm text-gray-500">
+            <div className="flex items-center gap-3 text-sm text-neutral-500">
               <span className="flex items-center gap-1">
                 <MapPin size={14} />
                 {item.postUserProfile?.location || 'Nigeria'}
-              </span>
-              <span className="flex items-center gap-1">
-                <Clock size={14} />
-                2d ago
               </span>
             </div>
           </div>
@@ -310,56 +313,6 @@ Price: ${formattedPrice}`;
                 >
                   <ChevronRight className="w-6 h-6" />
                 </button>
-
-                {/* Thumbnail strip */}
-                {/* <div className="flex gap-2 mt-3 px-1 overflow-x-auto">
-                  {item.media.map((m, index) => (
-                    <button
-                      key={index}
-                      onClick={() => {
-                        setSlideDirection(index > currentMediaIndex ? 1 : -1);
-                        setCurrentMediaIndex(index);
-                      }}
-                      className={`relative w-16 h-16 rounded-md overflow-hidden flex-shrink-0 border-2 transition-all ${
-                        currentMediaIndex === index
-                          ? 'border-blue opacity-100'
-                          : 'border-transparent opacity-60 hover:opacity-80'
-                      }`}
-                    >
-                      {m.type === 'image' ? (
-                        <img
-                          src={m.url}
-                          alt={`Thumb ${index + 1}`}
-                          fill
-                          className="object-cover"
-                        />
-                      ) : (
-                        <div className="relative w-full h-full bg-gray-900">
-                          {m.thumbnail ? (
-                            <img
-                              src={m.thumbnail}
-                              alt={`Video ${index + 1}`}
-                              fill
-                              className="object-cover"
-                            />
-                          ) : (
-                            <video
-                              src={m.url}
-                              className="w-full h-full object-cover"
-                              muted
-                              preload="metadata"
-                            />
-                          )}
-                          <div className="absolute inset-0 flex items-center justify-center bg-black/30">
-                            <div className="w-5 h-5 rounded-full bg-white/80 flex items-center justify-center">
-                              <div className="w-0 h-0 border-l-[5px] border-l-gray-800 border-y-[3px] border-y-transparent ml-0.5" />
-                            </div>
-                          </div>
-                        </div>
-                      )}
-                    </button>
-                  ))}
-                </div> */}
               </>
             )}
           </div>
@@ -372,30 +325,34 @@ Price: ${formattedPrice}`;
           {/* Seller Details - Desktop */}
           {!isMobile && (
             <div className="flex items-center gap-3 mb-6">
-              <div className="relative w-12 h-12">
+              <div
+                className="relative w-10 h-10 cursor-pointer"
+                onClick={handleCreatorOrStoreClick}
+              >
                 <Image
-                  src={item.postUserProfile?.profilePicUrl}
+                  src={item?.postUserProfile?.profilePicUrl}
                   alt="Seller"
                   fill
                   className="rounded-full object-cover"
                 />
-                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
+                {/* <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" /> */}
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="font-medium text-lg">
-                    {item.postUserProfile?.businessName || item.postUserProfile?.userName}
+                  <h3
+                    className="font-medium text-sm cursor-pointer hover:font-semibold"
+                    onClick={() => handleCreatorOrStoreClick()}
+                  >
+                    {item.postUserProfile?.displayName || item.postUserProfile?.userName}
                   </h3>
-                  {item.postUserProfile?.isVerified && <span className="text-blue text-xs">✓</span>}
+                  {item.postUserProfile?.isVerified && (
+                    <i className="ri-verified-badge-fill text-[#1D9BF0] text-[14px] flex-shrink-0" />
+                  )}
                 </div>
-                <div className="flex items-center gap-3 text-sm text-gray-500">
+                <div className="flex items-center gap-3 text-sm text-neutral-500">
                   <span className="flex items-center gap-1">
                     <MapPin size={14} />
                     {item.postUserProfile?.location || 'Nigeria'}
-                  </span>
-                  <span className="flex items-center gap-1">
-                    <Clock size={14} />
-                    2d ago
                   </span>
                 </div>
               </div>
@@ -477,7 +434,7 @@ Price: ${formattedPrice}`;
                 {item.productTags.map((tag, index) => (
                   <span
                     key={index}
-                    className="px-3 py-1 text-xs font-medium bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
+                    className="px-3 py-1 text-xs font-medium bg-neutral-100 dark:bg-zinc-800 text-neutral-700 dark:text-neutral-300 rounded-full hover:bg-neutral-200 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
                   >
                     {tag}
                   </span>
@@ -485,7 +442,7 @@ Price: ${formattedPrice}`;
               </div>
             )}
 
-            <div className="flex items-center justify-end">
+            {/* <div className="flex items-center justify-end">
               <div className="flex items-center gap-3">
                 <Tooltip title={isSaved ? 'Remove from saved' : 'Save item'}>
                   <motion.button
@@ -498,7 +455,7 @@ Price: ${formattedPrice}`;
                       className={`w-6 h-6 ${
                         isSaved
                           ? 'fill-pink-500 text-pink-500'
-                          : 'text-gray-400 group-hover:text-gray-600'
+                          : 'text-neutral-400 group-hover:text-neutral-600'
                       } transition-colors`}
                     />
                   </motion.button>
@@ -510,20 +467,20 @@ Price: ${formattedPrice}`;
                     onClick={handleShare}
                     className="group"
                   >
-                    <Share2 className="w-6 h-6 text-gray-400 group-hover:text-gray-600 transition-colors" />
+                    <Share2 className="w-6 h-6 text-neutral-400 group-hover:text-neutral-600 transition-colors" />
                   </motion.button>
                 </Tooltip>
               </div>
-            </div>
+            </div> */}
 
             <div
               className={`${
                 !isMobile ? 'max-h-[500px] overflow-y-scroll' : 'max-h-[500px] overflow-y-scroll'
               }`}
             >
-              <div className="bg-gray-50 rounded-lg p-3 mb-3">
+              <div className="bg-neutral-50 rounded-lg p-3 mb-3">
                 <h4 className="font-medium mb-2">Description</h4>
-                <p className={`text-gray-600 ${!isDescriptionExpanded && 'line-clamp-3'}`}>
+                <p className={`text-neutral-600 ${!isDescriptionExpanded && 'line-clamp-3'}`}>
                   {item.description}
                 </p>
                 <button
@@ -538,7 +495,7 @@ Price: ${formattedPrice}`;
 
           {/* Action Buttons — conditional on isBuyable */}
           {!isSellerView && (
-            <div className="absolute w-[90%] flex flex-col gap-2 bottom-0 bg-white dark:bg-gray-800 py-4 mt-6 border-t">
+            <div className="absolute w-[90%] flex flex-col gap-2 bottom-0 bg-white dark:bg-neutral-800 py-4 mt-6 border-t">
               {item.isBuyable ? (
                 <>
                   {/* BUYABLE: Buy Now + Add to Cart */}
@@ -569,10 +526,10 @@ Price: ${formattedPrice}`;
                         disabled={isMaxQuantityReached}
                         className={`p-3 rounded-lg border shadow-sm transition-colors ${
                           isMaxQuantityReached
-                            ? 'bg-gray-100 border-gray-200 text-gray-300 cursor-not-allowed'
+                            ? 'bg-neutral-100 border-neutral-200 text-neutral-300 cursor-not-allowed'
                             : itemInCart
                               ? 'bg-blue-50 border-blue text-blue'
-                              : 'bg-neutral-100 border-neutral-200 text-gray-600 hover:border-blue hover:text-blue'
+                              : 'bg-neutral-100 border-neutral-200 text-neutral-600 hover:border-blue hover:text-blue'
                         }`}
                       >
                         <ShoppingCart size={20} />
@@ -606,7 +563,7 @@ Price: ${formattedPrice}`;
                         <Bookmark
                           size={20}
                           className={`${
-                            isSaved ? 'fill-pink-500 text-pink-500' : 'text-gray-500'
+                            isSaved ? 'fill-pink-500 text-pink-500' : 'text-neutral-500'
                           } transition-colors`}
                         />
                       </motion.button>
@@ -619,7 +576,7 @@ Price: ${formattedPrice}`;
                         onClick={handleShare}
                         className="p-3 rounded-lg border border-neutral-200 bg-neutral-100 shadow-sm"
                       >
-                        <Share2 size={20} className="text-gray-500" />
+                        <Share2 size={20} className="text-neutral-500" />
                       </motion.button>
                     </Tooltip>
                   </div>
@@ -646,13 +603,13 @@ Price: ${formattedPrice}`;
                         className={`flex-1 p-3 rounded-lg border shadow-sm transition-colors flex items-center justify-center gap-1.5 ${
                           isSaved
                             ? 'bg-pink-50 border-pink-200 text-pink-500'
-                            : 'bg-neutral-100 border-neutral-200 text-gray-500'
+                            : 'bg-neutral-100 border-neutral-200 text-neutral-500'
                         }`}
                       >
                         <Bookmark
                           size={18}
                           className={`${
-                            isSaved ? 'fill-pink-500 text-pink-500' : 'text-gray-500'
+                            isSaved ? 'fill-pink-500 text-pink-500' : 'text-neutral-500'
                           } transition-colors`}
                         />
                         Save
@@ -664,9 +621,9 @@ Price: ${formattedPrice}`;
                         whileHover={{ scale: 1.1 }}
                         whileTap={{ scale: 0.9 }}
                         onClick={handleShare}
-                        className="flex-1 p-3 rounded-lg border border-neutral-200 bg-neutral-100 shadow-sm flex items-center justify-center gap-1.5 text-gray-500"
+                        className="flex-1 p-3 rounded-lg border border-neutral-200 bg-neutral-100 shadow-sm flex items-center justify-center gap-1.5 text-neutral-500"
                       >
-                        <Share2 size={18} className="text-gray-500" />
+                        <Share2 size={18} className="text-neutral-500" />
                         Share
                       </motion.button>
                     </Tooltip>

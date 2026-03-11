@@ -18,11 +18,11 @@ const UserDropdown = () => {
     {
       key: 'popular-vendors',
       type: 'group',
-      label: 'Popular Vendors',
+      label: 'Popular Creators',
       children: popularVendors.map((vendor) => ({
         key: vendor.id,
         label: (
-          <a href={`/vendor/${vendor.id}`} className="flex items-center gap-2 py-1">
+          <a href={`/creators/${vendor.id}`} className="flex items-center gap-2 py-1">
             <span
               className="h-6 w-6 rounded-full flex items-center justify-center text-xs"
               style={{
@@ -94,7 +94,7 @@ const UserDropdown = () => {
             {isEmpty('') && getFirstCharacter('Ifeanyi')}
           </span>
         )}
-        <ChevronDown size={16} className="text-gray-600" />
+        <ChevronDown size={16} className="text-neutral-600" />
       </div>
     </Dropdown>
   );

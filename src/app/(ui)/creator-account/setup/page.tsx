@@ -1,147 +1,56 @@
 'use client';
 
-import React, { useState, useCallback, useRef } from 'react';
+import React, { useState, useCallback, useEffect, useRef } from 'react';
 import { message as antMessage } from 'antd';
+import { useSearchParams } from 'next/navigation';
+import { fetchData } from '@grc/_shared/helpers';
+import { useUsers } from '@grc/hooks/useUser';
+import { useCreators } from '@grc/hooks/useCreators';
+import { usePayments } from '@grc/hooks/usePayments';
+import { useMedia } from '@grc/hooks/useMedia';
 import CreatorAccountSetup, {
   type CreatorAccountData,
-  type MemberPrefillData,
+  type LocationOption,
 } from '@grc/components/apps/creator-account-setup';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// MEMBER PREFILL DATA
-// This would come from your auth context / user profile query
+// CONSTANTS
 // ═══════════════════════════════════════════════════════════════════════════
 
-// ── TODO: Replace with real user data from auth context ──────────────
-// Example:
-// const { user } = useAuthContext();
-// const memberData: MemberPrefillData = {
-//   firstName: user.firstName,
-//   lastName: user.lastName,
-//   email: user.email,
-//   phoneNumber: user.phoneNumber,
-//   profileImageUrl: user.profilePicUrl,
-// };
-// ─────────────────────────────────────────────────────────────────────
+const NIGERIA_ISO2 = 'NG';
+const USERNAME_REGEX = /^[a-z0-9._]{3,30}$/;
+const SESSION_KEY = 'creator_setup_form';
+const FREE_PLAN_ID = 'starter';
 
-const mockMemberData: MemberPrefillData = {
-  firstName: 'Emmanuel',
-  lastName: 'Okafor',
-  email: 'emmanuel.okafor@gmail.com',
-  phoneNumber: '2348012345678',
-  profileImageUrl:
-    'https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=200&h=200&fit=crop',
-};
+type UsernameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid';
 
 // ═══════════════════════════════════════════════════════════════════════════
-// INITIAL STATE (pre-filled from member account)
+// BUILD INITIAL DATA
 // ═══════════════════════════════════════════════════════════════════════════
 
-const buildInitialData = (member: MemberPrefillData): CreatorAccountData => ({
+const buildInitialData = (profile?: any): CreatorAccountData => ({
   username: '',
-  firstName: member.firstName,
-  lastName: member.lastName,
-  bio: '',
-  contactEmail: member.email,
-  phoneNumber: member.phoneNumber,
-  whatsappNumber: member.phoneNumber, // default to same as phone
+  firstName: profile?.firstName || '',
+  lastName: profile?.lastName || '',
+  bio: profile?.bio || '',
+  contactEmail: profile?.email || '',
+  phoneNumber: profile?.mobile?.phoneNumber || '',
+  whatsappNumber: profile?.mobile?.phoneNumber || '',
   website: '',
   instagramHandle: '',
   twitterHandle: '',
   tiktokHandle: '',
-  profileImage: member.profileImageUrl,
+  profileImage: profile?.avatar || null,
+  state: profile?.state || '',
+  city: profile?.city || '',
   selectedIndustries: [],
-  selectedPlan: 'starter',
+  tags: [],
+  selectedPlan: FREE_PLAN_ID,
 });
-
-// ═══════════════════════════════════════════════════════════════════════════
-// BACKEND INTEGRATION HELPERS
-// ═══════════════════════════════════════════════════════════════════════════
-
-type UsernameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid';
-
-/**
- * Checks if a username is available.
- * Replace with your actual endpoint.
- */
-const checkUsernameAvailability = async (username: string): Promise<{ available: boolean }> => {
-  // ── TODO: Replace with real API call ───────────────────────────────
-  // Example:
-  // const res = await fetch(`/api/creator/check-username?username=${encodeURIComponent(username)}`);
-  // return await res.json();
-  // ────────────────────────────────────────────────────────────────────
-
-  await new Promise((r) => setTimeout(r, 600));
-
-  // Mock: treat some usernames as taken
-  const takenUsernames = ['admin', 'comaket', 'test', 'creator', 'emmanuel'];
-  return { available: !takenUsernames.includes(username.toLowerCase()) };
-};
-
-/**
- * Uploads the creator profile image.
- */
-const uploadProfileImage = async (base64Image: string): Promise<string> => {
-  // ── TODO: Replace with real upload ──────────────────────────────────
-  // const formData = new FormData();
-  // formData.append('file', dataURItoBlob(base64Image));
-  // const res = await fetch('/api/upload/creator-image', {
-  //   method: 'POST',
-  //   body: formData,
-  // });
-  // const data = await res.json();
-  // return data.url;
-  // ────────────────────────────────────────────────────────────────────
-
-  await new Promise((r) => setTimeout(r, 500));
-  return base64Image;
-};
-
-/**
- * Submits the creator account setup to the backend.
- * This upgrades a member account to a creator account.
- */
-const submitCreatorAccount = async (payload: {
-  username: string;
-  firstName: string;
-  lastName: string;
-  bio: string;
-  contactEmail: string;
-  phoneNumber: string;
-  whatsappNumber: string;
-  website: string;
-  socialLinks: {
-    instagram: string;
-    twitter: string;
-    tiktok: string;
-  };
-  profileImageUrl: string | null;
-  industries: string[];
-  planId: string;
-}): Promise<{ success: boolean; creatorId?: string }> => {
-  // ── TODO: Replace with real API call ───────────────────────────────
-  // const res = await fetch('/api/creator/setup-account', {
-  //   method: 'POST',
-  //   headers: { 'Content-Type': 'application/json' },
-  //   body: JSON.stringify(payload),
-  // });
-  // if (!res.ok) {
-  //   const err = await res.json();
-  //   throw new Error(err.message || 'Failed to create creator account');
-  // }
-  // return await res.json();
-  // ────────────────────────────────────────────────────────────────────
-
-  await new Promise((r) => setTimeout(r, 1500));
-  console.log('Creator account payload:', payload);
-  return { success: true, creatorId: 'creator_acc_123' };
-};
 
 // ═══════════════════════════════════════════════════════════════════════════
 // VALIDATION
 // ═══════════════════════════════════════════════════════════════════════════
-
-const USERNAME_REGEX = /^[a-z0-9._]{3,30}$/;
 
 const validateStep = (
   step: number,
@@ -150,101 +59,302 @@ const validateStep = (
 ): string | null => {
   switch (step) {
     case 1:
-      if (!data.username || data.username.length < 3) {
+      if (!data.username || data.username.length < 3)
         return 'Username must be at least 3 characters';
-      }
-      if (!USERNAME_REGEX.test(data.username)) {
+      if (!USERNAME_REGEX.test(data.username))
         return 'Username can only contain letters, numbers, dots and underscores';
-      }
-      if (usernameStatus === 'taken') {
-        return 'That username is already taken';
-      }
-      if (usernameStatus === 'checking') {
-        return 'Please wait while we check username availability';
-      }
-      if (!data.firstName.trim()) {
-        return 'First name is required';
-      }
-      if (!data.lastName.trim()) {
-        return 'Last name is required';
-      }
+      if (usernameStatus === 'taken') return 'That username is already taken';
+      if (usernameStatus === 'checking') return 'Please wait while we check username availability';
+      if (!data.firstName.trim()) return 'First name is required';
+      if (!data.lastName.trim()) return 'Last name is required';
       return null;
-
     case 2:
-      if (data.selectedIndustries.length === 0) {
-        return 'Please select at least one industry';
-      }
-      if (data.selectedIndustries.length > 5) {
-        return 'You can select up to 5 industries';
-      }
+      if (data.selectedIndustries.length === 0) return 'Please select at least one industry';
+      if (data.selectedIndustries.length > 5) return 'You can select up to 5 industries';
       return null;
-
     case 3:
-      if (!data.selectedPlan) {
-        return 'Please select a plan';
-      }
+      if (data.tags.length === 0) return 'Please add at least one tag';
+      if (data.tags.length > 15) return 'You can select up to 15 tags';
       return null;
-
+    case 4:
+      if (!data.selectedPlan) return 'Please select a plan';
+      return null;
     default:
       return null;
   }
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
-// PAGE COMPONENT (Logic Layer)
+// SESSION STORAGE — persists form across Paystack redirect
+// ═══════════════════════════════════════════════════════════════════════════
+
+const saveFormToSession = (data: CreatorAccountData) => {
+  try {
+    sessionStorage.setItem(SESSION_KEY, JSON.stringify(data));
+  } catch {}
+};
+
+const loadFormFromSession = (): CreatorAccountData | null => {
+  try {
+    const raw = sessionStorage.getItem(SESSION_KEY);
+    return raw ? JSON.parse(raw) : null;
+  } catch {
+    return null;
+  }
+};
+
+const clearFormSession = () => {
+  try {
+    sessionStorage.removeItem(SESSION_KEY);
+  } catch {}
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// BUILD CREATOR PAYLOAD
+// ═══════════════════════════════════════════════════════════════════════════
+
+const buildCreatorPayload = (data: CreatorAccountData, avatarUrl?: string | null) => ({
+  username: data.username.trim(),
+  firstName: data.firstName.trim(),
+  lastName: data.lastName.trim(),
+  bio: data.bio.trim(),
+  contactEmail: data.contactEmail.trim(),
+  phoneNumber: data.phoneNumber.trim(),
+  whatsappNumber: data.whatsappNumber.trim(),
+  website: data.website.trim(),
+  socialLinks: {
+    instagram: data.instagramHandle.trim(),
+    twitter: data.twitterHandle.trim(),
+    tiktok: data.tiktokHandle.trim(),
+  },
+  ...(avatarUrl && { profileImageUrl: avatarUrl }),
+  location: { country: 'Nigeria', state: data.state, city: data.city },
+  industries: data.selectedIndustries,
+  tags: data.tags,
+  planId: data.selectedPlan,
+});
+
+// ═══════════════════════════════════════════════════════════════════════════
+// PAGE COMPONENT
 // ═══════════════════════════════════════════════════════════════════════════
 
 const CreatorAccountSetupPage = () => {
-  // ── TODO: Replace mockMemberData with real user from auth context ──
-  const memberData = mockMemberData;
+  const searchParams = useSearchParams();
 
-  const [currentStep, setCurrentStep] = useState(2);
-  const [formData, setFormData] = useState<CreatorAccountData>(buildInitialData(memberData));
+  // ── Detect payment return from Paystack ─────────────────────────────
+  const stepParam = searchParams?.get('step');
+  const referenceParam = searchParams?.get('reference') || searchParams?.get('trxref') || '';
+  const isPaymentReturn = stepParam === 'verify' && !!referenceParam;
+
+  // ── Hooks ───────────────────────────────────────────────────────────
+  const { userProfile, isLoadingProfile } = useUsers({ fetchProfile: true });
+  const { checkUsername, becomeCreator } = useCreators();
+  const { initializeSubscription, isInitializingSubscription, verifyPayment } = usePayments();
+  const { uploadImage, isUploadingGeneral } = useMedia();
+
+  // ── Upload profile image helper ─────────────────────────────────────
+  const uploadProfileImage = useCallback(
+    async (imageData: string | null): Promise<string | null> => {
+      if (!imageData) return null;
+      if (!imageData.startsWith('data:')) return imageData; // already a URL
+      try {
+        const res = await fetch(imageData);
+        const blob = await res.blob();
+        const file = new File([blob], `creator-avatar-${Date.now()}.jpg`, {
+          type: blob.type || 'image/jpeg',
+        });
+        const url = await uploadImage(file, true);
+        return url || null;
+      } catch {
+        return null;
+      }
+    },
+    [uploadImage]
+  );
+
+  // ── Form state ──────────────────────────────────────────────────────
+  const [currentStep, setCurrentStep] = useState(1);
+  const [formData, setFormData] = useState<CreatorAccountData>(buildInitialData());
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [usernameStatus, setUsernameStatus] = useState<UsernameStatus>('idle');
+  const [isInitialized, setIsInitialized] = useState(false);
+  const [isVerifyingSubscription, setIsVerifyingSubscription] = useState(false);
+  const [subscriptionError, setSubscriptionError] = useState<string | null>(null);
 
-  // Debounce timer for username check
   const usernameTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const verifyAttempted = useRef(false);
 
-  // ── Data change handler ─────────────────────────────────────────────
+  // ── Location state ──────────────────────────────────────────────────
+  const [states, setStates] = useState<LocationOption[]>([]);
+  const [cities, setCities] = useState<LocationOption[]>([]);
+  const [loadingStates, setLoadingStates] = useState(false);
+  const [loadingCities, setLoadingCities] = useState(false);
+  const [selectedStateIso2, setSelectedStateIso2] = useState<string>('');
 
-  const handleDataChange = useCallback((partial: Partial<CreatorAccountData>) => {
-    setFormData((prev: any) => ({ ...prev, ...partial }));
-  }, []);
-
-  // ── Username check with debounce ────────────────────────────────────
-
-  const handleCheckUsername = useCallback((username: string) => {
-    // Clear previous timer
-    if (usernameTimerRef.current) {
-      clearTimeout(usernameTimerRef.current);
+  // ── Prefill form once user profile loads (skip if returning from payment) ─
+  useEffect(() => {
+    if (userProfile && !isInitialized && !isPaymentReturn) {
+      setFormData(buildInitialData(userProfile));
+      setIsInitialized(true);
     }
+  }, [userProfile, isInitialized, isPaymentReturn]);
 
-    // Basic client-side validation first
-    if (username.length < 3) {
-      setUsernameStatus('idle');
-      return;
-    }
-    if (!USERNAME_REGEX.test(username)) {
-      setUsernameStatus('invalid');
-      return;
-    }
+  // ══════════════════════════════════════════════════════════════════════
+  // PAYMENT RETURN FLOW
+  // Paystack redirects back to: /creator-account/setup?step=verify&reference=PSK_xxx
+  // 1. Restore saved form from sessionStorage
+  // 2. Verify payment with backend
+  // 3. If verified → call becomeCreator with paid plan → step 5
+  // 4. If failed → show error on step 4 so user can retry
+  // ══════════════════════════════════════════════════════════════════════
 
-    setUsernameStatus('checking');
+  useEffect(() => {
+    if (!isPaymentReturn || verifyAttempted.current) return;
+    verifyAttempted.current = true;
 
-    // Debounce the API call by 500ms
-    usernameTimerRef.current = setTimeout(async () => {
-      try {
-        const result = await checkUsernameAvailability(username);
-        setUsernameStatus(result.available ? 'available' : 'taken');
-      } catch {
-        // If check fails, allow proceeding (server will validate again)
-        setUsernameStatus('idle');
+    const verifyAndComplete = async () => {
+      setIsVerifyingSubscription(true);
+
+      // 1. Restore form
+      const savedForm = loadFormFromSession();
+      if (!savedForm) {
+        setSubscriptionError('Your session expired. Please fill in the form and try again.');
+        setIsVerifyingSubscription(false);
+        // Clean URL
+        window.history.replaceState({}, '', window.location.pathname);
+        return;
       }
-    }, 500);
+
+      setFormData(savedForm);
+      setUsernameStatus('available'); // Was validated before redirect
+
+      try {
+        // 2. Verify payment
+        const result = await verifyPayment(referenceParam);
+        const data = result?.data || result;
+
+        if (!data?.verified && data?.status !== 'success' && data?.status !== 'paid') {
+          // Payment not confirmed
+          setSubscriptionError(
+            'Subscription payment could not be verified. You can retry or choose a different plan.'
+          );
+          setCurrentStep(4);
+          setIsVerifyingSubscription(false);
+          window.history.replaceState({}, '', window.location.pathname);
+          return;
+        }
+
+        // 3. Payment verified → upload avatar and complete creator signup
+        const avatarUrl = await uploadProfileImage(savedForm.profileImage);
+        const payload = buildCreatorPayload(savedForm, avatarUrl);
+        await becomeCreator(payload);
+
+        // 4. Done!
+        clearFormSession();
+        setCurrentStep(5);
+        window.history.replaceState({}, '', window.location.pathname);
+      } catch (err: any) {
+        console.error('Post-payment creator setup failed:', err);
+        setSubscriptionError(
+          err?.data?.message ||
+            'Something went wrong after payment. Please contact support — you will not be charged again.'
+        );
+        setCurrentStep(4);
+        window.history.replaceState({}, '', window.location.pathname);
+      } finally {
+        setIsVerifyingSubscription(false);
+      }
+    };
+
+    verifyAndComplete();
+  }, [isPaymentReturn, referenceParam, verifyPayment, becomeCreator]);
+
+  // ── Fetch states on mount ───────────────────────────────────────────
+  useEffect(() => {
+    const loadStates = async () => {
+      setLoadingStates(true);
+      try {
+        const data = await fetchData(
+          `${process.env.NEXT_PUBLIC_COUNTRY_API_BASE_URL}/countries/${NIGERIA_ISO2}/states`
+        );
+        setStates((data || []).map((s: Record<string, any>) => ({ name: s.name, iso2: s.iso2 })));
+      } catch {
+      } finally {
+        setLoadingStates(false);
+      }
+    };
+    loadStates();
   }, []);
 
-  // ── Step change with validation ─────────────────────────────────────
+  useEffect(() => {
+    if (formData.state && states.length > 0 && !selectedStateIso2) {
+      const match = states.find((s) => s.name.toLowerCase() === formData.state.toLowerCase());
+      if (match?.iso2) setSelectedStateIso2(match.iso2);
+    }
+  }, [formData.state, states, selectedStateIso2]);
+
+  useEffect(() => {
+    if (!selectedStateIso2) {
+      setCities([]);
+      return;
+    }
+    const loadCities = async () => {
+      setLoadingCities(true);
+      try {
+        const data = await fetchData(
+          `${process.env.NEXT_PUBLIC_COUNTRY_API_BASE_URL}/countries/${NIGERIA_ISO2}/states/${selectedStateIso2}/cities`
+        );
+        setCities((data || []).map((c: Record<string, any>) => ({ name: c.name })));
+      } catch {
+        setCities([]);
+      } finally {
+        setLoadingCities(false);
+      }
+    };
+    loadCities();
+  }, [selectedStateIso2]);
+
+  // ── Handlers ────────────────────────────────────────────────────────
+
+  const handleDataChange = useCallback(
+    (partial: Partial<CreatorAccountData>) => {
+      setFormData((prev) => ({ ...prev, ...partial }));
+      if (subscriptionError) setSubscriptionError(null);
+    },
+    [subscriptionError]
+  );
+
+  const handleStateChange = useCallback(
+    (stateName: string) => {
+      const match = states.find((s) => s.name.toLowerCase() === stateName.toLowerCase());
+      setSelectedStateIso2(match?.iso2 || '');
+    },
+    [states]
+  );
+
+  const handleCheckUsername = useCallback(
+    (username: string) => {
+      if (usernameTimerRef.current) clearTimeout(usernameTimerRef.current);
+      if (username.length < 3) {
+        setUsernameStatus('idle');
+        return;
+      }
+      if (!USERNAME_REGEX.test(username)) {
+        setUsernameStatus('invalid');
+        return;
+      }
+      setUsernameStatus('checking');
+      usernameTimerRef.current = setTimeout(async () => {
+        try {
+          const available = await checkUsername(username);
+          setUsernameStatus(available ? 'available' : 'taken');
+        } catch {
+          setUsernameStatus('idle');
+        }
+      }, 500);
+    },
+    [checkUsername]
+  );
 
   const handleStepChange = useCallback(
     (nextStep: number) => {
@@ -261,65 +371,78 @@ const CreatorAccountSetupPage = () => {
     [currentStep, formData, usernameStatus]
   );
 
-  // ── Final submit ────────────────────────────────────────────────────
+  // ══════════════════════════════════════════════════════════════════════
+  // SUBMIT — branches based on plan
+  // ══════════════════════════════════════════════════════════════════════
 
   const handleSubmit = useCallback(async () => {
-    const error = validateStep(3, formData, usernameStatus);
+    const error = validateStep(4, formData, usernameStatus);
     if (error) {
       antMessage.error(error);
       return;
     }
 
+    const isPaidPlan = formData.selectedPlan !== FREE_PLAN_ID;
     setIsSubmitting(true);
 
-    try {
-      // Step 1: Upload profile image if it's a new base64 image
-      let profileImageUrl: string | null = formData.profileImage;
-      if (formData.profileImage && formData.profileImage.startsWith('data:')) {
-        profileImageUrl = await uploadProfileImage(formData.profileImage);
+    if (isPaidPlan) {
+      // ── PAID: save form → Paystack → verify on return ───────────────
+      try {
+        saveFormToSession(formData);
+        const callbackUrl = `${window.location.origin}/creator-account/setup?step=verify`;
+        await initializeSubscription({
+          plan: formData.selectedPlan as 'pro' | 'business',
+          callbackUrl,
+        });
+        // Page navigates away to Paystack — isSubmitting stays true
+      } catch (err: any) {
+        clearFormSession();
+        antMessage.error(err?.data?.message || 'Failed to start subscription payment.');
+        setIsSubmitting(false);
       }
-
-      // Step 2: Submit to backend
-      const result = await submitCreatorAccount({
-        username: formData.username.trim(),
-        firstName: formData.firstName.trim(),
-        lastName: formData.lastName.trim(),
-        bio: formData.bio.trim(),
-        contactEmail: formData.contactEmail.trim(),
-        phoneNumber: formData.phoneNumber.trim(),
-        whatsappNumber: formData.whatsappNumber.trim(),
-        website: formData.website.trim(),
-        socialLinks: {
-          instagram: formData.instagramHandle.trim(),
-          twitter: formData.twitterHandle.trim(),
-          tiktok: formData.tiktokHandle.trim(),
-        },
-        profileImageUrl,
-        industries: formData.selectedIndustries,
-        planId: formData.selectedPlan,
-      });
-
-      if (result.success) {
-        setCurrentStep(4);
-
-        // ── TODO: Post-setup actions ─────────────────────────────
-        // - Update global auth/user context:
-        //   updateUserContext({ isCreator: true, creatorId: result.creatorId });
-        // - Invalidate user profile query:
-        //   await queryClient.invalidateQueries(['user-profile']);
-        // - Track analytics:
-        //   analytics.track('creator_account_created', { plan: formData.selectedPlan });
-        // ─────────────────────────────────────────────────────────
-      } else {
-        antMessage.error('Something went wrong. Please try again.');
+    } else {
+      // ── FREE: upload avatar and submit directly ─────────────────────
+      try {
+        const avatarUrl = await uploadProfileImage(formData.profileImage);
+        const payload = buildCreatorPayload(formData, avatarUrl);
+        await becomeCreator(payload);
+        setCurrentStep(5);
+      } catch (err: any) {
+        antMessage.error(err?.data?.message || 'Failed to set up your creator account.');
+      } finally {
+        setIsSubmitting(false);
       }
-    } catch (err) {
-      console.error('Creator account setup failed:', err);
-      antMessage.error('Failed to set up your creator account. Please try again.');
-    } finally {
-      setIsSubmitting(false);
     }
-  }, [formData, usernameStatus]);
+  }, [formData, usernameStatus, becomeCreator, initializeSubscription]);
+
+  // ── Loading states ──────────────────────────────────────────────────
+
+  if (isLoadingProfile) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-3">
+          <div className="w-8 h-8 border-2 border-blue/30 border-t-blue rounded-full animate-spin mx-auto" />
+          <p className="text-sm text-neutral-400">Loading your profile...</p>
+        </div>
+      </div>
+    );
+  }
+
+  if (isVerifyingSubscription) {
+    return (
+      <div className="min-h-screen flex items-center justify-center">
+        <div className="text-center space-y-3">
+          <div className="w-10 h-10 border-2 border-blue/30 border-t-blue rounded-full animate-spin mx-auto" />
+          <p className="text-base font-semibold text-neutral-900 dark:text-white">
+            Confirming your subscription...
+          </p>
+          <p className="text-sm text-neutral-400 max-w-xs mx-auto">
+            Verifying payment and setting up your creator account. This will only take a moment.
+          </p>
+        </div>
+      </div>
+    );
+  }
 
   // ── Render ──────────────────────────────────────────────────────────
 
@@ -327,12 +450,18 @@ const CreatorAccountSetupPage = () => {
     <CreatorAccountSetup
       data={formData}
       currentStep={currentStep}
-      isSubmitting={isSubmitting}
+      isSubmitting={isSubmitting || isInitializingSubscription || isUploadingGeneral}
       usernameStatus={usernameStatus}
       onStepChange={handleStepChange}
       onDataChange={handleDataChange}
       onCheckUsername={handleCheckUsername}
       onSubmit={handleSubmit}
+      states={states}
+      cities={cities}
+      loadingStates={loadingStates}
+      loadingCities={loadingCities}
+      onStateChange={handleStateChange}
+      subscriptionError={subscriptionError}
     />
   );
 };

@@ -167,12 +167,12 @@ const StoreCard: React.FC<{
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
       transition={{ delay: index * 0.05, duration: 0.3 }}
-      className="group bg-white dark:bg-gray-800/80 rounded-xl border border-gray-200 dark:border-gray-700/60 p-4 cursor-pointer hover:border-blue dark:hover:border-blue hover:shadow-md transition-all duration-200"
+      className="group bg-white dark:bg-neutral-800/80 rounded-xl border border-neutral-200 dark:border-neutral-700/60 p-4 cursor-pointer hover:border-blue dark:hover:border-blue hover:shadow-md transition-all duration-200"
     >
       {/* Top row */}
       <div className="flex items-center gap-3">
         <div
-          className="w-12 h-12 rounded-full overflow-hidden bg-gray-100 dark:bg-gray-700 flex-shrink-0"
+          className="w-12 h-12 rounded-full overflow-hidden bg-neutral-100 dark:bg-neutral-700 flex-shrink-0"
           onClick={() => onSelect(store.id)}
         >
           <img
@@ -183,13 +183,13 @@ const StoreCard: React.FC<{
         </div>
         <div className="flex-1 min-w-0" onClick={() => onSelect(store.id)}>
           <div className="flex items-center gap-1.5">
-            <h3 className="font-semibold text-sm text-gray-900 dark:text-white truncate">
+            <h3 className="font-semibold text-sm text-neutral-900 dark:text-white truncate">
               {store.businessName}
             </h3>
             {store.isVerified && <VerifiedBadge isSuper={store.isSuperVerified} />}
           </div>
           <div className="flex items-center gap-2 mt-0.5">
-            <div className="flex items-center gap-1 text-xs text-gray-400">
+            <div className="flex items-center gap-1 text-xs text-neutral-400">
               <MapPin size={11} />
               <span>{store.location}</span>
             </div>
@@ -205,44 +205,44 @@ const StoreCard: React.FC<{
         <Dropdown menu={{ items: menuItems }} trigger={['click']} placement="bottomRight">
           <button
             onClick={(e) => e.stopPropagation()}
-            className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-gray-100 dark:hover:bg-gray-700 transition-colors"
+            className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-neutral-100 dark:hover:bg-neutral-700 transition-colors"
           >
-            <MoreVertical size={16} className="text-gray-400" />
+            <MoreVertical size={16} className="text-neutral-400" />
           </button>
         </Dropdown>
       </div>
 
       {/* Stats row */}
       <div
-        className="flex items-center gap-4 mt-3 pt-3 border-t border-gray-100 dark:border-gray-700/50"
+        className="flex items-center gap-4 mt-3 pt-3 border-t border-neutral-100 dark:border-neutral-700/50"
         onClick={() => onSelect(store.id)}
       >
         {store.rating > 0 && (
           <>
             <div className="flex items-center gap-1">
               <Star size={13} className="text-amber-400 fill-amber-400" />
-              <span className="text-sm font-bold text-gray-900 dark:text-white">
+              <span className="text-sm font-bold text-neutral-900 dark:text-white">
                 {store.rating}
               </span>
-              <span className="text-[11px] text-gray-400">({store.reviewCount})</span>
+              <span className="text-[11px] text-neutral-400">({store.reviewCount})</span>
             </div>
-            <span className="w-px h-3.5 bg-gray-200 dark:bg-gray-700" />
+            <span className="w-px h-3.5 bg-neutral-200 dark:bg-neutral-700" />
           </>
         )}
 
         <div className="flex items-center gap-1">
-          <Package size={12} className="text-gray-400" />
-          <span className="text-xs text-gray-600 dark:text-gray-300">
-            {store.productCount} <span className="text-gray-400">items</span>
+          <Package size={12} className="text-neutral-400" />
+          <span className="text-xs text-neutral-600 dark:text-neutral-300">
+            {store.productCount} <span className="text-neutral-400">items</span>
           </span>
         </div>
 
         {store.responseRate >= 80 && (
           <>
-            <span className="w-px h-3.5 bg-gray-200 dark:bg-gray-700" />
+            <span className="w-px h-3.5 bg-neutral-200 dark:bg-neutral-700" />
             <div className="flex items-center gap-1">
               <Zap size={12} className="text-emerald-500" />
-              <span className="text-xs text-gray-600 dark:text-gray-300">
+              <span className="text-xs text-neutral-600 dark:text-neutral-300">
                 {store.responseRate}%
               </span>
             </div>
@@ -251,7 +251,7 @@ const StoreCard: React.FC<{
 
         <ChevronRight
           size={16}
-          className="ml-auto text-gray-300 dark:text-gray-600 group-hover:text-blue transition-colors flex-shrink-0"
+          className="ml-auto text-neutral-300 dark:text-neutral-600 group-hover:text-blue transition-colors flex-shrink-0"
         />
       </div>
 
@@ -261,13 +261,13 @@ const StoreCard: React.FC<{
           {store.categories.slice(0, 3).map((cat) => (
             <span
               key={cat}
-              className="px-2 py-0.5 bg-gray-50 dark:bg-gray-700/50 rounded text-[11px] text-gray-500 dark:text-gray-400"
+              className="px-2 py-0.5 bg-neutral-50 dark:bg-neutral-700/50 rounded text-[11px] text-neutral-500 dark:text-neutral-400"
             >
               {cat}
             </span>
           ))}
           {store.categories.length > 3 && (
-            <span className="text-[11px] text-gray-400">+{store.categories.length - 3}</span>
+            <span className="text-[11px] text-neutral-400">+{store.categories.length - 3}</span>
           )}
         </div>
       )}
@@ -291,7 +291,7 @@ const MyStore = () => {
   };
 
   return (
-    <div className={`dark:bg-gray-900/50 min-h-screen ${isMobile ? 'max-w-[100vw]' : ''}`}>
+    <div className={`dark:bg-neutral-900/50 min-h-screen ${isMobile ? 'max-w-[100vw]' : ''}`}>
       <div className={`w-full ${!isMobile ? 'max-w-4xl mx-auto px-4' : 'px-3'}`}>
         {/* Header */}
         <motion.div
@@ -301,11 +301,11 @@ const MyStore = () => {
         >
           <div className="flex items-center justify-between">
             <div>
-              <h1 className="text-xl font-bold text-gray-900 dark:text-white flex items-center gap-2">
+              <h1 className="text-xl font-bold text-neutral-900 dark:text-white flex items-center gap-2">
                 <Store size={22} className="text-purple-500" />
                 My Stores
               </h1>
-              <p className="text-xs text-gray-400 mt-1">
+              <p className="text-xs text-neutral-400 mt-1">
                 {stores.length} store{stores.length !== 1 ? 's' : ''} · Manage your vendor profiles
               </p>
             </div>
@@ -343,9 +343,9 @@ const MyStore = () => {
                 animate={{ opacity: 1, scale: 1 }}
                 className="text-center py-20"
               >
-                <Store size={48} className="mx-auto text-gray-200 dark:text-gray-700 mb-4" />
-                <p className="text-gray-500 dark:text-gray-400 font-medium">No stores yet</p>
-                <p className="text-xs text-gray-400 mt-1">
+                <Store size={48} className="mx-auto text-neutral-200 dark:text-neutral-700 mb-4" />
+                <p className="text-neutral-500 dark:text-neutral-400 font-medium">No stores yet</p>
+                <p className="text-xs text-neutral-400 mt-1">
                   Create your first vendor store to start selling on Comaket
                 </p>
                 <button

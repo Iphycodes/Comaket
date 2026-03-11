@@ -73,7 +73,7 @@ export type MenuItem = Required<MenuProps>['items'][number];
 export type NavItem = {
   label: string | ReactNode;
   key: string;
-  destination: string;
+  destination?: string;
   icon?: React.ReactNode | any;
   items?: NavItem[];
   children?: NavItem[];
@@ -201,7 +201,7 @@ export const generateChartData = (cashFlowBreakdown: {
         label: 'No Data Available',
         data: [0],
         fill: false,
-        borderColor: 'gray',
+        borderColor: 'neutral',
         borderWidth: 2,
         pointRadius: 0,
       },
@@ -233,7 +233,7 @@ export const generateDisbursementData = (
     datasets: [
       {
         data: [1],
-        backgroundColor: ['gray'],
+        backgroundColor: ['neutral'],
       },
     ],
   };

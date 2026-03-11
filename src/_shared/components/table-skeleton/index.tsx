@@ -13,10 +13,10 @@ const TableSkeleton: React.FC<TableSkeletonProps> = ({ rows = 5, columns = 4, cl
 
   return (
     <div
-      className={`w-full overflow-hidden bg-white dark:bg-gray-800 rounded-lg shadow ${className}`}
+      className={`w-full overflow-hidden bg-white dark:bg-neutral-800 rounded-lg shadow ${className}`}
     >
       {/* Table header skeleton */}
-      <div className="border-b border-gray-200 dark:border-gray-700">
+      <div className="border-b border-neutral-200 dark:border-neutral-700">
         <div
           className={`grid ${
             isMobile ? 'grid-cols-2' : `grid-cols-${Math.min(columns, 6)}`
@@ -45,8 +45,10 @@ const TableSkeleton: React.FC<TableSkeletonProps> = ({ rows = 5, columns = 4, cl
         .map((_, rowIdx) => (
           <div
             key={`row-${rowIdx}`}
-            className={`border-b border-gray-100 dark:border-gray-700 ${
-              rowIdx % 2 === 0 ? 'bg-gray-50 dark:bg-gray-900/20' : 'bg-white dark:bg-gray-800'
+            className={`border-b border-neutral-100 dark:border-neutral-700 ${
+              rowIdx % 2 === 0
+                ? 'bg-neutral-50 dark:bg-neutral-900/20'
+                : 'bg-white dark:bg-neutral-800'
             }`}
           >
             <div
