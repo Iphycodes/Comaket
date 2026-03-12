@@ -1,153 +1,162 @@
-import { api } from '@grc/services/api';
-import {
-  appUrl,
-  constantUrl,
-  accountUrl,
-  forgotPasswordUrl,
-  loginUrl,
-  POST,
-  registerUrl,
-  sendVerificationUrl,
-  userUrl,
-  verifyEmailUrl,
-  resetPasswordUrl,
-  verifyUserUrl,
-} from '@grc/_shared/constant';
-import type {
-  authResponseType,
-  forgotPasswordRequestType,
-  loginRequestType,
-  registerRequestType,
-  sendVerificationRequestType,
-  verifyRequestType,
-} from '@grc/_shared/namespace/auth';
-import { accountResponseType } from '@grc/_shared/namespace/auth';
-import { updateUserTag } from '@grc/services/tags';
+import { OptionType } from '@grc/_shared/namespace';
+import { api } from '../api';
+import { accountTag, userTag } from '../tags';
+
+// ═══════════════════════════════════════════════════════════════════════════
+// TYPES
+// ═══════════════════════════════════════════════════════════════════════════
+
+export interface SignInPayload {
+  email: string;
+  password: string;
+}
+
+export interface SignUpPayload {
+  firstName: string;
+  lastName: string;
+  email: string;
+  password: string;
+}
+
+export interface VerifyOtpPayload {
+  email: string;
+  otp: string;
+}
+
+export interface ResendOtpPayload {
+  email: string;
+}
+
+export interface ForgotPasswordPayload {
+  email: string;
+}
+
+export interface ResetPasswordPayload {
+  token: string;
+  newPassword: string;
+}
+
+export interface GoogleAuthPayload {
+  token: string;
+}
+
+export interface AuthResponse {
+  meta: {
+    success: boolean;
+    token?: string;
+    error?: {
+      message: string;
+    };
+  };
+  data?: Record<string, any>;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RTK QUERY ENDPOINTS
+// ═══════════════════════════════════════════════════════════════════════════
 
 export const authApi = api?.injectEndpoints({
   endpoints: (builder) => ({
-    login: builder.mutation<authResponseType, loginRequestType>({
-      query: ({ payload }) => {
-        return {
-          url: loginUrl,
-          method: POST,
-          body: payload,
-        };
-      },
-    }),
-    register: builder.mutation<authResponseType, registerRequestType>({
-      query: ({ payload }) => {
-        return {
-          url: registerUrl,
-          method: POST,
-          body: payload,
-        };
-      },
-    }),
-    account: builder.mutation<accountResponseType, registerRequestType>({
-      query: ({ payload }) => {
-        return {
-          url: accountUrl,
-          method: POST,
-          body: payload,
-        };
-      },
-    }),
-    getAccounts: builder.query({
-      query: () => ({
-        url: `${accountUrl}`,
+    // Sign in with email and password
+    signIn: builder.mutation<Record<string, any>, { payload: SignInPayload; options: OptionType }>({
+      query: ({ payload }) => ({
+        url: `/auth/login`,
+        method: 'POST',
+        body: payload,
       }),
+      invalidatesTags: [accountTag, userTag],
     }),
-    verifyEmail: builder.mutation<authResponseType, verifyRequestType>({
-      query: ({ payload }) => {
-        return {
-          url: verifyEmailUrl,
-          method: POST,
-          body: payload,
-        };
-      },
-    }),
-    sendVerification: builder.mutation<authResponseType, sendVerificationRequestType>({
-      query: ({ payload }) => {
-        return {
-          url: sendVerificationUrl,
-          method: POST,
-          body: payload,
-        };
-      },
-    }),
-    forgotPassword: builder.mutation<authResponseType, forgotPasswordRequestType>({
-      query: ({ payload }) => {
-        return {
-          url: forgotPasswordUrl,
-          method: POST,
-          body: payload,
-        };
-      },
-    }),
-    resetPassword: builder.mutation<authResponseType, forgotPasswordRequestType>({
-      query: ({ payload }) => {
-        return {
-          url: resetPasswordUrl,
-          method: POST,
-          body: payload,
-        };
-      },
-    }),
-    getApp: builder.query({
-      query: () => ({
-        url: `${appUrl}`,
+
+    // Sign up with email and password
+    signUp: builder.mutation<Record<string, any>, { payload: SignUpPayload; options: OptionType }>({
+      query: ({ payload }) => ({
+        url: `/auth/register`,
+        method: 'POST',
+        body: payload,
       }),
+      invalidatesTags: [accountTag],
     }),
-    getLoggedInUser: builder.query({
-      query: (params) => ({
-        url: `${userUrl}`,
-        params,
+
+    // Verify email with OTP
+    verifyOtp: builder.mutation<
+      Record<string, any>,
+      { payload: VerifyOtpPayload; options: OptionType }
+    >({
+      query: ({ payload }) => ({
+        url: `/auth/verify-email`,
+        method: 'POST',
+        body: payload,
       }),
-      providesTags: [updateUserTag],
+      invalidatesTags: [accountTag, userTag],
     }),
-    updateLoggedInUser: builder.mutation({
-      query: ({ payload }) => {
-        return {
-          url: userUrl,
-          method: POST,
-          body: payload,
-        };
-      },
-      invalidatesTags: [updateUserTag],
-    }),
-    getConstants: builder.query({
-      query: () => ({
-        url: constantUrl,
+
+    // Resend verification OTP
+    resendOtp: builder.mutation<
+      Record<string, any>,
+      { payload: ResendOtpPayload; options: OptionType }
+    >({
+      query: ({ payload }) => ({
+        url: `/auth/resend-verification`,
+        method: 'POST',
+        body: payload,
       }),
     }),
 
-    verifyUser: builder.mutation({
-      query: ({ payload }) => {
-        return {
-          url: verifyUserUrl,
-          method: POST,
-          body: payload,
-        };
-      },
-      invalidatesTags: [updateUserTag],
+    // Forgot password
+    forgotPassword: builder.mutation<
+      Record<string, any>,
+      { payload: ForgotPasswordPayload; options: OptionType }
+    >({
+      query: ({ payload }) => ({
+        url: `/auth/forgot-password`,
+        method: 'POST',
+        body: payload,
+      }),
+    }),
+
+    // Reset password with token
+    resetPassword: builder.mutation<
+      Record<string, any>,
+      { payload: ResetPasswordPayload; options: OptionType }
+    >({
+      query: ({ payload }) => ({
+        url: `/auth/reset-password`,
+        method: 'POST',
+        body: payload,
+      }),
+    }),
+
+    // Google authentication
+    googleAuth: builder.mutation<
+      Record<string, any>,
+      { payload: GoogleAuthPayload; options: OptionType }
+    >({
+      query: ({ payload }) => ({
+        url: `/auth/google`,
+        method: 'POST',
+        body: payload,
+      }),
+      invalidatesTags: [accountTag],
+    }),
+
+    // Logout
+    logout: builder.mutation<Record<string, any>, { options: OptionType }>({
+      query: () => ({
+        url: `/auth/logout`,
+        method: 'POST',
+        body: {},
+      }),
     }),
   }),
 });
 
 export const {
-  useLoginMutation,
-  useRegisterMutation,
-  useVerifyEmailMutation,
+  useSignInMutation,
+  useSignUpMutation,
+  useVerifyOtpMutation,
+  useResendOtpMutation,
   useForgotPasswordMutation,
   useResetPasswordMutation,
-  useLazyGetAccountsQuery,
-  useSendVerificationMutation,
-  useAccountMutation,
-  useLazyGetAppQuery,
-  useLazyGetConstantsQuery,
-  useLazyGetLoggedInUserQuery,
-  useUpdateLoggedInUserMutation,
-  useVerifyUserMutation,
-  endpoints: { login, getAccounts, getApp, getConstants },
+  useGoogleAuthMutation,
+  useLogoutMutation,
 } = authApi;

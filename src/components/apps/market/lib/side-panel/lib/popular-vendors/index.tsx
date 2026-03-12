@@ -27,7 +27,7 @@ const PopularVendors: React.FC<Props> = ({}) => {
   ];
   return (
     <div className="flex flex-col gap-3">
-      <span className="text-gray-500 font-semibold text-[16px]">Popular Vendors</span>
+      <span className="text-neutral-500 font-semibold text-[16px]">Popular Vendors</span>
       <div>
         {mockPopularVendors.map((mockPopularVendors, idx) => {
           return <PopularVendorAccount key={idx} vendorProfile={mockPopularVendors} />;

@@ -90,10 +90,10 @@ const SellTypeSelector: React.FC<SellTypeSelectorProps> = ({ onSelect, selected 
   return (
     <div className="space-y-4">
       <div className="mb-6">
-        <h3 className="text-lg font-semibold text-gray-900 dark:text-white">
+        <h3 className="text-lg font-semibold text-neutral-900 dark:text-white">
           How would you like to sell?
         </h3>
-        <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
+        <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
           Choose the selling method that works best for you
         </p>
       </div>
@@ -117,8 +117,8 @@ const SellTypeSelector: React.FC<SellTypeSelectorProps> = ({ onSelect, selected 
                 relative w-full text-left rounded-2xl border-2 p-5 transition-all duration-200 overflow-hidden
                 ${
                   isSelected
-                    ? `border-${option.accentColor}-500 bg-white dark:bg-gray-800 shadow-lg shadow-${option.accentColor}-500/10`
-                    : 'border-gray-200 dark:border-gray-700 bg-white dark:bg-gray-800 hover:border-gray-300 dark:hover:border-gray-600 hover:shadow-md'
+                    ? `border-${option.accentColor}-500 bg-white dark:bg-neutral-800 shadow-lg shadow-${option.accentColor}-500/10`
+                    : 'border-neutral-200 dark:border-neutral-700 bg-white dark:bg-neutral-800 hover:border-neutral-300 dark:hover:border-neutral-600 hover:shadow-md'
                 }
               `}
               style={{ background: isSelected ? option.bgPattern : undefined }}
@@ -140,7 +140,7 @@ const SellTypeSelector: React.FC<SellTypeSelectorProps> = ({ onSelect, selected 
                   ${
                     isSelected
                       ? `bg-gradient-to-br ${option.gradient} text-white shadow-md`
-                      : 'bg-gray-100 dark:bg-gray-700 text-gray-500 dark:text-gray-400'
+                      : 'bg-neutral-100 dark:bg-neutral-700 text-neutral-500 dark:text-neutral-400'
                   }
                   transition-all duration-200
                 `}
@@ -152,10 +152,10 @@ const SellTypeSelector: React.FC<SellTypeSelectorProps> = ({ onSelect, selected 
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between">
                     <div>
-                      <h4 className="font-semibold text-gray-900 dark:text-white text-base">
+                      <h4 className="font-semibold text-neutral-900 dark:text-white text-base">
                         {option.title}
                       </h4>
-                      <p className="text-xs text-gray-500 dark:text-gray-400 font-medium">
+                      <p className="text-xs text-neutral-500 dark:text-neutral-400 font-medium">
                         {option.subtitle}
                       </p>
                     </div>
@@ -164,14 +164,14 @@ const SellTypeSelector: React.FC<SellTypeSelectorProps> = ({ onSelect, selected 
                       className={`flex-shrink-0 w-8 h-8 rounded-full flex items-center justify-center ${
                         isSelected
                           ? `bg-gradient-to-br ${option.gradient} text-white`
-                          : 'bg-gray-100 dark:bg-gray-700 text-gray-400'
+                          : 'bg-neutral-100 dark:bg-neutral-700 text-neutral-400'
                       }`}
                     >
                       <ArrowRight size={16} />
                     </motion.div>
                   </div>
 
-                  <p className="text-sm text-gray-600 dark:text-gray-300 mt-2 leading-relaxed">
+                  <p className="text-sm text-neutral-600 dark:text-neutral-300 mt-2 leading-relaxed">
                     {option.description}
                   </p>
 
@@ -180,13 +180,13 @@ const SellTypeSelector: React.FC<SellTypeSelectorProps> = ({ onSelect, selected 
                     {option.features.map((feature, i) => (
                       <div
                         key={i}
-                        className="flex items-center gap-1.5 text-xs text-gray-500 dark:text-gray-400"
+                        className="flex items-center gap-1.5 text-xs text-neutral-500 dark:text-neutral-400"
                       >
                         <div
                           className={`w-1 h-1 rounded-full flex-shrink-0 ${
                             isSelected
                               ? `bg-${option.accentColor}-500`
-                              : 'bg-gray-300 dark:bg-gray-600'
+                              : 'bg-neutral-300 dark:bg-neutral-600'
                           }`}
                         />
                         <span className="truncate">{feature}</span>
@@ -196,12 +196,12 @@ const SellTypeSelector: React.FC<SellTypeSelectorProps> = ({ onSelect, selected 
 
                   {/* Fee badge */}
                   <div className="mt-3 flex items-center gap-2">
-                    <AccentIcon size={13} className="text-gray-400" />
+                    <AccentIcon size={13} className="text-neutral-400" />
                     <span
                       className={`text-xs font-semibold ${
                         isSelected
                           ? `text-${option.accentColor}-600 dark:text-${option.accentColor}-400`
-                          : 'text-gray-500'
+                          : 'text-neutral-500'
                       }`}
                     >
                       {option.fee}

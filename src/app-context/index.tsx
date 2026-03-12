@@ -17,6 +17,7 @@ import { mockMarketItems } from '@grc/_shared/constant';
 import { CartItem } from '@grc/_shared/namespace/cart';
 import { MarketItem } from '@grc/_shared/namespace';
 import { getFirstImageUrl } from '@grc/components/apps/media-renderer';
+import { useCart } from '@grc/hooks/useCart';
 
 type AppProviderPropType = {
   children: ReactNode;
@@ -44,6 +45,17 @@ interface AppContextPropType {
   setIsSellItemModalOpen: Dispatch<SetStateAction<boolean>>;
   isChatsModalOpen: boolean;
   setIsChatsModalOpen: Dispatch<SetStateAction<boolean>>;
+  // Auth modal
+  isAuthModalOpen: boolean;
+  setIsAuthModalOpen: Dispatch<SetStateAction<boolean>>;
+  handleLogin: (data: { email: string; password: string }) => void;
+  handleSignup: (data: {
+    firstName: string;
+    lastName: string;
+    email: string;
+    password: string;
+  }) => void;
+  handleGoogleSignIn: () => void;
   payoutDetails: Record<string, any>;
   setPayoutdetails: Dispatch<SetStateAction<Record<string, any>>>;
   selectedDashboardTransaction: Record<string, any>;
@@ -85,6 +97,12 @@ export const AppContext = createContext<AppContextPropType>({
   setIsSellItemModalOpen: () => {},
   isChatsModalOpen: false,
   setIsChatsModalOpen: () => {},
+  // Auth modal
+  isAuthModalOpen: false,
+  setIsAuthModalOpen: () => {},
+  handleLogin: () => {},
+  handleSignup: () => {},
+  handleGoogleSignIn: () => {},
   payoutDetails: {},
   setPayoutdetails: () => {},
   selectedDashboardTransaction: {},
@@ -141,6 +159,9 @@ export const AppProvider = (props: AppProviderPropType) => {
   const [isSellItemModalOpen, setIsSellItemModalOpen] = useState(false);
   const [isChatsModalOpen, setIsChatsModalOpen] = useState(false);
 
+  // Auth modal
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+
   // Shop items — initialised with mock data, will be replaced by API
   const [shopItems, setShopItems] = useState<MarketItem[]>(mockMarketItems);
 
@@ -159,6 +180,67 @@ export const AppProvider = (props: AppProviderPropType) => {
   useEffect(() => {
     isMobile && setToggleSider(true);
   }, [isMobile]);
+
+  // ── Auth handlers ─────────────────────────────────────────────────────
+
+  const handleLogin = useCallback((data: { email: string; password: string }) => {
+    // ── TODO: Replace with real API call ───────────────────────────
+    // const res = await fetch('/api/auth/login', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify(data),
+    // });
+    // const result = await res.json();
+    // if (result.success) {
+    //   setAuthData(result.authData);
+    //   setIsAuthModalOpen(false);
+    // }
+    // ──────────────────────────────────────────────────────────────
+    console.log('Login payload:', data);
+    setIsAuthModalOpen(false);
+  }, []);
+
+  const handleSignup = useCallback(
+    (data: { firstName: string; lastName: string; email: string; password: string }) => {
+      // ── TODO: Replace with real API call ───────────────────────────
+      // const res = await fetch('/api/auth/signup', {
+      //   method: 'POST',
+      //   headers: { 'Content-Type': 'application/json' },
+      //   body: JSON.stringify(data),
+      // });
+      // const result = await res.json();
+      // if (result.success) {
+      //   setAuthData(result.authData);
+      //   setIsAuthModalOpen(false);
+      // }
+      // ──────────────────────────────────────────────────────────────
+      console.log('Signup payload:', data);
+      setIsAuthModalOpen(false);
+    },
+    []
+  );
+
+  const handleGoogleSignIn = useCallback(() => {
+    // ── TODO: Replace with real Google OAuth flow ─────────────────────
+    // Option A: Redirect-based
+    // window.location.href = '/api/auth/google';
+    //
+    // Option B: Popup-based with @react-oauth/google
+    // const { credential } = await googleLogin();
+    // const res = await fetch('/api/auth/google', {
+    //   method: 'POST',
+    //   headers: { 'Content-Type': 'application/json' },
+    //   body: JSON.stringify({ idToken: credential }),
+    // });
+    // const result = await res.json();
+    // if (result.success) {
+    //   setAuthData(result.authData);
+    //   setIsAuthModalOpen(false);
+    // }
+    // ──────────────────────────────────────────────────────────────────
+    console.log('Google Sign-In triggered');
+    setIsAuthModalOpen(false);
+  }, []);
 
   // ── Cart helpers ──────────────────────────────────────────────────────
 
@@ -186,7 +268,7 @@ export const AppProvider = (props: AppProviderPropType) => {
         condition: shopItem.condition,
         negotiable: shopItem.askingPrice?.negotiable || false,
         sellerName:
-          shopItem.postUserProfile?.businessName || shopItem.postUserProfile?.userName || '',
+          shopItem.postUserProfile?.displayName || shopItem.postUserProfile?.userName || '',
       };
       return [...prev, newCartItem];
     });
@@ -214,7 +296,8 @@ export const AppProvider = (props: AppProviderPropType) => {
 
   const isInCart = (id: string | number): boolean => cartItems.some((item) => item.id === id);
 
-  const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  // const cartCount = cartItems.reduce((sum, item) => sum + item.quantity, 0);
+  const { cartItemCount: cartCount } = useCart({ fetchCount: true, fetchCart: true });
 
   const getCartTotal = useCallback(
     () => cartItems.reduce((sum, item) => sum + item.price * item.quantity, 0),
@@ -254,6 +337,12 @@ export const AppProvider = (props: AppProviderPropType) => {
     setIsSellItemModalOpen,
     isChatsModalOpen,
     setIsChatsModalOpen,
+    // Auth modal
+    isAuthModalOpen,
+    setIsAuthModalOpen,
+    handleLogin,
+    handleSignup,
+    handleGoogleSignIn,
     shopItems,
     setShopItems,
     cartItems,

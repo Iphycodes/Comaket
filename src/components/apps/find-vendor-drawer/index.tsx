@@ -70,7 +70,7 @@ const FindVendorDrawer: React.FC<LeftDrawerProps> = ({ toggleFindVendorDrawer })
     <Sider
       collapsed={toggleFindVendorDrawer}
       collapsedWidth={0}
-      className="dash-sider rounded-r-2xl border-r border-r-gray-200 rounded-br-3xl p-0 text-lg shadow-2xl shadow-gray-400"
+      className="dash-sider rounded-r-2xl border-r border-r-neutral-200 rounded-br-3xl p-0 text-lg shadow-2xl shadow-neutral-400"
       width={400}
       style={{
         overflow: 'auto',
@@ -86,7 +86,7 @@ const FindVendorDrawer: React.FC<LeftDrawerProps> = ({ toggleFindVendorDrawer })
       }}
     >
       <div className="pb-2 sticky top-0 bg-white z-50">
-        <div className="px-5 py-3 border-b border-b-gray-300">
+        <div className="px-5 py-3 border-b border-b-neutral-300">
           <div className="my-6 mb-10">
             <h1 className="text-[24px] font-semibold">Vendors</h1>
           </div>
@@ -97,15 +97,15 @@ const FindVendorDrawer: React.FC<LeftDrawerProps> = ({ toggleFindVendorDrawer })
               onBlur={handleBlur}
               value={inputValue}
               onChange={(e) => setInputValue(e.target.value)}
-              prefix={isIconVisible && <i className="ri-search-line text-gray-400"></i>}
+              prefix={isIconVisible && <i className="ri-search-line text-neutral-400"></i>}
               suffix={
                 <i
-                  className="ri-close-circle-fill cursor-pointer text-gray-400"
+                  className="ri-close-circle-fill cursor-pointer text-neutral-400"
                   onClick={handleClearInput}
                 ></i>
               }
               placeholder="Search Vendor"
-              className="h-10 text-[16px] bg-gray-100 find-vendor-input"
+              className="h-10 text-[16px] bg-neutral-100 find-vendor-input"
             />
           </div>
         </div>

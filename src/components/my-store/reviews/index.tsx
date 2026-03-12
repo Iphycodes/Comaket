@@ -12,152 +12,147 @@ import {
   TrendingUp,
   Award,
   AlertTriangle,
+  Loader2,
 } from 'lucide-react';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 
 const { TextArea } = Input;
 
+const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || 'Comaket';
+
 // ═══════════════════════════════════════════════════════════════════════════
 // TYPES
 // ═══════════════════════════════════════════════════════════════════════════
 
-interface StoreReview {
+interface TransformedReview {
   id: string;
   buyerName: string;
-  buyerAvatar?: string;
+  buyerAvatar: string;
   rating: number;
   comment: string;
-  productName?: string;
+  productName: string;
   date: string;
-  reply?: string;
-  repliedAt?: string;
+  sellerReply: string | null;
+  repliedAt: string | null;
   deletionRequested?: boolean;
   deletionReason?: string;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// MOCK DATA
+// HELPERS
 // ═══════════════════════════════════════════════════════════════════════════
 
-const mockReviews: StoreReview[] = [
-  {
-    id: 'r1',
-    buyerName: 'Chidera Nwosu',
-    rating: 5,
-    comment:
-      'Amazing product! The iPhone arrived in perfect condition. Delivery was fast and the seller was very responsive.',
-    productName: 'iPhone 14 Pro Max',
-    date: '2025-02-18T10:30:00Z',
-    reply: 'Thank you so much, Chidera! We appreciate your kind words 🙏',
-    repliedAt: '2025-02-18T12:00:00Z',
-  },
-  {
-    id: 'r2',
-    buyerName: 'Amaka Eze',
-    rating: 4,
-    comment:
-      'Good quality product. Packaging could be a bit better but overall satisfied with my purchase.',
-    productName: 'Samsung Galaxy S24',
-    date: '2025-02-17T15:20:00Z',
-  },
-  {
-    id: 'r3',
-    buyerName: 'Tunde Bakare',
-    rating: 5,
-    comment: 'Best seller on Comaket! Always reliable and honest about product conditions.',
-    date: '2025-02-16T09:00:00Z',
-  },
-  {
-    id: 'r4',
-    buyerName: 'Ngozi Okafor',
-    rating: 3,
-    comment:
-      'Product was okay but took longer than expected to arrive. Communication could improve.',
-    productName: 'AirPods Pro 2',
-    date: '2025-02-15T18:45:00Z',
-  },
-  {
-    id: 'r5',
-    buyerName: 'Ibrahim Musa',
-    rating: 1,
-    comment: 'Terrible experience. Product was not as described. Complete waste of money.',
-    productName: 'PS5 Console',
-    date: '2025-02-14T11:30:00Z',
-    deletionRequested: true,
-    deletionReason: 'This review contains false claims. The buyer never purchased from our store.',
-  },
-  {
-    id: 'r6',
-    buyerName: 'Blessing Adeyemi',
-    rating: 5,
-    comment: 'Outstanding service! Will definitely buy again.',
-    productName: 'MacBook Air M2',
-    date: '2025-02-13T14:00:00Z',
-    reply: 'Thank you Blessing! Looking forward to serving you again ❤️',
-    repliedAt: '2025-02-13T15:30:00Z',
-  },
-  {
-    id: 'r7',
-    buyerName: 'Emeka Johnson',
-    rating: 4,
-    comment: 'Solid product, fair price. Seller was helpful when I had questions.',
-    productName: 'iPhone 15 Pro',
-    date: '2025-02-12T16:15:00Z',
-  },
-  {
-    id: 'r8',
-    buyerName: 'Fatima Hassan',
-    rating: 2,
-    comment: "Item arrived with minor scratches that weren't mentioned in the listing.",
-    productName: 'iPad Air',
-    date: '2025-02-11T10:00:00Z',
-  },
-];
+const transformReview = (r: any): TransformedReview => {
+  const buyer = typeof r.buyer === 'object' ? r.buyer : null;
+  const listing = typeof r.listing === 'object' ? r.listing : null;
+  return {
+    id: r._id || r.id || '',
+    buyerName: buyer
+      ? `${buyer.firstName || ''} ${buyer.lastName || ''}`.trim()
+      : r.buyerName || 'Anonymous',
+    buyerAvatar: buyer?.avatar || r.buyerAvatar || '',
+    rating: r.rating || 0,
+    comment: r.comment || r.review || '',
+    productName: listing?.itemName || r.productName || '',
+    date: r.createdAt || r.date || '',
+    sellerReply: r.sellerReply?.comment || r.sellerReply || null,
+    repliedAt: r.sellerReply?.createdAt || r.repliedAt || null,
+    deletionRequested: r.deletionRequested || r.flagged || false,
+    deletionReason: r.deletionReason || r.flagReason || '',
+  };
+};
+
+const getRatingLabel = (rating: number): string => {
+  if (rating >= 4.5) return 'Excellent';
+  if (rating >= 3.5) return 'Very Good';
+  if (rating >= 2.5) return 'Good';
+  if (rating >= 1.5) return 'Fair';
+  return 'Poor';
+};
 
 // ═══════════════════════════════════════════════════════════════════════════
-// STAR RATING COMPONENT
+// STAR RATING
 // ═══════════════════════════════════════════════════════════════════════════
 
-const StarRating: React.FC<{ rating: number; size?: number }> = ({ rating, size = 14 }) => (
-  <div className="flex items-center gap-0.5">
-    {Array.from({ length: 5 }).map((_, i) => (
-      <Star
-        key={i}
-        size={size}
-        className={
-          i < Math.floor(rating)
-            ? 'text-amber-400 fill-amber-400'
-            : 'text-gray-200 dark:text-gray-700'
-        }
-      />
-    ))}
-  </div>
-);
+const StarRating: React.FC<{ rating: number; size?: number }> = ({ rating, size = 14 }) => {
+  const full = Math.floor(rating);
+  const hasHalf = rating - full >= 0.3;
+  return (
+    <div className="flex items-center gap-0.5">
+      {Array.from({ length: 5 }).map((_, i) => (
+        <Star
+          key={i}
+          size={size}
+          className={
+            i < full
+              ? 'text-amber-400 fill-amber-400'
+              : i === full && hasHalf
+                ? 'text-amber-400 fill-amber-400/50'
+                : 'text-neutral-200 dark:text-neutral-700'
+          }
+        />
+      ))}
+    </div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// RATING BREAKDOWN
+// ═══════════════════════════════════════════════════════════════════════════
+
+const RatingBreakdown: React.FC<{ reviews: TransformedReview[] }> = ({ reviews }) => {
+  const counts = [5, 4, 3, 2, 1].map((star) => ({
+    star,
+    count: reviews.filter((r) => Math.floor(r.rating) === star).length,
+  }));
+  const total = reviews.length;
+  return (
+    <div className="space-y-1.5">
+      {counts.map(({ star, count }) => (
+        <div key={star} className="flex items-center gap-2.5">
+          <span className="text-xs text-neutral-500 w-3 text-right">{star}</span>
+          <Star size={11} className="text-amber-400 fill-amber-400" />
+          <div className="flex-1 h-2 bg-neutral-100 dark:bg-neutral-700 rounded-full overflow-hidden">
+            <div
+              className="h-full bg-amber-400 rounded-full transition-all duration-500"
+              style={{ width: total > 0 ? `${(count / total) * 100}%` : '0%' }}
+            />
+          </div>
+          <span className="text-[11px] text-neutral-400 w-6 text-right">{count}</span>
+        </div>
+      ))}
+    </div>
+  );
+};
 
 // ═══════════════════════════════════════════════════════════════════════════
 // REVIEW CARD
 // ═══════════════════════════════════════════════════════════════════════════
 
 const ReviewCard: React.FC<{
-  review: StoreReview;
-  onReply: (review: StoreReview) => void;
-  onRequestDelete: (review: StoreReview) => void;
-}> = ({ review, onReply, onRequestDelete }) => {
+  review: TransformedReview;
+  onReply: (review: TransformedReview) => void;
+  onRequestRemoval: (review: TransformedReview) => void;
+  index: number;
+}> = ({ review, onReply, onRequestRemoval, index }) => {
   const formatDate = (d: string) =>
-    new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' });
+    d
+      ? new Date(d).toLocaleDateString('en-NG', { day: 'numeric', month: 'short', year: 'numeric' })
+      : '';
 
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-white dark:bg-gray-800/60 rounded-xl p-5 border border-gray-100 dark:border-gray-700/50"
+      transition={{ delay: index * 0.04 }}
+      className="bg-white dark:bg-neutral-800/60 rounded-xl p-5 border border-neutral-100 dark:border-neutral-700/50"
     >
       {/* Deletion flag */}
       {review.deletionRequested && (
         <div className="flex items-center gap-2 px-3 py-2 bg-amber-50 dark:bg-amber-900/10 rounded-lg mb-3 border border-amber-100 dark:border-amber-900/20">
           <Flag size={12} className="text-amber-500" />
           <span className="text-[11px] font-semibold text-amber-600 dark:text-amber-400">
-            Deletion requested — under review
+            Removal requested — under review
           </span>
         </div>
       )}
@@ -170,16 +165,16 @@ const ReviewCard: React.FC<{
             className="w-9 h-9 rounded-full object-cover flex-shrink-0"
           />
         ) : (
-          <div className="w-9 h-9 rounded-full bg-gray-100 dark:bg-gray-700 flex items-center justify-center flex-shrink-0">
-            <span className="text-xs font-bold text-gray-500">{review.buyerName.charAt(0)}</span>
+          <div className="w-9 h-9 rounded-full bg-neutral-100 dark:bg-neutral-700 flex items-center justify-center flex-shrink-0">
+            <span className="text-xs font-bold text-neutral-500">{review.buyerName.charAt(0)}</span>
           </div>
         )}
         <div className="flex-1 min-w-0">
           <div className="flex items-center justify-between gap-2">
-            <span className="text-sm font-semibold text-gray-900 dark:text-white">
+            <span className="text-sm font-semibold text-neutral-900 dark:text-white">
               {review.buyerName}
             </span>
-            <span className="text-[11px] text-gray-400 flex-shrink-0">
+            <span className="text-[11px] text-neutral-400 flex-shrink-0">
               {formatDate(review.date)}
             </span>
           </div>
@@ -187,26 +182,29 @@ const ReviewCard: React.FC<{
             <StarRating rating={review.rating} size={12} />
             {review.productName && (
               <>
-                <span className="text-gray-300 dark:text-gray-600">·</span>
-                <span className="text-[11px] text-gray-400 truncate">{review.productName}</span>
+                <span className="text-neutral-300 dark:text-neutral-600">·</span>
+                <span className="text-[11px] text-neutral-400 truncate">{review.productName}</span>
               </>
             )}
           </div>
-          <p className="text-sm text-gray-600 dark:text-gray-300 mt-2 leading-relaxed">
+          <p className="text-sm text-neutral-600 dark:text-neutral-300 mt-2 leading-relaxed">
             {review.comment}
           </p>
 
-          {/* Reply */}
-          {review.reply && (
+          {/* Seller Reply */}
+          {review.sellerReply && (
             <div className="mt-3 pl-3 border-l-2 border-indigo-200 dark:border-blue-800">
               <p className="text-xs font-semibold text-blue dark:text-blue mb-0.5">Your reply</p>
-              <p className="text-xs text-gray-600 dark:text-gray-400">{review.reply}</p>
+              <p className="text-xs text-neutral-600 dark:text-neutral-400">{review.sellerReply}</p>
+              {review.repliedAt && (
+                <p className="text-[10px] text-neutral-400 mt-1">{formatDate(review.repliedAt)}</p>
+              )}
             </div>
           )}
 
           {/* Actions */}
           <div className="flex items-center gap-2 mt-3">
-            {!review.reply && (
+            {!review.sellerReply && (
               <button
                 onClick={() => onReply(review)}
                 className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-blue dark:text-blue bg-blue-50 dark:bg-blue-900/20 rounded-lg hover:bg-indigo-100 dark:hover:bg-blue-900/30 transition-colors"
@@ -216,8 +214,8 @@ const ReviewCard: React.FC<{
             )}
             {!review.deletionRequested && (
               <button
-                onClick={() => onRequestDelete(review)}
-                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-gray-500 bg-gray-50 dark:bg-gray-700/50 rounded-lg hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20 dark:hover:text-red-400 transition-colors"
+                onClick={() => onRequestRemoval(review)}
+                className="flex items-center gap-1.5 px-3 py-1.5 text-xs font-medium text-neutral-500 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg hover:bg-red-50 hover:text-red-500 dark:hover:bg-red-900/20 dark:hover:text-red-400 transition-colors"
               >
                 <Flag size={12} /> Request Removal
               </button>
@@ -230,33 +228,25 @@ const ReviewCard: React.FC<{
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
-// RATING BREAKDOWN
+// SKELETON
 // ═══════════════════════════════════════════════════════════════════════════
 
-const RatingBreakdown: React.FC<{ reviews: StoreReview[] }> = ({ reviews }) => {
-  const counts = [5, 4, 3, 2, 1].map((star) => ({
-    star,
-    count: reviews.filter((r) => Math.floor(r.rating) === star).length,
-  }));
-  const total = reviews.length;
-  return (
-    <div className="space-y-1.5">
-      {counts.map(({ star, count }) => (
-        <div key={star} className="flex items-center gap-2.5">
-          <span className="text-xs text-gray-500 w-3 text-right">{star}</span>
-          <Star size={11} className="text-amber-400 fill-amber-400" />
-          <div className="flex-1 h-2 bg-gray-100 dark:bg-gray-700 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-amber-400 rounded-full transition-all duration-500"
-              style={{ width: total > 0 ? `${(count / total) * 100}%` : '0%' }}
-            />
-          </div>
-          <span className="text-[11px] text-gray-400 w-6 text-right">{count}</span>
+const ReviewSkeleton: React.FC = () => (
+  <div className="bg-white dark:bg-neutral-800/60 rounded-xl p-5 border border-neutral-100 dark:border-neutral-700/50 animate-pulse">
+    <div className="flex items-start gap-3">
+      <div className="w-9 h-9 rounded-full bg-neutral-200 dark:bg-neutral-700 flex-shrink-0" />
+      <div className="flex-1 space-y-2">
+        <div className="flex items-center justify-between">
+          <div className="h-3.5 bg-neutral-200 dark:bg-neutral-700 rounded w-28" />
+          <div className="h-3 bg-neutral-200 dark:bg-neutral-700 rounded w-16" />
         </div>
-      ))}
+        <div className="h-3 bg-neutral-200 dark:bg-neutral-700 rounded w-24" />
+        <div className="h-3 bg-neutral-200 dark:bg-neutral-700 rounded w-full" />
+        <div className="h-3 bg-neutral-200 dark:bg-neutral-700 rounded w-3/4" />
+      </div>
     </div>
-  );
-};
+  </div>
+);
 
 // ═══════════════════════════════════════════════════════════════════════════
 // MAIN COMPONENT
@@ -264,34 +254,55 @@ const RatingBreakdown: React.FC<{ reviews: StoreReview[] }> = ({ reviews }) => {
 
 interface StoreReviewsProps {
   storeId: string;
+  reviews: any[];
+  reviewsTotal: number;
+  isLoading: boolean;
+  onSellerReply: (reviewId: string, data: { comment: string }) => Promise<void>;
+  isReplying: boolean;
+  onLoadMore: (page: number) => void;
+  onRefresh: () => void;
 }
 
-const StoreReviews: React.FC<StoreReviewsProps> = ({}) => {
+const StoreReviews: React.FC<StoreReviewsProps> = ({
+  reviews: rawReviews,
+  reviewsTotal,
+  isLoading,
+  onSellerReply,
+  isReplying,
+  onLoadMore,
+  onRefresh,
+}) => {
   const isMobile = useMediaQuery(mediaSize.mobile);
-  const [reviews, setReviews] = useState<StoreReview[]>(mockReviews);
+
+  // ── Transform reviews ───────────────────────────────────────────────
+  const reviews = useMemo(() => rawReviews.map(transformReview), [rawReviews]);
+
+  // ── Local filter state (client-side on loaded data) ─────────────────
   const [searchQuery, setSearchQuery] = useState('');
   const [filterRating, setFilterRating] = useState<number | null>(null);
   const [filterType, setFilterType] = useState<string | null>(null);
 
-  // Reply state
-  const [replyTarget, setReplyTarget] = useState<StoreReview | null>(null);
+  // ── Reply state ─────────────────────────────────────────────────────
+  const [replyTarget, setReplyTarget] = useState<TransformedReview | null>(null);
   const [replyText, setReplyText] = useState('');
   const [isReplyOpen, setIsReplyOpen] = useState(false);
 
-  // Delete request state
-  const [deleteTarget, setDeleteTarget] = useState<StoreReview | null>(null);
-  const [deleteReason, setDeleteReason] = useState('');
-  const [isDeleteOpen, setIsDeleteOpen] = useState(false);
+  // ── Removal request state ───────────────────────────────────────────
+  const [removeTarget, setRemoveTarget] = useState<TransformedReview | null>(null);
+  const [removeReason, setRemoveReason] = useState('');
+  const [isRemoveOpen, setIsRemoveOpen] = useState(false);
+  const [isSubmittingRemoval, setIsSubmittingRemoval] = useState(false);
 
-  // Computed
+  // ── Computed metrics ────────────────────────────────────────────────
   const avgRating = useMemo(() => {
     if (reviews.length === 0) return 0;
     return Math.round((reviews.reduce((s, r) => s + r.rating, 0) / reviews.length) * 10) / 10;
   }, [reviews]);
 
-  const repliedCount = useMemo(() => reviews.filter((r) => r.reply).length, [reviews]);
+  const repliedCount = useMemo(() => reviews.filter((r) => r.sellerReply).length, [reviews]);
   const responseRate = reviews.length > 0 ? Math.round((repliedCount / reviews.length) * 100) : 0;
 
+  // ── Filter ──────────────────────────────────────────────────────────
   const filteredReviews = useMemo(() => {
     return reviews.filter((r) => {
       if (searchQuery) {
@@ -299,72 +310,74 @@ const StoreReviews: React.FC<StoreReviewsProps> = ({}) => {
         if (
           !r.buyerName.toLowerCase().includes(q) &&
           !r.comment.toLowerCase().includes(q) &&
-          !(r.productName || '').toLowerCase().includes(q)
+          !r.productName.toLowerCase().includes(q)
         )
           return false;
       }
       if (filterRating && Math.floor(r.rating) !== filterRating) return false;
-      if (filterType === 'replied' && !r.reply) return false;
-      if (filterType === 'unreplied' && r.reply) return false;
+      if (filterType === 'replied' && !r.sellerReply) return false;
+      if (filterType === 'unreplied' && r.sellerReply) return false;
       if (filterType === 'flagged' && !r.deletionRequested) return false;
       return true;
     });
   }, [reviews, searchQuery, filterRating, filterType]);
 
-  // Handlers
-  const handleReply = useCallback((review: StoreReview) => {
+  // ── Handlers ────────────────────────────────────────────────────────
+
+  const handleOpenReply = useCallback((review: TransformedReview) => {
     setReplyTarget(review);
     setReplyText('');
     setIsReplyOpen(true);
   }, []);
 
-  const handleSubmitReply = useCallback(() => {
+  const handleSubmitReply = useCallback(async () => {
     if (!replyTarget || !replyText.trim()) return;
-    setReviews((prev) =>
-      prev.map((r) =>
-        r.id === replyTarget.id
-          ? { ...r, reply: replyText.trim(), repliedAt: new Date().toISOString() }
-          : r
-      )
-    );
-    setIsReplyOpen(false);
-    antMessage.success('Reply posted!');
-  }, [replyTarget, replyText]);
+    try {
+      await onSellerReply(replyTarget.id, { comment: replyText.trim() });
+      setIsReplyOpen(false);
+      antMessage.success('Reply posted!');
+    } catch {
+      antMessage.error('Failed to post reply');
+    }
+  }, [replyTarget, replyText, onSellerReply]);
 
-  const handleRequestDelete = useCallback((review: StoreReview) => {
-    setDeleteTarget(review);
-    setDeleteReason('');
-    setIsDeleteOpen(true);
+  const handleOpenRemoval = useCallback((review: TransformedReview) => {
+    setRemoveTarget(review);
+    setRemoveReason('');
+    setIsRemoveOpen(true);
   }, []);
 
-  const handleSubmitDeleteRequest = useCallback(() => {
-    if (!deleteTarget || !deleteReason.trim()) {
+  const handleSubmitRemoval = useCallback(async () => {
+    if (!removeTarget || !removeReason.trim()) {
       antMessage.warning('Please provide a reason for the removal request');
       return;
     }
-    setReviews((prev) =>
-      prev.map((r) =>
-        r.id === deleteTarget.id
-          ? { ...r, deletionRequested: true, deletionReason: deleteReason.trim() }
-          : r
-      )
-    );
-    setIsDeleteOpen(false);
-    antMessage.success('Removal request submitted. Our team will review it.');
-  }, [deleteTarget, deleteReason]);
+    setIsSubmittingRemoval(true);
+    try {
+      // TODO: Wire to backend endpoint when available
+      // await requestReviewRemoval(removeTarget.id, { reason: removeReason.trim() });
+      antMessage.success('Removal request submitted. Our team will review it within 48 hours.');
+      setIsRemoveOpen(false);
+      onRefresh();
+    } catch {
+      antMessage.error('Failed to submit removal request');
+    } finally {
+      setIsSubmittingRemoval(false);
+    }
+  }, [removeTarget, removeReason, onRefresh]);
 
-  // Metrics
+  // ── Metrics ─────────────────────────────────────────────────────────
   const metricCards = [
     {
       label: 'Average Rating',
-      value: `${avgRating}`,
+      value: avgRating > 0 ? `${avgRating}` : '—',
       icon: Star,
       iconColor: 'text-amber-500',
       iconBg: 'bg-amber-50 dark:bg-amber-900/20',
     },
     {
       label: 'Total Reviews',
-      value: `${reviews.length}`,
+      value: `${reviewsTotal}`,
       icon: MessageCircle,
       iconColor: 'text-blue',
       iconBg: 'bg-blue-50 dark:bg-blue-900/20',
@@ -395,7 +408,7 @@ const StoreReviews: React.FC<StoreReviewsProps> = ({}) => {
             initial={{ opacity: 0, y: 15 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: i * 0.05 }}
-            className="bg-white dark:bg-gray-800/60 rounded-xl p-4 border border-gray-100 dark:border-gray-700/50 flex items-center gap-3"
+            className="bg-white dark:bg-neutral-800/60 rounded-xl p-4 border border-neutral-100 dark:border-neutral-700/50 flex items-center gap-3"
           >
             <div
               className={`w-9 h-9 rounded-lg ${m.iconBg} flex items-center justify-center flex-shrink-0`}
@@ -403,25 +416,27 @@ const StoreReviews: React.FC<StoreReviewsProps> = ({}) => {
               <m.icon size={16} className={m.iconColor} />
             </div>
             <div>
-              <p className="text-lg font-bold text-gray-900 dark:text-white">{m.value}</p>
-              <p className="text-[11px] text-gray-500">{m.label}</p>
+              <p className="text-lg font-bold text-neutral-900 dark:text-white">{m.value}</p>
+              <p className="text-[11px] text-neutral-500">{m.label}</p>
             </div>
           </motion.div>
         ))}
       </div>
 
       <div className={`grid gap-6 ${isMobile ? 'grid-cols-1' : 'grid-cols-4'}`}>
-        {/* Rating Breakdown */}
+        {/* Rating Breakdown — sidebar */}
         <div className={`${isMobile ? '' : 'col-span-1'}`}>
-          <div className="bg-white dark:bg-gray-800/60 rounded-xl p-5 border border-gray-100 dark:border-gray-700/50 sticky top-4">
+          <div className="bg-white dark:bg-neutral-800/60 rounded-xl p-5 border border-neutral-100 dark:border-neutral-700/50 sticky top-4">
             <div className="text-center mb-4">
-              <p className="text-4xl font-bold text-gray-900 dark:text-white">{avgRating}</p>
-              <StarRating rating={avgRating} size={16} />
-              <p className="text-xs text-gray-400 mt-1">
-                {reviews.length} review{reviews.length !== 1 ? 's' : ''}
+              <p className="text-4xl font-bold text-neutral-900 dark:text-white">
+                {avgRating > 0 ? avgRating : '—'}
+              </p>
+              {avgRating > 0 && <StarRating rating={avgRating} size={16} />}
+              <p className="text-xs text-neutral-400 mt-1.5">
+                {getRatingLabel(avgRating)} · {reviewsTotal} review{reviewsTotal !== 1 ? 's' : ''}
               </p>
             </div>
-            <RatingBreakdown reviews={reviews} />
+            {reviews.length > 0 && <RatingBreakdown reviews={reviews} />}
           </div>
         </div>
 
@@ -432,7 +447,7 @@ const StoreReviews: React.FC<StoreReviewsProps> = ({}) => {
             <div className="relative flex-1">
               <Search
                 size={16}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400"
+                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400"
               />
               <input
                 type="text"
@@ -441,7 +456,7 @@ const StoreReviews: React.FC<StoreReviewsProps> = ({}) => {
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className={`w-full ${
                   isMobile ? 'h-10' : 'h-11'
-                } pl-10 pr-4 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue/20 focus:border-blue outline-none transition-all`}
+                } pl-10 pr-4 border border-neutral-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 text-sm text-neutral-900 dark:text-white placeholder-neutral-400 focus:ring-2 focus:ring-blue/20 focus:border-blue outline-none transition-all`}
               />
             </div>
             <div className="flex gap-2">
@@ -473,41 +488,76 @@ const StoreReviews: React.FC<StoreReviewsProps> = ({}) => {
           </div>
 
           {/* Review Cards */}
-          <div className="space-y-3">
-            {filteredReviews.map((review) => (
-              <ReviewCard
-                key={review.id}
-                review={review}
-                onReply={handleReply}
-                onRequestDelete={handleRequestDelete}
-              />
-            ))}
-            {filteredReviews.length === 0 && (
-              <div className="text-center py-16 bg-white dark:bg-gray-800/60 rounded-2xl border border-gray-100 dark:border-gray-700/50">
-                <Star size={32} className="mx-auto text-gray-200 dark:text-gray-700 mb-3" />
-                <p className="text-sm text-gray-400">No reviews match your filters</p>
-              </div>
-            )}
-          </div>
+          {isLoading ? (
+            <div className="space-y-3">
+              {[1, 2, 3, 4].map((i) => (
+                <ReviewSkeleton key={i} />
+              ))}
+            </div>
+          ) : filteredReviews.length === 0 ? (
+            <div className="text-center py-16 bg-white dark:bg-neutral-800/60 rounded-2xl border border-neutral-100 dark:border-neutral-700/50">
+              <Star size={32} className="mx-auto text-neutral-200 dark:text-neutral-700 mb-3" />
+              <p className="text-sm text-neutral-500">
+                {searchQuery || filterRating || filterType
+                  ? 'No reviews match your filters'
+                  : 'No reviews yet'}
+              </p>
+              {(searchQuery || filterRating || filterType) && (
+                <button
+                  onClick={() => {
+                    setSearchQuery('');
+                    setFilterRating(null);
+                    setFilterType(null);
+                  }}
+                  className="text-xs text-blue hover:underline mt-1"
+                >
+                  Clear filters
+                </button>
+              )}
+            </div>
+          ) : (
+            <div className="space-y-3">
+              {filteredReviews.map((review, i) => (
+                <ReviewCard
+                  key={review.id}
+                  review={review}
+                  index={i}
+                  onReply={handleOpenReply}
+                  onRequestRemoval={handleOpenRemoval}
+                />
+              ))}
+
+              {/* Load more */}
+              {reviews.length < reviewsTotal && (
+                <button
+                  onClick={() => onLoadMore(Math.floor(reviews.length / 20) + 1)}
+                  className="w-full py-3 text-sm font-medium text-blue hover:bg-blue-50 dark:hover:bg-blue-900/10 rounded-xl transition-colors"
+                >
+                  Load More Reviews
+                </button>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
-      {/* Reply Modal */}
+      {/* ── Reply Modal ── */}
       <Modal
         open={isReplyOpen}
         onCancel={() => setIsReplyOpen(false)}
         title={<span className="text-base font-bold">Reply to {replyTarget?.buyerName}</span>}
         footer={null}
         width={isMobile ? '95%' : 480}
+        rootClassName="modal-with-backdrop"
         className="[&_.ant-modal-content]:!rounded-2xl"
       >
         <div className="space-y-4 pt-2">
           {replyTarget && (
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3">
+            <div className="bg-neutral-50 dark:bg-neutral-800 rounded-xl p-3">
               <div className="flex items-center gap-1 mb-1">
                 <StarRating rating={replyTarget.rating} size={12} />
               </div>
-              <p className="text-xs text-gray-600 dark:text-gray-400">
+              <p className="text-xs text-neutral-600 dark:text-neutral-400">
                 &quot;{replyTarget.comment}&quot;
               </p>
             </div>
@@ -524,29 +574,30 @@ const StoreReviews: React.FC<StoreReviewsProps> = ({}) => {
           <div className="flex gap-3">
             <button
               onClick={() => setIsReplyOpen(false)}
-              className="flex-1 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl transition-colors"
+              className="flex-1 py-2.5 text-sm font-medium text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl transition-colors"
             >
               Cancel
             </button>
             <button
               onClick={handleSubmitReply}
-              disabled={!replyText.trim()}
+              disabled={!replyText.trim() || isReplying}
               className={`flex-1 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
-                replyText.trim()
+                replyText.trim() && !isReplying
                   ? 'bg-gradient-to-r from-blue to-indigo-500 text-white shadow-md'
-                  : 'bg-gray-200 dark:bg-gray-700 text-gray-400 cursor-not-allowed'
+                  : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-400 cursor-not-allowed'
               }`}
             >
-              <Send size={14} /> Post Reply
+              {isReplying ? <Loader2 size={14} className="animate-spin" /> : <Send size={14} />}
+              {isReplying ? 'Posting...' : 'Post Reply'}
             </button>
           </div>
         </div>
       </Modal>
 
-      {/* Request Delete Modal */}
+      {/* ── Request Removal Modal ── */}
       <Modal
-        open={isDeleteOpen}
-        onCancel={() => setIsDeleteOpen(false)}
+        open={isRemoveOpen}
+        onCancel={() => setIsRemoveOpen(false)}
         title={
           <div className="flex items-center gap-2 text-base font-bold">
             <AlertTriangle size={18} className="text-amber-500" /> Request Review Removal
@@ -554,26 +605,27 @@ const StoreReviews: React.FC<StoreReviewsProps> = ({}) => {
         }
         footer={null}
         width={isMobile ? '95%' : 480}
+        rootClassName="modal-with-backdrop"
         className="[&_.ant-modal-content]:!rounded-2xl"
       >
         <div className="space-y-4 pt-2">
-          <p className="text-sm text-gray-500">
-            Explain why this review should be removed. Our team will review your request within 48
-            hours.
+          <p className="text-sm text-neutral-500">
+            Explain why this review should be removed. The {APP_NAME} team will review your request
+            within 48 hours.
           </p>
-          {deleteTarget && (
-            <div className="bg-gray-50 dark:bg-gray-800 rounded-xl p-3">
-              <p className="text-xs font-semibold text-gray-500 mb-1">
-                {deleteTarget.buyerName} · {deleteTarget.rating}★
+          {removeTarget && (
+            <div className="bg-neutral-50 dark:bg-neutral-800 rounded-xl p-3">
+              <p className="text-xs font-semibold text-neutral-500 mb-1">
+                {removeTarget.buyerName} · {removeTarget.rating}★
               </p>
-              <p className="text-xs text-gray-600 dark:text-gray-400">
-                &quot;{deleteTarget.comment}&quot;
+              <p className="text-xs text-neutral-600 dark:text-neutral-400">
+                &quot;{removeTarget.comment}&quot;
               </p>
             </div>
           )}
           <TextArea
-            value={deleteReason}
-            onChange={(e) => setDeleteReason(e.target.value)}
+            value={removeReason}
+            onChange={(e) => setRemoveReason(e.target.value)}
             placeholder="Reason for removal request..."
             rows={3}
             maxLength={500}
@@ -582,21 +634,26 @@ const StoreReviews: React.FC<StoreReviewsProps> = ({}) => {
           />
           <div className="flex gap-3">
             <button
-              onClick={() => setIsDeleteOpen(false)}
-              className="flex-1 py-2.5 text-sm font-medium text-gray-600 hover:bg-gray-100 rounded-xl transition-colors"
+              onClick={() => setIsRemoveOpen(false)}
+              className="flex-1 py-2.5 text-sm font-medium text-neutral-600 hover:bg-neutral-100 rounded-xl transition-colors"
             >
               Cancel
             </button>
             <button
-              onClick={handleSubmitDeleteRequest}
-              disabled={!deleteReason.trim()}
+              onClick={handleSubmitRemoval}
+              disabled={!removeReason.trim() || isSubmittingRemoval}
               className={`flex-1 py-2.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
-                deleteReason.trim()
+                removeReason.trim() && !isSubmittingRemoval
                   ? 'bg-gradient-to-r from-red-500 to-rose-500 text-white shadow-md'
-                  : 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                  : 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
               }`}
             >
-              <Flag size={14} /> Submit Request
+              {isSubmittingRemoval ? (
+                <Loader2 size={14} className="animate-spin" />
+              ) : (
+                <Flag size={14} />
+              )}
+              {isSubmittingRemoval ? 'Submitting...' : 'Submit Request'}
             </button>
           </div>
         </div>

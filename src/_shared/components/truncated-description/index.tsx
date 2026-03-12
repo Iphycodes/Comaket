@@ -12,7 +12,7 @@ const TruncatedDescription = ({ description, max }: TruncatedDescriptionProps) =
   const displayText = isExpanded ? description : truncateText(description, max);
 
   return (
-    <div className="text-gray-600 dark:text-gray-300 leading-relaxed">
+    <div className="text-neutral-600 dark:text-neutral-300 leading-relaxed">
       <span>{displayText}</span>{' '}
       {description.length > 100 && (
         <button

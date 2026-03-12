@@ -65,26 +65,26 @@ const MobileFullScreen: React.FC<MobileFullScreenProps> = ({ open, onClose, titl
           animate={{ opacity: 1, y: 0 }}
           exit={{ opacity: 0, y: '100%' }}
           transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-          className="fixed inset-0 z-[9999] bg-white dark:bg-gray-900 flex flex-col overflow-hidden"
+          className="fixed inset-0 z-[9999] bg-white dark:bg-neutral-900 flex flex-col overflow-hidden"
         >
           {/* Header — outside scroll area, always pinned */}
           <div
-            className={`flex items-center justify-between px-4 py-3 border-b border-gray-100 dark:border-gray-800 flex-shrink-0 ${
+            className={`flex items-center justify-between px-4 py-3 border-b border-neutral-100 dark:border-neutral-800 flex-shrink-0 ${
               isMobile ? 'pt-10' : ''
             }`}
           >
             <button
               onClick={onClose}
-              className="flex items-center gap-2 text-sm text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors"
+              className="flex items-center gap-2 text-sm text-neutral-500 hover:text-neutral-900 dark:hover:text-white transition-colors"
             >
               <ArrowLeft size={18} />
               <span className="font-medium">{title || 'Back'}</span>
             </button>
             <button
               onClick={onClose}
-              className="w-8 h-8 rounded-full bg-gray-100 dark:bg-gray-800 flex items-center justify-center hover:bg-gray-200 dark:hover:bg-gray-700 transition-colors"
+              className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center hover:bg-neutral-200 dark:hover:bg-neutral-700 transition-colors"
             >
-              <X size={16} className="text-gray-500" />
+              <X size={16} className="text-neutral-500" />
             </button>
           </div>
 
@@ -208,7 +208,7 @@ const MediaLightboxDesktop: React.FC<LightboxProps> = ({ media, initialIndex, op
                 }`}
               >
                 {isVideo(m) ? (
-                  <div className="w-full h-full bg-gray-800 flex items-center justify-center relative">
+                  <div className="w-full h-full bg-neutral-800 flex items-center justify-center relative">
                     <video
                       src={m}
                       className="w-full h-full object-cover"
@@ -311,7 +311,7 @@ const MobileLightboxContent: React.FC<MobileLightboxContentProps> = ({ media, in
               }`}
             >
               {isVideo(m) ? (
-                <div className="w-full h-full bg-gray-800 flex items-center justify-center relative">
+                <div className="w-full h-full bg-neutral-800 flex items-center justify-center relative">
                   <video src={m} className="w-full h-full object-cover" muted preload="metadata" />
                   <div className="absolute inset-0 flex items-center justify-center">
                     <i className="ri-play-fill text-white text-xs"></i>
@@ -358,25 +358,25 @@ const CounterOfferView: React.FC<CounterOfferViewProps> = ({ item, onSubmit }) =
     <div className="pt-10 p-2 space-y-6">
       {/* Header info */}
       <div>
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white mb-1">Counter Offer</h2>
-        <p className="text-sm text-gray-500">
+        <h2 className="text-xl font-bold text-neutral-900 dark:text-white mb-1">Counter Offer</h2>
+        <p className="text-sm text-neutral-500">
           Submit your counter offer for <strong>{item.itemName}</strong>
         </p>
       </div>
 
       {/* Price comparison */}
-      <div className="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-4 space-y-3">
+      <div className="bg-neutral-50 dark:bg-neutral-800/50 rounded-2xl p-4 space-y-3">
         <div className="flex justify-between text-sm">
-          <span className="text-gray-500">Your asking price</span>
+          <span className="text-neutral-500">Your asking price</span>
           <span className="font-semibold">₦{askingPriceNaira.toLocaleString()}</span>
         </div>
         <div className="flex justify-between text-sm">
-          <span className="text-gray-500">Their offer</span>
+          <span className="text-neutral-500">Their offer</span>
           <span className="font-semibold text-blue">₦{platformBidNaira.toLocaleString()}</span>
         </div>
-        <div className="border-t border-gray-200 dark:border-gray-700 pt-3">
+        <div className="border-t border-neutral-200 dark:border-neutral-700 pt-3">
           <div className="flex justify-between text-sm">
-            <span className="text-gray-500">Difference</span>
+            <span className="text-neutral-500">Difference</span>
             <span className="font-semibold text-orange-500">
               ₦{(askingPriceNaira - platformBidNaira).toLocaleString()}
             </span>
@@ -386,7 +386,7 @@ const CounterOfferView: React.FC<CounterOfferViewProps> = ({ item, onSubmit }) =
 
       {/* Counter offer input */}
       <div>
-        <label className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-2 block">
+        <label className="text-sm font-medium text-neutral-700 dark:text-neutral-300 mb-2 block">
           Your Counter Offer (₦)
         </label>
         <InputNumber
@@ -398,10 +398,10 @@ const CounterOfferView: React.FC<CounterOfferViewProps> = ({ item, onSubmit }) =
           parser={(value) => Number(value?.replace(/\$\s?|(,*)/g, '') || 0)}
           min={1}
           controls={false}
-          prefix={<span className="text-gray-400 text-base mr-1">₦</span>}
+          prefix={<span className="text-neutral-400 text-base mr-1">₦</span>}
         />
         {amount && amount > 0 && (
-          <p className="text-xs text-gray-400 mt-1.5">
+          <p className="text-xs text-neutral-400 mt-1.5">
             {amount > platformBidNaira
               ? `₦${(amount - platformBidNaira).toLocaleString()} above their offer`
               : amount < platformBidNaira
@@ -417,7 +417,7 @@ const CounterOfferView: React.FC<CounterOfferViewProps> = ({ item, onSubmit }) =
         disabled={isSubmitting || !amount || amount <= 0}
         className={`w-full py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
           isSubmitting || !amount || amount <= 0
-            ? 'bg-gray-200 dark:bg-gray-700 text-gray-400 cursor-not-allowed'
+            ? 'bg-neutral-200 dark:bg-neutral-700 text-neutral-400 cursor-not-allowed'
             : 'bg-gradient-to-r from-orange-500 to-amber-500 hover:from-orange-600 hover:to-amber-600 text-white shadow-md shadow-orange-500/20 hover:shadow-lg'
         }`}
       >
@@ -575,13 +575,13 @@ const SellItemDetail: React.FC<Props> = ({
     <div className="max-w-3xl mx-auto relative py-0">
       {/* ── Sticky back button ───────────────────────────────────────────── */}
       <div
-        className={`sticky w-full top-0 z-10 bg-white dark:bg-gray-900 pb-3 pt-1 -mx-1 px-1 ${
+        className={`sticky w-full top-0 z-10 bg-white dark:bg-neutral-900 pb-3 pt-1 -mx-1 px-1 ${
           isMobile ? 'pt-9' : ''
         }`}
       >
         <button
           onClick={onBack}
-          className="flex w-full items-center gap-2 text-sm text-gray-500 hover:text-gray-900 dark:hover:text-white transition-colors group"
+          className="flex w-full items-center gap-2 text-sm text-neutral-500 hover:text-neutral-900 dark:hover:text-white transition-colors group"
         >
           <ArrowLeft size={16} className="group-hover:-translate-x-0.5 transition-transform" />
           Back to Products
@@ -591,13 +591,13 @@ const SellItemDetail: React.FC<Props> = ({
       {/* ── Media gallery ────────────────────────────────────────────────── */}
       {allMedia.length > 0 && (
         <motion.div initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mb-6">
-          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-gray-300 dark:scrollbar-thumb-gray-600">
+          <div className="flex gap-3 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-neutral-300 dark:scrollbar-thumb-neutral-600">
             {allMedia.map((media, i) => (
               <button
                 key={i}
                 type="button"
                 onClick={() => openLightbox(i)}
-                className="relative flex-shrink-0 w-28 h-28 sm:w-32 sm:h-32 rounded-xl overflow-hidden border-2 border-gray-200 dark:border-gray-700 hover:border-blue dark:hover:border-blue transition-colors cursor-pointer group"
+                className="relative flex-shrink-0 w-28 h-28 sm:w-32 sm:h-32 rounded-xl overflow-hidden border-2 border-neutral-200 dark:border-neutral-700 hover:border-blue dark:hover:border-blue transition-colors cursor-pointer group"
               >
                 {isVideo(media) ? (
                   <>
@@ -645,7 +645,7 @@ const SellItemDetail: React.FC<Props> = ({
         transition={{ delay: 0.05 }}
         className="flex flex-wrap items-center gap-2 mb-4"
       >
-        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-gray-100 dark:bg-gray-800 text-gray-700 dark:text-gray-300">
+        <span className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-semibold bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-300">
           <ModelIcon size={14} />
           {getSellingModelLabel(item.sellingModel)}
         </span>
@@ -691,9 +691,9 @@ const SellItemDetail: React.FC<Props> = ({
         transition={{ delay: 0.1 }}
         className="mb-6"
       >
-        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">{item.itemName}</h1>
+        <h1 className="text-2xl font-bold text-neutral-900 dark:text-white">{item.itemName}</h1>
         <div className="flex items-center gap-3 mt-2">
-          <span className="text-3xl font-bold text-gray-900 dark:text-white">
+          <span className="text-3xl font-bold text-neutral-900 dark:text-white">
             ₦{priceNaira.toLocaleString()}
           </span>
           {item.askingPrice?.negotiable && (
@@ -702,10 +702,14 @@ const SellItemDetail: React.FC<Props> = ({
             </span>
           )}
         </div>
-        <div className="flex items-center gap-1.5 mt-2 text-sm text-gray-500">
-          <MapPin size={14} />
-          <span>{item.location}</span>
-        </div>
+        {item?.location && (
+          <div className="flex items-center gap-1.5 mt-2 text-sm text-neutral-500">
+            <MapPin size={14} />
+            <span>
+              {item.location?.state ?? ''} {item?.location?.city ?? ''}
+            </span>
+          </div>
+        )}
       </motion.div>
 
       {/* ─── STATUS-SPECIFIC PANELS ─────────────────────────────────────── */}
@@ -810,7 +814,7 @@ const SellItemDetail: React.FC<Props> = ({
                   <span className="text-3xl font-bold text-blue dark:text-blue">
                     ₦{(item.platformBid / 100).toLocaleString()}
                   </span>
-                  <span className="text-sm text-gray-400 line-through">
+                  <span className="text-sm text-neutral-400 line-through">
                     ₦{priceNaira.toLocaleString()}
                   </span>
                 </div>
@@ -826,7 +830,7 @@ const SellItemDetail: React.FC<Props> = ({
                   {onCounterOffer && (
                     <button
                       onClick={handleCounterOffer}
-                      className="px-5 py-2 bg-white dark:bg-gray-800 border border-orange-300 dark:border-orange-700 text-orange-600 dark:text-orange-400 rounded-xl text-sm font-semibold hover:bg-orange-50 transition-all flex items-center gap-1.5"
+                      className="px-5 py-2 bg-white dark:bg-neutral-800 border border-orange-300 dark:border-orange-700 text-orange-600 dark:text-orange-400 rounded-xl text-sm font-semibold hover:bg-orange-50 transition-all flex items-center gap-1.5"
                     >
                       <ArrowLeftRight size={14} /> Counter Offer
                     </button>
@@ -834,7 +838,7 @@ const SellItemDetail: React.FC<Props> = ({
                   {onRejectOffer && (
                     <button
                       onClick={onRejectOffer}
-                      className="px-5 py-2 text-gray-500 hover:text-red-500 rounded-xl text-sm font-medium hover:bg-red-50 transition-all flex items-center gap-1.5"
+                      className="px-5 py-2 text-neutral-500 hover:text-red-500 rounded-xl text-sm font-medium hover:bg-red-50 transition-all flex items-center gap-1.5"
                     >
                       <ThumbsDown size={14} /> Decline
                     </button>
@@ -903,10 +907,10 @@ const SellItemDetail: React.FC<Props> = ({
         transition={{ delay: 0.15 }}
         className="mb-6"
       >
-        <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+        <h3 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-2">
           Description
         </h3>
-        <p className="text-sm text-gray-700 dark:text-gray-300 leading-relaxed whitespace-pre-wrap">
+        <p className="text-sm text-neutral-700 dark:text-neutral-300 leading-relaxed whitespace-pre-wrap">
           {item.description}
         </p>
       </motion.div>
@@ -934,10 +938,13 @@ const SellItemDetail: React.FC<Props> = ({
               color: 'text-purple-500',
             },
           ].map(({ icon: Icon, label, count, color }) => (
-            <div key={label} className="bg-gray-50 dark:bg-gray-800/50 rounded-xl p-3 text-center">
+            <div
+              key={label}
+              className="bg-neutral-50 dark:bg-neutral-800/50 rounded-xl p-3 text-center"
+            >
               <Icon size={18} className={`${color} mx-auto mb-1`} />
-              <p className="text-lg font-bold text-gray-900 dark:text-white">{count}</p>
-              <p className="text-[10px] text-gray-400 uppercase tracking-wider">{label}</p>
+              <p className="text-lg font-bold text-neutral-900 dark:text-white">{count}</p>
+              <p className="text-[10px] text-neutral-400 uppercase tracking-wider">{label}</p>
             </div>
           ))}
         </motion.div>
@@ -948,20 +955,20 @@ const SellItemDetail: React.FC<Props> = ({
         initial={{ opacity: 0, y: 12 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.25 }}
-        className="mb-6 bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-4"
+        className="mb-6 bg-neutral-50 dark:bg-neutral-800/50 rounded-2xl p-4"
       >
-        <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+        <h3 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-3">
           Pricing Summary
         </h3>
         <div className="space-y-2">
           <div className="flex justify-between text-sm">
-            <span className="text-gray-500">Your asking price</span>
+            <span className="text-neutral-500">Your asking price</span>
             <span className="font-semibold">₦{priceNaira.toLocaleString()}</span>
           </div>
 
           {item.sellingModel === 'self-listing' && item.listingFee && (
             <div className="flex justify-between text-sm">
-              <span className="text-gray-500">Listing fee ({LISTING_FEE_PERCENT}%)</span>
+              <span className="text-neutral-500">Listing fee ({LISTING_FEE_PERCENT}%)</span>
               <span className="font-semibold text-blue">
                 ₦{(item.listingFee / 100).toLocaleString()}
               </span>
@@ -971,7 +978,7 @@ const SellItemDetail: React.FC<Props> = ({
           {item.sellingModel === 'consignment' && (
             <>
               <div className="flex justify-between text-sm">
-                <span className="text-gray-500">
+                <span className="text-neutral-500">
                   Commission ({CONSIGNMENT_COMMISSION_PERCENT}%)
                 </span>
                 <span className="font-medium">
@@ -983,8 +990,10 @@ const SellItemDetail: React.FC<Props> = ({
                   ).toLocaleString()}
                 </span>
               </div>
-              <div className="flex justify-between text-sm pt-2 border-t border-gray-200 dark:border-gray-700">
-                <span className="font-medium text-gray-700 dark:text-gray-300">You receive</span>
+              <div className="flex justify-between text-sm pt-2 border-t border-neutral-200 dark:border-neutral-700">
+                <span className="font-medium text-neutral-700 dark:text-neutral-300">
+                  You receive
+                </span>
                 <span className="font-bold text-emerald-600">
                   ₦
                   {(
@@ -998,8 +1007,8 @@ const SellItemDetail: React.FC<Props> = ({
           )}
 
           {item.sellingModel === 'direct-sale' && item.platformBid && (
-            <div className="flex justify-between text-sm pt-2 border-t border-gray-200 dark:border-gray-700">
-              <span className="font-medium text-gray-700 dark:text-gray-300">Our offer</span>
+            <div className="flex justify-between text-sm pt-2 border-t border-neutral-200 dark:border-neutral-700">
+              <span className="font-medium text-neutral-700 dark:text-neutral-300">Our offer</span>
               <span className="font-bold text-blue">
                 ₦{(item.platformBid / 100).toLocaleString()}
               </span>
@@ -1015,10 +1024,10 @@ const SellItemDetail: React.FC<Props> = ({
         transition={{ delay: 0.3 }}
         className="mb-8"
       >
-        <h3 className="text-sm font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-2">
+        <h3 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-2">
           Timeline
         </h3>
-        <div className="flex items-center gap-1.5 text-xs text-gray-400">
+        <div className="flex items-center gap-1.5 text-xs text-neutral-400">
           <Clock size={12} />
           <span>
             Created{' '}
@@ -1028,7 +1037,7 @@ const SellItemDetail: React.FC<Props> = ({
               day: 'numeric',
             })}
           </span>
-          <span className="text-gray-300">·</span>
+          <span className="text-neutral-300">·</span>
           <span>
             Updated{' '}
             {new Date(item.updatedAt).toLocaleDateString('en-NG', {
@@ -1051,7 +1060,7 @@ const SellItemDetail: React.FC<Props> = ({
           {(onEdit || editView) && (
             <button
               onClick={handleEdit}
-              className="flex-1 py-3 bg-blue dark:bg-gray-800 text-white dark:text-gray-300 rounded-xl text-sm font-semibold hover:bg-blue dark:hover:bg-gray-700 transition-colors flex items-center justify-center gap-2"
+              className="flex-1 py-3 bg-blue dark:bg-neutral-800 text-white dark:text-neutral-300 rounded-xl text-sm font-semibold hover:bg-blue dark:hover:bg-neutral-700 transition-colors flex items-center justify-center gap-2"
             >
               <Edit2 size={15} /> Edit Product
             </button>

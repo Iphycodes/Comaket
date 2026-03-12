@@ -74,7 +74,7 @@ export const PostRequestSuccessful: React.FC<Props> = ({
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.3 }}
-        className="text-2xl font-bold text-gray-900 dark:text-white mb-2"
+        className="text-2xl font-bold text-neutral-900 dark:text-white mb-2"
       >
         {type === 'new' ? 'Submitted Successfully!' : 'Updated Successfully!'}
       </motion.h2>
@@ -83,7 +83,7 @@ export const PostRequestSuccessful: React.FC<Props> = ({
         initial={{ opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.4 }}
-        className="text-sm text-gray-500 dark:text-gray-400 max-w-sm"
+        className="text-sm text-neutral-500 dark:text-neutral-400 max-w-sm"
       >
         {type === 'new' ? (
           <>
@@ -110,7 +110,7 @@ export const PostRequestSuccessful: React.FC<Props> = ({
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           transition={{ delay: 0.5 }}
-          className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-gray-100 dark:bg-gray-800 text-sm font-medium text-gray-700 dark:text-gray-300"
+          className="mt-4 inline-flex items-center gap-2 px-4 py-2 rounded-full bg-neutral-100 dark:bg-neutral-800 text-sm font-medium text-neutral-700 dark:text-neutral-300"
         >
           <ModelIcon size={16} />
           {getSellingModelLabel(sellingModel)}
@@ -125,8 +125,8 @@ export const PostRequestSuccessful: React.FC<Props> = ({
           transition={{ delay: 0.6 }}
           className="mt-6 w-full max-w-sm"
         >
-          <div className="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-4 text-left">
-            <h4 className="text-xs font-semibold text-gray-500 dark:text-gray-400 uppercase tracking-wider mb-3">
+          <div className="bg-neutral-50 dark:bg-neutral-800/50 rounded-2xl p-4 text-left">
+            <h4 className="text-xs font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-3">
               What happens next?
             </h4>
             <div className="space-y-3">
@@ -137,12 +137,14 @@ export const PostRequestSuccessful: React.FC<Props> = ({
                       {i + 1}
                     </span>
                   </div>
-                  <p className="text-sm text-gray-600 dark:text-gray-300 leading-relaxed">{step}</p>
+                  <p className="text-sm text-neutral-600 dark:text-neutral-300 leading-relaxed">
+                    {step}
+                  </p>
                 </div>
               ))}
             </div>
 
-            <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-gray-200 dark:border-gray-700 text-xs text-gray-400">
+            <div className="flex items-center gap-1.5 mt-3 pt-3 border-t border-neutral-200 dark:border-neutral-700 text-xs text-neutral-400">
               <Clock size={12} />
               <span>{msgs.timeline}</span>
             </div>
@@ -165,7 +167,7 @@ export const PostRequestSuccessful: React.FC<Props> = ({
         </button>
         <button
           onClick={onClose}
-          className="w-full py-3 text-gray-500 hover:text-gray-700 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl text-sm font-medium transition-colors"
+          className="w-full py-3 text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl text-sm font-medium transition-colors"
         >
           Close
         </button>

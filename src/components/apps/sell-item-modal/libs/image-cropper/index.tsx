@@ -136,14 +136,14 @@ export const ImageCropper: React.FC<ImageCropperProps> = ({ imageSrc, onComplete
             <button
               type="button"
               onClick={onCancel}
-              className="w-full py-3 rounded-xl text-sm font-medium text-gray-600 dark:text-gray-400 hover:bg-gray-100 dark:hover:bg-gray-800 border border-gray-200 dark:border-gray-700 transition-colors"
+              className="w-full py-3 rounded-xl text-sm font-medium text-neutral-600 dark:text-neutral-400 hover:bg-neutral-100 dark:hover:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 transition-colors"
             >
               Cancel
             </button>
           </>
         ) : (
           <>
-            <Button type="default" onClick={onCancel} className="!h-14 px-10 hover:bg-gray-100">
+            <Button type="default" onClick={onCancel} className="!h-14 px-10 hover:bg-neutral-100">
               Cancel
             </Button>
             <Button

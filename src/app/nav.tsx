@@ -1,20 +1,17 @@
 'use client';
 import React from 'react';
 import { SiderTheme } from 'antd/es/layout/Sider';
-import { NavItem, getFirstCharacter, getRandomColorByString } from '@grc/_shared/helpers';
-import { isEmpty } from 'lodash';
-import { Avatar } from 'antd';
-import { Bookmark, HeartSearch, MoneyChange, ShopRemove, Bag } from 'iconsax-react';
+import { NavItem } from '@grc/_shared/helpers';
+import { Bookmark, Shop, BagHappy, People, Tag2 } from 'iconsax-react';
 import {
+  Crown,
   HandCoins,
   ShoppingBag,
   UserRoundSearch,
   Settings,
   ShieldAlert,
   MoreHorizontal,
-  Store,
 } from 'lucide-react';
-import SideNavAuthButton from '@grc/components/apps/layout/side-nav/lib/side-nav-auth-button';
 
 export type Nav = {
   theme: SiderTheme & string;
@@ -24,53 +21,9 @@ export type Nav = {
   footerMenuItems: NavItem[];
 };
 
-// ─── Mock Vendor Stores tied to the user's account ──────────────────────────
-
-export interface UserVendorStore {
-  id: string;
-  name: string;
-  avatar?: string;
-}
-
-export const mockUserVendorStores: UserVendorStore[] = [
-  { id: 'vs-001', name: 'EmTech Store' },
-  { id: 'vs-002', name: 'Gadget Hub NG' },
-  { id: 'vs-003', name: 'PhoneDeals Kaduna' },
-];
-
-// ─── Footer Menu Items ──────────────────────────────────────────────────────
+// ─── Footer Menu Items (static — My Stores is injected dynamically in SideNav) ─
 
 const footerMenuItems: NavItem[] = [
-  {
-    label: 'Profile',
-    key: 'profile',
-    destination: '/profile',
-    icon: (
-      <Avatar
-        style={{
-          backgroundColor: getRandomColorByString('Ifeanyi'),
-          verticalAlign: 'middle',
-          height: '24px',
-          width: '24px',
-        }}
-      >
-        <span className="text-white">{isEmpty('') && getFirstCharacter('Ifeanyi')}</span>
-      </Avatar>
-    ),
-  },
-  {
-    label: 'My Stores',
-    key: 'my-store',
-    destination: '/my-store',
-    icon: <Store />,
-    children: [
-      ...mockUserVendorStores.map((store) => ({
-        label: <span className="!text-sm">{store.name}</span>,
-        key: `my-store-${store.id}`,
-        destination: `/my-store/${store.id}`,
-      })),
-    ],
-  },
   {
     label: 'More',
     key: 'more',
@@ -84,16 +37,16 @@ const footerMenuItems: NavItem[] = [
         icon: <Settings size={18} />,
       },
       {
+        label: 'Subscription',
+        key: 'subscription',
+        destination: '/creator-account/subscription',
+        icon: <Crown size={18} />,
+      },
+      {
         label: 'Disputes',
         key: 'disputes',
         destination: '/disputes',
         icon: <ShieldAlert size={18} />,
-      },
-      {
-        label: <SideNavAuthButton />,
-        key: 'auth',
-        destination: '',
-        icon: <></>,
       },
     ],
   },
@@ -101,42 +54,55 @@ const footerMenuItems: NavItem[] = [
 
 // ─── Main Menu Items ────────────────────────────────────────────────────────
 
+// {
+//   label: 'Market',
+//   key: 'market',
+//   destination: '/',
+//   icon: <ShopRemove variant="Bulk" color="#6366f1" />,
+// },
+// {
+//   label: 'Cart',
+//   key: 'cart',
+//   destination: '/cart',
+//   icon: <Bag variant="Bulk" color="#22c55e" />,
+// },
+// {
+//   label: 'Find Creators',
+//   key: 'Creators',
+//   destination: '/creators',
+//   icon: <HeartSearch variant="Bulk" color="#22c55e" />,
+// },
+// {
+//   label: 'Sell Item',
+//   key: 'sell-item',
+//   destination: '/sell-item',
+//   icon: <MoneyChange variant="Bulk" color="#f97316" />,
+// },
+
 const menuItems: NavItem[] = [
   {
     label: 'Market',
     key: 'market',
     destination: '/',
-    icon: <ShopRemove variant="Bulk" color="#6366f1" />,
+    icon: <Shop variant="Bulk" color="#6366f1" size={22} />,
   },
   {
     label: 'Cart',
     key: 'cart',
     destination: '/cart',
-    icon: <Bag variant="Bulk" color="#22c55e" />,
+    icon: <BagHappy variant="Bulk" color="#22c55e" size={22} />,
   },
   {
-    label: 'Vendors',
-    key: 'vendors',
-    destination: '/vendors',
-    icon: <HeartSearch variant="Bulk" color="#22c55e" />,
+    label: 'Find Creators',
+    key: 'Creators',
+    destination: '/creators',
+    icon: <People variant="Bulk" color="#0ea5e9" size={22} />,
   },
-  // {
-  //   label: 'Notifications',
-  //   key: 'notifications',
-  //   destination: '',
-  //   icon: <Notification variant="Bulk" color="#1e88e5" />,
-  // },
-  // {
-  //   label: 'Saved',
-  //   key: 'saved',
-  //   destination: '/saved',
-  //   icon: <Bookmark variant="Bulk" color="#ec4899" />,
-  // },
   {
     label: 'Sell Item',
     key: 'sell-item',
-    destination: '/sell-item', // Mobile routes here; desktop opens modal (handled in SideNav)
-    icon: <MoneyChange variant="Bulk" color="#f97316" />,
+    destination: '/sell-item',
+    icon: <Tag2 variant="Bulk" color="#f97316" size={22} />,
   },
 ];
 
@@ -150,9 +116,9 @@ const mobileMenuItems: NavItem[] = [
     icon: <ShoppingBag />,
   },
   {
-    label: 'Vendors',
-    key: 'vendors',
-    destination: '/vendors',
+    label: 'Find Creators',
+    key: 'creators',
+    destination: '/creators',
     icon: <UserRoundSearch />,
   },
   {
@@ -174,7 +140,7 @@ const appNav: Nav = {
   theme: 'light',
   items: menuItems,
   mobileMenuItems,
-  footerMenuItems: footerMenuItems,
+  footerMenuItems,
 };
 
 export { appNav };

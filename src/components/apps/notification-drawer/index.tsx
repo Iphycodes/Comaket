@@ -71,14 +71,14 @@ const NotificationItem: React.FC<NotificationItemComponentProps> = ({
       case 'likes':
         return 'bg-pink-50 text-pink-600';
       default:
-        return 'bg-gray-50 text-gray-600';
+        return 'bg-neutral-50 text-neutral-600';
     }
   };
 
   return (
     <div
-      className={`p-4 hover:bg-gray-50 cursor-pointer border-b border-gray-100 transition-colors ${
-        !read ? 'bg-gray-50' : ''
+      className={`p-4 hover:bg-neutral-50 cursor-pointer border-b border-neutral-100 transition-colors ${
+        !read ? 'bg-neutral-50' : ''
       }`}
       onClick={() => !read && onMarkAsRead(id)}
     >
@@ -88,12 +88,12 @@ const NotificationItem: React.FC<NotificationItemComponentProps> = ({
         </div>
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
-            <h4 className="font-medium text-sm text-gray-900 line-clamp-1">{title}</h4>
-            <span className="text-xs text-gray-500 whitespace-nowrap">
+            <h4 className="font-medium text-sm text-neutral-900 line-clamp-1">{title}</h4>
+            <span className="text-xs text-neutral-500 whitespace-nowrap">
               {formatDistanceToNow(timestamp, { addSuffix: true })}
             </span>
           </div>
-          <p className="text-sm text-gray-600 mt-1 line-clamp-2">{message}</p>
+          <p className="text-sm text-neutral-600 mt-1 line-clamp-2">{message}</p>
           {imageUrl && (
             <div className="mt-2">
               <img src={imageUrl} alt="" className="h-12 w-12 object-cover rounded-md" />
@@ -273,7 +273,7 @@ const NotificationsDrawer = (
     <Sider
       collapsed={toggleNotificationsDrawer}
       collapsedWidth={0}
-      className="dash-sider z-200 rounded-r-2xl border-r border-r-gray-200 rounded-br-3xl p-0 text-lg shadow-2xl shadow-gray-400"
+      className="dash-sider z-200 rounded-r-2xl border-r border-r-neutral-200 rounded-br-3xl p-0 text-lg shadow-2xl shadow-neutral-400"
       width={isMobile ? '90vw' : 400}
       style={{
         overflow: 'hidden',
@@ -287,12 +287,12 @@ const NotificationsDrawer = (
       }}
     >
       <div className="flex flex-col h-full">
-        <div className="sticky top-0 bg-white z-10 border-b border-gray-200">
+        <div className="sticky top-0 bg-white z-10 border-b border-neutral-200">
           <div className="p-4 flex items-center justify-between">
             <div className="flex items-center gap-3">
               <button
                 onClick={() => setToggleNotificationsDrawer(true)}
-                className="text-gray-600 hover:text-gray-900 p-1 rounded-full hover:bg-gray-100 transition-colors"
+                className="text-neutral-600 hover:text-neutral-900 p-1 rounded-full hover:bg-neutral-100 transition-colors"
               >
                 <i className="ri-close-line text-xl"></i>
               </button>
@@ -300,7 +300,7 @@ const NotificationsDrawer = (
             </div>{' '}
             <Button
               type="text"
-              className="text-gray-600 hover:text-gray-900 space-x-2"
+              className="text-neutral-600 hover:text-neutral-900 space-x-2"
               onClick={handleMarkAllAsRead}
               disabled={unreadCount === 0}
             >
@@ -337,7 +337,7 @@ const NotificationsDrawer = (
               />
             ))
           ) : (
-            <div className="flex flex-col items-center justify-center h-full p-8 text-center text-gray-500">
+            <div className="flex flex-col items-center justify-center h-full p-8 text-center text-neutral-500">
               <i className="ri-notification-off-line text-4xl mb-2"></i>
               <p>No notifications yet</p>
             </div>

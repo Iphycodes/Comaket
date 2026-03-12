@@ -1,20 +1,35 @@
-export const loggedInUserTag = 'logged_in_user';
-export const virtualAccountTag = 'virtual-account';
-export const bankAccountsTag = 'bank-accounts';
-export const updateUserTag = 'update-profile';
-export const changePasswordTag = 'change-password';
-export const businessProfileTag = 'business-profile';
-export const accountSettingTag = 'account-setting';
-export const transactionsTag = 'transactions';
-export const dashboardAnalyticsTag = 'dashboard-analytics';
+/**
+ * RTK Query Cache Tags
+ * =====================
+ * Tags are used for automatic cache invalidation.
+ * When a mutation invalidates a tag, all queries providing
+ * that tag automatically refetch.
+ */
+
+export const accountTag = 'Account' as const;
+export const userTag = 'User' as const;
+export const creatorTag = 'Creator' as const;
+export const storeTag = 'Store' as const;
+export const listingTag = 'Listing' as const;
+export const orderTag = 'Order' as const;
+export const categoryTag = 'Category' as const;
+export const reviewTag = 'Review' as const;
+export const adminTag = 'Admin' as const;
+export const cartTag = 'Cart' as const;
+export const savedProductTag = 'SavedProduct' as const;
+export const shippingAddressTag = 'ShippingAddress' as const;
 
 export default [
-  loggedInUserTag,
-  virtualAccountTag,
-  updateUserTag,
-  businessProfileTag,
-  changePasswordTag,
-  bankAccountsTag,
-  transactionsTag,
-  dashboardAnalyticsTag,
+  accountTag,
+  userTag,
+  creatorTag,
+  storeTag,
+  listingTag,
+  orderTag,
+  categoryTag,
+  reviewTag,
+  adminTag,
+  cartTag,
+  savedProductTag,
+  shippingAddressTag,
 ];

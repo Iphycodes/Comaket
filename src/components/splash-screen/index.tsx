@@ -18,7 +18,7 @@ const SplashScreen: React.FC<Props> = ({}) => {
         priority
         style={{ width: '50px', height: '50px' }}
       />
-      <div className="absolute flex flex-col text-gray-600 gap-0 bottom-8 font-semibold text-center mx-auto">
+      <div className="absolute flex flex-col text-neutral-600 gap-0 bottom-8 font-semibold text-center mx-auto">
         <Preloader
           use={TailSpin}
           size={32}

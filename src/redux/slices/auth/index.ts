@@ -1,23 +1,18 @@
 import { createSlice } from '@reduxjs/toolkit';
 import { authApi } from '@grc/services/auth';
 import { AppCookie } from '@grc/_shared/helpers';
-import { AuthDataType } from '@grc/_shared/namespace/auth';
+// import { AuthDataType } from '@grc/_shared/namespace/auth';
 import { persistor } from '@grc/redux/store';
-import { WalletNamespace } from '@grc/_shared/namespace/wallet';
-import { AccountNamespace } from '@grc/_shared/namespace/account';
+import { usersApi } from '@grc/services/users';
 
 export const initialState = {
   authData: null,
   sessionToken: null,
-  currentAccount: null,
-  wallet: null,
-  isLiveMode: false,
+  isAuthenticated: false,
 } as {
-  authData: AuthDataType | null;
+  authData: Record<string, any> | null;
   sessionToken: string | null;
-  currentAccount: AccountNamespace.Account | null;
-  wallet: WalletNamespace.Wallet | null;
-  isLiveMode: boolean;
+  isAuthenticated: boolean;
 };
 
 const AUTH_KEY = 'auth';
@@ -27,35 +22,45 @@ export const authSlice = createSlice({
   initialState,
   reducers: {
     logout: () => {
+      console.log('logged out 1::::');
       return initialState;
     },
-    setCurrentAccount: (state, { payload }) => {
+    setAuthData: (state, { payload }) => {
       return {
         ...state,
         currentAccount: payload,
       };
     },
-
-    setWallet: (state, { payload }) => {
-      return {
-        ...state,
-        wallet: payload,
-      };
-    },
   },
 
   extraReducers: (builder) => {
-    builder.addMatcher(authApi.endpoints.login.matchFulfilled, (state, action) => {
-      state.authData = action.payload.data;
-      state.sessionToken = action.payload.meta?.token;
+    builder.addMatcher(authApi.endpoints.signIn.matchFulfilled, (state, action) => {
+      state.authData = action.payload.meta?.token ? action.payload.data : null;
+      state.sessionToken = action.payload.meta?.token ?? null;
+      state.isAuthenticated = action.payload.meta?.token ? true : false;
     });
-    builder.addMatcher(authApi.endpoints.register.matchFulfilled, (state, action) => {
-      state.authData = action.payload.data;
-      state.sessionToken = action.payload.meta?.token;
+    builder.addMatcher(authApi.endpoints.googleAuth.matchFulfilled, (state, action) => {
+      state.authData = action.payload.meta?.token ? action.payload.data : null;
+      state.sessionToken = action.payload.meta?.token ?? null;
+      state.isAuthenticated = action.payload.meta?.token ? true : false;
     });
-    builder.addMatcher(authApi.endpoints.getLoggedInUser.matchFulfilled, (state, action) => {
+    builder.addMatcher(authApi.endpoints.signUp.matchFulfilled, (state, action) => {
+      state.authData = action.payload.meta?.token ? action.payload.data : null;
+      state.sessionToken = action.payload.meta?.token ?? null;
+      state.isAuthenticated = action.payload.meta?.token ? true : false;
+    });
+    builder.addMatcher(authApi.endpoints.verifyOtp.matchFulfilled, (state, action) => {
+      state.authData = action.payload.meta?.token ? action.payload.data : null;
+      state.sessionToken = action.payload.meta?.token ?? null;
+      state.isAuthenticated = action.payload.meta?.token ? true : false;
+    });
+    builder.addMatcher(usersApi.endpoints.getUserProfile.matchFulfilled, (state, action) => {
       state.authData = action.payload.data;
-      state.isLiveMode = action.payload.data?.currentAccount?.live;
+    });
+    builder.addMatcher(authApi.endpoints.logout.matchFulfilled, () => {
+      console.log('logged out 2::::');
+
+      return initialState;
     });
   },
 });
@@ -63,6 +68,7 @@ export const authSlice = createSlice({
 export const logoutMiddleware = (store: any) => (next: any) => async (action: any) => {
   if (authSlice.actions.logout.match(action)) {
     console.log('store::', store);
+    console.log('logged out 3::::');
     AppCookie({});
     await persistor.purge();
     window.location.reload();
@@ -70,6 +76,6 @@ export const logoutMiddleware = (store: any) => (next: any) => async (action: an
   return next(action);
 };
 
-export const { logout, setCurrentAccount, setWallet } = authSlice.actions;
+export const { logout, setAuthData } = authSlice.actions;
 
 export default authSlice.reducer;

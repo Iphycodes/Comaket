@@ -32,36 +32,36 @@ export const PostRequestSuccessful: React.FC<PostRequestSuccessfulProps> = ({
       )}
 
       {type === 'new' && (
-        <p className="text-center text-gray-600 max-w-md mb-2">
+        <p className="text-center text-neutral-600 max-w-md mb-2">
           Your request to sell <span className="font-medium">{itemName ?? 'New Product'}</span> with
           ID <span className="font-medium">{itemId}</span> has been submitted successfully.
         </p>
       )}
 
       {type === 'update' && (
-        <p className="text-center text-gray-600 max-w-md mb-2">
+        <p className="text-center text-neutral-600 max-w-md mb-2">
           Your request to update Product <span className="font-medium">{itemId}</span> has been
           submitted successfully.
         </p>
       )}
 
       {sellingModel && (
-        <p className="text-sm text-gray-500 mb-8">
+        <p className="text-sm text-neutral-500 mb-8">
           Selling via <span className="font-medium">{getSellingModelLabel(sellingModel)}</span>
         </p>
       )}
 
       {!sellingModel && <div className="mb-6" />}
 
-      <div className="bg-gray-50 rounded-lg p-4 mb-8 w-full max-w-md">
+      <div className="bg-neutral-50 rounded-lg p-4 mb-8 w-full max-w-md">
         {type === 'new' && (
-          <p className="text-sm text-gray-600 text-center">
+          <p className="text-sm text-neutral-600 text-center">
             Your item will be listed on the marketplace once all verifications are complete and the
             platform fee is processed. We'll notify you of any updates.
           </p>
         )}
         {type === 'update' && (
-          <p className="text-sm text-gray-600 text-center">
+          <p className="text-sm text-neutral-600 text-center">
             Your item will be updated on the marketplace once all verifications are complete. We'll
             notify you of any updates.
           </p>
@@ -71,7 +71,7 @@ export const PostRequestSuccessful: React.FC<PostRequestSuccessfulProps> = ({
       <div className="flex gap-4">
         <button
           onClick={onClose}
-          className="px-6 py-2 border border-gray-300 rounded-md hover:bg-gray-50 transition-colors"
+          className="px-6 py-2 border border-neutral-300 rounded-md hover:bg-neutral-50 transition-colors"
         >
           Close
         </button>
@@ -80,7 +80,7 @@ export const PostRequestSuccessful: React.FC<PostRequestSuccessfulProps> = ({
             onClose();
             onTrackStatus(itemId);
           }}
-          className="px-6 py-2 bg-black text-white rounded-md hover:bg-gray-800 transition-colors"
+          className="px-6 py-2 bg-black text-white rounded-md hover:bg-neutral-800 transition-colors"
         >
           Track Status
         </button>

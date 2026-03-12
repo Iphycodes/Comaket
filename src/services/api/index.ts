@@ -34,6 +34,7 @@ const baseQueryWithResponse: BaseQueryFn<FetchArgs, unknown, FetchBaseQueryError
     error,
   }: QueryReturnValue<any, any, Record<string, any>> = await baseQuery(args, api, extraOptions);
   const token = data?.meta?.token;
+  console.log('endpoint return new:::::', data);
   if (error) {
     return { error: { status: error?.status, data: error?.data } };
   }

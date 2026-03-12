@@ -48,6 +48,10 @@ module.exports = (phase) => {
           protocol: 'https',
           hostname: 'images.unsplash.com',
         },
+        {
+          protocol: 'https',
+          hostname: 'res.cloudinary.com',
+        },
       ],
     },
     // redirects: async =() => {

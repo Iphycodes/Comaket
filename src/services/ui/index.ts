@@ -14,14 +14,21 @@ export const appMiddleware =
     const isMutation = get(action, ['meta', 'arg', 'type']) === 'mutation';
     const originalArgs = get(action, ['meta', 'arg', 'originalArgs']);
     const options = originalArgs?.options;
-    const pagination = get(action, ['payload', 'meta']);
+    const pagination = get(action, ['payload', 'meta', 'pagination']);
     const endpointName = get(action, ['meta', 'arg', 'endpointName']);
     const isWithPagination = isObject(originalArgs) && keys(originalArgs).includes('page');
 
+    console.log('th original args::::', originalArgs);
+    console.log('args pagination::::::', pagination);
+    console.log('args payload', get(action, ['payload']));
+
     const { noErrorMessage, noSuccessMessage, errorMessage, successMessage } = options || {};
+
+    console.log('endpoint return::::::', action.payload?.data?.message ?? '');
 
     const errMssg =
       errorMessage ||
+      get(action, ['payload', 'data', 'message']) ||
       get(action, ['payload', 'data', 'meta', 'error', 'message']) ||
       get(action, ['payload', 'data', 'error_details'])?.[0]?.message ||
       get(action, ['payload', 'data', 'error_description']);

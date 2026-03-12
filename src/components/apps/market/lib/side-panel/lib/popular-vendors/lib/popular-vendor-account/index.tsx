@@ -9,7 +9,7 @@ interface Props {
 
 const PopularVendorAccount: React.FC<Props> = ({ vendorProfile }) => {
   return (
-    <div className="w-full hover:bg-gray-100 cursor-pointer px-1 py-2 flex justify-between items-center">
+    <div className="w-full hover:bg-neutral-100 cursor-pointer px-1 py-2 flex justify-between items-center">
       <section className="flex gap-3 items-center">
         <Image
           src={vendorProfile?.profilePicUrl ?? ''}

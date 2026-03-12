@@ -109,7 +109,7 @@ const ModernItemPost: React.FC<ItemPostProps> = ({
     image: getFirstImageUrl(media),
     condition,
     negotiable: askingPrice?.negotiable || false,
-    sellerName: postUserProfile?.businessName || postUserProfile?.userName || '',
+    sellerName: postUserProfile?.displayName || '',
   });
 
   const handleAddToCart = () => {
@@ -139,7 +139,7 @@ const ModernItemPost: React.FC<ItemPostProps> = ({
       return;
     }
     const formattedPrice = numberFormat(askingPrice?.price / 100, Currencies.NGN);
-    const sellerName = postUserProfile?.businessName || postUserProfile?.userName || 'Seller';
+    const sellerName = postUserProfile?.displayName || postUserProfile?.userName || 'Seller';
 
     const msg = `Hi, ${sellerName},
 I am interested in this item on Comaket.
@@ -186,11 +186,17 @@ Price: ${formattedPrice}`;
   };
 
   /** Navigate to vendor profile page */
-  const handleVendorClick = () => {
-    const vendorId = postUserProfile?.id || postUserProfile?.userName;
-    if (vendorId) {
-      router.push(`/vendors/${encodeURIComponent(vendorId)}`);
+  const handleCreatorOrStoreClick = () => {
+    console.log('post user data::::::', postUserProfile);
+    if (postUserProfile?.isStore) {
+      router.push(`/stores/${encodeURIComponent(postUserProfile?.id)}`);
+    } else {
+      router.push(`/creators/${encodeURIComponent(postUserProfile?.userName)}`);
     }
+  };
+
+  const handleUsernameClick = () => {
+    router.push(`/creators/${encodeURIComponent(postUserProfile?.username)}`);
   };
 
   const handleShare = async () => {
@@ -243,29 +249,32 @@ Price: ${formattedPrice}`;
     };
   }, [isMobile, currentMediaIndex, media.length]);
 
+  console.log('postUserProfile::::::', postUserProfile);
+
   return (
     <motion.div
       initial={{ opacity: 0, y: 10 }}
       animate={{ opacity: 1, y: 0 }}
-      className="w-full border-b border-gray-100 dark:border-zinc-800 py-8 first:pt-0"
+      className="w-full border-b border-neutral-100 dark:border-zinc-800 py-8 first:pt-0"
+      // onClick={handleViewItem}
     >
       {/* Seller info */}
       <div className={`flex items-center gap-3 mb-4 ${isMobile ? 'px-2' : ''}`}>
-        <div className="relative w-10 h-10 cursor-pointer" onClick={handleVendorClick}>
+        <div className="relative w-10 h-10 cursor-pointer" onClick={handleCreatorOrStoreClick}>
           <img
             src={postUserProfile?.profilePicUrl}
             alt="Seller"
             className="rounded-full object-cover w-full h-full"
           />
-          <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
+          {/* <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" /> */}
         </div>
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <h3
               className="font-medium cursor-pointer hover:text-blue transition-colors"
-              onClick={handleVendorClick}
+              onClick={handleCreatorOrStoreClick}
             >
-              {postUserProfile?.businessName || postUserProfile?.userName}
+              {postUserProfile?.displayName || ''}
             </h3>
             {postUserProfile?.isVerified && (
               <i
@@ -275,7 +284,16 @@ Price: ${formattedPrice}`;
               />
             )}
           </div>
-          <div className="flex items-center gap-3 text-[12px] text-gray-500 dark:text-gray-400">
+          <div className="flex items-center gap-2 text-[12px] text-neutral-500 dark:text-neutral-400">
+            <span>
+              {postUserProfile?.isStore && 'Owned by: '}
+              <span
+                className="cursor-pointer hover:text-blue transition-colors"
+                onClick={handleUsernameClick}
+              >
+                @{postUserProfile?.userName || ''}
+              </span>
+            </span>
             <div className="flex items-center gap-1">
               <MapPin size={14} />
               <span>{postUserProfile?.location || 'Nigeria'}</span>
@@ -379,7 +397,7 @@ Price: ${formattedPrice}`;
                   className={`px-2 py-1 text-[10px] !flex gap-2 items-center font-semibold ${
                     availability
                       ? 'text-white drop-shadow-[0_2px_12px_rgba(16,185,129,0.8)]'
-                      : 'text-gray-200 drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]'
+                      : 'text-neutral-200 drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]'
                   }`}
                 >
                   <div
@@ -440,7 +458,7 @@ Price: ${formattedPrice}`;
                 {productTags.map((tag, index) => (
                   <span
                     key={index}
-                    className="px-3 py-1 text-xs font-medium bg-gray-100 dark:bg-zinc-800 text-gray-700 dark:text-gray-300 rounded-full hover:bg-gray-200 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
+                    className="px-3 py-1 text-xs font-medium bg-neutral-100 dark:bg-zinc-800 text-neutral-700 dark:text-neutral-300 rounded-full hover:bg-neutral-200 dark:hover:bg-zinc-700 transition-colors cursor-pointer"
                   >
                     {tag}
                   </span>
@@ -464,7 +482,7 @@ Price: ${formattedPrice}`;
                     disabled={isSoldOut}
                     className={`flex-1 py-3 rounded-lg font-medium flex items-center justify-center gap-1.5 shadow-sm text-sm transition-all ${
                       isSoldOut
-                        ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                        ? 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
                         : 'bg-gradient-to-r from-blue to-indigo-700 hover:from-blue hover:to-indigo-800 text-white hover:shadow-md'
                     }`}
                   >
@@ -490,10 +508,10 @@ Price: ${formattedPrice}`;
                       disabled={isSoldOut || isMaxQuantityReached}
                       className={`p-3 rounded-lg border shadow-sm transition-colors ${
                         isSoldOut || isMaxQuantityReached
-                          ? 'bg-gray-100 border-gray-200 text-gray-300 cursor-not-allowed'
+                          ? 'bg-neutral-100 border-neutral-200 text-neutral-300 cursor-not-allowed'
                           : itemInCart
                             ? 'bg-indigo-50 border-blue text-blue dark:bg-blue/20 dark:border-blue'
-                            : 'bg-neutral-100 border-neutral-200 dark:bg-gray-700 dark:border-gray-600 text-gray-600 dark:text-gray-400 hover:border-blue hover:text-blue'
+                            : 'bg-neutral-100 border-neutral-200 dark:bg-neutral-700 dark:border-neutral-600 text-neutral-600 dark:text-neutral-400 hover:border-blue hover:text-blue'
                       }`}
                     >
                       <ShoppingCart size={18} />
@@ -521,7 +539,7 @@ Price: ${formattedPrice}`;
                       className={`p-3 rounded-lg border shadow-sm transition-colors ${
                         isSaved
                           ? 'bg-pink-50 border-pink-200 dark:bg-pink-900/20 dark:border-pink-800'
-                          : 'bg-neutral-100 border-neutral-200 dark:bg-gray-700 dark:border-gray-600'
+                          : 'bg-neutral-100 border-neutral-200 dark:bg-neutral-700 dark:border-neutral-600'
                       }`}
                     >
                       <Bookmark
@@ -529,7 +547,7 @@ Price: ${formattedPrice}`;
                         className={`${
                           isSaved
                             ? 'fill-pink-500 text-pink-500'
-                            : 'text-gray-500 dark:text-gray-400'
+                            : 'text-neutral-500 dark:text-neutral-400'
                         } transition-colors`}
                       />
                     </motion.button>
@@ -540,9 +558,9 @@ Price: ${formattedPrice}`;
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       onClick={handleShare}
-                      className="p-3 rounded-lg border border-neutral-200 dark:border-gray-600 bg-neutral-100 dark:bg-gray-700 shadow-sm"
+                      className="p-3 rounded-lg border border-neutral-200 dark:border-neutral-600 bg-neutral-100 dark:bg-neutral-700 shadow-sm"
                     >
-                      <Share2 size={18} className="text-gray-500 dark:text-gray-400" />
+                      <Share2 size={18} className="text-neutral-500 dark:text-neutral-400" />
                     </motion.button>
                   </Tooltip>
                 </div>
@@ -569,7 +587,7 @@ Price: ${formattedPrice}`;
                       className={`flex-1 p-3 rounded-lg border shadow-sm transition-colors flex items-center justify-center gap-1.5 text-sm ${
                         isSaved
                           ? 'bg-pink-50 border-pink-200 dark:bg-pink-900/20 dark:border-pink-800 text-pink-500'
-                          : 'bg-neutral-100 border-neutral-200 dark:bg-gray-700 dark:border-gray-600 text-gray-500'
+                          : 'bg-neutral-100 border-neutral-200 dark:bg-neutral-700 dark:border-neutral-600 text-neutral-500'
                       }`}
                     >
                       <Bookmark
@@ -577,7 +595,7 @@ Price: ${formattedPrice}`;
                         className={`${
                           isSaved
                             ? 'fill-pink-500 text-pink-500'
-                            : 'text-gray-500 dark:text-gray-400'
+                            : 'text-neutral-500 dark:text-neutral-400'
                         } transition-colors`}
                       />
                       Save
@@ -589,9 +607,9 @@ Price: ${formattedPrice}`;
                       whileHover={{ scale: 1.1 }}
                       whileTap={{ scale: 0.9 }}
                       onClick={handleShare}
-                      className="flex-1 p-3 rounded-lg border border-neutral-200 dark:border-gray-600 bg-neutral-100 dark:bg-gray-700 shadow-sm flex items-center justify-center gap-1.5 text-sm text-gray-500"
+                      className="flex-1 p-3 rounded-lg border border-neutral-200 dark:border-neutral-600 bg-neutral-100 dark:bg-neutral-700 shadow-sm flex items-center justify-center gap-1.5 text-sm text-neutral-500"
                     >
-                      <Share2 size={16} className="text-gray-500 dark:text-gray-400" />
+                      <Share2 size={16} className="text-neutral-500 dark:text-neutral-400" />
                       Share
                     </motion.button>
                   </Tooltip>
@@ -602,25 +620,30 @@ Price: ${formattedPrice}`;
         </div>
       </div>
 
-      <ItemDetailModal
-        open={isModalOpen}
-        onClose={() => setIsModalOpen(false)}
-        item={{
-          description,
-          sponsored,
-          postUserProfile,
-          media,
-          askingPrice,
-          condition,
-          comments,
-          itemName,
-          id,
-          productTags,
-          quantity,
-          isBuyable,
-          listingType,
-        }}
-      />
+      <div onClick={(e) => e.stopPropagation()}>
+        <ItemDetailModal
+          open={isModalOpen}
+          onClose={() => {
+            console.log('onclose hit');
+            setIsModalOpen(false);
+          }}
+          item={{
+            description,
+            sponsored,
+            postUserProfile,
+            media,
+            askingPrice,
+            condition,
+            comments,
+            itemName,
+            id,
+            productTags,
+            quantity,
+            isBuyable,
+            listingType,
+          }}
+        />
+      </div>
     </motion.div>
   );
 };

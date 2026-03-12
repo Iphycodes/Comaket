@@ -4,30 +4,43 @@ import React, { useState, useMemo } from 'react';
 import { Input, message as antMessage } from 'antd';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
+  AlertTriangle,
   ArrowLeft,
   ArrowRight,
   AtSign,
   Camera,
   Check,
   CheckCircle,
+  CreditCard,
   Crown,
   Globe,
   Loader2,
   Mail,
-  MessageCircle,
+  MapPin,
+  Building2,
   Minus,
   PartyPopper,
-  Phone,
+  Plus,
   Rocket,
   Search,
   ShoppingBag,
   Sparkles,
+  Tag,
   User,
   UserCheck,
   Palette,
+  X,
 } from 'lucide-react';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
-import { CREATOR_INDUSTRIES, CREATOR_PLANS } from '@grc/_shared/constant';
+import {
+  CREATOR_INDUSTRIES,
+  CREATOR_PLANS,
+  CreatorPlan,
+  getKeywordsForIndustries,
+} from '@grc/_shared/constant';
+import { SearchableSelect } from '@grc/_shared/components/searchable-select';
+import PhoneInput from '@grc/_shared/components/phone-input';
+import { useGetPlatformSettingsQuery } from '@grc/services/payments';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TYPES
@@ -40,26 +53,37 @@ export interface CreatorAccountData {
   lastName: string;
   bio: string;
   contactEmail: string;
-  phoneNumber: string;
-  whatsappNumber: string;
+  phoneNumber: string; // stored as "+2349076141362"
+  whatsappNumber: string; // stored as "+2349076141362"
   website: string;
   instagramHandle: string;
   twitterHandle: string;
   tiktokHandle: string;
-  profileImage: string | null; // base64 or existing URL
-  // Step 2: Industries
+  profileImage: string | null;
+  state: string;
+  city: string;
+  // Step 2: Industries (stored as IDs e.g. ["fashion", "jewelry"])
   selectedIndustries: string[];
-  // Step 3: Plan
+  // Step 3: Tags
+  tags: string[];
+  // Step 4: Plan
   selectedPlan: string;
 }
 
-/** Data passed in from the existing member account to pre-fill fields */
 export interface MemberPrefillData {
   firstName: string;
   lastName: string;
   email: string;
   phoneNumber: string;
   profileImageUrl: string | null;
+  bio?: string;
+  state?: string;
+  city?: string;
+}
+
+export interface LocationOption {
+  name: string;
+  iso2?: string;
 }
 
 type UsernameStatus = 'idle' | 'checking' | 'available' | 'taken' | 'invalid';
@@ -73,16 +97,24 @@ interface CreatorAccountSetupProps {
   onDataChange: (data: Partial<CreatorAccountData>) => void;
   onCheckUsername: (username: string) => void;
   onSubmit: () => void;
+  states?: LocationOption[];
+  cities?: LocationOption[];
+  loadingStates?: boolean;
+  loadingCities?: boolean;
+  onStateChange?: (state: string) => void;
+  /** Error from failed subscription payment return */
+  subscriptionError?: string | null;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
-// STEP INDICATOR
+// STEP INDICATOR — 4 steps (Profile → Industry → Tags → Plan)
 // ═══════════════════════════════════════════════════════════════════════════
 
 const stepsConfig = [
   { key: 1, label: 'Profile', icon: <User size={16} /> },
   { key: 2, label: 'Industry', icon: <Palette size={16} /> },
-  { key: 3, label: 'Plan', icon: <Crown size={16} /> },
+  { key: 3, label: 'Tags', icon: <Tag size={16} /> },
+  { key: 4, label: 'Plan', icon: <Crown size={16} /> },
 ];
 
 const StepIndicator: React.FC<{ current: number; isMobile: boolean }> = ({ current, isMobile }) => (
@@ -96,7 +128,7 @@ const StepIndicator: React.FC<{ current: number; isMobile: boolean }> = ({ curre
                 ? 'w-8 h-8 bg-emerald-500 text-white'
                 : current === step.key
                   ? 'w-8 h-8 bg-gradient-to-r from-blue to-indigo-500 text-white shadow-md shadow-blue/20'
-                  : 'w-8 h-8 bg-gray-100 dark:bg-gray-800 text-gray-400'
+                  : 'w-8 h-8 bg-neutral-100 dark:bg-neutral-800 text-neutral-400'
             }`}
           >
             {current > step.key ? <Check size={14} /> : step.icon}
@@ -104,7 +136,7 @@ const StepIndicator: React.FC<{ current: number; isMobile: boolean }> = ({ curre
           {!isMobile && (
             <span
               className={`text-xs font-semibold transition-colors ${
-                current >= step.key ? 'text-gray-900 dark:text-white' : 'text-gray-400'
+                current >= step.key ? 'text-neutral-900 dark:text-white' : 'text-neutral-400'
               }`}
             >
               {step.label}
@@ -113,8 +145,8 @@ const StepIndicator: React.FC<{ current: number; isMobile: boolean }> = ({ curre
         </div>
         {i < stepsConfig.length - 1 && (
           <div
-            className={`h-[2px] transition-all duration-500 ${isMobile ? 'w-8' : 'w-12'} ${
-              current > step.key ? 'bg-emerald-500' : 'bg-gray-200 dark:bg-gray-700'
+            className={`h-[2px] transition-all duration-500 ${isMobile ? 'w-6' : 'w-10'} ${
+              current > step.key ? 'bg-emerald-500' : 'bg-neutral-200 dark:bg-neutral-700'
             }`}
           />
         )}
@@ -136,9 +168,7 @@ const UsernameInput: React.FC<{
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const raw = e.target.value.toLowerCase().replace(/[^a-z0-9._]/g, '');
     onChange(raw);
-    if (raw.length >= 3) {
-      onCheck(raw);
-    }
+    if (raw.length >= 3) onCheck(raw);
   };
 
   const statusIndicator = () => {
@@ -158,7 +188,7 @@ const UsernameInput: React.FC<{
 
   return (
     <div>
-      <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 block">
+      <label className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5 block">
         Username <span className="text-red-400">*</span>
       </label>
       <div className="relative">
@@ -171,11 +201,11 @@ const UsernameInput: React.FC<{
         />
         <AtSign
           size={16}
-          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none"
+          className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400 pointer-events-none"
         />
         <div className="absolute right-3.5 top-1/2 -translate-y-1/2">{statusIndicator()}</div>
       </div>
-      <p className="text-[11px] text-gray-400 mt-1.5">
+      <p className="text-[11px] text-neutral-400 mt-1.5">
         Letters, numbers, dots and underscores only. Min 3 characters.
       </p>
       {status === 'available' && value.length >= 3 && (
@@ -188,7 +218,7 @@ const UsernameInput: React.FC<{
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
-// STEP 1: PROFILE & IDENTITY
+// STEP 1: PROFILE & IDENTITY — with PhoneInput
 // ═══════════════════════════════════════════════════════════════════════════
 
 interface Step1Props {
@@ -198,6 +228,11 @@ interface Step1Props {
   onCheckUsername: (username: string) => void;
   onNext: () => void;
   isMobile: boolean;
+  states?: LocationOption[];
+  cities?: LocationOption[];
+  loadingStates?: boolean;
+  loadingCities?: boolean;
+  onStateChange?: (state: string) => void;
 }
 
 const Step1Profile: React.FC<Step1Props> = ({
@@ -207,6 +242,11 @@ const Step1Profile: React.FC<Step1Props> = ({
   onCheckUsername,
   onNext,
   isMobile,
+  states = [],
+  cities = [],
+  loadingStates,
+  loadingCities,
+  onStateChange,
 }) => {
   const fileInputRef = React.useRef<HTMLInputElement>(null);
   const [showSocials, setShowSocials] = useState(
@@ -220,6 +260,11 @@ const Step1Profile: React.FC<Step1Props> = ({
     reader.onload = () => onChange({ profileImage: reader.result as string });
     reader.readAsDataURL(file);
     e.target.value = '';
+  };
+
+  const handleStateSelect = (stateName: string) => {
+    onChange({ state: stateName, city: '' });
+    onStateChange?.(stateName);
   };
 
   const canProceed =
@@ -236,21 +281,20 @@ const Step1Profile: React.FC<Step1Props> = ({
       transition={{ duration: 0.3 }}
       className="space-y-5"
     >
-      {/* Header */}
       <div className="text-center">
         <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue to-indigo-500 flex items-center justify-center mx-auto mb-3 shadow-lg shadow-blue/20">
           <UserCheck size={24} className="text-white" />
         </div>
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white">
+        <h2 className="text-xl font-bold text-neutral-900 dark:text-white">
           Create Your Creator Profile
         </h2>
-        <p className="text-sm text-gray-500 mt-1">
+        <p className="text-sm text-neutral-500 mt-1">
           This is your personal identity as a creator on Comaket
         </p>
       </div>
 
-      {/* Profile image */}
       <div className="max-w-2xl mx-auto justify-center space-y-4">
+        {/* Profile image */}
         <div className="flex justify-center">
           <input
             ref={fileInputRef}
@@ -264,20 +308,19 @@ const Step1Profile: React.FC<Step1Props> = ({
               <img
                 src={data.profileImage}
                 alt="Profile"
-                className="w-24 h-24 rounded-full object-cover border-4 border-gray-100 dark:border-gray-700"
+                className="w-24 h-24 rounded-full object-cover border-4 border-neutral-100 dark:border-neutral-700"
               />
             ) : (
-              <div className="w-24 h-24 rounded-full bg-gray-100 dark:bg-gray-800 border-4 border-gray-50 dark:border-gray-700 flex items-center justify-center">
-                <User size={32} className="text-gray-300 dark:text-gray-600" />
+              <div className="w-24 h-24 rounded-full bg-neutral-100 dark:bg-neutral-800 border-4 border-neutral-50 dark:border-neutral-700 flex items-center justify-center">
+                <User size={32} className="text-neutral-300 dark:text-neutral-600" />
               </div>
             )}
-            <div className="absolute bottom-0 right-0 w-8 h-8 bg-blue rounded-full flex items-center justify-center shadow-md border-2 border-white dark:border-gray-900 group-hover:scale-110 transition-transform">
+            <div className="absolute bottom-0 right-0 w-8 h-8 bg-blue rounded-full flex items-center justify-center shadow-md border-2 border-white dark:border-neutral-900 group-hover:scale-110 transition-transform">
               <Camera size={14} className="text-white" />
             </div>
           </button>
         </div>
 
-        {/* Username */}
         <UsernameInput
           value={data.username}
           status={usernameStatus}
@@ -285,10 +328,9 @@ const Step1Profile: React.FC<Step1Props> = ({
           onCheck={onCheckUsername}
         />
 
-        {/* Name row */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 block">
+            <label className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5 block">
               First Name <span className="text-red-400">*</span>
             </label>
             <Input
@@ -299,7 +341,7 @@ const Step1Profile: React.FC<Step1Props> = ({
             />
           </div>
           <div>
-            <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 block">
+            <label className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5 block">
               Last Name <span className="text-red-400">*</span>
             </label>
             <Input
@@ -311,9 +353,8 @@ const Step1Profile: React.FC<Step1Props> = ({
           </div>
         </div>
 
-        {/* Bio */}
         <div>
-          <label className="text-sm font-semibold text-gray-700 dark:text-gray-300 mb-1.5 block">
+          <label className="text-sm font-semibold text-neutral-700 dark:text-neutral-300 mb-1.5 block">
             Bio
           </label>
           <Input.TextArea
@@ -327,16 +368,15 @@ const Step1Profile: React.FC<Step1Props> = ({
           />
         </div>
 
-        {/* Contact section */}
-        <div className="border-t border-gray-200 dark:border-gray-700 pt-5">
-          <h3 className="text-sm font-bold text-gray-900 dark:text-white mb-1">Contact</h3>
-          <p className="text-[11px] text-gray-400 mb-4">
+        {/* Contact */}
+        <div className="border-t border-neutral-200 dark:border-neutral-700 pt-5">
+          <h3 className="text-sm font-bold text-neutral-900 dark:text-white mb-1">Contact</h3>
+          <p className="text-[11px] text-neutral-400 mb-4">
             How buyers and collaborators can reach you
           </p>
-
           <div className="space-y-4">
             <div>
-              <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1.5 block">
+              <label className="text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-1.5 block">
                 Email
               </label>
               <Input
@@ -344,41 +384,83 @@ const Step1Profile: React.FC<Step1Props> = ({
                 onChange={(e) => onChange({ contactEmail: e.target.value })}
                 placeholder="your@email.com"
                 className="!rounded-xl h-11"
-                prefix={<Mail size={14} className="text-gray-400" />}
+                prefix={<Mail size={14} className="text-neutral-400" />}
               />
             </div>
-
             <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-2 gap-3'}`}>
               <div>
-                <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1.5 block">
+                <label className="text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-1.5 block">
                   Phone
                 </label>
-                <Input
+                <PhoneInput
                   value={data.phoneNumber}
-                  onChange={(e) => onChange({ phoneNumber: e.target.value })}
-                  placeholder="e.g. 2348012345678"
-                  className="!rounded-xl h-11"
-                  prefix={<Phone size={14} className="text-gray-400" />}
+                  onChange={(val) => onChange({ phoneNumber: val })}
+                  placeholder="9076141362"
                 />
               </div>
               <div>
-                <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1.5 block">
+                <label className="text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-1.5 block">
                   WhatsApp
                 </label>
-                <Input
+                <PhoneInput
                   value={data.whatsappNumber}
-                  onChange={(e) => onChange({ whatsappNumber: e.target.value })}
-                  placeholder="e.g. 2348012345678"
-                  className="!rounded-xl h-11"
-                  prefix={<MessageCircle size={14} className="text-gray-400" />}
+                  onChange={(val) => onChange({ whatsappNumber: val })}
+                  placeholder="9076141362"
                 />
               </div>
             </div>
           </div>
         </div>
 
-        {/* Socials — collapsible */}
-        <div className="">
+        {/* Location */}
+        <div className="border-t border-neutral-200 dark:border-neutral-700 pt-5">
+          <h3 className="text-sm font-bold text-neutral-900 dark:text-white mb-1">Location</h3>
+          <p className="text-[11px] text-neutral-400 mb-4">Help buyers find creators near them</p>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-1.5 block">
+                State
+              </label>
+              <SearchableSelect
+                options={states}
+                value={data.state}
+                onChange={handleStateSelect}
+                placeholder="Select state"
+                searchPlaceholder="Search states..."
+                loading={loadingStates}
+                icon={MapPin}
+              />
+            </div>
+            <div>
+              <label className="text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-1.5 block">
+                City
+              </label>
+              {cities.length > 0 ? (
+                <SearchableSelect
+                  options={cities}
+                  value={data.city}
+                  onChange={(v) => onChange({ city: v })}
+                  placeholder="Select city"
+                  searchPlaceholder="Search cities..."
+                  loading={loadingCities}
+                  icon={Building2}
+                  disabled={!data.state}
+                />
+              ) : (
+                <Input
+                  value={data.city}
+                  onChange={(e) => onChange({ city: e.target.value })}
+                  placeholder={data.state ? 'Enter city' : 'Select a state first'}
+                  disabled={!data.state}
+                  className="!rounded-xl h-11"
+                />
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* Socials */}
+        <div>
           <button
             onClick={() => setShowSocials(!showSocials)}
             className="flex items-center gap-2 text-sm font-semibold text-blue hover:text-indigo-600 transition-colors"
@@ -393,7 +475,6 @@ const Step1Profile: React.FC<Step1Props> = ({
               ▼
             </motion.span>
           </button>
-
           <AnimatePresence>
             {showSocials && (
               <motion.div
@@ -405,7 +486,7 @@ const Step1Profile: React.FC<Step1Props> = ({
               >
                 <div className="space-y-4 pt-4">
                   <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1.5 block">
+                    <label className="text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-1.5 block">
                       Website
                     </label>
                     <Input
@@ -413,12 +494,11 @@ const Step1Profile: React.FC<Step1Props> = ({
                       onChange={(e) => onChange({ website: e.target.value })}
                       placeholder="https://yoursite.com"
                       className="!rounded-xl h-11"
-                      prefix={<Globe size={14} className="text-gray-400" />}
+                      prefix={<Globe size={14} className="text-neutral-400" />}
                     />
                   </div>
-
                   <div>
-                    <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1.5 block">
+                    <label className="text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-1.5 block">
                       Instagram
                     </label>
                     <Input
@@ -427,16 +507,15 @@ const Step1Profile: React.FC<Step1Props> = ({
                       placeholder="username"
                       className="!rounded-xl h-11"
                       prefix={
-                        <span className="text-gray-400 text-sm flex items-center gap-1">
+                        <span className="text-neutral-400 text-sm flex items-center gap-1">
                           <i className="ri-instagram-line" /> @
                         </span>
                       }
                     />
                   </div>
-
                   <div className={`grid ${isMobile ? 'grid-cols-1 gap-4' : 'grid-cols-2 gap-3'}`}>
                     <div>
-                      <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1.5 block">
+                      <label className="text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-1.5 block">
                         Twitter / X
                       </label>
                       <Input
@@ -445,14 +524,14 @@ const Step1Profile: React.FC<Step1Props> = ({
                         placeholder="username"
                         className="!rounded-xl h-11"
                         prefix={
-                          <span className="text-gray-400 text-sm flex items-center gap-1">
+                          <span className="text-neutral-400 text-sm flex items-center gap-1">
                             <i className="ri-twitter-x-line" /> @
                           </span>
                         }
                       />
                     </div>
                     <div>
-                      <label className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-1.5 block">
+                      <label className="text-sm font-medium text-neutral-600 dark:text-neutral-400 mb-1.5 block">
                         TikTok
                       </label>
                       <Input
@@ -461,7 +540,7 @@ const Step1Profile: React.FC<Step1Props> = ({
                         placeholder="username"
                         className="!rounded-xl h-11"
                         prefix={
-                          <span className="text-gray-400 text-sm flex items-center gap-1">
+                          <span className="text-neutral-400 text-sm flex items-center gap-1">
                             <i className="ri-tiktok-line" /> @
                           </span>
                         }
@@ -474,14 +553,13 @@ const Step1Profile: React.FC<Step1Props> = ({
           </AnimatePresence>
         </div>
 
-        {/* Next */}
         <button
           onClick={onNext}
           disabled={!canProceed}
           className={`w-full py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
             canProceed
               ? 'bg-gradient-to-r from-blue to-indigo-500 hover:from-blue hover:to-indigo-600 text-white shadow-md shadow-blue/20 hover:shadow-lg'
-              : 'bg-gray-200 dark:bg-gray-700 text-gray-400 cursor-not-allowed'
+              : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-400 cursor-not-allowed'
           }`}
         >
           Continue
@@ -493,20 +571,18 @@ const Step1Profile: React.FC<Step1Props> = ({
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
-// STEP 2: INDUSTRY SELECTION
+// STEP 2: INDUSTRY SELECTION — sends IDs (e.g. "fashion", "jewelry")
 // ═══════════════════════════════════════════════════════════════════════════
 
-interface Step2Props {
+const MAX_INDUSTRIES = 5;
+
+const Step2Industry: React.FC<{
   data: CreatorAccountData;
   onChange: (data: Partial<CreatorAccountData>) => void;
   onNext: () => void;
   onBack: () => void;
   isMobile: boolean;
-}
-
-const MAX_INDUSTRIES = 5;
-
-const Step2Industry: React.FC<Step2Props> = ({ data, onChange, onNext, onBack, isMobile }) => {
+}> = ({ data, onChange, onNext, onBack, isMobile }) => {
   const [searchQuery, setSearchQuery] = useState('');
 
   const filteredIndustries = useMemo(() => {
@@ -520,7 +596,13 @@ const Step2Industry: React.FC<Step2Props> = ({ data, onChange, onNext, onBack, i
   const toggleIndustry = (id: string) => {
     const current = data.selectedIndustries;
     if (current.includes(id)) {
-      onChange({ selectedIndustries: current.filter((i) => i !== id) });
+      // Also clear tags that belong ONLY to this industry (not shared with remaining ones)
+      const remaining = current.filter((i) => i !== id);
+      const remainingKeywords = new Set(getKeywordsForIndustries(remaining));
+      const cleanedTags = data.tags.filter(
+        (t) => remainingKeywords.has(t) || !getKeywordsForIndustries([id]).includes(t)
+      );
+      onChange({ selectedIndustries: remaining, tags: cleanedTags });
     } else if (current.length < MAX_INDUSTRIES) {
       onChange({ selectedIndustries: [...current, id] });
     } else {
@@ -542,19 +624,19 @@ const Step2Industry: React.FC<Step2Props> = ({ data, onChange, onNext, onBack, i
         <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center mx-auto mb-3 shadow-lg shadow-orange-500/20">
           <Palette size={24} className="text-white" />
         </div>
-        <h2 className="text-xl font-bold text-gray-900 dark:text-white">What Do You Create?</h2>
-        <p className="text-sm text-gray-500 mt-1">
+        <h2 className="text-xl font-bold text-neutral-900 dark:text-white">What Do You Create?</h2>
+        <p className="text-sm text-neutral-500 mt-1">
           Select up to {MAX_INDUSTRIES} industries that best describe your craft
         </p>
       </div>
 
       <div className="flex items-center justify-between">
-        <span className="text-xs font-semibold text-gray-500">
+        <span className="text-xs font-semibold text-neutral-500">
           {data.selectedIndustries.length} of {MAX_INDUSTRIES} selected
         </span>
         {data.selectedIndustries.length > 0 && (
           <button
-            onClick={() => onChange({ selectedIndustries: [] })}
+            onClick={() => onChange({ selectedIndustries: [], tags: [] })}
             className="text-xs text-red-400 hover:text-red-500 font-medium transition-colors"
           >
             Clear all
@@ -563,13 +645,13 @@ const Step2Industry: React.FC<Step2Props> = ({ data, onChange, onNext, onBack, i
       </div>
 
       <div className="relative">
-        <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-gray-400" />
+        <Search size={16} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400" />
         <input
           type="text"
           placeholder="Search industries..."
           value={searchQuery}
           onChange={(e) => setSearchQuery(e.target.value)}
-          className="w-full h-11 pl-10 pr-4 border border-gray-200 dark:border-gray-700 rounded-xl bg-white dark:bg-gray-800 text-sm text-gray-900 dark:text-white placeholder-gray-400 focus:ring-2 focus:ring-blue/20 focus:border-blue outline-none transition-all"
+          className="w-full h-11 pl-10 pr-4 border border-neutral-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 text-sm text-neutral-900 dark:text-white placeholder-neutral-400 focus:ring-2 focus:ring-blue/20 focus:border-blue outline-none transition-all"
         />
       </div>
 
@@ -588,14 +670,14 @@ const Step2Industry: React.FC<Step2Props> = ({ data, onChange, onNext, onBack, i
               className={`flex items-center gap-3 p-3 rounded-xl border-2 text-left transition-all ${
                 isSelected
                   ? 'border-blue bg-blue/5 dark:bg-blue/10 shadow-sm'
-                  : 'border-gray-100 dark:border-gray-700/50 hover:border-gray-200 dark:hover:border-gray-600'
+                  : 'border-neutral-100 dark:border-neutral-700/50 hover:border-neutral-200 dark:hover:border-neutral-600'
               }`}
             >
               <div
                 className={`w-10 h-10 rounded-xl flex items-center justify-center flex-shrink-0 transition-all ${
                   isSelected
                     ? `bg-gradient-to-br ${industry.color} text-white shadow-sm`
-                    : 'bg-gray-50 dark:bg-gray-800 text-gray-400'
+                    : 'bg-neutral-50 dark:bg-neutral-800 text-neutral-400'
                 }`}
               >
                 <i className={`${industry.icon} text-lg`} />
@@ -604,19 +686,19 @@ const Step2Industry: React.FC<Step2Props> = ({ data, onChange, onNext, onBack, i
                 <p
                   className={`text-sm font-semibold ${
                     isSelected
-                      ? 'text-gray-900 dark:text-white'
-                      : 'text-gray-700 dark:text-gray-300'
+                      ? 'text-neutral-900 dark:text-white'
+                      : 'text-neutral-700 dark:text-neutral-300'
                   }`}
                 >
                   {industry.label}
                 </p>
-                <p className="text-[11px] text-gray-400 truncate">{industry.description}</p>
+                <p className="text-[11px] text-neutral-400 truncate">{industry.description}</p>
               </div>
               <div
                 className={`w-5 h-5 rounded-full flex items-center justify-center flex-shrink-0 transition-all ${
                   isSelected
                     ? 'bg-blue text-white'
-                    : 'border-2 border-gray-200 dark:border-gray-600'
+                    : 'border-2 border-neutral-200 dark:border-neutral-600'
                 }`}
               >
                 {isSelected && <Check size={12} />}
@@ -624,10 +706,9 @@ const Step2Industry: React.FC<Step2Props> = ({ data, onChange, onNext, onBack, i
             </motion.button>
           );
         })}
-
         {filteredIndustries.length === 0 && (
           <div className="col-span-2 text-center py-8">
-            <p className="text-sm text-gray-400">
+            <p className="text-sm text-neutral-400">
               No industries found for &quot;{searchQuery}&quot;
             </p>
           </div>
@@ -637,7 +718,7 @@ const Step2Industry: React.FC<Step2Props> = ({ data, onChange, onNext, onBack, i
       <div className="flex gap-3 pt-2">
         <button
           onClick={onBack}
-          className="flex items-center justify-center gap-1.5 px-5 py-3.5 text-sm font-medium text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 transition-colors"
+          className="flex items-center justify-center gap-1.5 px-5 py-3.5 text-sm font-medium text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 transition-colors"
         >
           <ArrowLeft size={16} />
           Back
@@ -648,7 +729,7 @@ const Step2Industry: React.FC<Step2Props> = ({ data, onChange, onNext, onBack, i
           className={`flex-1 py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
             canProceed
               ? 'bg-gradient-to-r from-blue to-indigo-500 hover:from-blue hover:to-indigo-600 text-white shadow-md shadow-blue/20 hover:shadow-lg'
-              : 'bg-gray-200 dark:bg-gray-700 text-gray-400 cursor-not-allowed'
+              : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-400 cursor-not-allowed'
           }`}
         >
           Continue
@@ -660,26 +741,247 @@ const Step2Industry: React.FC<Step2Props> = ({ data, onChange, onNext, onBack, i
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
-// STEP 3: PLAN SELECTION
+// STEP 3: TAGS / KEYWORDS — NEW STEP
 // ═══════════════════════════════════════════════════════════════════════════
 
-interface Step3Props {
+const MAX_TAGS = 15;
+
+const Step3Tags: React.FC<{
+  data: CreatorAccountData;
+  onChange: (data: Partial<CreatorAccountData>) => void;
+  onNext: () => void;
+  onBack: () => void;
+  isMobile: boolean;
+}> = ({ data, onChange, onNext, onBack }) => {
+  const [searchQuery, setSearchQuery] = useState('');
+  const [customTag, setCustomTag] = useState('');
+
+  // All keywords from selected industries, deduped
+  const suggestedTags = useMemo(
+    () => getKeywordsForIndustries(data.selectedIndustries),
+    [data.selectedIndustries]
+  );
+
+  const filteredSuggestions = useMemo(() => {
+    if (!searchQuery.trim()) return suggestedTags;
+    const q = searchQuery.toLowerCase();
+    return suggestedTags.filter((tag) => tag.toLowerCase().includes(q));
+  }, [suggestedTags, searchQuery]);
+
+  const toggleTag = (tag: string) => {
+    const current = data.tags;
+    if (current.includes(tag)) {
+      onChange({ tags: current.filter((t) => t !== tag) });
+    } else if (current.length < MAX_TAGS) {
+      onChange({ tags: [...current, tag] });
+    } else {
+      antMessage.warning(`You can select up to ${MAX_TAGS} tags`);
+    }
+  };
+
+  const sanitizeTag = (raw: string): string =>
+    raw
+      .trim()
+      .toLowerCase()
+      .replace(/[^a-z0-9-]/g, '-')
+      .replace(/-+/g, '-')
+      .replace(/^-|-$/g, '');
+
+  const addCustomTag = () => {
+    const tag = sanitizeTag(customTag);
+    if (!tag) return;
+    if (data.tags.includes(tag)) {
+      antMessage.info('Tag already added');
+      setCustomTag('');
+      return;
+    }
+    if (data.tags.length >= MAX_TAGS) {
+      antMessage.warning(`You can select up to ${MAX_TAGS} tags`);
+      return;
+    }
+    onChange({ tags: [...data.tags, tag] });
+    setCustomTag('');
+  };
+
+  const handleCustomKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === 'Enter') {
+      e.preventDefault();
+      addCustomTag();
+    }
+  };
+
+  const canProceed = data.tags.length >= 1;
+
+  return (
+    <motion.div
+      initial={{ opacity: 0, x: 30 }}
+      animate={{ opacity: 1, x: 0 }}
+      exit={{ opacity: 0, x: -30 }}
+      transition={{ duration: 0.3 }}
+      className="space-y-5"
+    >
+      <div className="text-center">
+        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-emerald-400 to-teal-500 flex items-center justify-center mx-auto mb-3 shadow-lg shadow-emerald-500/20">
+          <Tag size={24} className="text-white" />
+        </div>
+        <h2 className="text-xl font-bold text-neutral-900 dark:text-white">Add Your Tags</h2>
+        <p className="text-sm text-neutral-500 mt-1 max-w-sm mx-auto">
+          These keywords help buyers find you when searching on Comaket. The more relevant your
+          tags, the easier it is for the right customers to discover your products and stores.
+        </p>
+      </div>
+
+      {/* Selected tags */}
+      <div>
+        <div className="flex items-center justify-between mb-2">
+          <span className="text-xs font-semibold text-neutral-500">
+            {data.tags.length} of {MAX_TAGS} tags
+          </span>
+          {data.tags.length > 0 && (
+            <button
+              onClick={() => onChange({ tags: [] })}
+              className="text-xs text-red-400 hover:text-red-500 font-medium transition-colors"
+            >
+              Clear all
+            </button>
+          )}
+        </div>
+        {data.tags.length > 0 && (
+          <div className="flex flex-wrap gap-2 p-3 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl border border-neutral-100 dark:border-neutral-700/50 mb-3">
+            <AnimatePresence>
+              {data.tags.map((tag) => (
+                <motion.span
+                  key={tag}
+                  initial={{ scale: 0.8, opacity: 0 }}
+                  animate={{ scale: 1, opacity: 1 }}
+                  exit={{ scale: 0.8, opacity: 0 }}
+                  className="inline-flex items-center gap-1 px-2.5 py-1 bg-blue-50 dark:bg-blue-900/30 border border-blue-200 dark:border-blue text-blue dark:text-blue-300 rounded-full text-xs font-medium"
+                >
+                  {tag}
+                  <button
+                    onClick={() => toggleTag(tag)}
+                    className="hover:text-red-500 transition-colors"
+                  >
+                    <X size={12} />
+                  </button>
+                </motion.span>
+              ))}
+            </AnimatePresence>
+          </div>
+        )}
+      </div>
+
+      {/* Custom tag input */}
+      <div>
+        <label className="text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-1.5 block">
+          Add a custom tag
+        </label>
+        <div className="flex gap-2">
+          <input
+            type="text"
+            value={customTag}
+            onChange={(e) => setCustomTag(e.target.value)}
+            onKeyDown={handleCustomKeyDown}
+            placeholder="Type a tag and press Enter"
+            className="flex-1 h-10 px-3 border border-neutral-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 text-sm text-neutral-900 dark:text-white placeholder-neutral-400 outline-none focus:ring-2 focus:ring-blue/20 focus:border-blue transition-all"
+          />
+          <button
+            onClick={addCustomTag}
+            disabled={!customTag.trim() || data.tags.length >= MAX_TAGS}
+            className="flex items-center gap-1 px-4 h-10 rounded-xl text-xs font-semibold bg-blue text-white hover:bg-indigo-600 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+          >
+            <Plus size={14} />
+            Add
+          </button>
+        </div>
+      </div>
+
+      {/* Suggested tags */}
+      <div>
+        <label className="text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-1.5 block">
+          Suggested from your industries — tap to add
+        </label>
+        <div className="relative mb-2">
+          <Search size={14} className="absolute left-3 top-1/2 -translate-y-1/2 text-neutral-400" />
+          <input
+            type="text"
+            placeholder="Filter suggestions..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            className="w-full h-9 pl-8 pr-3 border border-neutral-200 dark:border-neutral-700 rounded-lg bg-white dark:bg-neutral-800 text-xs text-neutral-900 dark:text-white placeholder-neutral-400 outline-none focus:ring-2 focus:ring-blue/20 focus:border-blue transition-all"
+          />
+        </div>
+        <div className="flex flex-wrap gap-1.5 max-h-[200px] overflow-y-auto pr-1 pb-1">
+          {filteredSuggestions.map((tag) => {
+            const isSelected = data.tags.includes(tag);
+            return (
+              <button
+                key={tag}
+                onClick={() => toggleTag(tag)}
+                className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
+                  isSelected
+                    ? 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue text-blue dark:text-blue-300'
+                    : 'bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:border-blue hover:text-blue'
+                }`}
+              >
+                {isSelected ? (
+                  <span className="inline-flex items-center gap-1">
+                    <Check size={10} />
+                    {tag}
+                  </span>
+                ) : (
+                  tag
+                )}
+              </button>
+            );
+          })}
+          {filteredSuggestions.length === 0 && (
+            <p className="text-xs text-neutral-400 py-4 w-full text-center">
+              No suggestions match &quot;{searchQuery}&quot;
+            </p>
+          )}
+        </div>
+      </div>
+
+      <div className="flex gap-3 pt-2">
+        <button
+          onClick={onBack}
+          className="flex items-center justify-center gap-1.5 px-5 py-3.5 text-sm font-medium text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 transition-colors"
+        >
+          <ArrowLeft size={16} />
+          Back
+        </button>
+        <button
+          onClick={onNext}
+          disabled={!canProceed}
+          className={`flex-1 py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 transition-all ${
+            canProceed
+              ? 'bg-gradient-to-r from-blue to-indigo-500 hover:from-blue hover:to-indigo-600 text-white shadow-md shadow-blue/20 hover:shadow-lg'
+              : 'bg-neutral-200 dark:bg-neutral-700 text-neutral-400 cursor-not-allowed'
+          }`}
+        >
+          Continue
+          <ArrowRight size={16} />
+        </button>
+      </div>
+    </motion.div>
+  );
+};
+
+// ═══════════════════════════════════════════════════════════════════════════
+// STEP 4: PLAN SELECTION
+// ═══════════════════════════════════════════════════════════════════════════
+
+const Step4Plan: React.FC<{
   data: CreatorAccountData;
   onChange: (data: Partial<CreatorAccountData>) => void;
   onSubmit: () => void;
   onBack: () => void;
   isSubmitting: boolean;
   isMobile: boolean;
-}
-
-const Step3Plan: React.FC<Step3Props> = ({
-  data,
-  onChange,
-  onSubmit,
-  onBack,
-  isSubmitting,
-  isMobile,
-}) => (
+  subscriptionError?: string | null;
+  plans: CreatorPlan[];
+}> = ({ data, onChange, onSubmit, onBack, isSubmitting, isMobile, subscriptionError, plans }) => (
   <motion.div
     initial={{ opacity: 0, x: 30 }}
     animate={{ opacity: 1, x: 0 }}
@@ -691,12 +993,29 @@ const Step3Plan: React.FC<Step3Props> = ({
       <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-violet-500 to-purple-600 flex items-center justify-center mx-auto mb-3 shadow-lg shadow-purple-500/20">
         <Crown size={24} className="text-white" />
       </div>
-      <h2 className="text-xl font-bold text-gray-900 dark:text-white">Choose Your Plan</h2>
-      <p className="text-sm text-gray-500 mt-1">Start free, upgrade when you&apos;re ready</p>
+      <h2 className="text-xl font-bold text-neutral-900 dark:text-white">Choose Your Plan</h2>
+      <p className="text-sm text-neutral-500 mt-1">Start free, upgrade when you&apos;re ready</p>
     </div>
 
-    <div className={`${isMobile ? 'space-y-3' : 'grid grid-cols-3 gap-3'}`}>
-      {CREATOR_PLANS.map((plan) => {
+    {/* Subscription error banner */}
+    {subscriptionError && (
+      <div className="flex items-start gap-2.5 p-4 bg-red-50 dark:bg-red-900/10 border border-red-200 dark:border-red-800/30 rounded-xl">
+        <AlertTriangle size={16} className="text-red-500 flex-shrink-0 mt-0.5" />
+        <div>
+          <p className="text-sm font-semibold text-red-700 dark:text-red-400">Payment Issue</p>
+          <p className="text-xs text-red-600 dark:text-red-400/80 mt-0.5 leading-relaxed">
+            {subscriptionError}
+          </p>
+        </div>
+      </div>
+    )}
+    <div
+      className={`${isMobile ? 'space-y-3' : 'grid gap-3'}`}
+      style={
+        !isMobile ? { gridTemplateColumns: `repeat(${plans.length}, minmax(0, 1fr))` } : undefined
+      }
+    >
+      {plans.map((plan) => {
         const isSelected = data.selectedPlan === plan.id;
         return (
           <motion.button
@@ -708,7 +1027,7 @@ const Step3Plan: React.FC<Step3Props> = ({
                 ? plan.highlighted
                   ? 'border-blue bg-gradient-to-b from-blue/5 to-indigo-500/5 shadow-lg shadow-blue/10'
                   : 'border-blue bg-blue/5 dark:bg-blue/10 shadow-md'
-                : 'border-gray-100 dark:border-gray-700/50 hover:border-gray-200 dark:hover:border-gray-600'
+                : 'border-neutral-100 dark:border-neutral-700/50 hover:border-neutral-200 dark:hover:border-neutral-600'
             }`}
           >
             {plan.badge && (
@@ -724,20 +1043,18 @@ const Step3Plan: React.FC<Step3Props> = ({
                 </span>
               </div>
             )}
-
             <div className="flex items-center justify-between mb-3">
-              <h3 className="text-base font-bold text-gray-900 dark:text-white">{plan.name}</h3>
+              <h3 className="text-base font-bold text-neutral-900 dark:text-white">{plan.name}</h3>
               <div
                 className={`w-5 h-5 rounded-full flex items-center justify-center transition-all ${
                   isSelected
                     ? 'bg-blue text-white'
-                    : 'border-2 border-gray-200 dark:border-gray-600'
+                    : 'border-2 border-neutral-200 dark:border-neutral-600'
                 }`}
               >
                 {isSelected && <Check size={12} />}
               </div>
             </div>
-
             <div className="mb-3">
               <span
                 className={`text-2xl font-bold ${
@@ -749,20 +1066,18 @@ const Step3Plan: React.FC<Step3Props> = ({
                 {plan.priceLabel}
               </span>
             </div>
-
-            <p className="text-xs text-gray-500 mb-4 leading-relaxed">{plan.description}</p>
-
+            <p className="text-xs text-neutral-500 mb-4 leading-relaxed">{plan.description}</p>
             <div className="space-y-2">
               {plan.features.map((f, i) => (
                 <div key={i} className="flex items-start gap-2">
                   <CheckCircle size={14} className="text-emerald-500 flex-shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-600 dark:text-gray-400">{f}</span>
+                  <span className="text-xs text-neutral-600 dark:text-neutral-400">{f}</span>
                 </div>
               ))}
               {plan.limits.map((l, i) => (
                 <div key={`l-${i}`} className="flex items-start gap-2">
-                  <Minus size={14} className="text-gray-300 flex-shrink-0 mt-0.5" />
-                  <span className="text-xs text-gray-400">{l}</span>
+                  <Minus size={14} className="text-neutral-300 flex-shrink-0 mt-0.5" />
+                  <span className="text-xs text-neutral-400">{l}</span>
                 </div>
               ))}
             </div>
@@ -770,11 +1085,10 @@ const Step3Plan: React.FC<Step3Props> = ({
         );
       })}
     </div>
-
     <div className="flex gap-3 pt-2">
       <button
         onClick={onBack}
-        className="flex items-center justify-center gap-1.5 px-5 py-3.5 text-sm font-medium text-gray-600 hover:bg-gray-100 dark:hover:bg-gray-800 rounded-xl border border-gray-200 dark:border-gray-700 transition-colors"
+        className="flex items-center justify-center gap-1.5 px-5 py-3.5 text-sm font-medium text-neutral-600 hover:bg-neutral-100 dark:hover:bg-neutral-800 rounded-xl border border-neutral-200 dark:border-neutral-700 transition-colors"
       >
         <ArrowLeft size={16} />
         Back
@@ -789,6 +1103,11 @@ const Step3Plan: React.FC<Step3Props> = ({
             <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
             Setting up...
           </>
+        ) : data.selectedPlan !== 'starter' ? (
+          <>
+            <CreditCard size={16} />
+            Pay & Become a Creator
+          </>
         ) : (
           <>
             <Rocket size={16} />
@@ -801,17 +1120,19 @@ const Step3Plan: React.FC<Step3Props> = ({
 );
 
 // ═══════════════════════════════════════════════════════════════════════════
-// STEP 4: SUCCESS
+// STEP 5: SUCCESS
 // ═══════════════════════════════════════════════════════════════════════════
 
-interface SuccessProps {
+const Step5Success: React.FC<{
   data: CreatorAccountData;
   isMobile: boolean;
-}
-
-const Step4Success: React.FC<SuccessProps> = ({ data }) => {
-  const plan = CREATOR_PLANS.find((p) => p.id === data.selectedPlan);
+  plans: CreatorPlan[];
+}> = ({ data, plans }) => {
+  const plan =
+    plans.find((p) => p.id === data.selectedPlan) ||
+    CREATOR_PLANS.find((p) => p.id === data.selectedPlan);
   const industries = CREATOR_INDUSTRIES.filter((ind) => data.selectedIndustries.includes(ind.id));
+  const locationStr = [data.city, data.state].filter(Boolean).join(', ');
 
   return (
     <motion.div
@@ -820,7 +1141,6 @@ const Step4Success: React.FC<SuccessProps> = ({ data }) => {
       transition={{ duration: 0.5, ease: 'easeOut' }}
       className="text-center space-y-6"
     >
-      {/* Celebration */}
       <div className="relative">
         <motion.div
           initial={{ scale: 0, rotate: -20 }}
@@ -830,7 +1150,6 @@ const Step4Success: React.FC<SuccessProps> = ({ data }) => {
         >
           <PartyPopper size={36} className="text-white" />
         </motion.div>
-
         {[...Array(6)].map((_, i) => (
           <motion.div
             key={i}
@@ -861,7 +1180,7 @@ const Step4Success: React.FC<SuccessProps> = ({ data }) => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.3 }}
-          className="text-2xl font-bold text-gray-900 dark:text-white"
+          className="text-2xl font-bold text-neutral-900 dark:text-white"
         >
           Welcome, Creator! 🎉
         </motion.h2>
@@ -869,25 +1188,24 @@ const Step4Success: React.FC<SuccessProps> = ({ data }) => {
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ delay: 0.4 }}
-          className="text-sm text-gray-500 mt-2"
+          className="text-sm text-neutral-500 mt-2"
         >
           <strong>@{data.username}</strong> is live on Comaket
         </motion.p>
       </div>
 
-      {/* Summary card */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ delay: 0.5 }}
-        className="bg-gray-50 dark:bg-gray-800/50 rounded-2xl p-5 text-left space-y-4"
+        className="bg-neutral-50 dark:bg-neutral-800/50 rounded-2xl p-5 text-left space-y-4"
       >
         <div className="flex items-center gap-3">
           {data.profileImage ? (
             <img
               src={data.profileImage}
               alt=""
-              className="w-12 h-12 rounded-full object-cover border-2 border-white dark:border-gray-700"
+              className="w-12 h-12 rounded-full object-cover border-2 border-white dark:border-neutral-700"
             />
           ) : (
             <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue to-indigo-500 flex items-center justify-center">
@@ -895,22 +1213,27 @@ const Step4Success: React.FC<SuccessProps> = ({ data }) => {
             </div>
           )}
           <div>
-            <p className="text-sm font-bold text-gray-900 dark:text-white">
+            <p className="text-sm font-bold text-neutral-900 dark:text-white">
               {data.firstName} {data.lastName}
             </p>
-            <p className="text-xs text-gray-400">@{data.username}</p>
+            <p className="text-xs text-neutral-400">@{data.username}</p>
           </div>
         </div>
-
+        {locationStr && (
+          <div className="flex items-center gap-1.5 text-sm text-neutral-500">
+            <MapPin size={14} className="text-neutral-400" />
+            {locationStr}
+          </div>
+        )}
         <div>
-          <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider mb-2">
+          <p className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider mb-2">
             Industries
           </p>
           <div className="flex flex-wrap gap-1.5">
             {industries.map((ind) => (
               <span
                 key={ind.id}
-                className="inline-flex items-center gap-1 px-2.5 py-1 bg-white dark:bg-gray-700/50 rounded-lg text-xs font-medium text-gray-600 dark:text-gray-300 border border-gray-100 dark:border-gray-600"
+                className="inline-flex items-center gap-1 px-2.5 py-1 bg-white dark:bg-neutral-700/50 rounded-lg text-xs font-medium text-neutral-600 dark:text-neutral-300 border border-neutral-100 dark:border-neutral-600"
               >
                 <i className={`${ind.icon} text-xs`} />
                 {ind.label}
@@ -918,11 +1241,32 @@ const Step4Success: React.FC<SuccessProps> = ({ data }) => {
             ))}
           </div>
         </div>
-
-        <div className="flex items-center justify-between py-2 border-t border-gray-200 dark:border-gray-700">
+        {data.tags.length > 0 && (
           <div>
-            <p className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">Plan</p>
-            <p className="text-sm font-bold text-gray-900 dark:text-white mt-0.5">
+            <p className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider mb-2">
+              Tags
+            </p>
+            <div className="flex flex-wrap gap-1.5">
+              {data.tags.slice(0, 8).map((tag) => (
+                <span
+                  key={tag}
+                  className="px-2 py-0.5 bg-blue-50 dark:bg-blue-900/20 rounded-full text-[11px] font-medium text-blue dark:text-blue-300"
+                >
+                  {tag}
+                </span>
+              ))}
+              {data.tags.length > 8 && (
+                <span className="text-[11px] text-neutral-400">+{data.tags.length - 8} more</span>
+              )}
+            </div>
+          </div>
+        )}
+        <div className="flex items-center justify-between py-2 border-t border-neutral-200 dark:border-neutral-700">
+          <div>
+            <p className="text-[11px] font-semibold text-neutral-400 uppercase tracking-wider">
+              Plan
+            </p>
+            <p className="text-sm font-bold text-neutral-900 dark:text-white mt-0.5">
               {plan?.name} — {plan?.priceLabel}
             </p>
           </div>
@@ -933,13 +1277,12 @@ const Step4Success: React.FC<SuccessProps> = ({ data }) => {
                 ? 'text-amber-500'
                 : plan?.id === 'pro'
                   ? 'text-blue'
-                  : 'text-gray-400'
+                  : 'text-neutral-400'
             }`}
           />
         </div>
       </motion.div>
 
-      {/* What's next info */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -958,13 +1301,12 @@ const Step4Success: React.FC<SuccessProps> = ({ data }) => {
           ].map((item, i) => (
             <li key={i} className="flex items-start gap-2">
               <CheckCircle size={13} className="text-blue/60 flex-shrink-0 mt-0.5" />
-              <span className="text-xs text-gray-600 dark:text-gray-400">{item}</span>
+              <span className="text-xs text-neutral-600 dark:text-neutral-400">{item}</span>
             </li>
           ))}
         </ul>
       </motion.div>
 
-      {/* CTA buttons */}
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
@@ -980,7 +1322,7 @@ const Step4Success: React.FC<SuccessProps> = ({ data }) => {
         </a>
         <a
           href="/profile"
-          className="w-full py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-700 transition-all"
+          className="w-full py-3.5 rounded-xl text-sm font-semibold flex items-center justify-center gap-2 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-all"
         >
           <User size={16} />
           Go to My Profile
@@ -991,7 +1333,7 @@ const Step4Success: React.FC<SuccessProps> = ({ data }) => {
 };
 
 // ═══════════════════════════════════════════════════════════════════════════
-// MAIN COMPONENT
+// MAIN — 5 steps total (4 active + success)
 // ═══════════════════════════════════════════════════════════════════════════
 
 const CreatorAccountSetup: React.FC<CreatorAccountSetupProps> = ({
@@ -1003,38 +1345,72 @@ const CreatorAccountSetup: React.FC<CreatorAccountSetupProps> = ({
   onDataChange,
   onCheckUsername,
   onSubmit,
+  states,
+  cities,
+  loadingStates,
+  loadingCities,
+  onStateChange,
+  subscriptionError,
 }) => {
   const isMobile = useMediaQuery(mediaSize.mobile);
+  const { data: settingsResponse } = useGetPlatformSettingsQuery();
+
+  const dynamicPlans = useMemo(() => {
+    const apiPlans = settingsResponse?.data?.plans;
+    if (!apiPlans) return CREATOR_PLANS;
+
+    const apiMap = new Map<string, { priceKobo: number; active: boolean }>();
+    for (const p of apiPlans) {
+      apiMap.set(p.id, { priceKobo: p.priceKobo, active: p.active });
+    }
+
+    return CREATOR_PLANS.filter((plan) => {
+      const api = apiMap.get(plan.id);
+      return !api || api.active;
+    }).map((plan) => {
+      const api = apiMap.get(plan.id);
+      if (!api) return plan;
+      const priceKobo = api.priceKobo;
+      const priceLabel =
+        priceKobo === 0 ? 'Free' : `₦${(priceKobo / 100).toLocaleString('en-NG')}/mo`;
+      return { ...plan, price: priceKobo, priceLabel };
+    });
+  }, [settingsResponse]);
 
   return (
-    <div className={`min-h-screen dark:bg-gray-900 ${isMobile ? 'pt-10' : ''}`}>
+    <div className={`min-h-screen dark:bg-neutral-900 ${isMobile ? 'pt-10' : ''}`}>
       <div className={`w-full ${isMobile ? 'px-4 py-6' : 'max-w-4xl mx-auto px-4 py-10'}`}>
-        {currentStep <= 3 && (
+        {currentStep <= 4 && (
           <div className="mb-8">
             <StepIndicator current={currentStep} isMobile={isMobile} />
           </div>
         )}
 
         <div
-          className={`bg-white dark:bg-gray-800/60 rounded-2xl dark:border-gray-700/50 ${
+          className={`bg-white dark:bg-neutral-800/60 rounded-2xl dark:border-neutral-700/50 ${
             isMobile ? 'p-5' : 'p-8'
           }`}
         >
           <AnimatePresence mode="wait">
             {currentStep === 1 && (
               <Step1Profile
-                key="step1"
+                key="s1"
                 data={data}
                 usernameStatus={usernameStatus}
                 onChange={onDataChange}
                 onCheckUsername={onCheckUsername}
                 onNext={() => onStepChange(2)}
                 isMobile={isMobile}
+                states={states}
+                cities={cities}
+                loadingStates={loadingStates}
+                loadingCities={loadingCities}
+                onStateChange={onStateChange}
               />
             )}
             {currentStep === 2 && (
               <Step2Industry
-                key="step2"
+                key="s2"
                 data={data}
                 onChange={onDataChange}
                 onNext={() => onStepChange(3)}
@@ -1043,22 +1419,36 @@ const CreatorAccountSetup: React.FC<CreatorAccountSetupProps> = ({
               />
             )}
             {currentStep === 3 && (
-              <Step3Plan
-                key="step3"
+              <Step3Tags
+                key="s3"
                 data={data}
                 onChange={onDataChange}
-                onSubmit={onSubmit}
+                onNext={() => onStepChange(4)}
                 onBack={() => onStepChange(2)}
-                isSubmitting={isSubmitting}
                 isMobile={isMobile}
               />
             )}
-            {currentStep === 4 && <Step4Success key="step4" data={data} isMobile={isMobile} />}
+            {currentStep === 4 && (
+              <Step4Plan
+                key="s4"
+                data={data}
+                onChange={onDataChange}
+                onSubmit={onSubmit}
+                onBack={() => onStepChange(3)}
+                isSubmitting={isSubmitting}
+                isMobile={isMobile}
+                subscriptionError={subscriptionError}
+                plans={dynamicPlans}
+              />
+            )}
+            {currentStep === 5 && (
+              <Step5Success key="s5" data={data} isMobile={isMobile} plans={dynamicPlans} />
+            )}
           </AnimatePresence>
         </div>
 
-        {currentStep <= 3 && (
-          <p className="text-center text-[11px] text-gray-400 mt-6">
+        {currentStep <= 4 && (
+          <p className="text-center text-[11px] text-neutral-400 mt-6">
             You can always update these details later in your profile settings
           </p>
         )}
