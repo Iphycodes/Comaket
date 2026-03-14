@@ -8,6 +8,7 @@ import type { Metadata } from 'next';
 import { Nunito } from 'next/font/google';
 import { ThemeProvider } from '@grc/_shared/components/theme-provider';
 import SplashScreen from '@grc/components/splash-screen';
+// import Script from 'next/script';
 
 const nunito = Nunito({
   subsets: ['latin'],
@@ -46,6 +47,16 @@ export default function RootLayout({ children }: LayoutProps) {
         >
           {loading ? <SplashScreen /> : children}
         </ThemeProvider>
+        {/* <Script id="aichat-widget" strategy="afterInteractive">
+          {`(function() {
+    var w = document.createElement('iframe');
+    w.src = 'http://localhost:3001/widget/e415273c-989d-47f5-98bb-bf0d827fe53d';
+    w.style.cssText = 'position:fixed;bottom:0;right:0;width:420px;height:620px;border:none;z-index:99999;background:transparent;';
+    w.setAttribute('allowtransparency', 'true');
+    w.id = 'aichat-widget';
+    document.body.appendChild(w);
+  })();`}
+        </Script> */}
       </body>
     </html>
   );

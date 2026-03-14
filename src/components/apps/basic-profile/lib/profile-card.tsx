@@ -20,16 +20,16 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ userProfile, onEditClick, isM
   // ── MOBILE: Centered layout ─────────────────────────────────────────
   if (isMobile) {
     return (
-      <div className="px-4 mt-10">
+      <div className="px-4 mt-2">
         <div className="bg-white dark:bg-neutral-800/60 rounded-2xl border border-neutral-100 dark:border-neutral-700/50 overflow-hidden">
-          <div className="px-5 pb-6 flex flex-col items-center text-center">
+          <div className="px-5 pt-4 pb-5 flex flex-col items-center text-center">
             {/* Avatar */}
             <div className="relative mb-3">
               {avatarUrl ? (
                 <img
                   src={avatarUrl}
                   alt={fullName}
-                  className="w-40 h-40 rounded-full object-cover border-4 border-white dark:border-neutral-800 shadow-lg"
+                  className="w-24 h-24 rounded-full object-cover border-4 border-white dark:border-neutral-800 shadow-lg"
                 />
               ) : (
                 <div

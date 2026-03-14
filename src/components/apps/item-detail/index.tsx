@@ -529,7 +529,7 @@ Price: ${formattedPrice}`;
                             ? 'bg-neutral-100 border-neutral-200 text-neutral-300 cursor-not-allowed'
                             : itemInCart
                               ? 'bg-blue-50 border-blue text-blue'
-                              : 'bg-neutral-100 border-neutral-200 text-neutral-600 hover:border-blue hover:text-blue'
+                              : 'bg-neutral-100 border-neutral-200 text-neutral-600 hover:border-blue '
                         }`}
                       >
                         <ShoppingCart size={20} />

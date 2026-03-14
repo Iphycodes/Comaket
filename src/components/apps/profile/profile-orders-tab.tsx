@@ -461,13 +461,16 @@ const ProfileOrdersTab: React.FC<ProfileOrdersTabProps> = ({
     );
 
   return (
-    <div className="p-5 px-6">
-      <div className="space-y-1 mb-5">
-        <h1 className="text-xl font-bold text-neutral-900 dark:text-white">
+    <div className={isMobile ? 'p-2 px-1' : 'p-5 px-6'}>
+      <div className={`space-y-1 ${isMobile ? 'mb-2' : 'mb-5'}`}>
+        <h1
+          className={`${
+            isMobile ? 'text-base' : 'text-xl'
+          } font-bold text-neutral-900 dark:text-white`}
+        >
           {variant === 'buyer' ? 'Purchases' : 'Recieved Orders'}
         </h1>
-        {/* Count */}
-        <p className="text-xs text-neutral-400 mb-3">
+        <p className="text-xs text-neutral-400">
           {ordersTotal} {variant === 'seller' ? 'order' : 'purchase'}
           {ordersTotal !== 1 ? 's' : ''}
           {hasActiveFilters ? ' (filtered)' : ''}
@@ -476,20 +479,22 @@ const ProfileOrdersTab: React.FC<ProfileOrdersTabProps> = ({
 
       {/* Search + Filters */}
       <div
-        className={`flex w-full ${isMobile ? 'flex-col gap-1' : 'items-center gap-2'} mb-4 sticky ${
+        className={`flex w-full ${
+          isMobile ? 'gap-2 items-center' : 'items-center gap-2'
+        } mb-4 sticky ${
           isMobile ? 'top-[75px]' : 'top-[45px]'
-        } z-10 bg-white dark:bg-neutral-900 py-3 -mx-4 px-4`}
+        } z-10 bg-white dark:bg-neutral-900 py-2 -mx-4 px-4`}
       >
-        <div className="flex-2 w-full mb-2">
+        <div className={`${isMobile ? 'flex-1' : 'flex-2 w-full'}`}>
           <Input
             prefix={<Search size={isMobile ? 14 : 16} className="text-neutral-400" />}
             placeholder={variant === 'seller' ? 'Search orders...' : 'Search purchases...'}
             onChange={(e) => debouncedChangeHandler(e.target.value)}
             allowClear
-            className={`w-full ${isMobile ? 'h-10' : 'h-11'} rounded-xl`}
+            className={`w-full ${isMobile ? 'h-8' : 'h-11'} rounded-xl`}
           />
         </div>
-        <div className={`flex items-center gap-2 mb-2 ${isMobile ? 'w-full' : ''}`}>
+        <div className={`flex items-center gap-2 ${isMobile ? '' : ''}`}>
           <Select
             allowClear
             placeholder="Status"
@@ -497,14 +502,16 @@ const ProfileOrdersTab: React.FC<ProfileOrdersTabProps> = ({
             onChange={(val) => setFilterStatus(val || null)}
             options={orderStatusOptions}
             className={`${
-              isMobile ? 'flex-1 h-10' : 'w-[150px] h-11'
+              isMobile ? 'w-[100px] h-8' : 'w-[150px] h-11'
             } [&_.ant-select-selector]:!rounded-lg`}
             popupClassName="!rounded-lg"
           />
           {hasActiveFilters && (
             <button
               onClick={clearFilters}
-              className="flex items-center gap-1 px-3 h-9 text-xs font-medium text-neutral-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg border border-neutral-200 dark:border-neutral-700 transition-colors"
+              className={`flex items-center gap-1 ${
+                isMobile ? 'px-2 h-8' : 'px-3 h-9'
+              } text-xs font-medium text-neutral-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg border border-neutral-200 dark:border-neutral-700 transition-colors`}
             >
               <X size={13} /> Clear
             </button>

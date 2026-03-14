@@ -333,9 +333,7 @@ const Profile: React.FC<ProfileProps> = ({
 
   return (
     <div
-      className={`dark:bg-neutral-900/50 min-h-screen ${
-        isMobile ? 'max-w-[100vw] mb-14 pt-8' : ''
-      }`}
+      className={`dark:bg-neutral-900/50 ${isMobile ? 'max-w-[100vw] mb-14 pt-0' : 'min-h-screen'}`}
     >
       <div className={`w-full ${!isMobile ? 'mx-auto px-4' : ''}`}>
         <ProfileHeader
@@ -346,17 +344,18 @@ const Profile: React.FC<ProfileProps> = ({
           isMobile={isMobile}
           onEditProfile={() => setIsEditOpen(true)}
           stores={myStores ?? []}
+          isCreatorOwnProfile={true}
           followersCount={followersCount}
           onShowFollowers={() => setShowFollowers(true)}
         />
 
-        <div className={`mt-6 ${isMobile ? 'px-0' : ''} pb-10`}>
+        <div className={`${isMobile ? 'mt-3 px-0' : 'mt-6'} pb-10`}>
           <Tabs
             defaultActiveKey={defaultTab}
-            className={`[&_.ant-tabs-nav]:!mb-4 [&_.ant-tabs-tab]:!text-sm [&_.ant-tabs-tab]:!font-medium [&_.ant-tabs-tab-active]:!font-semibold [&_.ant-tabs-ink-bar]:!bg-blue [&_.ant-tabs-nav]:!px-4 [&_.ant-tabs-nav]:!sticky [&_.ant-tabs-nav]:!z-[100] [&_.ant-tabs-nav]:!bg-white [&_.ant-tabs-nav]:dark:!bg-neutral-900 ${
+            className={`[&_.ant-tabs-nav]:!mb-4 [&_.ant-tabs-tab]:!text-sm [&_.ant-tabs-tab]:!font-medium [&_.ant-tabs-tab-active]:!font-semibold [&_.ant-tabs-ink-bar]:!bg-blue [&_.ant-tabs-nav]:!sticky [&_.ant-tabs-nav]:!z-[100] [&_.ant-tabs-nav]:!bg-white [&_.ant-tabs-nav]:dark:!bg-neutral-900 [&_.ant-tabs-tab]:!text-black dark:[&_.ant-tabs-tab]:!text-white [&_.ant-tabs-tab:hover]:!text-black dark:[&_.ant-tabs-tab:hover]:!text-white [&_.ant-tabs-tab-btn]:!text-inherit hover:[&_.ant-tabs-tab-btn]:!text-inherit [&_.ant-tabs-tab-active_.ant-tabs-tab-btn]:!text-black dark:[&_.ant-tabs-tab-active_.ant-tabs-tab-btn]:!text-white ${
               isMobile
-                ? '[&_.ant-tabs-nav-list]:!w-full [&_.ant-tabs-nav-list]:!justify-around [&_.ant-tabs-nav]:!top-[30px]'
-                : '[&_.ant-tabs-nav]:!top-0'
+                ? '[&_.ant-tabs-nav-list]:!flex-nowrap [&_.ant-tabs-nav-list]:!gap-1 [&_.ant-tabs-nav-wrap]:!overflow-x-auto [&_.ant-tabs-nav-wrap]:!flex-nowrap [&_.ant-tabs-nav-operations]:!hidden [&_.ant-tabs-nav]:!top-[0px] [&_.ant-tabs-tab]:!flex-shrink-0 [&_.ant-tabs-tab]:!px-3 [&_.ant-tabs-nav-list]:!justify-between [&_.ant-tabs-nav]:!px-4 [&_.ant-tabs-tab:last-child]:!mr-[30px]'
+                : '[&_.ant-tabs-nav]:!px-4 [&_.ant-tabs-nav]:!top-0'
             }`}
             items={tabItems}
           />

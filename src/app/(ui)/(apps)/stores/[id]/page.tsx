@@ -129,7 +129,7 @@ const StoreDetailPage = () => {
         </p>
         <button
           onClick={() => router.push('/creators')}
-          className="text-sm text-blue hover:text-blue font-medium mt-2"
+          className="text-sm text-blue  font-medium mt-2"
         >
           Browse Creators
         </button>

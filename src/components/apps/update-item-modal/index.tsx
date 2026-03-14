@@ -127,7 +127,7 @@ const FormContent: React.FC<FormContentProps> = ({
             <button
               type="button"
               onClick={() => setImages(initialImages)}
-              className="text-xs text-blue hover:text-blue font-medium"
+              className="text-xs text-blue  font-medium"
             >
               Reset to original
             </button>

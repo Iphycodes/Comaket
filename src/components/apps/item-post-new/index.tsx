@@ -185,6 +185,15 @@ Price: ${formattedPrice}`;
     }
   };
 
+  /** On mobile list view, image click does nothing (user swipes to browse media).
+   *  Only the card body navigates to the product page. */
+  const handleImageClick = () => {
+    if (!isMobile) {
+      handleViewItem();
+    }
+    // On mobile: do nothing — let swipe gestures handle media navigation
+  };
+
   /** Navigate to vendor profile page */
   const handleCreatorOrStoreClick = () => {
     console.log('post user data::::::', postUserProfile);
@@ -271,7 +280,7 @@ Price: ${formattedPrice}`;
         <div className="flex-1">
           <div className="flex items-center gap-2">
             <h3
-              className="font-medium cursor-pointer hover:text-blue transition-colors"
+              className="font-medium cursor-pointer  transition-colors"
               onClick={handleCreatorOrStoreClick}
             >
               {postUserProfile?.displayName || ''}
@@ -287,10 +296,7 @@ Price: ${formattedPrice}`;
           <div className="flex items-center gap-2 text-[12px] text-neutral-500 dark:text-neutral-400">
             <span>
               {postUserProfile?.isStore && 'Owned by: '}
-              <span
-                className="cursor-pointer hover:text-blue transition-colors"
-                onClick={handleUsernameClick}
-              >
+              <span className="cursor-pointer  transition-colors" onClick={handleUsernameClick}>
                 @{postUserProfile?.userName || ''}
               </span>
             </span>
@@ -325,7 +331,7 @@ Price: ${formattedPrice}`;
                     media={currentMedia}
                     alt={`${itemName} - ${currentMediaIndex + 1}`}
                     priority
-                    onClick={handleViewItem}
+                    onClick={handleImageClick}
                   />
                 )}
               </motion.div>
@@ -511,7 +517,7 @@ Price: ${formattedPrice}`;
                           ? 'bg-neutral-100 border-neutral-200 text-neutral-300 cursor-not-allowed'
                           : itemInCart
                             ? 'bg-indigo-50 border-blue text-blue dark:bg-blue/20 dark:border-blue'
-                            : 'bg-neutral-100 border-neutral-200 dark:bg-neutral-700 dark:border-neutral-600 text-neutral-600 dark:text-neutral-400 hover:border-blue hover:text-blue'
+                            : 'bg-neutral-100 border-neutral-200 dark:bg-neutral-700 dark:border-neutral-600 text-neutral-600 dark:text-neutral-400 hover:border-blue '
                       }`}
                     >
                       <ShoppingCart size={18} />
