@@ -137,26 +137,27 @@ const Product = ({
         isMobile ? 'fixed inset-0 z-[100] overflow-y-auto' : 'rounded-lg mt-10'
       }`}
     >
-      {/* Sticky back header */}
+      {/* Back header */}
       <div
-        className={`sticky top-0 left-0 w-full py-3 z-50 bg-white dark:bg-neutral-800 border-b border-neutral-100 dark:border-zinc-800 ${
-          isMobile ? 'px-3 pt-9' : 'px-0'
+        className={`sticky top-0 left-0 w-full z-50 bg-white/90 dark:bg-neutral-800/90 backdrop-blur-md border-b border-neutral-100 dark:border-zinc-800 ${
+          isMobile ? 'px-3 pt-8 pb-2' : 'py-3 px-0'
         }`}
       >
-        <motion.button
-          whileTap={{ scale: 0.95 }}
+        <button
           onClick={handleGoBack}
-          className="text-neutral-500 dark:text-neutral-400 hover:text-blue font-semibold flex text-base gap-1.5 items-center"
+          className="flex items-center gap-2 text-neutral-600 dark:text-neutral-300  transition-colors"
         >
-          <ArrowLeft size={20} />
-          <span>Back</span>
-        </motion.button>
+          <div className="w-8 h-8 rounded-full bg-neutral-100 dark:bg-neutral-700 flex items-center justify-center">
+            <ArrowLeft size={16} />
+          </div>
+          <span className="text-sm font-medium">Back</span>
+        </button>
       </div>
 
-      <div className={`${isMobile ? 'px-3 mb-48' : 'pb-6'}`}>
+      <div className={`${isMobile ? 'pb-20' : 'pb-6'}`}>
         {/* Seller Info */}
-        <div className="flex items-center gap-3 my-4">
-          <div className="relative w-11 h-11">
+        <div className={`flex items-center gap-2.5 my-3 ${isMobile ? 'px-3' : ''}`}>
+          <div className="relative w-8 h-8">
             <img
               src={item.postUserProfile?.profilePicUrl ?? ''}
               alt="Seller"
@@ -165,25 +166,25 @@ const Product = ({
                 (e.target as HTMLImageElement).src = '/default-avatar.png';
               }}
             />
-            <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white dark:border-neutral-800" />
+            <div className="absolute -bottom-0.5 -right-0.5 w-3 h-3 bg-green-500 rounded-full border-[1.5px] border-white dark:border-neutral-800" />
           </div>
-          <div className="flex-1">
-            <div className="flex items-center gap-2">
-              <h3 className="font-medium text-neutral-900 dark:text-white">
+          <div className="flex-1 min-w-0">
+            <div className="flex items-center gap-1.5">
+              <h3 className="font-medium text-sm text-neutral-900 dark:text-white truncate">
                 {item.postUserProfile?.displayName || item.postUserProfile?.userName}
               </h3>
               {item.postUserProfile?.isVerified && (
-                <i className="ri-verified-badge-fill text-[#1D9BF0] text-[14px]" />
+                <i className="ri-verified-badge-fill text-[#1D9BF0] text-[13px]" />
               )}
             </div>
-            <div className="flex items-center gap-3 text-[12px] text-neutral-500 dark:text-neutral-400">
-              <span className="flex items-center gap-1">
-                <MapPin size={14} />
+            <div className="flex items-center gap-2 text-[11px] text-neutral-500 dark:text-neutral-400">
+              <span className="flex items-center gap-0.5">
+                <MapPin size={12} />
                 {item.postUserProfile?.location || 'Nigeria'}
               </span>
               {item.createdAt && (
-                <span className="flex items-center gap-1">
-                  <Clock size={14} />
+                <span className="flex items-center gap-0.5">
+                  <Clock size={12} />
                   {new Date(item.createdAt).toLocaleDateString()}
                 </span>
               )}
@@ -192,11 +193,11 @@ const Product = ({
         </div>
 
         {/* Main content: Image + Details */}
-        <div className={`flex ${isMobile ? 'flex-col gap-4' : 'gap-8'}`}>
+        <div className={`flex ${isMobile ? 'flex-col gap-3' : 'gap-8'}`}>
           {/* Left — Media Carousel */}
           <div
             className={`relative w-full md:w-3/5 overflow-hidden ${
-              isMobile ? 'rounded-sm' : 'rounded-md'
+              isMobile ? 'rounded-none' : 'rounded-md'
             }`}
           >
             <div ref={imageContainerRef} className="relative aspect-square">
@@ -318,7 +319,11 @@ const Product = ({
           </div>
 
           {/* Right — Details */}
-          <div className={`${isMobile ? 'w-full' : 'w-1/2 min-h-[100%] overflow-y-auto'} relative`}>
+          <div
+            className={`${
+              isMobile ? 'w-full px-3' : 'w-1/2 min-h-[100%] overflow-y-auto'
+            } relative`}
+          >
             <div className="space-y-4">
               {/* Title + Price */}
               <div>
@@ -342,6 +347,29 @@ const Product = ({
                     </span>
                   )}
                 </div>
+              </div>
+
+              {/* Condition + Location */}
+              <div className="flex flex-wrap items-center gap-2">
+                {item.condition && (
+                  <span
+                    className={`inline-flex items-center px-2.5 py-1 text-xs font-medium rounded-full ${
+                      item.condition === 'Brand New'
+                        ? 'bg-green-50 dark:bg-green-900/20 text-green-600 dark:text-green-400'
+                        : item.condition === 'Fairly Used'
+                          ? 'bg-blue-50 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400'
+                          : 'bg-yellow-50 dark:bg-yellow-900/20 text-yellow-600 dark:text-yellow-400'
+                    }`}
+                  >
+                    {item.condition}
+                  </span>
+                )}
+                {item.postUserProfile?.location && (
+                  <span className="inline-flex items-center gap-1 px-2.5 py-1 text-xs font-medium bg-neutral-100 dark:bg-zinc-800 text-neutral-600 dark:text-neutral-400 rounded-full">
+                    <MapPin size={11} />
+                    {item.postUserProfile.location}
+                  </span>
+                )}
               </div>
 
               {/* Tags */}
@@ -379,12 +407,10 @@ const Product = ({
               </div>
             </div>
 
-            {/* ─── Fixed bottom actions ─── */}
+            {/* ─── Bottom actions ─── */}
             <div
               className={`${
-                isMobile
-                  ? 'fixed bottom-0 left-0 right-0 px-3 py-3 pb-20'
-                  : 'sticky bottom-0 pt-4 mt-6'
+                isMobile ? 'pt-4 mt-4 pb-6' : 'sticky bottom-0 pt-4 mt-6'
               } bg-white dark:bg-neutral-800 border-t border-neutral-100 dark:border-zinc-800 z-40`}
             >
               {isBuyable ? (
@@ -426,7 +452,7 @@ const Product = ({
                             ? 'bg-neutral-100 dark:bg-zinc-800 border-neutral-200 dark:border-zinc-700 text-neutral-300 cursor-not-allowed'
                             : itemInCart
                               ? 'bg-indigo-50 border-blue text-blue dark:bg-blue/20 dark:border-blue'
-                              : 'bg-neutral-100 border-neutral-200 dark:bg-neutral-700 dark:border-neutral-600 text-neutral-600 dark:text-neutral-400 hover:border-blue hover:text-blue'
+                              : 'bg-neutral-100 border-neutral-200 dark:bg-neutral-700 dark:border-neutral-600 text-neutral-600 dark:text-neutral-400 hover:border-blue '
                         }`}
                       >
                         <ShoppingCart size={18} />

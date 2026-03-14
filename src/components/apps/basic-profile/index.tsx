@@ -106,8 +106,8 @@ const BasicProfile: React.FC<BasicProfileProps> = ({
 
   return (
     <div
-      className={`dark:bg-neutral-900/50 min-h-screen ${
-        isMobile ? 'max-w-[100vw] mb-14 pt-8' : 'px-40'
+      className={`dark:bg-neutral-900/50 ${
+        isMobile ? 'max-w-[100vw] mb-14 pt-2' : 'min-h-screen px-40'
       }`}
     >
       <div className={`w-full ${!isMobile ? 'mx-auto px-4' : ''}`}>
@@ -117,7 +117,7 @@ const BasicProfile: React.FC<BasicProfileProps> = ({
           isMobile={isMobile}
         />
 
-        <div className="mt-5">
+        <div className={isMobile ? 'mt-3' : 'mt-5'}>
           <SwitchToCreatorCTA isMobile={isMobile} />
         </div>
 
@@ -125,8 +125,7 @@ const BasicProfile: React.FC<BasicProfileProps> = ({
         <div className={`mt-2 ${isMobile ? 'px-0' : ''} pb-10`}>
           <Tabs
             defaultActiveKey="orders"
-            // indicator={{ size: 0 }}
-            className={`[&_.ant-tabs-nav]:!mb-4 !text-black [&_.ant-tabs-nav]:!px-4 [&_.ant-tabs-nav]:!sticky [&_.ant-tabs-nav]:!z-20 [&_.ant-tabs-nav]:!bg-white [&_.ant-tabs-nav]:dark:!bg-neutral-900 [&_.ant-tabs-ink-bar]:!hidden [&_.ant-tabs-nav-list]:!w-full [&_.ant-tabs-nav-list]:!flex [&_.ant-tabs-tab]:!flex-1 [&_.ant-tabs-tab]:!justify-center [&_.ant-tabs-tab]:!text-sm [&_.ant-tabs-tab]:!text-black [&_.ant-tabs-tab]:!font-medium [&_.ant-tabs-tab]:!m-0 [&_.ant-tabs-tab]:!px-4 [&_.ant-tabs-tab]:!py-2.5 [&_.ant-tabs-tab]:!rounded-lg [&_.ant-tabs-tab]:!transition-all [&_.ant-tabs-tab-active]:!font-semibold [&_.ant-tabs-tab-active]:!bg-neutral-100 [&_.ant-tabs-tab-active]:dark:!bg-neutral-700 [&_.ant-tabs-nav-list]:!bg-nutral-50 [&_.ant-tabs-nav-list]:!text-black [&_.ant-tabs-nav-list]:dark:!bg-neutral-800 [&_.ant-tabs-nav-list]:!rounded-xl [&_.ant-tabs-nav-list]:!p-1 ${
+            className={`[&_.ant-tabs-nav]:!mb-4 !text-black [&_.ant-tabs-nav]:!px-4 [&_.ant-tabs-nav]:!sticky [&_.ant-tabs-nav]:!z-20 [&_.ant-tabs-nav]:!bg-white [&_.ant-tabs-nav]:dark:!bg-neutral-900 [&_.ant-tabs-ink-bar]:!hidden [&_.ant-tabs-nav-list]:!w-full [&_.ant-tabs-nav-list]:!flex [&_.ant-tabs-tab]:!flex-1 [&_.ant-tabs-tab]:!justify-center [&_.ant-tabs-tab]:!text-sm [&_.ant-tabs-tab]:!text-black dark:[&_.ant-tabs-tab]:!text-white [&_.ant-tabs-tab]:!font-medium [&_.ant-tabs-tab]:!m-0 [&_.ant-tabs-tab]:!px-4 [&_.ant-tabs-tab]:!py-2.5 [&_.ant-tabs-tab]:!rounded-lg [&_.ant-tabs-tab]:!transition-all [&_.ant-tabs-tab-active]:!font-semibold [&_.ant-tabs-tab-active]:!bg-neutral-100 [&_.ant-tabs-tab-active]:dark:!bg-neutral-700 [&_.ant-tabs-nav-list]:!bg-nutral-50 [&_.ant-tabs-nav-list]:!text-black [&_.ant-tabs-nav-list]:dark:!bg-neutral-800 [&_.ant-tabs-nav-list]:!rounded-xl [&_.ant-tabs-nav-list]:!p-1 [&_.ant-tabs-tab:hover]:!text-black dark:[&_.ant-tabs-tab:hover]:!text-white [&_.ant-tabs-tab-btn]:!text-inherit hover:[&_.ant-tabs-tab-btn]:!text-inherit [&_.ant-tabs-tab-active_.ant-tabs-tab-btn]:!text-black dark:[&_.ant-tabs-tab-active_.ant-tabs-tab-btn]:!text-white ${
               isMobile ? '[&_.ant-tabs-nav]:!top-[30px]' : '[&_.ant-tabs-nav]:!top-0'
             }`}
             items={[

@@ -267,7 +267,7 @@ const StoreDashboard: React.FC<StoreDashboardProps> = ({
           <h3 className="text-sm font-semibold text-neutral-900 dark:text-white">Recent Orders</h3>
           <button
             onClick={() => router.push(`/my-store/${storeId}/orders`)}
-            className="text-xs font-semibold text-blue hover:text-blue flex items-center gap-1"
+            className="text-xs font-semibold text-blue  flex items-center gap-1"
           >
             View All <ExternalLink size={10} />
           </button>

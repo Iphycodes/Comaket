@@ -139,34 +139,55 @@ const Market: React.FC<MarketProps> = ({
     return found?.children || [];
   }, [filters.category, displayCategories]);
 
-  // ── Mobile scroll-hide header (Twitter-style) ──
-  const [mobileHeaderHidden, setMobileHeaderHidden] = useState(false);
+  // ── Scroll-hide header (Twitter-style) ──
+  // Header flows naturally in the page. When user scrolls UP, it becomes
+  // fixed at the top and slides in. When scrolling DOWN, it slides out.
+  // This way it takes zero space when not needed.
+  const [headerMode, setHeaderMode] = useState<'static' | 'visible' | 'hidden'>('static');
   const lastScrollYRef = useRef(0);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const headerRef = useRef<HTMLDivElement | null>(null);
+  const headerHeightRef = useRef(0);
+  const wasInProductViewRef = useRef(false);
+
+  // Computed early so it can be used in effects below
+  const isInProductView = !!(selectedProductId !== '' && selectedProduct && isMobile);
+
+  // Measure header height for the spacer
+  useEffect(() => {
+    if (headerRef.current) {
+      headerHeightRef.current = headerRef.current.offsetHeight;
+    }
+  });
 
   const handleScroll = useCallback(() => {
-    if (!scrollContainerRef.current) return;
+    if (!scrollContainerRef.current || !isMobile) return;
     const currentY = scrollContainerRef.current.scrollTop;
     const delta = currentY - lastScrollYRef.current;
+    const headerH = headerHeightRef.current || 200;
 
-    if (delta > 5 && currentY > 80) {
-      // Scrolling down past threshold → hide smoothly
-      setMobileHeaderHidden(true);
+    if (currentY <= 10) {
+      // At the top — header in normal document flow
+      setHeaderMode('static');
     } else if (delta < -3) {
-      // Scrolling up → show immediately
-      setMobileHeaderHidden(false);
+      // Scrolling UP — show fixed header
+      setHeaderMode('visible');
+    } else if (delta > 5 && currentY > headerH) {
+      // Scrolling DOWN past header — hide fixed header
+      setHeaderMode('hidden');
     }
 
     lastScrollYRef.current = currentY;
-  }, []);
+  }, [isMobile]);
 
   useEffect(() => {
+    // Re-attach when handleScroll changes OR when returning from product view
+    // (scroll container re-mounts, so the old listener is gone)
     const container = scrollContainerRef.current;
     if (!container) return;
     container.addEventListener('scroll', handleScroll, { passive: true });
     return () => container.removeEventListener('scroll', handleScroll);
-  }, [handleScroll]);
+  }, [handleScroll, isInProductView]);
 
   // ── Infinite scroll sentinel ──
   const sentinelRef = useRef<HTMLDivElement | null>(null);
@@ -342,20 +363,6 @@ const Market: React.FC<MarketProps> = ({
                   }
                 />
 
-                <div className="absolute top-2 right-2 z-[5]">
-                  <span
-                    className={`px-2 py-1 rounded-full text-[10px] font-semibold backdrop-blur-sm ${
-                      item.condition === 'Brand New'
-                        ? 'bg-green-500/90 text-white'
-                        : item.condition === 'Fairly Used'
-                          ? 'bg-blue/90 text-white'
-                          : 'bg-yellow-500/90 text-white'
-                    }`}
-                  >
-                    {item.condition}
-                  </span>
-                </div>
-
                 {item.availability && maxQty > 0 && maxQty <= 5 && (
                   <div className="absolute bottom-2 right-2 bg-black/60 backdrop-blur-sm text-white text-[9px] font-semibold px-1.5 py-0.5 rounded-full z-[5]">
                     {maxQty} left
@@ -399,7 +406,7 @@ const Market: React.FC<MarketProps> = ({
                   ) : (
                     <div className="w-5 h-5 rounded-full bg-neutral-200 dark:bg-neutral-700 flex-shrink-0" />
                   )}
-                  <span className="text-[11px] text-neutral-500 dark:text-neutral-400 font-medium truncate hover:text-blue transition-colors">
+                  <span className="text-[11px] text-neutral-500 dark:text-neutral-400 font-medium truncate  transition-colors">
                     {item.postUserProfile?.displayName}
                   </span>
                   {item?.postUserProfile?.isVerified && (
@@ -412,7 +419,7 @@ const Market: React.FC<MarketProps> = ({
                 </div>
 
                 <h3
-                  className="font-semibold text-sm dark:text-white mb-1 line-clamp-2 cursor-pointer hover:text-blue transition-colors"
+                  className="font-semibold text-sm dark:text-white mb-1 line-clamp-2 cursor-pointer  transition-colors"
                   onClick={() => onGridItemClick(item)}
                 >
                   {item.itemName}
@@ -499,7 +506,7 @@ const Market: React.FC<MarketProps> = ({
                                 ? 'bg-neutral-100 border-neutral-200 text-neutral-300 cursor-not-allowed'
                                 : itemInCart
                                   ? 'bg-blue-50 border-blue text-blue'
-                                  : 'bg-neutral-50 border-neutral-200 dark:bg-neutral-700 dark:border-neutral-600 text-neutral-500 hover:border-blue hover:text-blue'
+                                  : 'bg-neutral-50 border-neutral-200 dark:bg-neutral-700 dark:border-neutral-600 text-neutral-500 hover:border-blue '
                             }`}
                           >
                             <ShoppingCart size={14} />
@@ -604,35 +611,17 @@ const Market: React.FC<MarketProps> = ({
     );
   };
 
-  // ── Mobile full-screen Product view ──
-  if (selectedProductId !== '' && selectedProduct && isMobile) {
-    return (
-      <AnimatePresence mode="wait">
-        <Product
-          key={selectedProductId}
-          item={selectedProduct}
-          setSelectedProductId={onSelectProduct}
-          isInCart={isInCart(selectedProduct.id ?? '')}
-          isSaved={isSaved(selectedProduct.id ?? '')}
-          cartQuantity={
-            cartItems?.find(
-              (ci: any) =>
-                ci.listingId === selectedProduct.id?.toString() ||
-                ci.id === selectedProduct.id?.toString()
-            )?.quantity || 0
-          }
-          // isAddingToCart={isAddingToCart}
-          // isTogglingSave={isTogglingSave}
-          onAddToCart={() => onAddToCart(selectedProduct)}
-          onBuyNow={() => onBuyNow(selectedProduct)}
-          onToggleSave={() => onToggleSave(selectedProduct)}
-          onWhatsAppMessage={() => onWhatsAppMessage(selectedProduct)}
-          onShare={() => onShare(selectedProduct)}
-          onGoBack={() => onSelectProduct('')}
-        />
-      </AnimatePresence>
-    );
-  }
+  // Reset header when returning from product view
+  useEffect(() => {
+    if (!isInProductView && wasInProductViewRef.current) {
+      wasInProductViewRef.current = false;
+      setHeaderMode('static');
+      lastScrollYRef.current = scrollContainerRef.current?.scrollTop ?? 0;
+    }
+    if (isInProductView) {
+      wasInProductViewRef.current = true;
+    }
+  }, [isInProductView]);
 
   // ════════════════════════════════════════════════════════════════════════
   // MAIN RENDER
@@ -646,335 +635,373 @@ const Market: React.FC<MarketProps> = ({
   });
 
   return (
-    <div
-      ref={scrollContainerRef}
-      className="min-h-screen dark:!bg-transparent w-full relative"
-      style={{ height: '100vh', overflowY: 'auto' }}
-    >
-      <Row gutter={[isMobile ? 0 : 24, 0]} className="w-full max-w-screen-7xl mx-auto">
-        <Col lg={24} className="relative w-full p-0">
-          {/* Sticky Search & Filter Bar */}
-          <motion.div
-            ref={headerRef}
-            initial={{ y: -20, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            className={`sticky top-0 z-20 backdrop-blur-md bg-white/80 dark:bg-neutral-900/80 shadow-sm ${
-              isMobile ? 'pt-8' : ''
-            }`}
-            style={{
-              transform: mobileHeaderHidden ? 'translateY(-100%)' : 'translateY(0)',
-              transition: mobileHeaderHidden
-                ? 'transform 0.3s ease-out' // smooth hide
-                : 'transform 0.15s ease-out', // instant show
-            }}
-          >
-            <div className={`p-4 ${isMobile ? 'px-1 pt-2' : ''}`}>
-              <div className="w-full flex items-center justify-between gap-3 mb-3">
-                <div className="flex-1">
-                  <SearchBar section="market" onSearch={onSearch} />
+    <>
+      {/* Product overlay — rendered on top when active, keeps market mounted underneath */}
+      {isInProductView && (
+        <Product
+          key={selectedProductId}
+          item={selectedProduct}
+          setSelectedProductId={onSelectProduct}
+          isInCart={isInCart(selectedProduct.id ?? '')}
+          isSaved={isSaved(selectedProduct.id ?? '')}
+          cartQuantity={
+            cartItems?.find(
+              (ci: any) =>
+                ci.listingId === selectedProduct.id?.toString() ||
+                ci.id === selectedProduct.id?.toString()
+            )?.quantity || 0
+          }
+          onAddToCart={() => onAddToCart(selectedProduct)}
+          onBuyNow={() => onBuyNow(selectedProduct)}
+          onToggleSave={() => onToggleSave(selectedProduct)}
+          onWhatsAppMessage={() => onWhatsAppMessage(selectedProduct)}
+          onShare={() => onShare(selectedProduct)}
+          onGoBack={() => onSelectProduct('')}
+        />
+      )}
+      <div
+        ref={scrollContainerRef}
+        className="min-h-screen dark:!bg-transparent w-full relative"
+        style={{ height: '100vh', overflowY: 'auto' }}
+      >
+        <Row gutter={[isMobile ? 0 : 24, 0]} className="w-full max-w-screen-7xl mx-auto">
+          <Col lg={24} className="relative w-full p-0">
+            {/* Search & Filter Bar — Twitter-style scroll on mobile, sticky on desktop */}
+            <div
+              ref={headerRef}
+              className={`z-20 backdrop-blur-md bg-white/80 dark:bg-neutral-900/80 ${
+                isMobile ? 'pt-8' : 'sticky top-0 shadow-sm'
+              } ${
+                isMobile
+                  ? headerMode === 'static'
+                    ? 'relative'
+                    : 'fixed top-0 left-0 right-0 shadow-md'
+                  : ''
+              }`}
+              style={
+                isMobile
+                  ? {
+                      transform: headerMode === 'hidden' ? 'translateY(-100%)' : 'translateY(0)',
+                      transition:
+                        headerMode === 'hidden'
+                          ? 'transform 0.3s ease-out'
+                          : headerMode === 'visible'
+                            ? 'transform 0.15s ease-out'
+                            : 'none',
+                    }
+                  : undefined
+              }
+            >
+              <div className={`p-4 ${isMobile ? 'px-1 pt-2' : ''}`}>
+                <div className="w-full flex items-center justify-between gap-3 mb-3">
+                  <div className="flex-1">
+                    <SearchBar section="market" onSearch={onSearch} />
+                  </div>
                 </div>
-              </div>
 
-              {/* ── Horizontal Scrollable Category Tags ── */}
-              <div className="mb-2">
-                <div
-                  className="flex items-center gap-2 overflow-x-auto pb-1.5"
-                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
-                >
-                  <style>{`.cat-scroll::-webkit-scrollbar { display: none; }`}</style>
-                  {/* All button */}
-                  <button
-                    onClick={() => onCategorySelect(null)}
-                    className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all border whitespace-nowrap ${
-                      !filters.category
-                        ? 'bg-blue text-white border-blue shadow-sm'
-                        : 'bg-neutral-50 dark:bg-zinc-800/60 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-zinc-700 hover:border-neutral-300 dark:hover:border-zinc-600'
-                    }`}
+                {/* ── Horizontal Scrollable Category Tags ── */}
+                <div className="mb-2">
+                  <div
+                    className="flex items-center gap-2 overflow-x-auto pb-1.5"
+                    style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                   >
-                    All
-                  </button>
-                  {displayCategories.map((cat) => (
+                    <style>{`.cat-scroll::-webkit-scrollbar { display: none; }`}</style>
+                    {/* All button */}
                     <button
-                      key={cat.id}
-                      onClick={() => onCategorySelect(filters.category === cat.id ? null : cat.id)}
-                      className={`flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all border whitespace-nowrap ${
-                        filters.category === cat.id
+                      onClick={() => onCategorySelect(null)}
+                      className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all border whitespace-nowrap ${
+                        !filters.category
                           ? 'bg-blue text-white border-blue shadow-sm'
                           : 'bg-neutral-50 dark:bg-zinc-800/60 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-zinc-700 hover:border-neutral-300 dark:hover:border-zinc-600'
                       }`}
                     >
-                      {cat.icon && <i className={`${cat.icon} text-[11px]`} />}
-                      {cat.label}
+                      All
                     </button>
-                  ))}
-                </div>
-
-                {/* Subcategories row */}
-                <AnimatePresence>
-                  {selectedCategoryChildren.length > 0 && (
-                    <motion.div
-                      initial={{ height: 0, opacity: 0 }}
-                      animate={{ height: 'auto', opacity: 1 }}
-                      exit={{ height: 0, opacity: 0 }}
-                      transition={{ duration: 0.2 }}
-                      className="overflow-hidden"
-                    >
-                      <div
-                        className="flex items-center gap-2 overflow-x-auto pt-1.5"
-                        style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                    {displayCategories.map((cat) => (
+                      <button
+                        key={cat.id}
+                        onClick={() =>
+                          onCategorySelect(filters.category === cat.id ? null : cat.id)
+                        }
+                        className={`flex-shrink-0 inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-medium transition-all border whitespace-nowrap ${
+                          filters.category === cat.id
+                            ? 'bg-blue text-white border-blue shadow-sm'
+                            : 'bg-neutral-50 dark:bg-zinc-800/60 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-zinc-700 hover:border-neutral-300 dark:hover:border-zinc-600'
+                        }`}
                       >
-                        <span className="text-[10px] text-neutral-400 dark:text-neutral-500 flex-shrink-0 pl-1">
-                          Sub:
-                        </span>
-                        <button
-                          onClick={() => onSubCategorySelect(null)}
-                          className={`flex-shrink-0 px-2.5 py-1 rounded-full text-[11px] font-medium transition-all border whitespace-nowrap ${
-                            !filters.subCategory
-                              ? 'bg-indigo-500 text-white border-indigo-500 shadow-sm'
-                              : 'bg-neutral-50 dark:bg-zinc-800/60 text-neutral-500 dark:text-neutral-400 border-neutral-200 dark:border-zinc-700 hover:border-neutral-300 dark:hover:border-zinc-600'
-                          }`}
+                        {cat.icon && <i className={`${cat.icon} text-[11px]`} />}
+                        {cat.label}
+                      </button>
+                    ))}
+                  </div>
+
+                  {/* Subcategories row */}
+                  <AnimatePresence>
+                    {selectedCategoryChildren.length > 0 && (
+                      <motion.div
+                        initial={{ height: 0, opacity: 0 }}
+                        animate={{ height: 'auto', opacity: 1 }}
+                        exit={{ height: 0, opacity: 0 }}
+                        transition={{ duration: 0.2 }}
+                        className="overflow-hidden"
+                      >
+                        <div
+                          className="flex items-center gap-2 overflow-x-auto pt-1.5"
+                          style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                         >
-                          All
-                        </button>
-                        {selectedCategoryChildren.map((sub) => (
+                          <span className="text-[10px] text-neutral-400 dark:text-neutral-500 flex-shrink-0 pl-1">
+                            Sub:
+                          </span>
                           <button
-                            key={sub.id}
-                            onClick={() =>
-                              onSubCategorySelect(filters.subCategory === sub.id ? null : sub.id)
-                            }
-                            className={`flex-shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium transition-all border whitespace-nowrap ${
-                              filters.subCategory === sub.id
+                            onClick={() => onSubCategorySelect(null)}
+                            className={`flex-shrink-0 px-2.5 py-1 rounded-full text-[11px] font-medium transition-all border whitespace-nowrap ${
+                              !filters.subCategory
                                 ? 'bg-indigo-500 text-white border-indigo-500 shadow-sm'
                                 : 'bg-neutral-50 dark:bg-zinc-800/60 text-neutral-500 dark:text-neutral-400 border-neutral-200 dark:border-zinc-700 hover:border-neutral-300 dark:hover:border-zinc-600'
                             }`}
                           >
-                            {sub.icon && <i className={`${sub.icon} text-[10px]`} />}
-                            {sub.label}
+                            All
                           </button>
-                        ))}
-                      </div>
-                    </motion.div>
+                          {selectedCategoryChildren.map((sub) => (
+                            <button
+                              key={sub.id}
+                              onClick={() =>
+                                onSubCategorySelect(filters.subCategory === sub.id ? null : sub.id)
+                              }
+                              className={`flex-shrink-0 inline-flex items-center gap-1 px-2.5 py-1 rounded-full text-[11px] font-medium transition-all border whitespace-nowrap ${
+                                filters.subCategory === sub.id
+                                  ? 'bg-indigo-500 text-white border-indigo-500 shadow-sm'
+                                  : 'bg-neutral-50 dark:bg-zinc-800/60 text-neutral-500 dark:text-neutral-400 border-neutral-200 dark:border-zinc-700 hover:border-neutral-300 dark:hover:border-zinc-600'
+                              }`}
+                            >
+                              {sub.icon && <i className={`${sub.icon} text-[10px]`} />}
+                              {sub.label}
+                            </button>
+                          ))}
+                        </div>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </div>
+
+                <div className="flex items-center justify-between gap-2">
+                  <div className="flex items-center gap-2 flex-1 min-w-0 overflow-x-auto scrollbar-hide">
+                    <button
+                      onClick={onToggleFilters}
+                      className="flex items-center gap-2 text-sm text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100 transition-colors flex-shrink-0"
+                    >
+                      <SlidersHorizontal size={16} />
+                      {showFilters ? 'Hide' : 'Filters'}
+                    </button>
+
+                    {Object.keys(filters).length > 0 && (
+                      <>
+                        <span className="text-[11px] text-neutral-400 dark:text-neutral-500 flex-shrink-0">
+                          ·
+                        </span>
+                        <div className="flex items-center gap-1.5 flex-shrink-0">
+                          {filters.condition && (
+                            <span
+                              onClick={() => onApplyFilters({ ...filters, condition: undefined })}
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue/10 text-blue cursor-pointer hover:bg-blue/20 transition-colors whitespace-nowrap"
+                            >
+                              {filters.condition === 'brand_new'
+                                ? 'Brand New'
+                                : filters.condition === 'fairly_used'
+                                  ? 'Fairly Used'
+                                  : filters.condition === 'refurbished'
+                                    ? 'Refurbished'
+                                    : filters.condition}
+                              <X size={10} />
+                            </span>
+                          )}
+                          {filters.category && (
+                            <span
+                              onClick={() => onCategorySelect(null)}
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue/10 text-blue cursor-pointer hover:bg-blue/20 transition-colors whitespace-nowrap"
+                            >
+                              {displayCategories.find((c) => c.id === filters.category)?.label ||
+                                CREATOR_INDUSTRIES.find((i: any) => i.id === filters.category)
+                                  ?.label ||
+                                filters.category}
+                              <X size={10} />
+                            </span>
+                          )}
+                          {filters.subCategory && (
+                            <span
+                              onClick={() => onSubCategorySelect(null)}
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-indigo-500/10 text-indigo-600 cursor-pointer hover:bg-indigo-500/20 transition-colors whitespace-nowrap"
+                            >
+                              {selectedCategoryChildren.find((c) => c.id === filters.subCategory)
+                                ?.label || filters.subCategory}
+                              <X size={10} />
+                            </span>
+                          )}
+                          {(filters.minPrice !== undefined || filters.maxPrice !== undefined) && (
+                            <span
+                              onClick={() =>
+                                onApplyFilters({
+                                  ...filters,
+                                  minPrice: undefined,
+                                  maxPrice: undefined,
+                                })
+                              }
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue/10 text-blue cursor-pointer hover:bg-blue/20 transition-colors whitespace-nowrap"
+                            >
+                              {filters.minPrice
+                                ? numberFormat(filters.minPrice / 100, Currencies.NGN)
+                                : '₦0'}{' '}
+                              –{' '}
+                              {filters.maxPrice
+                                ? numberFormat(filters.maxPrice / 100, Currencies.NGN)
+                                : 'Any'}
+                              <X size={10} />
+                            </span>
+                          )}
+                          {filters.sort && (
+                            <span
+                              onClick={() => onApplyFilters({ ...filters, sort: undefined })}
+                              className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue/10 text-blue cursor-pointer hover:bg-blue/20 transition-colors whitespace-nowrap"
+                            >
+                              {filters.sort === 'price_asc'
+                                ? 'Low→High'
+                                : filters.sort === 'price_desc'
+                                  ? 'High→Low'
+                                  : filters.sort === 'newest'
+                                    ? 'Newest'
+                                    : filters.sort === 'oldest'
+                                      ? 'Oldest'
+                                      : filters.sort}
+                              <X size={10} />
+                            </span>
+                          )}
+                          <button
+                            onClick={onResetFilters}
+                            className="text-[10px] text-neutral-400 hover:text-red-500 transition-colors flex-shrink-0"
+                          >
+                            <X size={12} />
+                          </button>
+                        </div>
+                      </>
+                    )}
+
+                    {!isLoading && Object.keys(filters).length === 0 && (
+                      <span className="text-xs text-neutral-400 flex-shrink-0">
+                        {totalListings} item{totalListings !== 1 ? 's' : ''}
+                      </span>
+                    )}
+                  </div>
+
+                  <div className="flex items-center gap-2">
+                    <button
+                      onClick={() => onViewChange('grid')}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors text-sm ${
+                        viewType === 'grid'
+                          ? 'bg-blue-50 text-blue dark:bg-blue/30 dark:text-blue'
+                          : 'text-neutral-500 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-700'
+                      }`}
+                    >
+                      <Grid size={16} />
+                      {!isMobile && <span className="font-medium">Grid</span>}
+                    </button>
+                    <button
+                      onClick={() => onViewChange('list')}
+                      className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors text-sm ${
+                        viewType === 'list'
+                          ? 'bg-blue-50 text-blue dark:bg-blue/30 dark:text-blue'
+                          : 'text-neutral-500 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-700'
+                      }`}
+                    >
+                      <List size={16} />
+                      {!isMobile && <span className="font-medium">List</span>}
+                    </button>
+                  </div>
+                </div>
+
+                <AnimatePresence>
+                  {showFilters && (
+                    // <motion.div
+                    //   initial={{ height: 0, opacity: 0 }}
+                    //   animate={{ height: 'auto', opacity: 1 }}
+                    //   exit={{ height: 0, opacity: 0 }}
+                    //   transition={{ duration: 0.2 }}
+                    //   className="overflow-hidden"
+                    // >
+                    <FilterPanel
+                      filters={filters}
+                      onApplyFilters={onApplyFilters}
+                      onResetFilters={onResetFilters}
+                      // open={showFilters}
+                      // onClose={() => setShowFilters(false)}
+                    />
+                    // </motion.div>
                   )}
                 </AnimatePresence>
               </div>
-
-              <div className="flex items-center justify-between gap-2">
-                <div className="flex items-center gap-2 flex-1 min-w-0 overflow-x-auto scrollbar-hide">
-                  <button
-                    onClick={onToggleFilters}
-                    className="flex items-center gap-2 text-sm text-neutral-600 hover:text-neutral-900 dark:text-neutral-400 dark:hover:text-neutral-100 transition-colors flex-shrink-0"
-                  >
-                    <SlidersHorizontal size={16} />
-                    {showFilters ? 'Hide' : 'Filters'}
-                  </button>
-
-                  {Object.keys(filters).length > 0 && (
-                    <>
-                      <span className="text-[11px] text-neutral-400 dark:text-neutral-500 flex-shrink-0">
-                        ·
-                      </span>
-                      <div className="flex items-center gap-1.5 flex-shrink-0">
-                        {filters.condition && (
-                          <span
-                            onClick={() => onApplyFilters({ ...filters, condition: undefined })}
-                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue/10 text-blue cursor-pointer hover:bg-blue/20 transition-colors whitespace-nowrap"
-                          >
-                            {filters.condition === 'brand_new'
-                              ? 'Brand New'
-                              : filters.condition === 'fairly_used'
-                                ? 'Fairly Used'
-                                : filters.condition === 'refurbished'
-                                  ? 'Refurbished'
-                                  : filters.condition}
-                            <X size={10} />
-                          </span>
-                        )}
-                        {filters.category && (
-                          <span
-                            onClick={() => onCategorySelect(null)}
-                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue/10 text-blue cursor-pointer hover:bg-blue/20 transition-colors whitespace-nowrap"
-                          >
-                            {displayCategories.find((c) => c.id === filters.category)?.label ||
-                              CREATOR_INDUSTRIES.find((i: any) => i.id === filters.category)
-                                ?.label ||
-                              filters.category}
-                            <X size={10} />
-                          </span>
-                        )}
-                        {filters.subCategory && (
-                          <span
-                            onClick={() => onSubCategorySelect(null)}
-                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-indigo-500/10 text-indigo-600 cursor-pointer hover:bg-indigo-500/20 transition-colors whitespace-nowrap"
-                          >
-                            {selectedCategoryChildren.find((c) => c.id === filters.subCategory)
-                              ?.label || filters.subCategory}
-                            <X size={10} />
-                          </span>
-                        )}
-                        {(filters.minPrice !== undefined || filters.maxPrice !== undefined) && (
-                          <span
-                            onClick={() =>
-                              onApplyFilters({
-                                ...filters,
-                                minPrice: undefined,
-                                maxPrice: undefined,
-                              })
-                            }
-                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue/10 text-blue cursor-pointer hover:bg-blue/20 transition-colors whitespace-nowrap"
-                          >
-                            {filters.minPrice
-                              ? numberFormat(filters.minPrice / 100, Currencies.NGN)
-                              : '₦0'}{' '}
-                            –{' '}
-                            {filters.maxPrice
-                              ? numberFormat(filters.maxPrice / 100, Currencies.NGN)
-                              : 'Any'}
-                            <X size={10} />
-                          </span>
-                        )}
-                        {filters.sort && (
-                          <span
-                            onClick={() => onApplyFilters({ ...filters, sort: undefined })}
-                            className="inline-flex items-center gap-1 px-2 py-0.5 rounded-full text-[10px] font-medium bg-blue/10 text-blue cursor-pointer hover:bg-blue/20 transition-colors whitespace-nowrap"
-                          >
-                            {filters.sort === 'price_asc'
-                              ? 'Low→High'
-                              : filters.sort === 'price_desc'
-                                ? 'High→Low'
-                                : filters.sort === 'newest'
-                                  ? 'Newest'
-                                  : filters.sort === 'oldest'
-                                    ? 'Oldest'
-                                    : filters.sort}
-                            <X size={10} />
-                          </span>
-                        )}
-                        <button
-                          onClick={onResetFilters}
-                          className="text-[10px] text-neutral-400 hover:text-red-500 transition-colors flex-shrink-0"
-                        >
-                          <X size={12} />
-                        </button>
-                      </div>
-                    </>
-                  )}
-
-                  {!isLoading && Object.keys(filters).length === 0 && (
-                    <span className="text-xs text-neutral-400 flex-shrink-0">
-                      {totalListings} item{totalListings !== 1 ? 's' : ''}
-                    </span>
-                  )}
-                </div>
-
-                <div className="flex items-center gap-2">
-                  <button
-                    onClick={() => onViewChange('grid')}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors text-sm ${
-                      viewType === 'grid'
-                        ? 'bg-blue-50 text-blue dark:bg-blue/30 dark:text-blue'
-                        : 'text-neutral-500 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-700'
-                    }`}
-                  >
-                    <Grid size={16} />
-                    {!isMobile && <span className="font-medium">Grid</span>}
-                  </button>
-                  <button
-                    onClick={() => onViewChange('list')}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg transition-colors text-sm ${
-                      viewType === 'list'
-                        ? 'bg-blue-50 text-blue dark:bg-blue/30 dark:text-blue'
-                        : 'text-neutral-500 hover:bg-neutral-100 dark:text-neutral-400 dark:hover:bg-neutral-700'
-                    }`}
-                  >
-                    <List size={16} />
-                    {!isMobile && <span className="font-medium">List</span>}
-                  </button>
-                </div>
-              </div>
-
-              <AnimatePresence>
-                {showFilters && (
-                  // <motion.div
-                  //   initial={{ height: 0, opacity: 0 }}
-                  //   animate={{ height: 'auto', opacity: 1 }}
-                  //   exit={{ height: 0, opacity: 0 }}
-                  //   transition={{ duration: 0.2 }}
-                  //   className="overflow-hidden"
-                  // >
-                  <FilterPanel
-                    filters={filters}
-                    onApplyFilters={onApplyFilters}
-                    onResetFilters={onResetFilters}
-                    // open={showFilters}
-                    // onClose={() => setShowFilters(false)}
-                  />
-                  // </motion.div>
-                )}
-              </AnimatePresence>
             </div>
-          </motion.div>
 
-          {/* Items */}
-          <div className={`${isMobile ? 'px-0 mb-10' : 'px-4'} py-6`}>
-            {isLoading ? (
-              viewType === 'grid' ? (
-                renderSkeletonGrid()
+            {/* Items */}
+            <div className={`${isMobile ? 'px-0 mb-10' : 'px-4'} py-6`}>
+              {isLoading ? (
+                viewType === 'grid' ? (
+                  renderSkeletonGrid()
+                ) : (
+                  renderSkeletonList()
+                )
               ) : (
-                renderSkeletonList()
-              )
-            ) : (
-              <motion.div variants={containerVariants} initial="hidden" animate="visible">
-                {viewType === 'grid' ? renderProductGrid() : renderProductList()}
-              </motion.div>
-            )}
+                <motion.div variants={containerVariants} initial="hidden" animate="visible">
+                  {viewType === 'grid' ? renderProductGrid() : renderProductList()}
+                </motion.div>
+              )}
 
-            {/* Loading more skeletons */}
-            {isLoadingMore && (
-              <div className="py-8">
-                {viewType === 'grid' ? renderSkeletonGrid() : renderSkeletonList()}
-              </div>
-            )}
+              {/* Loading more skeletons */}
+              {isLoadingMore && (
+                <div className="py-8">
+                  {viewType === 'grid' ? renderSkeletonGrid() : renderSkeletonList()}
+                </div>
+              )}
 
-            {/* Sentinel for IntersectionObserver */}
-            {hasMore && !isLoading && <div ref={setSentinelRef} className="h-4 w-full" />}
+              {/* Sentinel for IntersectionObserver */}
+              {hasMore && !isLoading && <div ref={setSentinelRef} className="h-4 w-full" />}
 
-            {/* End of results */}
-            {!hasMore && listings.length > 0 && !isLoading && (
-              <div className="text-center py-8">
-                <p className="text-sm text-neutral-400">
-                  You&apos;ve seen all {totalListings} items
-                </p>
-              </div>
-            )}
-          </div>
-        </Col>
-      </Row>
+              {/* End of results */}
+              {!hasMore && listings.length > 0 && !isLoading && (
+                <div className="text-center py-8">
+                  <p className="text-sm text-neutral-400">
+                    You&apos;ve seen all {totalListings} items
+                  </p>
+                </div>
+              )}
+            </div>
+          </Col>
+        </Row>
 
-      {/* Grid View Item Detail Modal (desktop) */}
-      {gridModalItem && (
-        <ItemDetailModal
-          open={gridModalOpen}
-          onClose={onCloseGridModal}
-          item={{
-            description: gridModalItem.description ?? '',
-            sponsored: gridModalItem.sponsored ?? false,
-            postUserProfile: gridModalItem.postUserProfile ?? {},
-            media: gridModalItem.media ?? [],
-            askingPrice: gridModalItem.askingPrice ?? {},
-            condition: gridModalItem.condition ?? 'Brand New',
-            comments: gridModalItem.comments ?? [],
-            itemName: gridModalItem.itemName ?? '',
-            id: gridModalItem.id ?? '',
-            productTags: gridModalItem.productTags ?? [],
-            quantity: gridModalItem.quantity ?? 1,
-            isBuyable: gridModalItem.isBuyable ?? false,
-            listingType: gridModalItem.listingType ?? 'self-listing',
-          }}
-        />
-      )}
+        {/* Grid View Item Detail Modal (desktop) */}
+        {gridModalItem && (
+          <ItemDetailModal
+            open={gridModalOpen}
+            onClose={onCloseGridModal}
+            item={{
+              description: gridModalItem.description ?? '',
+              sponsored: gridModalItem.sponsored ?? false,
+              postUserProfile: gridModalItem.postUserProfile ?? {},
+              media: gridModalItem.media ?? [],
+              askingPrice: gridModalItem.askingPrice ?? {},
+              condition: gridModalItem.condition ?? 'Brand New',
+              comments: gridModalItem.comments ?? [],
+              itemName: gridModalItem.itemName ?? '',
+              id: gridModalItem.id ?? '',
+              productTags: gridModalItem.productTags ?? [],
+              quantity: gridModalItem.quantity ?? 1,
+              isBuyable: gridModalItem.isBuyable ?? false,
+              listingType: gridModalItem.listingType ?? 'self-listing',
+            }}
+          />
+        )}
 
-      <NotificationsDrawer />
-    </div>
+        <NotificationsDrawer />
+      </div>
+    </>
   );
 };
 

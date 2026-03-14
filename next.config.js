@@ -33,6 +33,9 @@ module.exports = (phase) => {
   return {
     env,
     reactStrictMode: true,
+    experimental: {
+      scrollRestoration: true,
+    },
     compiler: { styledComponents: true },
     webpack: (config) => {
       config.module.rules.push({

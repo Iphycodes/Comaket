@@ -282,7 +282,7 @@ const CreatorCard: React.FC<{
 
         <ChevronRight
           size={16}
-          className="text-neutral-200 dark:text-neutral-700 group-hover:text-blue transition-colors flex-shrink-0 mt-1"
+          className="text-neutral-200 dark:text-neutral-700 group-hover:font-semibold transition-colors flex-shrink-0 mt-1"
         />
       </div>
 
@@ -574,6 +574,39 @@ const Creators: React.FC<CreatorsProps> = (props) => {
   const searchTimerRef = useRef<NodeJS.Timeout | null>(null);
   const [searchInput, setSearchInput] = useState(props.searchQuery);
 
+  // ── Scroll-hide header (mobile only, Twitter-style) ───────────────
+  const [headerMode, setHeaderMode] = useState<'static' | 'visible' | 'hidden'>('static');
+  const lastScrollYRef = useRef(0);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const headerRef = useRef<HTMLDivElement>(null);
+  const headerHeightRef = useRef(0);
+
+  useEffect(() => {
+    if (!isMobile) return;
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      const currentY = container.scrollTop;
+      const delta = currentY - lastScrollYRef.current;
+      const headerH = headerHeightRef.current || (headerRef.current?.offsetHeight ?? 0);
+      if (headerRef.current) headerHeightRef.current = headerRef.current.offsetHeight;
+
+      if (currentY <= 10) {
+        setHeaderMode('static');
+      } else if (delta < -3) {
+        setHeaderMode('visible');
+      } else if (delta > 5 && currentY > headerH) {
+        setHeaderMode('hidden');
+      }
+
+      lastScrollYRef.current = currentY;
+    };
+
+    container.addEventListener('scroll', handleScroll, { passive: true });
+    return () => container.removeEventListener('scroll', handleScroll);
+  }, [isMobile]);
+
   const {
     activeTab,
     onTabChange,
@@ -627,27 +660,65 @@ const Creators: React.FC<CreatorsProps> = (props) => {
     value: ind.id,
   }));
 
+  // ── Header class logic ─────────────────────────────────────────────
+  const getHeaderClassName = () => {
+    const base =
+      'bg-neutral-50 dark:bg-neutral-900/95 backdrop-blur-md z-20 border-b border-neutral-200 dark:border-neutral-700/60';
+
+    if (!isMobile) {
+      return `sticky top-0 ${base} py-0`;
+    }
+
+    // Mobile modes
+    switch (headerMode) {
+      case 'static':
+        return `relative ${base} pt-8 pb-0`;
+      case 'visible':
+        return `fixed top-0 left-0 right-0 shadow-md ${base} pt-8 pb-0`;
+      case 'hidden':
+        return `fixed top-0 left-0 right-0 shadow-md ${base} pt-8 pb-0`;
+      default:
+        return `relative ${base} pt-8 pb-0`;
+    }
+  };
+
+  const getHeaderStyle = (): React.CSSProperties => {
+    if (!isMobile) return {};
+    switch (headerMode) {
+      case 'hidden':
+        return { transform: 'translateY(-100%)', transition: 'transform 0.3s ease-out' };
+      case 'visible':
+        return { transform: 'translateY(0)', transition: 'transform 0.15s ease-out' };
+      default:
+        return {};
+    }
+  };
+
   return (
     <div
+      ref={scrollContainerRef}
+      style={isMobile ? { height: '100vh', overflowY: 'auto' } : undefined}
       className={`dark:bg-neutral-900/50 bg-neutral-50 min-h-screen ${
         isMobile ? 'max-w-[100vw]' : 'w-full pt-8'
       }`}
     >
       <div className={`w-full ${!isMobile ? 'mx-auto px-4' : 'px-3'}`}>
-        {/* ── Sticky Header ───────────────────────────────────────────── */}
-        <div
-          className={`sticky top-0 bg-neutral-50 dark:bg-neutral-900/95 backdrop-blur-md z-20 border-b border-neutral-200 dark:border-neutral-700/60 ${
-            isMobile ? 'pt-10 pb-0' : 'py-0'
-          }`}
-        >
+        {/* ── Header ──────────────────────────────────────────────────── */}
+        <div ref={headerRef} className={getHeaderClassName()} style={getHeaderStyle()}>
           {/* Title + subtitle */}
-          <div className="pt-4 pb-3">
-            <h1 className="text-xl font-bold text-neutral-900 dark:text-white flex items-center gap-2">
-              <Sparkles size={20} className="text-blue" />
-              Discover Creators
-            </h1>
-            <p className="text-xs text-neutral-400 mt-0.5">Find creators and stores on KRaft</p>
-          </div>
+          {!isMobile && (
+            <div className={isMobile ? 'pt-2 pb-2' : 'pt-4 pb-3'}>
+              <h1
+                className={`${
+                  isMobile ? 'text-lg' : 'text-xl'
+                } font-bold text-neutral-900 dark:text-white flex items-center gap-2`}
+              >
+                <Sparkles size={20} className="text-blue" />
+                Discover Creators
+              </h1>
+              <p className="text-xs text-neutral-400 mt-0.5">Find creators and stores on KRaft</p>
+            </div>
+          )}
 
           <div
             className={isMobile ? 'flex-col items-start gap-1' : 'flex w-full items-center gap-2'}
@@ -663,7 +734,9 @@ const Creators: React.FC<CreatorsProps> = (props) => {
                 placeholder="Search by name, industry, keyword..."
                 value={searchInput}
                 onChange={(e) => handleSearchInput(e.target.value)}
-                className="w-full h-12 pl-10 pr-10 border border-neutral-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 text-sm text-neutral-900 dark:text-white placeholder-neutral-400 focus:ring-2 focus:ring-blue/20 focus:border-blue outline-none transition-all"
+                className={`w-full ${
+                  isMobile ? 'h-9' : 'h-12'
+                } pl-10 pr-10 border border-neutral-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 text-sm text-neutral-900 dark:text-white placeholder-neutral-400 focus:ring-2 focus:ring-blue/20 focus:border-blue outline-none transition-all`}
               />
               {searchInput && (
                 <button
@@ -690,9 +763,9 @@ const Creators: React.FC<CreatorsProps> = (props) => {
                   (option?.label as string)?.toLowerCase().includes(input.toLowerCase())
                 }
                 options={industryOptions}
-                className={`${
-                  isMobile ? 'flex-1 min-w-[100px]' : 'w-[160px]'
-                } !h-12 [&_.ant-select-selector]:!rounded-lg [&_.ant-select-selector]:!border-neutral-200 dark:[&_.ant-select-selector]:!border-neutral-700 [&_.ant-select-selector]:!bg-white dark:[&_.ant-select-selector]:!bg-neutral-800`}
+                className={`${isMobile ? 'flex-1 min-w-[100px]' : 'w-[160px]'} ${
+                  isMobile ? '!h-9' : '!h-12'
+                } [&_.ant-select-selector]:!rounded-lg [&_.ant-select-selector]:!border-neutral-200 dark:[&_.ant-select-selector]:!border-neutral-700 [&_.ant-select-selector]:!bg-white dark:[&_.ant-select-selector]:!bg-neutral-800`}
               />
 
               <FilterSelect
@@ -701,7 +774,7 @@ const Creators: React.FC<CreatorsProps> = (props) => {
                 onChange={onStateChange}
                 placeholder="State"
                 loading={loadingStates}
-                className={isMobile ? 'flex-1 min-w-[100px] !h-12' : 'w-[150px] !h-12'}
+                className={isMobile ? 'flex-1 min-w-[100px] !h-9' : 'w-[150px] !h-12'}
               />
 
               <FilterSelect
@@ -711,7 +784,7 @@ const Creators: React.FC<CreatorsProps> = (props) => {
                 placeholder="City"
                 loading={loadingCities}
                 disabled={!filterState}
-                className={isMobile ? 'flex-1 min-w-[100px] !h-12' : 'w-[150px] !h-12'}
+                className={isMobile ? 'flex-1 min-w-[100px] !h-9' : 'w-[150px] !h-12'}
               />
 
               {hasActiveFilters && (
@@ -720,7 +793,9 @@ const Creators: React.FC<CreatorsProps> = (props) => {
                     onClearFilters();
                     setSearchInput('');
                   }}
-                  className="flex items-center gap-1 px-3 h-12 text-xs font-medium text-neutral-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg border border-neutral-200 dark:border-neutral-700 transition-colors flex-shrink-0"
+                  className={`flex items-center gap-1 px-3 ${
+                    isMobile ? 'h-9' : 'h-12'
+                  } text-xs font-medium text-neutral-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg border border-neutral-200 dark:border-neutral-700 transition-colors flex-shrink-0`}
                 >
                   <X size={12} />
                   Clear
@@ -737,6 +812,11 @@ const Creators: React.FC<CreatorsProps> = (props) => {
             storesCount={stores.length}
           />
         </div>
+
+        {/* Spacer when header is fixed on mobile */}
+        {isMobile && headerMode !== 'static' && (
+          <div style={{ height: headerHeightRef.current || 0 }} />
+        )}
 
         {/* ── Content Area ─────────────────────────────────────────────── */}
         <div className="pt-5 pb-10">

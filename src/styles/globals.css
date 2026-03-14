@@ -3,6 +3,13 @@
 @import 'tailwindcss/utilities';
 
 @layer base {
+  /* Prevent default blue hover on links and buttons — Tailwind utilities override this */
+  a:hover,
+  button:hover,
+  [role='button']:hover {
+    color: inherit;
+  }
+
   :root {
     --background: 0 0% 100%;
     --foreground: 240 10% 3.9%;

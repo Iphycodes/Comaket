@@ -346,7 +346,7 @@ const ResetPasswordContent = () => {
           Remembered your password?{' '}
           <button
             onClick={() => setIsAuthModalOpen(true)}
-            className="font-medium text-blue hover:text-blue transition-colors"
+            className="font-medium text-blue  transition-colors"
           >
             Sign in
           </button>

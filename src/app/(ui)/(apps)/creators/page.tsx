@@ -8,6 +8,7 @@ import { useStores } from '@grc/hooks/useStores';
 import { LocationOption } from '@grc/components/apps/creator-account-setup';
 import Creators from '@grc/components/apps/find-creators';
 import { isEmpty, omit } from 'lodash';
+import { useScrollRestore } from '@grc/hooks/useScrollRestore';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CONSTANTS
@@ -51,6 +52,8 @@ const CreatorsPage = () => {
 
   // ── Track if this is a "load more" vs fresh search ──────────────────
   const isLoadingMoreRef = useRef(false);
+  const dataReady = creatorsList.length > 0 || storesList.length > 0;
+  const { saveScrollPosition } = useScrollRestore(dataReady);
 
   // ── Fetch Nigerian states on mount ──────────────────────────────────
   useEffect(() => {
@@ -206,11 +209,20 @@ const CreatorsPage = () => {
 
   // ── Navigation ─────────────────────────────────────────────────────
   const handleSelectCreator = useCallback(
-    (username: string) => router.push(`/creators/${encodeURIComponent(username)}`),
-    [router]
+    (username: string) => {
+      saveScrollPosition();
+      router.push(`/creators/${encodeURIComponent(username)}`);
+    },
+    [router, saveScrollPosition]
   );
 
-  const handleSelectStore = useCallback((id: string) => router.push(`/stores/${id}`), [router]);
+  const handleSelectStore = useCallback(
+    (id: string) => {
+      saveScrollPosition();
+      router.push(`/stores/${id}`);
+    },
+    [router, saveScrollPosition]
+  );
 
   // ── Filter handlers ────────────────────────────────────────────────
   const handleStateChange = useCallback((state: string | null) => {

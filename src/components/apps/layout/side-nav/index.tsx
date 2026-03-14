@@ -69,14 +69,14 @@ const StoreMenuLabel: React.FC<{ store: StoreData }> = ({ store }) => {
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5">
-          <span className="text-xs font-semibold text-neutral-800 dark:text-neutral-100 truncate group-hover:text-blue transition-colors">
+          <span className="text-xs font-semibold text-neutral-800 dark:text-neutral-100 truncate group-hover:font-semibold transition-colors">
             {store.name}
           </span>
         </div>
       </div>
       <ChevronRight
         size={14}
-        className="text-neutral-300 dark:text-neutral-600 group-hover:text-blue group-hover:translate-x-0.5 transition-all flex-shrink-0"
+        className="text-neutral-300 dark:text-neutral-600 group-hover:font-semibold group-hover:translate-x-0.5 transition-all flex-shrink-0"
       />
     </div>
   );

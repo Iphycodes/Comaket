@@ -519,9 +519,15 @@ const SellItem = ({ storeId }: SellItemProps) => {
             animate={{ y: 0, opacity: 1 }}
             className="sticky top-0 z-20 bg-white dark:bg-neutral-900 pb-2"
           >
-            <div className="flex items-center justify-between py-4">
+            <div className={`flex items-center justify-between ${isMobile ? 'py-3' : 'py-4'}`}>
               <div>
-                <h1 className="text-xl font-bold text-neutral-900 dark:text-white">My Products</h1>
+                <h1
+                  className={`${
+                    isMobile ? 'text-base' : 'text-xl'
+                  } font-bold text-neutral-900 dark:text-white`}
+                >
+                  My Products
+                </h1>
                 <p className="text-xs text-neutral-400 mt-0.5">
                   {myListingsTotal} product{myListingsTotal !== 1 ? 's' : ''}
                 </p>
@@ -530,19 +536,23 @@ const SellItem = ({ storeId }: SellItemProps) => {
                 <button
                   onClick={refetch}
                   disabled={isFetchingMyListings}
-                  className={`w-10 h-10 rounded-xl border border-neutral-200 dark:border-neutral-700 flex items-center justify-center text-neutral-500 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all ${
+                  className={`${
+                    isMobile ? 'w-8 h-8' : 'w-10 h-10'
+                  } rounded-xl border border-neutral-200 dark:border-neutral-700 flex items-center justify-center text-neutral-500 hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-all ${
                     isFetchingMyListings ? 'animate-spin' : ''
                   }`}
                 >
-                  <RefreshCw size={16} />
+                  <RefreshCw size={isMobile ? 14 : 16} />
                 </button>
                 <motion.button
                   whileHover={{ scale: 1.02 }}
                   whileTap={{ scale: 0.98 }}
                   onClick={() => setIsSellItemModalOpen(true)}
-                  className="bg-gradient-to-r from-blue to-indigo-500 hover:from-blue hover:to-indigo-600 text-white py-2.5 px-5 rounded-xl font-semibold flex items-center gap-1.5 text-sm shadow-md shadow-blue/20 hover:shadow-lg transition-all"
+                  className={`bg-gradient-to-r from-blue to-indigo-500 hover:from-blue hover:to-indigo-600 text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-md shadow-blue/20 hover:shadow-lg transition-all ${
+                    isMobile ? 'py-1.5 px-3 text-xs' : 'py-2.5 px-5 text-sm'
+                  }`}
                 >
-                  <Plus size={18} />
+                  <Plus size={isMobile ? 14 : 18} />
                   {isMobile ? 'Sell' : 'New Product'}
                 </motion.button>
               </div>

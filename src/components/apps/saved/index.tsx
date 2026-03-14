@@ -570,7 +570,7 @@ const SavedItems: React.FC = () => {
                     ) : (
                       <div className="w-5 h-5 rounded-full bg-neutral-200 dark:bg-neutral-700 flex-shrink-0" />
                     )}
-                    <span className="text-[11px] text-neutral-500 dark:text-neutral-400 font-medium truncate hover:text-blue transition-colors">
+                    <span className="text-[11px] text-neutral-500 dark:text-neutral-400 font-medium truncate  transition-colors">
                       {item.postUserProfile?.displayName || item.postUserProfile?.userName}
                     </span>
                     {item.postUserProfile?.isVerified && (
@@ -585,7 +585,7 @@ const SavedItems: React.FC = () => {
                   </div>
 
                   <h3
-                    className="font-semibold text-sm dark:text-white mb-1 line-clamp-2 cursor-pointer hover:text-blue transition-colors"
+                    className="font-semibold text-sm dark:text-white mb-1 line-clamp-2 cursor-pointer  transition-colors"
                     onClick={() => handleGridItemClick(item)}
                   >
                     {item?.itemName}
@@ -671,7 +671,7 @@ const SavedItems: React.FC = () => {
                                   ? 'bg-neutral-100 border-neutral-200 text-neutral-300 cursor-not-allowed'
                                   : itemInCart
                                     ? 'bg-blue-50 border-blue text-blue'
-                                    : 'bg-neutral-50 border-neutral-200 dark:bg-neutral-700 dark:border-neutral-600 text-neutral-500 hover:border-blue hover:text-blue'
+                                    : 'bg-neutral-50 border-neutral-200 dark:bg-neutral-700 dark:border-neutral-600 text-neutral-500 hover:border-blue '
                               }`}
                             >
                               <ShoppingCart size={14} />
@@ -830,16 +830,18 @@ const SavedItems: React.FC = () => {
   const totalCount = savedCount || savedItemsList.length || 0;
 
   return (
-    <div className="min-h-screen dark:bg-neutral-900/50">
+    <div className="dark:bg-neutral-900/50">
       <div className="w-full !max-w-7xl mx-auto">
         <div className="mb-8">
           <div
-            className={`py-5 ${
-              isMobile ? 'px-2' : ''
-            } sticky top-12 z-20 backdrop-blur-sm bg-white dark:bg-neutral-800`}
+            className={`${isMobile ? 'py-2 px-2' : 'py-5'} sticky ${
+              isMobile ? 'top-[30px]' : 'top-12'
+            } z-20 backdrop-blur-sm bg-white dark:bg-neutral-800`}
           >
-            <div className="flex justify-between items-center mb-6">
-              <h2 className="text-xl font-semibold dark:text-white">My Saved Products</h2>
+            <div className={`flex justify-between items-center ${isMobile ? 'mb-2' : 'mb-6'}`}>
+              <h2 className={`${isMobile ? 'text-base' : 'text-xl'} font-semibold dark:text-white`}>
+                My Saved Products
+              </h2>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => handleViewChange('grid')}
@@ -871,7 +873,7 @@ const SavedItems: React.FC = () => {
                 onChange={(e) => debouncedChangeHandler(e.target.value)}
                 placeholder="Search Saved Products..."
                 className={`${
-                  isMobile ? 'h-10' : 'h-12'
+                  isMobile ? 'h-9' : 'h-12'
                 } !w-full pl-11 pr-4 rounded-xl border-neutral-200 hover:border-blue focus:border-blue transition-colors`}
                 suffix={
                   searchValue && (
