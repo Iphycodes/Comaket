@@ -13,7 +13,6 @@ import {
   Globe,
   MessageCircle,
   Users,
-  Award,
   Calendar,
   ExternalLink,
   UserPlus,
@@ -272,7 +271,7 @@ const CreatorLinkCard: React.FC<{ creator: any; isMobile: boolean }> = ({ creato
       </div>
       <div className="flex-1 min-w-0">
         <div className="flex items-center gap-1.5">
-          <p className="text-sm font-semibold text-neutral-800 dark:text-neutral-100 truncate group-hover:text-blue transition-colors">
+          <p className="text-sm font-semibold text-neutral-800 dark:text-neutral-100 truncate group-hover:font-semibold transition-colors">
             {fullName}
           </p>
           {isVerified && <VerifiedBadge />}
@@ -361,7 +360,7 @@ const StoreDetails: React.FC<StoreDetailsProps> = ({
   const website = store?.website || '';
   const socialLinks = store?.socialLinks;
   const totalListings = listingsTotal || 0;
-  const totalSales = store?.totalSales || 0;
+  const _totalSales = store?.totalSales || 0;
   const joinedDate = store?.createdAt || '';
   const locationParts = [
     store?.location?.street,
@@ -423,7 +422,7 @@ const StoreDetails: React.FC<StoreDetailsProps> = ({
     pending: { dot: 'bg-amber-400', label: 'Pending' },
     suspended: { dot: 'bg-red-400', label: 'Suspended' },
   };
-  const storeStatus = statusConfig[status] || statusConfig.active;
+  const _storeStatus = statusConfig[status] || statusConfig.active;
 
   const tabItems = [
     {
@@ -708,13 +707,17 @@ const StoreDetails: React.FC<StoreDetailsProps> = ({
 
   return (
     <div
-      className={`dark:bg-neutral-900/50 min-h-screen ${
-        isMobile ? 'max-w-[100vw] mb-14 pt-8' : ''
+      className={`dark:bg-neutral-900/50 ${
+        isMobile ? 'max-w-[100vw] mb-14 pt-0 pb-4' : 'min-h-screen'
       }`}
     >
       <div className={`w-full ${!isMobile ? 'w-full px-4' : ''}`}>
         {/* Cover */}
-        <div className="relative h-44 sm:h-56 bg-gradient-to-br from-neutral-200 to-neutral-100 dark:from-neutral-800 dark:to-neutral-900 overflow-hidden sm:rounded-b-2xl">
+        <div
+          className={`relative ${
+            isMobile ? 'h-36' : 'h-44 sm:h-56'
+          } bg-gradient-to-br from-neutral-200 to-neutral-100 dark:from-neutral-800 dark:to-neutral-900 overflow-hidden sm:rounded-b-2xl`}
+        >
           {coverImageUrl ? (
             <img
               src={coverImageUrl}
@@ -727,29 +730,26 @@ const StoreDetails: React.FC<StoreDetailsProps> = ({
           <div className="absolute inset-0 bg-gradient-to-t from-black/50 via-black/10 to-transparent" />
           <button
             onClick={onBack}
-            className="absolute top-4 left-4 z-10 flex items-center gap-1.5 px-3 py-1.5 bg-black/30 hover:bg-black/50 backdrop-blur-sm text-white rounded-lg text-sm font-medium transition-colors"
+            className={`absolute ${
+              isMobile ? 'top-12' : 'top-4'
+            } left-4 z-10 flex items-center gap-1.5 ${
+              isMobile ? 'px-2.5 py-1 text-xs' : 'px-3 py-1.5 text-sm'
+            } bg-black/30 hover:bg-black/50 backdrop-blur-sm text-white rounded-lg font-medium transition-colors`}
           >
-            <ArrowLeft size={16} />
+            <ArrowLeft size={isMobile ? 14 : 16} />
             Back
           </button>
-          <div className="absolute bottom-4 right-4 flex gap-1.5 flex-wrap justify-end">
-            <span className="flex items-center gap-1.5 px-2.5 py-1 bg-white/90 dark:bg-neutral-900/80 backdrop-blur-sm rounded-full text-[11px] font-semibold text-neutral-700 dark:text-neutral-300 shadow-sm">
-              <div className={`w-1.5 h-1.5 rounded-full ${storeStatus.dot}`} />
-              {storeStatus.label}
-            </span>
-            {totalSales > 0 && (
-              <span className="flex items-center gap-1 px-2.5 py-1 bg-white/90 dark:bg-neutral-900/80 backdrop-blur-sm rounded-full text-[11px] font-semibold text-neutral-700 dark:text-neutral-300 shadow-sm">
-                <Award size={11} className="text-amber-500" />
-                {totalSales} sale{totalSales !== 1 ? 's' : ''}
-              </span>
-            )}
-          </div>
+          {/* Award tags removed per user request */}
         </div>
 
         {/* Profile Header */}
-        <div className={`${isMobile ? 'px-4' : ''} -mt-24 relative z-10`}>
+        <div className={`${isMobile ? 'px-4 -mt-14' : '-mt-24'} relative z-20`}>
           <div className="flex items-end justify-between gap-4">
-            <div className="w-36 h-36 sm:w-40 sm:h-40 rounded-2xl border-4 border-white dark:border-neutral-900 overflow-hidden shadow-lg bg-neutral-200 dark:bg-neutral-700 flex-shrink-0">
+            <div
+              className={`${
+                isMobile ? 'w-24 h-24' : 'w-36 h-36 sm:w-40 sm:h-40'
+              } rounded-2xl border-4 border-white dark:border-neutral-900 overflow-hidden shadow-lg bg-neutral-200 dark:bg-neutral-700 flex-shrink-0`}
+            >
               {logoUrl ? (
                 <img src={logoUrl} alt={storeName} className="w-full h-full object-cover" />
               ) : (
@@ -761,28 +761,32 @@ const StoreDetails: React.FC<StoreDetailsProps> = ({
                 </div>
               )}
             </div>
-            <div className="pb-2">
+            <div className={`${isMobile ? '' : 'pb-2'}`}>
               <motion.button
                 whileTap={{ scale: 0.95 }}
                 onClick={onToggleFollow}
                 disabled={isTogglingFollow || isSellerView}
-                className={`flex disabled:!cursor-not-allowed items-center gap-2 px-5 py-2.5 rounded-xl text-sm font-semibold transition-all ${
+                className={`flex disabled:!cursor-not-allowed items-center ${
+                  isMobile
+                    ? 'gap-1.5 px-3.5 py-1.5 rounded-lg text-xs'
+                    : 'gap-2 px-5 py-2.5 rounded-xl text-sm'
+                } font-semibold transition-all ${
                   isFollowing
                     ? 'bg-neutral-100 dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:border-red-300 hover:text-red-500 dark:hover:border-red-700 dark:hover:text-red-400 group'
                     : 'bg-gradient-to-r from-blue to-indigo-500 hover:from-blue hover:to-indigo-600 text-white shadow-md shadow-blue/20 hover:shadow-lg'
                 }`}
               >
                 {isTogglingFollow ? (
-                  <Loader2 size={16} className="animate-spin" />
+                  <Loader2 size={isMobile ? 14 : 16} className="animate-spin" />
                 ) : isFollowing ? (
                   <>
-                    <UserCheck size={16} className="group-hover:hidden" />
+                    <UserCheck size={isMobile ? 14 : 16} className="group-hover:hidden" />
                     <span className="group-hover:hidden">Following</span>
                     <span className="hidden group-hover:inline text-red-500">Unfollow</span>
                   </>
                 ) : (
                   <>
-                    <UserPlus size={16} />
+                    <UserPlus size={isMobile ? 14 : 16} />
                     Follow
                   </>
                 )}
@@ -808,7 +812,7 @@ const StoreDetails: React.FC<StoreDetailsProps> = ({
                     onClick={() =>
                       router.push(`/creators/${encodeURIComponent(creatorProfile?.username ?? '')}`)
                     }
-                    className="font-medium cursor-pointer hover:text-blue transition-colors"
+                    className="font-medium cursor-pointer hover:font-semibold transition-colors"
                   >
                     @{creatorProfile?.username ?? ''}
                   </span>
@@ -827,7 +831,7 @@ const StoreDetails: React.FC<StoreDetailsProps> = ({
           <div className="flex items-center gap-4 mt-1 text-sm text-neutral-500">
             <button
               onClick={() => setShowFollowers(true)}
-              className="hover:text-blue transition-colors"
+              className="hover:font-semibold transition-colors"
             >
               <strong className="text-neutral-900 dark:text-white">
                 {followersCount.toLocaleString()}
@@ -870,22 +874,30 @@ const StoreDetails: React.FC<StoreDetailsProps> = ({
             )}
           </div>
 
-          <div className="flex gap-2.5 mt-5 flex-wrap">
+          <div className={`flex ${isMobile ? 'gap-2 mt-4' : 'gap-2.5 mt-5'} flex-wrap`}>
             {(whatsappNumber || phoneNumber) && (
               <button
                 onClick={handleWhatsApp}
-                className="flex items-center gap-2 px-5 py-2.5 bg-emerald-500 hover:bg-emerald-600 text-white rounded-xl text-sm font-semibold shadow-md shadow-emerald-500/20 hover:shadow-lg transition-all"
+                className={`flex items-center ${
+                  isMobile
+                    ? 'gap-1.5 px-3.5 py-1.5 text-xs rounded-lg'
+                    : 'gap-2 px-5 py-2.5 text-sm rounded-xl'
+                } bg-emerald-500 hover:bg-emerald-600 text-white font-semibold shadow-md shadow-emerald-500/20 hover:shadow-lg transition-all`}
               >
-                <MessageCircle size={16} />
+                <MessageCircle size={isMobile ? 14 : 16} />
                 WhatsApp
               </button>
             )}
             {phoneNumber && (
               <button
                 onClick={handleCall}
-                className="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-xl text-sm font-semibold hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-all"
+                className={`flex items-center ${
+                  isMobile
+                    ? 'gap-1.5 px-3.5 py-1.5 text-xs rounded-lg'
+                    : 'gap-2 px-5 py-2.5 text-sm rounded-xl'
+                } bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 font-semibold hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-all`}
               >
-                <Phone size={16} />
+                <Phone size={isMobile ? 14 : 16} />
                 Call
               </button>
             )}
@@ -896,9 +908,13 @@ const StoreDetails: React.FC<StoreDetailsProps> = ({
                 )}&body=${encodeURIComponent(
                   `Hi,\n\nI found your store "${storeName}" on Comaket and I'm interested in your products.\n\nLooking forward to hearing from you.`
                 )}`}
-                className="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-xl text-sm font-semibold hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-all"
+                className={`flex items-center ${
+                  isMobile
+                    ? 'gap-1.5 px-3.5 py-1.5 text-xs rounded-lg'
+                    : 'gap-2 px-5 py-2.5 text-sm rounded-xl'
+                } bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 font-semibold hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-all`}
               >
-                <Mail size={16} />
+                <Mail size={isMobile ? 14 : 16} />
                 Email
               </a>
             )}
@@ -908,9 +924,11 @@ const StoreDetails: React.FC<StoreDetailsProps> = ({
                   href={website.startsWith('http') ? website : `https://${website}`}
                   target="_blank"
                   rel="noopener noreferrer"
-                  className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-xl text-sm font-semibold hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-all"
+                  className={`flex items-center ${
+                    isMobile ? 'gap-1.5 px-3 py-1.5 rounded-lg' : 'gap-2 px-4 py-2.5 rounded-xl'
+                  } bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 text-sm font-semibold hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-all`}
                 >
-                  <Globe size={16} />
+                  <Globe size={isMobile ? 14 : 16} />
                 </a>
               </Tooltip>
             )}
@@ -918,12 +936,12 @@ const StoreDetails: React.FC<StoreDetailsProps> = ({
         </div>
 
         {/* Tabs */}
-        <div className={`mt-6 ${isMobile ? 'px-0' : ''} pb-10`}>
+        <div className={`${isMobile ? 'mt-3 px-0' : 'mt-6'} pb-10`}>
           <Tabs
             defaultActiveKey="products"
-            className={`[&_.ant-tabs-nav]:!mb-4 [&_.ant-tabs-tab]:!text-sm [&_.ant-tabs-tab]:!font-medium [&_.ant-tabs-tab-active]:!font-semibold [&_.ant-tabs-ink-bar]:!bg-blue [&_.ant-tabs-nav]:!px-4 [&_.ant-tabs-nav]:!sticky [&_.ant-tabs-nav]:!z-[100] [&_.ant-tabs-nav]:!bg-white [&_.ant-tabs-nav]:dark:!bg-neutral-900 ${
+            className={`[&_.ant-tabs-nav]:!mb-4 [&_.ant-tabs-tab]:!text-sm [&_.ant-tabs-tab]:!font-medium [&_.ant-tabs-tab-active]:!font-semibold [&_.ant-tabs-ink-bar]:!bg-blue [&_.ant-tabs-nav]:!px-4 [&_.ant-tabs-nav]:!sticky [&_.ant-tabs-nav]:!z-[100] [&_.ant-tabs-nav]:!bg-white [&_.ant-tabs-nav]:dark:!bg-neutral-900 [&_.ant-tabs-tab]:!text-black dark:[&_.ant-tabs-tab]:!text-white [&_.ant-tabs-tab:hover]:!text-black dark:[&_.ant-tabs-tab:hover]:!text-white [&_.ant-tabs-tab-btn]:!text-inherit hover:[&_.ant-tabs-tab-btn]:!text-inherit [&_.ant-tabs-tab-active_.ant-tabs-tab-btn]:!text-black dark:[&_.ant-tabs-tab-active_.ant-tabs-tab-btn]:!text-white ${
               isMobile
-                ? '[&_.ant-tabs-nav-list]:!w-full [&_.ant-tabs-nav-list]:!justify-around [&_.ant-tabs-nav]:!top-[30px]'
+                ? '[&_.ant-tabs-nav-list]:!flex-nowrap [&_.ant-tabs-nav-list]:!gap-1 [&_.ant-tabs-nav-list]:!justify-between [&_.ant-tabs-nav-list]:!w-full [&_.ant-tabs-nav-wrap]:!overflow-x-auto [&_.ant-tabs-nav-wrap]:!flex-nowrap [&_.ant-tabs-nav-operations]:!hidden [&_.ant-tabs-nav]:!top-[0px] [&_.ant-tabs-tab]:!flex-shrink-0 [&_.ant-tabs-tab]:!px-3'
                 : '[&_.ant-tabs-nav]:!top-0'
             }`}
             items={tabItems}

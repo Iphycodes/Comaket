@@ -109,8 +109,8 @@ const StoreDropdown: React.FC<StoreDropdownProps> = ({
     <div ref={dropdownRef} className="relative">
       <button
         onClick={() => setOpen((p) => !p)}
-        className={`flex items-center rounded-xl text-sm font-semibold bg-gradient-to-r from-blue/5 to-indigo-500/5 dark:from-blue/10 dark:to-indigo-500/10 border border-blue/20 dark:border-blue/30 text-blue hover:bg-blue/10 dark:hover:bg-blue/20 transition-all ${
-          isMobile ? 'gap-1 px-3 py-1.5' : 'gap-1.5 px-4 py-2.5'
+        className={`flex z-10 items-center rounded-xl text-sm font-semibold bg-gradient-to-r from-blue/5 to-indigo-500/5 dark:from-blue/10 dark:to-indigo-500/10 border border-blue/20 dark:border-blue/30 text-blue hover:bg-blue/10 dark:hover:bg-blue/20 transition-all ${
+          isMobile ? 'gap-1 px-2 py-1' : 'gap-1.5 px-4 py-2.5'
         }`}
       >
         <Store size={15} />
@@ -143,7 +143,7 @@ const StoreDropdown: React.FC<StoreDropdownProps> = ({
               <span className="text-sm font-semibold text-blue">Add New Store</span>
               <ChevronRight
                 size={15}
-                className="text-blue/40 group-hover:text-blue group-hover:translate-x-0.5 transition-all flex-shrink-0 ml-auto"
+                className="text-blue/40 group-hover:font-semibold group-hover:translate-x-0.5 transition-all flex-shrink-0 ml-auto"
               />
             </button>
           )}
@@ -168,7 +168,7 @@ const StoreDropdown: React.FC<StoreDropdownProps> = ({
                 </div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center gap-1.5">
-                    <p className="text-sm font-semibold text-neutral-800 dark:text-neutral-100 truncate group-hover:text-blue transition-colors">
+                    <p className="text-sm font-semibold text-neutral-800 dark:text-neutral-100 truncate group-hover:font-semibold transition-colors">
                       {store.name}
                     </p>
                     <div
@@ -198,7 +198,7 @@ const StoreDropdown: React.FC<StoreDropdownProps> = ({
                 </div>
                 <ChevronRight
                   size={15}
-                  className="text-neutral-300 dark:text-neutral-600 group-hover:text-blue group-hover:translate-x-0.5 transition-all flex-shrink-0"
+                  className="text-neutral-300 dark:text-neutral-600 group-hover:font-semibold group-hover:translate-x-0.5 transition-all flex-shrink-0"
                 />
               </button>
             ))}
@@ -251,7 +251,11 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
   return (
     <>
-      <div className="relative h-44 sm:h-56 bg-gradient-to-br from-neutral-200 to-neutral-100 dark:from-neutral-800 dark:to-neutral-900 overflow-hidden sm:rounded-b-2xl">
+      <div
+        className={`relative ${
+          isMobile ? 'h-36' : 'h-44 sm:h-56'
+        } bg-gradient-to-br from-neutral-200 to-neutral-100 dark:from-neutral-800 dark:to-neutral-900 overflow-hidden sm:rounded-b-2xl`}
+      >
         {coverImageUrl ? (
           <img
             src={coverImageUrl}
@@ -278,9 +282,13 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
         </div> */}
       </div>
 
-      <div className={`${isMobile ? 'px-4' : ''} -mt-24 relative z-10`}>
+      <div className={`${isMobile ? 'px-4 -mt-16' : '-mt-24'} relative z-20`}>
         <div className="flex items-end justify-between gap-4">
-          <div className="w-36 h-36 sm:w-40 sm:h-40 rounded-full border-4 border-white dark:border-neutral-900 overflow-hidden shadow-lg bg-neutral-200 dark:bg-neutral-700 flex-shrink-0">
+          <div
+            className={`${
+              isMobile ? 'w-24 h-24' : 'w-36 h-36 sm:w-40 sm:h-40'
+            } rounded-full border-4 border-white dark:border-neutral-900 overflow-hidden shadow-lg bg-neutral-200 dark:bg-neutral-700 flex-shrink-0`}
+          >
             {avatarUrl ? (
               <img src={avatarUrl} alt={fullName} className="w-full h-full object-cover" />
             ) : (
@@ -292,7 +300,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               </div>
             )}
           </div>
-          <div className="pb-2 flex items-center gap-2">
+          <div className={`sm:mt-10 flex items-center gap-2 ${isMobile ? '!mt-[20px]' : ''}`}>
             {showStoreSection && (
               <StoreDropdown
                 stores={stores}
@@ -305,7 +313,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
               <button
                 onClick={onEditProfile}
                 className={`flex items-center rounded-xl text-sm font-semibold bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-all ${
-                  isMobile ? 'text-sm gap-1 px-3 py-1.5' : 'gap-2 px-5 py-2.5'
+                  isMobile ? 'text-sm gap-1 px-2 py-1' : 'gap-2 px-5 py-2.5'
                 }`}
               >
                 <Edit3 size={16} />
@@ -342,7 +350,7 @@ const ProfileHeader: React.FC<ProfileHeaderProps> = ({
 
         {/* Stats — followers clickable */}
         <div className="flex items-center gap-4 mt-1 text-sm text-neutral-500">
-          <button onClick={onShowFollowers} className="hover:text-blue transition-colors">
+          <button onClick={onShowFollowers} className="hover:font-semibold transition-colors">
             <strong className="text-neutral-900 dark:text-white">
               {followersCount.toLocaleString()}
             </strong>{' '}

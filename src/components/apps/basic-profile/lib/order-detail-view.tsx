@@ -265,7 +265,7 @@ const OrderDetailView: React.FC<OrderDetailViewProps> = ({
           {store && (
             <ExternalLink
               size={14}
-              className="text-neutral-300 group-hover:text-blue transition-colors flex-shrink-0"
+              className="text-neutral-300 group-hover:font-semibold transition-colors flex-shrink-0"
             />
           )}
         </div>
@@ -327,7 +327,7 @@ const OrderDetailView: React.FC<OrderDetailViewProps> = ({
             {canEditAddress && !isEditingAddress && (
               <button
                 onClick={startEditingAddress}
-                className="inline-flex items-center gap-1 text-xs font-medium text-blue hover:text-blue/80 transition-colors"
+                className="inline-flex items-center gap-1 text-xs font-medium text-blue/80 hover:font-semibold transition-colors"
               >
                 <Pencil size={12} />
                 Edit
@@ -496,7 +496,7 @@ const OrderDetailView: React.FC<OrderDetailViewProps> = ({
                 <span className="text-neutral-500">Tracking No.</span>
                 <button
                   onClick={() => copyToClipboard(tracking.trackingNumber)}
-                  className="inline-flex items-center gap-1.5 font-medium text-blue hover:text-blue/80 transition-colors"
+                  className="inline-flex items-center gap-1.5 font-medium text-blue/80 hover:font-semibold transition-colors"
                 >
                   {tracking.trackingNumber}
                   {copiedRef ? <CheckCheck size={13} /> : <Copy size={13} />}
@@ -577,7 +577,7 @@ const OrderDetailView: React.FC<OrderDetailViewProps> = ({
               <span className="text-neutral-500">Reference</span>
               <button
                 onClick={() => copyToClipboard(payment.reference)}
-                className="inline-flex items-center gap-1.5 font-medium text-neutral-600 dark:text-neutral-300 text-xs font-mono hover:text-blue transition-colors max-w-[60%] truncate"
+                className="inline-flex items-center gap-1.5 font-medium text-neutral-600 dark:text-neutral-300 text-xs font-mono  transition-colors max-w-[60%] truncate"
               >
                 {payment.reference}
                 <Copy size={11} className="flex-shrink-0" />

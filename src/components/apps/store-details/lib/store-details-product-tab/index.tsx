@@ -329,7 +329,7 @@ const StoreDetailsProductsTab: React.FC<StoreDetailsProductsTabProps> = ({
             </div>
             <div className="p-3 flex flex-col flex-grow">
               <h3
-                className="font-semibold text-sm dark:text-white mb-1 line-clamp-2 cursor-pointer hover:text-blue transition-colors"
+                className="font-semibold text-sm dark:text-white mb-1 line-clamp-2 cursor-pointer  transition-colors"
                 onClick={() => handleGridItemClick(item)}
               >
                 {item?.itemName}
@@ -409,7 +409,7 @@ const StoreDetailsProductsTab: React.FC<StoreDetailsProductsTabProps> = ({
                               ? 'bg-neutral-100 border-neutral-200 text-neutral-300 cursor-not-allowed'
                               : itemInCart
                                 ? 'bg-blue-50 border-blue text-blue'
-                                : 'bg-neutral-50 border-neutral-200 dark:bg-neutral-700 dark:border-neutral-600 text-neutral-500 hover:border-blue hover:text-blue'
+                                : 'bg-neutral-50 border-neutral-200 dark:bg-neutral-700 dark:border-neutral-600 text-neutral-500 hover:border-blue '
                           }`}
                         >
                           <ShoppingCart size={14} />

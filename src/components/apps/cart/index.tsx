@@ -323,7 +323,7 @@ const Cart: React.FC<CartProps> = ({
           />
           <button
             onClick={allSelected || someSelected ? onDeselectAll : onSelectAll}
-            className="text-sm font-medium text-neutral-700 dark:text-neutral-300 hover:text-blue dark:hover:text-blue transition-colors"
+            className="text-sm font-medium text-neutral-700 dark:text-neutral-300  dark: transition-colors"
           >
             {allSelected ? 'Deselect all' : someSelected ? 'Deselect all' : 'Select all'}
           </button>

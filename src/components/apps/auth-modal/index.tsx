@@ -432,7 +432,7 @@ const VerifyEmailView = ({
               type="button"
               onClick={handleResend}
               disabled={isResending}
-              className="font-semibold text-blue hover:text-blue transition-colors inline-flex items-center gap-1"
+              className="font-semibold text-blue  transition-colors inline-flex items-center gap-1"
             >
               {isResending ? (
                 <>
@@ -525,7 +525,7 @@ const ForgotPasswordView = ({
               setSent(false);
               setEmail('');
             }}
-            className="text-sm text-blue hover:text-blue font-medium transition-colors"
+            className="text-sm text-blue  font-medium transition-colors"
           >
             Try a different email
           </button>
@@ -847,7 +847,7 @@ const SignupForm = ({
         <button
           type="button"
           onClick={onSwitchToLogin}
-          className="font-semibold text-blue hover:text-blue transition-colors"
+          className="font-semibold text-blue  transition-colors"
         >
           Sign in
         </button>
@@ -963,7 +963,7 @@ const LoginForm = ({
           <button
             type="button"
             onClick={onForgotPassword}
-            className="text-[11px] font-medium text-blue hover:text-blue transition-colors"
+            className="text-[11px] font-medium text-blue  transition-colors"
           >
             Forgot password?
           </button>
@@ -1016,7 +1016,7 @@ const LoginForm = ({
         <button
           type="button"
           onClick={onSwitchToSignup}
-          className="font-semibold text-blue hover:text-blue transition-colors"
+          className="font-semibold text-blue  transition-colors"
         >
           Create one
         </button>

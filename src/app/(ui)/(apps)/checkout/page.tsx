@@ -334,7 +334,7 @@ const CheckoutPage = () => {
         <p className="text-neutral-500 text-sm">Please sign in to checkout</p>
         <button
           onClick={() => router.push('/auth/sign-in')}
-          className="text-sm text-blue hover:text-blue font-medium"
+          className="text-sm text-blue  font-medium"
         >
           Sign In
         </button>
@@ -359,10 +359,7 @@ const CheckoutPage = () => {
     return (
       <div className="min-h-[80vh] flex flex-col items-center justify-center gap-3">
         <p className="text-neutral-500 text-sm">No Items Found</p>
-        <button
-          onClick={() => router.push('/cart')}
-          className="text-sm text-blue hover:text-blue font-medium"
-        >
+        <button onClick={() => router.push('/cart')} className="text-sm text-blue  font-medium">
           Return to Cart
         </button>
       </div>

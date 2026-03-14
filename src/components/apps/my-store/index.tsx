@@ -251,7 +251,7 @@ const StoreCard: React.FC<{
 
         <ChevronRight
           size={16}
-          className="ml-auto text-neutral-300 dark:text-neutral-600 group-hover:text-blue transition-colors flex-shrink-0"
+          className="ml-auto text-neutral-300 dark:text-neutral-600 group-hover:font-semibold transition-colors flex-shrink-0"
         />
       </div>
 

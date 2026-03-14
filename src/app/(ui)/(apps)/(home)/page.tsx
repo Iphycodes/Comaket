@@ -13,8 +13,9 @@ import { Currencies } from '@grc/_shared/constant';
 import Market from '@grc/components/apps/market';
 import { useGetCategoryTreeQuery, Category } from '@grc/services/categories';
 import { transformListing, MarketFilters } from '@grc/_shared/helpers/transform-listing';
+import { useScrollRestore } from '@grc/hooks/useScrollRestore';
 
-const PER_PAGE = 21;
+const PER_PAGE = 20;
 
 const MarketPage = () => {
   const router = useRouter();
@@ -31,6 +32,7 @@ const MarketPage = () => {
   const [gridModalItem, setGridModalItem] = useState<any>(null);
 
   const { searchValue, setSearchValue } = useSearch(600);
+  const { saveScrollPosition } = useScrollRestore(accumulatedListings.length > 0);
 
   // Fetch category tree from backend
   const { data: categoryTreeResponse } = useGetCategoryTreeQuery();
@@ -217,13 +219,14 @@ const MarketPage = () => {
   const handleVendorClick = useCallback(
     (item: any) => {
       console.log('post user data::::::', item?.postUserProfile);
+      saveScrollPosition();
       if (item?.postUserProfile?.isStore) {
         router.push(`/stores/${encodeURIComponent(item?.postUserProfile?.id)}`);
       } else {
         router.push(`/creators/${encodeURIComponent(item?.postUserProfile?.userName)}`);
       }
     },
-    [router]
+    [router, saveScrollPosition]
   );
 
   const handleGridItemClick = useCallback(

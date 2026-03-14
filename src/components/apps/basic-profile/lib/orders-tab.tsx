@@ -273,7 +273,7 @@ const OrdersTab: React.FC<OrdersTabProps> = ({
             placeholder="Search orders..."
             onChange={(e) => debouncedChangeHandler(e.target.value)}
             allowClear
-            className={`w-full ${isMobile ? 'h-10' : 'h-11'} rounded-xl`}
+            className={`w-full ${isMobile ? 'h-9' : 'h-11'} rounded-xl`}
           />
         </div>
         <div className={`flex items-center gap-2 mb-2 ${isMobile ? 'w-full' : ''}`}>
@@ -284,7 +284,7 @@ const OrdersTab: React.FC<OrdersTabProps> = ({
             onChange={(val) => setFilterStatus(val || null)}
             options={orderStatusOptions}
             className={`${
-              isMobile ? 'flex-1 h-10' : 'w-[150px] h-11'
+              isMobile ? 'flex-1 h-9' : 'w-[150px] h-11'
             } [&_.ant-select-selector]:!rounded-lg`}
             popupClassName="!rounded-lg"
           />

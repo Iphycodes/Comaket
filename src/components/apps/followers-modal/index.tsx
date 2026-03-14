@@ -123,7 +123,7 @@ const FollowerRow: React.FC<{
         <div className="flex items-center gap-1.5">
           <p
             className={`text-sm font-semibold text-neutral-900 dark:text-white truncate ${
-              isCreator ? 'group-hover:text-blue transition-colors' : ''
+              isCreator ? 'group-hover:font-semibold transition-colors' : ''
             }`}
           >
             {fullName}

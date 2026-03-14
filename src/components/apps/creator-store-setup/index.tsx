@@ -854,7 +854,7 @@ const Step3Tags: React.FC<{
                 className={`px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
                   isSelected
                     ? 'bg-blue-50 dark:bg-blue-900/30 border-blue-200 dark:border-blue text-blue dark:text-blue-300'
-                    : 'bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:border-blue hover:text-blue'
+                    : 'bg-white dark:bg-neutral-800 border-neutral-200 dark:border-neutral-700 text-neutral-600 dark:text-neutral-400 hover:border-blue '
                 }`}
               >
                 {isSelected ? (

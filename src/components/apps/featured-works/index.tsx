@@ -47,7 +47,7 @@ const CaptionUploadScreen: React.FC<CaptionUploadScreenProps> = ({
   return (
     <div className="flex flex-col h-full bg-black">
       {/* Top bar */}
-      <div className="flex items-center justify-between px-4 py-3 bg-black/80 backdrop-blur-sm z-10">
+      <div className="flex items-center justify-between px-4 pt-12 pb-3 bg-black/80 backdrop-blur-sm z-10">
         <button
           onClick={onBack}
           disabled={isSubmitting}
@@ -142,8 +142,8 @@ const CaptionUploadScreen: React.FC<CaptionUploadScreenProps> = ({
       )}
 
       {/* Caption input area — WhatsApp style */}
-      <div className="px-4 py-4 bg-gradient-to-t from-black via-black/95 to-black/80">
-        <div className="flex items-end gap-3">
+      <div className="px-4 py-4 pb-8 bg-gradient-to-t from-black via-black/95 to-black/80">
+        <div className="flex items-center gap-3">
           <div className="flex-1 relative">
             <textarea
               value={caption}
@@ -519,9 +519,13 @@ const FeaturedWorks: React.FC<FeaturedWorksProps> = ({
       />
 
       {/* Header */}
-      <div className={`flex items-center justify-between mb-5 ${isMobile ? 'px-4' : ''}`}>
+      <div className={`flex items-center justify-between ${isMobile ? 'mb-3 px-4' : 'mb-5'}`}>
         <div>
-          <h2 className="text-xl font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+          <h2
+            className={`${
+              isMobile ? 'text-base' : 'text-xl'
+            } font-bold text-neutral-900 dark:text-white flex items-center gap-2`}
+          >
             Featured Works
           </h2>
           <p className="text-xs text-neutral-400 mt-0.5">
@@ -533,9 +537,11 @@ const FeaturedWorks: React.FC<FeaturedWorksProps> = ({
             whileHover={{ scale: 1.02 }}
             whileTap={{ scale: 0.98 }}
             onClick={() => fileInputRef.current?.click()}
-            className="bg-gradient-to-r from-blue to-indigo-500 hover:from-blue hover:to-indigo-600 text-white py-2.5 px-5 rounded-xl font-semibold flex items-center gap-1.5 text-sm shadow-md shadow-blue/20 hover:shadow-lg transition-all"
+            className={`bg-gradient-to-r from-blue to-indigo-500 hover:from-blue hover:to-indigo-600 text-white rounded-xl font-semibold flex items-center gap-1.5 shadow-md shadow-blue/20 hover:shadow-lg transition-all ${
+              isMobile ? 'py-1.5 px-3 text-xs' : 'py-2.5 px-5 text-sm'
+            }`}
           >
-            <Plus size={16} />
+            <Plus size={isMobile ? 14 : 16} />
             {isMobile ? 'Add' : 'Add Work'}
           </motion.button>
         )}
@@ -697,10 +703,10 @@ const FeaturedWorks: React.FC<FeaturedWorksProps> = ({
                   animate={{ opacity: 1, x: 0 }}
                   exit={{ opacity: 0, x: '100%' }}
                   transition={{ type: 'spring', damping: 28, stiffness: 300 }}
-                  className="fixed inset-0 z-[200] bg-black flex flex-col pt-10"
+                  className="fixed inset-0 z-[200] bg-black flex flex-col"
                 >
                   {/* Header */}
-                  <div className="flex items-center justify-between px-4 py-3 bg-black/80 backdrop-blur-sm flex-shrink-0">
+                  <div className="flex items-center justify-between px-4 pt-12 pb-3 bg-black/80 backdrop-blur-sm flex-shrink-0">
                     <button
                       onClick={handleCloseDetail}
                       className="flex items-center gap-2 text-white/80 hover:text-white transition-colors"
