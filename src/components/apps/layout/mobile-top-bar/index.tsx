@@ -163,7 +163,11 @@ const MobileTopBar: React.FC<MobileTopBarProps> = ({
         <span className="cursor-pointer flex-shrink-0" onClick={() => router.push('/')}>
           <Image
             priority
-            src="/assets/imgs/kraft-logo-new-1.png"
+            src={
+              theme === 'dark'
+                ? '/assets/imgs/logos/kraft-logo-dark.png'
+                : '/assets/imgs/logos/kraft-logo-light.png'
+            }
             alt="Kraft logo"
             width={60}
             height={36}

@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@grc/hooks/useAuth';
 import { useCart } from '@grc/hooks/useCart';
@@ -500,4 +500,10 @@ const CheckoutPage = () => {
   );
 };
 
-export default CheckoutPage;
+const CheckoutPageWrapper = () => (
+  <Suspense fallback={null}>
+    <CheckoutPage />
+  </Suspense>
+);
+
+export default CheckoutPageWrapper;
