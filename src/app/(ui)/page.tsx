@@ -183,7 +183,7 @@ function Navbar({ onSignIn, onSignUp }: { onSignIn: () => void; onSignUp: () => 
               alt="Kraft"
               width={90}
               height={36}
-              style={{ width: '90px', height: 'auto' }}
+              style={{ width: '50px', height: 'auto' }}
               priority
             />
           </Link>
