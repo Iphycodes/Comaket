@@ -51,10 +51,11 @@ const StoreDetailPage = () => {
     if (!storeId) return;
     try {
       const result = await toggleFollow({ targetType: 'store', targetId: storeId });
-      const followed = result?.followed ?? !isFollowing;
+      if (!result) return; // User wasn't authenticated — auth modal shown, don't update UI
+      const followed = result.followed ?? !isFollowing;
       setIsFollowing(followed);
       setFollowersCount(
-        result?.totalFollowers ?? (followed ? followersCount + 1 : Math.max(0, followersCount - 1))
+        result.totalFollowers ?? (followed ? followersCount + 1 : Math.max(0, followersCount - 1))
       );
     } catch {}
   }, [storeId, toggleFollow, isFollowing, followersCount]);

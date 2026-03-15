@@ -180,14 +180,14 @@ export default function PaymentVerifyPage() {
 
   // ── Navigate ────────────────────────────────────────────────────────
   const handleRedirect = () => router.push(config.getRedirectPath(meta));
-  const handleGoHome = () => router.push('/');
+  const handleGoHome = () => router.push('/market');
 
   // ════════════════════════════════════════════════════════════════════════
   // RENDER
   // ════════════════════════════════════════════════════════════════════════
 
   return (
-    <div className="min-h-screen dark:bg-neutral-950 flex items-center justify-center px-4 py-10">
+    <div className="h-screen overflow-hidden dark:bg-neutral-950 flex items-center justify-center px-4 py-10">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}

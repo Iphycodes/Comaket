@@ -317,7 +317,7 @@ const DesktopSidebar: React.FC<StoreSidebarProps & { storeId: string }> = ({
     <div className="fixed left-0 top-0 bottom-0 w-[240px] bg-neutral-900 border-r border-neutral-800 flex flex-col z-30">
       <div className="px-4 pt-4 pb-2">
         <button
-          onClick={() => router.push('/')}
+          onClick={() => router.push('/market')}
           className="flex items-center gap-2 text-xs font-medium text-neutral-500 hover:text-neutral-300 transition-colors"
         >
           <ArrowLeft size={14} />
@@ -407,7 +407,7 @@ const MobileTopBar: React.FC<StoreSidebarProps & { storeId: string }> = ({
     <div className="sticky top-0 z-30 bg-neutral-900 border-b border-neutral-800 px-4 py-3 pt-12">
       <div className="flex items-center justify-between gap-3">
         <button
-          onClick={() => router.push('/')}
+          onClick={() => router.push('/market')}
           className="p-1.5 rounded-lg hover:bg-white/10 transition-colors"
         >
           <ArrowLeft size={18} className="text-neutral-400" />

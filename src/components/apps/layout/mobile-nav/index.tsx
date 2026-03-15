@@ -24,7 +24,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ setSelectedKey, isCreatorAccount 
   console.log('cart count:::::', cartCount);
 
   const allTabs = [
-    { key: 'market', label: 'Market', href: '/', icon: Store },
+    { key: 'market', label: 'Market', href: '/market', icon: Store },
     { key: 'creators', label: 'Creators', href: '/creators', icon: Users },
     { key: 'sell', label: 'Sell', href: '/sell-item', icon: Tag, creatorOnly: true },
     { key: 'cart', label: 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
@@ -57,7 +57,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ setSelectedKey, isCreatorAccount 
       {/* Background */}
       <div className="absolute inset-0 bg-white/95 dark:bg-neutral-950/95 backdrop-blur-xl border-t border-neutral-200/60 dark:border-zinc-800/60" />
 
-      <div className="relative flex items-center justify-around px-1 h-[56px] pb-[env(safe-area-inset-bottom)]">
+      <div className="relative flex items-center justify-around px-1 h-[48px] pb-[env(safe-area-inset-bottom)]">
         {tabs.map((tab) => {
           const active = isActive(tab.key, tab.href);
           const Icon = tab.icon;
@@ -66,7 +66,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ setSelectedKey, isCreatorAccount 
             <button
               key={tab.key}
               onClick={() => handleTap(tab)}
-              className="relative flex flex-col items-center justify-center flex-1 py-1.5 group"
+              className="relative flex flex-col items-center justify-center flex-1 py-1 group"
               aria-label={tab.label}
             >
               {/* Active pill behind icon */}

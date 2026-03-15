@@ -231,24 +231,32 @@ const Cart: React.FC<CartProps> = ({
   if (cartItems.length === 0) {
     return (
       <div
-        className={`min-h-[80vh] flex flex-col items-center justify-center ${
-          isMobile ? 'px-4' : ''
+        className={`h-screen flex flex-col items-center justify-center overflow-hidden ${
+          isMobile ? 'px-4 pt-10' : ''
         }`}
       >
         <Empty
           image={
             <ShoppingCart
-              size={80}
+              size={isMobile ? 48 : 64}
               className="mx-auto text-neutral-300 dark:text-neutral-600"
               strokeWidth={1}
             />
           }
           description={
             <div className="text-center">
-              <h3 className="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-2">
+              <h3
+                className={`${
+                  isMobile ? 'text-base' : 'text-lg'
+                } font-medium text-neutral-900 dark:text-neutral-100 mb-1.5`}
+              >
                 Your cart is empty
               </h3>
-              <p className="text-neutral-500 dark:text-neutral-400 mb-6">
+              <p
+                className={`${
+                  isMobile ? 'text-xs' : 'text-sm'
+                } text-neutral-500 dark:text-neutral-400 mb-4`}
+              >
                 Browse the marketplace and add items to your cart
               </p>
             </div>
@@ -258,9 +266,11 @@ const Cart: React.FC<CartProps> = ({
           whileHover={{ scale: 1.02 }}
           whileTap={{ scale: 0.98 }}
           onClick={onContinueShopping}
-          className="bg-gradient-to-r from-blue to-indigo-600 text-white px-6 py-3 rounded-lg font-medium flex items-center gap-2"
+          className={`bg-gradient-to-r from-blue to-indigo-600 text-white rounded-lg font-medium flex items-center gap-2 ${
+            isMobile ? 'px-4 py-2.5 text-sm' : 'px-6 py-3'
+          }`}
         >
-          <ShoppingBag size={18} />
+          <ShoppingBag size={isMobile ? 15 : 18} />
           Browse Marketplace
         </motion.button>
       </div>
@@ -276,8 +286,14 @@ const Cart: React.FC<CartProps> = ({
         }`}
       >
         <div>
-          <h1 className="text-2xl font-bold dark:text-white">Shopping Cart</h1>
-          <p className="text-sm text-neutral-500 dark:text-neutral-400 mt-1">
+          <h1 className={`${isMobile ? 'text-lg' : 'text-2xl'} font-bold dark:text-white`}>
+            Shopping Cart
+          </h1>
+          <p
+            className={`${
+              isMobile ? 'text-xs' : 'text-sm'
+            } text-neutral-500 dark:text-neutral-400 mt-0.5`}
+          >
             {cartCount} {cartCount === 1 ? 'item' : 'items'} in your cart
             {unavailableCount > 0 && (
               <span className="text-orange-500 ml-1">· {unavailableCount} unavailable</span>
@@ -335,7 +351,7 @@ const Cart: React.FC<CartProps> = ({
 
       <div className={`flex ${isMobile ? 'flex-col' : 'gap-8'}`}>
         {/* Cart Items */}
-        <div className={`${isMobile ? 'w-full' : 'w-2/3'} space-y-4 pb-10`}>
+        <div className={`${isMobile ? 'w-full space-y-2.5' : 'w-2/3 space-y-4'} pb-10`}>
           <AnimatePresence>
             {cartItems.map((item) => {
               const maxQty = item.maxQuantity ?? Infinity;
@@ -351,7 +367,9 @@ const Cart: React.FC<CartProps> = ({
                   initial={{ opacity: 0, y: 20 }}
                   animate={{ opacity: 1, y: 0 }}
                   exit={{ opacity: 0, x: -100 }}
-                  className={`relative bg-white dark:bg-neutral-800 rounded-xl border p-4 flex gap-3 transition-all ${
+                  className={`relative bg-white dark:bg-neutral-800 rounded-xl border ${
+                    isMobile ? 'p-2.5' : 'p-4'
+                  } flex gap-3 transition-all ${
                     isUnavailable
                       ? 'border-red-200 dark:border-red-900/40 opacity-60'
                       : isSelected
@@ -381,9 +399,9 @@ const Cart: React.FC<CartProps> = ({
 
                   {/* Product Image */}
                   <div
-                    className={`relative w-24 h-24 md:w-32 md:h-32 rounded-lg overflow-hidden flex-shrink-0 ${
-                      isUnavailable ? 'mt-6' : ''
-                    }`}
+                    className={`relative ${
+                      isMobile ? 'w-20 h-20' : 'w-24 h-24 md:w-32 md:h-32'
+                    } rounded-lg overflow-hidden flex-shrink-0 ${isUnavailable ? 'mt-6' : ''}`}
                   >
                     {item.image ? (
                       <Image
@@ -454,7 +472,9 @@ const Cart: React.FC<CartProps> = ({
                       {/* Price section */}
                       <div className="flex items-center gap-2 mt-1 flex-wrap">
                         <span
-                          className={`text-lg font-bold transition-colors ${
+                          className={`${
+                            isMobile ? 'text-sm' : 'text-lg'
+                          } font-bold transition-colors ${
                             isUnavailable || !isSelected
                               ? 'text-neutral-400 dark:text-neutral-500'
                               : 'bg-gradient-to-r from-orange-500 to-rose-500 bg-clip-text text-transparent'

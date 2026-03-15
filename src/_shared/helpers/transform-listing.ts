@@ -59,6 +59,7 @@ export const transformListing = (listing: any) => {
         ? `${store?.location?.city}, ${store?.location?.state}`
         : `${creator?.location?.city}, ${creator?.location?.state}`,
     },
+    ownerId: user?._id || (typeof listing.userId === 'string' ? listing.userId : null),
     _raw: listing,
   };
 };

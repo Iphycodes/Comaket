@@ -94,7 +94,7 @@ export const useCart = ({ fetchCart = false, fetchCount = false }: UseCartProps 
       const result = await updateCartItem({
         listingId,
         payload: { quantity },
-        options: { successMessage: 'Cart updated' },
+        options: { noSuccessMessage: true },
       }).unwrap();
       return result;
     } catch (error) {

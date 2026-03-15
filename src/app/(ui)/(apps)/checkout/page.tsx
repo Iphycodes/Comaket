@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useCallback, useEffect, useMemo, useState } from 'react';
+import React, { Suspense, useCallback, useEffect, useMemo, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { useAuth } from '@grc/hooks/useAuth';
 import { useCart } from '@grc/hooks/useCart';
@@ -10,37 +10,12 @@ import { fetchData } from '@grc/_shared/helpers';
 import { message as antMessage } from 'antd';
 import Checkout from '@grc/components/apps/checkout';
 import { CheckoutCartPayload } from '@grc/services/cart';
+import { useLazyGetDeliveryFeeQuery } from '@grc/services/delivery-zones';
+import { useShippingAddresses } from '@grc/hooks/useShippingAddresses';
 
-// ═══════════════════════════════════════════════════════════════════════════
-// TYPES
-// ═══════════════════════════════════════════════════════════════════════════
-
-export interface ShippingFormData {
-  fullName: string;
-  phoneNumber: string;
-  email: string;
-  address: string;
-  country: string;
-  state: string;
-  city: string;
-  zipCode: string;
-  buyerNote: string;
-}
-
-export interface CheckoutCartItem {
-  listingId: string;
-  itemName: string;
-  quantity: number;
-  unitPrice: number;
-  totalPrice: number;
-  image: string;
-  storeName: string;
-}
-
-export interface LocationOption {
-  name: string;
-  iso2?: string;
-}
+// Types in ./types.ts to avoid circular dependency (component imports from page)
+import type { ShippingFormData, CheckoutCartItem, LocationOption } from './types';
+export type { ShippingFormData, CheckoutCartItem, LocationOption };
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CHECKOUT PAGE
@@ -76,6 +51,15 @@ const CheckoutPage = () => {
 
   const { initializePayment, isInitializingPayment } = usePayments();
 
+  const {
+    addresses: savedAddresses,
+    isLoading: isLoadingSavedAddresses,
+    create: createAddress,
+    isCreating: isCreatingAddress,
+  } = useShippingAddresses({ fetchOnMount: !!isAuthenticated });
+  const [selectedAddressId, setSelectedAddressId] = useState<string | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<'paystack' | 'opay'>('paystack');
+
   // ── Location state ────────────────────────────────────────────────
   const [countries, setCountries] = useState<LocationOption[]>([]);
   const [states, setStates] = useState<LocationOption[]>([]);
@@ -85,6 +69,12 @@ const CheckoutPage = () => {
   const [loadingCities, setLoadingCities] = useState(false);
   const [selectedCountryIso2, setSelectedCountryIso2] = useState('');
   const [selectedStateIso2, setSelectedStateIso2] = useState('');
+
+  // ── Delivery fee ──────────────────────────────────────────────────
+  const [triggerGetDeliveryFee] = useLazyGetDeliveryFeeQuery();
+  const [deliveryFee, setDeliveryFee] = useState(0);
+  const [deliveryZoneName, setDeliveryZoneName] = useState<string | null>(null);
+  const [loadingDeliveryFee, setLoadingDeliveryFee] = useState(false);
 
   // ── Shipping form state (lifted for location coupling) ────────────
   const [shippingData, setShippingData] = useState<ShippingFormData>({
@@ -201,6 +191,30 @@ const CheckoutPage = () => {
     loadCities();
   }, [selectedCountryIso2, selectedStateIso2]);
 
+  // ── Fetch delivery fee when state changes ──────────────────────────
+  useEffect(() => {
+    if (!shippingData.state) {
+      setDeliveryFee(0);
+      setDeliveryZoneName(null);
+      return;
+    }
+    const fetchFee = async () => {
+      setLoadingDeliveryFee(true);
+      try {
+        const result = await triggerGetDeliveryFee(shippingData.state).unwrap();
+        const data = result?.data || result;
+        setDeliveryFee(data?.fee || 0);
+        setDeliveryZoneName(data?.zoneName || null);
+      } catch {
+        setDeliveryFee(0);
+        setDeliveryZoneName(null);
+      } finally {
+        setLoadingDeliveryFee(false);
+      }
+    };
+    fetchFee();
+  }, [shippingData.state]);
+
   // ── Auto-resolve state iso2 when profile prefills ─────────────────
   useEffect(() => {
     if (!shippingData.state || states.length === 0) return;
@@ -209,6 +223,56 @@ const CheckoutPage = () => {
       setSelectedStateIso2(match.iso2);
     }
   }, [shippingData.state, states]);
+
+  // ── Select saved address handler ──────────────────────────────────
+  const handleSelectSavedAddress = useCallback(
+    (addressId: string | null) => {
+      setSelectedAddressId(addressId);
+      if (!addressId) return;
+      const addr = savedAddresses?.find((a: any) => a._id === addressId);
+      if (!addr) return;
+      setShippingData((prev) => ({
+        ...prev,
+        fullName: addr.fullName || prev.fullName,
+        phoneNumber: addr.phoneNumber || prev.phoneNumber,
+        email: addr.email || prev.email,
+        address: addr.address || '',
+        country: addr.country || 'Nigeria',
+        state: addr.state || '',
+        city: addr.city || '',
+        zipCode: addr.zipCode || '',
+      }));
+      // Resolve country iso2
+      const countryMatch = countries.find(
+        (c) => c.name.toLowerCase() === (addr.country || 'nigeria').toLowerCase()
+      );
+      if (countryMatch?.iso2) setSelectedCountryIso2(countryMatch.iso2);
+    },
+    [savedAddresses, countries]
+  );
+
+  // ── Save current address handler ────────────────────────────────
+  const handleSaveAddress = useCallback(
+    async (label?: string) => {
+      try {
+        await createAddress({
+          fullName: shippingData.fullName,
+          phoneNumber: shippingData.phoneNumber,
+          email: shippingData.email,
+          address: shippingData.address,
+          city: shippingData.city,
+          state: shippingData.state,
+          country: shippingData.country,
+          zipCode: shippingData.zipCode || undefined,
+          label: label || undefined,
+        });
+        antMessage.success('Address saved');
+      } catch {
+        antMessage.error('Failed to save address');
+      }
+    },
+    [createAddress, shippingData]
+  );
 
   // ── Location change handlers ──────────────────────────────────────
   const handleCountryChange = useCallback(
@@ -276,7 +340,9 @@ const CheckoutPage = () => {
       setIsProcessing(true);
 
       try {
-        const callbackUrl = `${window.location.origin}/checkout/verify`;
+        const callbackUrl = `${window.location.origin}/checkout/verify${
+          paymentMethod === 'opay' ? '?provider=opay' : ''
+        }`;
 
         const checkoutPayload: CheckoutCartPayload & { listingIds?: string[] } = {
           shippingAddress: {
@@ -291,6 +357,8 @@ const CheckoutPage = () => {
           email: shipping.email,
           ...(shipping.buyerNote.trim() && { buyerNote: shipping.buyerNote.trim() }),
           callbackUrl,
+          ...(deliveryFee > 0 && { deliveryFee }),
+          paymentMethod,
         };
 
         // Pass selected listing IDs so backend only checks out these items
@@ -387,8 +455,34 @@ const CheckoutPage = () => {
       onCountryChange={handleCountryChange}
       onStateChange={handleStateChange}
       onCityChange={handleCityChange}
+      // Delivery fee
+      deliveryFee={deliveryFee}
+      deliveryZoneName={deliveryZoneName}
+      loadingDeliveryFee={loadingDeliveryFee}
+      // Saved addresses
+      savedAddresses={savedAddresses || []}
+      isLoadingSavedAddresses={isLoadingSavedAddresses}
+      selectedAddressId={selectedAddressId}
+      onSelectSavedAddress={handleSelectSavedAddress}
+      onSaveAddress={handleSaveAddress}
+      isSavingAddress={isCreatingAddress}
+      // Payment method
+      paymentMethod={paymentMethod}
+      onPaymentMethodChange={setPaymentMethod}
     />
   );
 };
 
-export default CheckoutPage;
+const CheckoutPageWrapper = () => (
+  <Suspense
+    fallback={
+      <div className="min-h-[80vh] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-blue border-t-transparent rounded-full animate-spin" />
+      </div>
+    }
+  >
+    <CheckoutPage />
+  </Suspense>
+);
+
+export default CheckoutPageWrapper;

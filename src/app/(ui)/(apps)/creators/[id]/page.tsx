@@ -25,7 +25,12 @@ const CreatorDetails = dynamic(() => import('@grc/components/apps/creator-detail
 const CreatorDetailPage = () => {
   const router = useRouter();
   const pathname = usePathname();
-  const username = decodeURIComponent(pathname?.split('/')?.[2] || '');
+  // Support both /creators/username and /@username (middleware rewrite)
+  const username = decodeURIComponent(
+    pathname?.startsWith('/@')
+      ? pathname.slice(2) // "/@ankara_by_adaeze" → "ankara_by_adaeze"
+      : pathname?.split('/')?.[2] || ''
+  );
   const { isAuthenticated } = useAuth();
 
   // ── 1. Fetch creator by slug ────────────────────────────────────────
@@ -58,10 +63,11 @@ const CreatorDetailPage = () => {
     if (!creatorId) return;
     try {
       const result = await toggleFollow({ targetType: 'creator', targetId: creatorId });
-      const followed = result?.followed ?? !isFollowing;
+      if (!result) return; // User wasn't authenticated — auth modal shown, don't update UI
+      const followed = result.followed ?? !isFollowing;
       setIsFollowing(followed);
       setFollowersCount(
-        result?.totalFollowers ?? (followed ? followersCount + 1 : Math.max(0, followersCount - 1))
+        result.totalFollowers ?? (followed ? followersCount + 1 : Math.max(0, followersCount - 1))
       );
     } catch {}
   }, [creatorId, toggleFollow, isFollowing, followersCount]);

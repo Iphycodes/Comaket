@@ -1,4 +1,4 @@
-import React, { useRef, useEffect, useCallback, useMemo, useState } from 'react';
+import React, { useRef, useEffect, useCallback, useMemo, useState, RefObject } from 'react';
 import { Badge, Col, Empty, Row, Tooltip } from 'antd';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -65,8 +65,8 @@ interface MarketProps {
   isInCart: (itemId: string | number) => boolean;
   isSaved: (itemId: string | number) => boolean;
   cartItems: any[];
-  isAddingToCart: boolean;
-  isTogglingSave: boolean;
+  currentUserId?: string;
+  scrollContainerRef?: RefObject<HTMLDivElement>;
 }
 
 const Market: React.FC<MarketProps> = ({
@@ -105,8 +105,8 @@ const Market: React.FC<MarketProps> = ({
   isInCart,
   isSaved,
   cartItems,
-  // isAddingToCart,
-  // isTogglingSave,
+  currentUserId,
+  scrollContainerRef: externalScrollRef,
 }) => {
   // ── Category navigation data ──
   // Use backend category tree if available, otherwise fall back to CREATOR_INDUSTRIES
@@ -145,8 +145,9 @@ const Market: React.FC<MarketProps> = ({
   // This way it takes zero space when not needed.
   const [headerMode, setHeaderMode] = useState<'static' | 'visible' | 'hidden'>('static');
   const lastScrollYRef = useRef(0);
-  const scrollContainerRef = useRef<HTMLDivElement | null>(null);
-  const headerRef = useRef<HTMLDivElement | null>(null);
+  const internalScrollRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = externalScrollRef || internalScrollRef;
+  const headerRef = useRef<HTMLDivElement>(null);
   const headerHeightRef = useRef(0);
   const wasInProductViewRef = useRef(false);
 
@@ -316,6 +317,7 @@ const Market: React.FC<MarketProps> = ({
           const existing = cartItems?.find((i: any) => i.listingId === item.id?.toString());
           const currentQty = existing?.quantity || 0;
           const isMaxQty = currentQty >= maxQty;
+          const isOwnItem = !!(currentUserId && item.ownerId === currentUserId);
           const firstMedia = item.media?.[0];
 
           return (
@@ -465,64 +467,100 @@ const Market: React.FC<MarketProps> = ({
                 )}
 
                 {/* Action Buttons */}
-                <div className="space-y-1.5">
-                  {item.isBuyable ? (
-                    <>
-                      <div className="flex items-center gap-1.5">
-                        <button
-                          onClick={(e) => {
-                            e.stopPropagation();
-                            onBuyNow(item);
-                          }}
-                          disabled={isSoldOut}
-                          className={`flex-1 py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all shadow-sm ${
-                            isSoldOut
-                              ? 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
-                              : 'bg-gradient-to-r from-blue to-indigo-700 hover:from-blue hover:to-indigo-800 text-white hover:shadow-md'
-                          }`}
-                        >
-                          <ShoppingBag size={14} />
-                          Buy Now
-                        </button>
-                        <Tooltip
-                          title={
-                            isSoldOut
-                              ? 'Sold out'
-                              : isMaxQty
-                                ? `Max qty (${maxQty})`
-                                : itemInCart
-                                  ? 'In cart'
-                                  : 'Add to cart'
-                          }
-                        >
+                {isOwnItem ? (
+                  <div className="mt-auto pt-2">
+                    <span className="block text-center text-[10px] text-neutral-400 italic">
+                      Your listing
+                    </span>
+                  </div>
+                ) : (
+                  <div className="space-y-1.5">
+                    {item.isBuyable ? (
+                      <>
+                        <div className="flex items-center gap-1.5">
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              onAddToCart(item);
+                              onBuyNow(item);
                             }}
-                            disabled={isSoldOut || isMaxQty}
-                            className={`p-2 rounded-lg border shadow-sm transition-colors ${
-                              isSoldOut || isMaxQty
-                                ? 'bg-neutral-100 border-neutral-200 text-neutral-300 cursor-not-allowed'
-                                : itemInCart
-                                  ? 'bg-blue-50 border-blue text-blue'
-                                  : 'bg-neutral-50 border-neutral-200 dark:bg-neutral-700 dark:border-neutral-600 text-neutral-500 hover:border-blue '
+                            disabled={isSoldOut}
+                            className={`flex-1 py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all shadow-sm ${
+                              isSoldOut
+                                ? 'bg-neutral-200 text-neutral-400 cursor-not-allowed'
+                                : 'bg-gradient-to-r from-blue to-indigo-700 hover:from-blue hover:to-indigo-800 text-white hover:shadow-md'
                             }`}
                           >
-                            <ShoppingCart size={14} />
+                            <ShoppingBag size={14} />
+                            Buy Now
                           </button>
-                        </Tooltip>
-                      </div>
-                      <div className="flex items-center gap-1.5">
+                          <Tooltip
+                            title={
+                              isSoldOut
+                                ? 'Sold out'
+                                : isMaxQty
+                                  ? `Max qty (${maxQty})`
+                                  : itemInCart
+                                    ? 'In cart'
+                                    : 'Add to cart'
+                            }
+                          >
+                            <button
+                              onClick={(e) => {
+                                e.stopPropagation();
+                                onAddToCart(item);
+                              }}
+                              disabled={isSoldOut || isMaxQty}
+                              className={`p-2 rounded-lg border shadow-sm transition-colors ${
+                                isSoldOut || isMaxQty
+                                  ? 'bg-neutral-100 border-neutral-200 text-neutral-300 cursor-not-allowed'
+                                  : itemInCart
+                                    ? 'bg-blue-50 border-blue text-blue'
+                                    : 'bg-neutral-50 border-neutral-200 dark:bg-neutral-700 dark:border-neutral-600 text-neutral-500 hover:border-blue '
+                              }`}
+                            >
+                              <ShoppingCart size={14} />
+                            </button>
+                          </Tooltip>
+                        </div>
+                        <div className="flex items-center gap-1.5">
+                          <button
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onWhatsAppMessage(item);
+                            }}
+                            className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all shadow-sm hover:shadow-md"
+                          >
+                            <MessageCircle size={14} />
+                            WhatsApp
+                          </button>
+                          <motion.button
+                            whileTap={{ scale: 0.9 }}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              onToggleSave(item);
+                            }}
+                            className="p-2 rounded-lg border border-neutral-200 dark:border-neutral-600 bg-neutral-50 dark:bg-neutral-700 shadow-sm"
+                          >
+                            <Bookmark
+                              size={16}
+                              className={`${
+                                itemIsSaved ? 'fill-pink-500 text-pink-500' : 'text-neutral-400'
+                              } transition-colors`}
+                            />
+                          </motion.button>
+                        </div>
+                      </>
+                    ) : (
+                      <>
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
                             onWhatsAppMessage(item);
                           }}
-                          className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all shadow-sm hover:shadow-md"
+                          className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all shadow-sm hover:shadow-md"
                         >
                           <MessageCircle size={14} />
-                          WhatsApp
+                          Message on WhatsApp
                         </button>
                         <motion.button
                           whileTap={{ scale: 0.9 }}
@@ -530,48 +568,20 @@ const Market: React.FC<MarketProps> = ({
                             e.stopPropagation();
                             onToggleSave(item);
                           }}
-                          className="p-2 rounded-lg border border-neutral-200 dark:border-neutral-600 bg-neutral-50 dark:bg-neutral-700 shadow-sm"
+                          className="w-full p-2 rounded-lg border border-neutral-200 dark:border-neutral-600 bg-neutral-50 dark:bg-neutral-700 shadow-sm flex items-center justify-center gap-1.5 text-xs text-neutral-500"
                         >
                           <Bookmark
-                            size={16}
+                            size={14}
                             className={`${
                               itemIsSaved ? 'fill-pink-500 text-pink-500' : 'text-neutral-400'
                             } transition-colors`}
                           />
+                          Save
                         </motion.button>
-                      </div>
-                    </>
-                  ) : (
-                    <>
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onWhatsAppMessage(item);
-                        }}
-                        className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all shadow-sm hover:shadow-md"
-                      >
-                        <MessageCircle size={14} />
-                        Message on WhatsApp
-                      </button>
-                      <motion.button
-                        whileTap={{ scale: 0.9 }}
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          onToggleSave(item);
-                        }}
-                        className="w-full p-2 rounded-lg border border-neutral-200 dark:border-neutral-600 bg-neutral-50 dark:bg-neutral-700 shadow-sm flex items-center justify-center gap-1.5 text-xs text-neutral-500"
-                      >
-                        <Bookmark
-                          size={14}
-                          className={`${
-                            itemIsSaved ? 'fill-pink-500 text-pink-500' : 'text-neutral-400'
-                          } transition-colors`}
-                        />
-                        Save
-                      </motion.button>
-                    </>
-                  )}
-                </div>
+                      </>
+                    )}
+                  </div>
+                )}
               </div>
             </motion.div>
           );
@@ -604,6 +614,7 @@ const Market: React.FC<MarketProps> = ({
               availability={item.availability ?? true}
               isBuyable={item.isBuyable ?? false}
               listingType={item.listingType ?? 'self-listing'}
+              ownerId={item.ownerId ?? null}
             />
           </div>
         ))}
@@ -627,13 +638,6 @@ const Market: React.FC<MarketProps> = ({
   // MAIN RENDER
   // ════════════════════════════════════════════════════════════════════════
 
-  console.log('MARKET DEBUG:', {
-    hasMore,
-    isLoading,
-    listingsCount: listings.length,
-    totalListings,
-  });
-
   return (
     <>
       {/* Product overlay — rendered on top when active, keeps market mounted underneath */}
@@ -651,6 +655,7 @@ const Market: React.FC<MarketProps> = ({
                 ci.id === selectedProduct.id?.toString()
             )?.quantity || 0
           }
+          isOwnItem={!!(currentUserId && selectedProduct?.ownerId === currentUserId)}
           onAddToCart={() => onAddToCart(selectedProduct)}
           onBuyNow={() => onBuyNow(selectedProduct)}
           onToggleSave={() => onToggleSave(selectedProduct)}
@@ -670,7 +675,7 @@ const Market: React.FC<MarketProps> = ({
             <div
               ref={headerRef}
               className={`z-20 backdrop-blur-md bg-white/80 dark:bg-neutral-900/80 ${
-                isMobile ? 'pt-8' : 'sticky top-0 shadow-sm'
+                isMobile ? 'pt-10' : 'sticky top-0 shadow-sm'
               } ${
                 isMobile
                   ? headerMode === 'static'
@@ -918,25 +923,13 @@ const Market: React.FC<MarketProps> = ({
                   </div>
                 </div>
 
-                <AnimatePresence>
-                  {showFilters && (
-                    // <motion.div
-                    //   initial={{ height: 0, opacity: 0 }}
-                    //   animate={{ height: 'auto', opacity: 1 }}
-                    //   exit={{ height: 0, opacity: 0 }}
-                    //   transition={{ duration: 0.2 }}
-                    //   className="overflow-hidden"
-                    // >
-                    <FilterPanel
-                      filters={filters}
-                      onApplyFilters={onApplyFilters}
-                      onResetFilters={onResetFilters}
-                      // open={showFilters}
-                      // onClose={() => setShowFilters(false)}
-                    />
-                    // </motion.div>
-                  )}
-                </AnimatePresence>
+                {showFilters && (
+                  <FilterPanel
+                    filters={filters}
+                    onApplyFilters={onApplyFilters}
+                    onResetFilters={onResetFilters}
+                  />
+                )}
               </div>
             </div>
 
@@ -995,6 +988,7 @@ const Market: React.FC<MarketProps> = ({
               quantity: gridModalItem.quantity ?? 1,
               isBuyable: gridModalItem.isBuyable ?? false,
               listingType: gridModalItem.listingType ?? 'self-listing',
+              ownerId: gridModalItem.ownerId ?? null,
             }}
           />
         )}

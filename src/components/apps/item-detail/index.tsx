@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext } from 'react';
+import React, { useState, useEffect, useContext, useMemo } from 'react';
 import { Tag, Tooltip, message as antMessage } from 'antd';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -22,6 +22,7 @@ import { CartItem } from '@grc/_shared/namespace/cart';
 import { setBuyNowItem } from '@grc/_shared/namespace/buy';
 import { ListingType, MediaItem } from '@grc/_shared/namespace';
 import MediaRenderer, { getFirstImageUrl } from '../media-renderer';
+import { useUsers } from '@grc/hooks/useUser';
 
 interface ItemDetailProps {
   item: {
@@ -47,6 +48,7 @@ interface ItemDetailProps {
       | undefined;
     platformFee?: number;
     live?: boolean;
+    ownerId?: string | null;
   };
   isSellerView?: boolean;
   onClose?: () => void;
@@ -60,6 +62,11 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ item, isSellerView }) => {
   const [isSaved, setIsSaved] = useState(false);
   const isMobile = useMediaQuery(mediaSize.mobile);
   const { addToCart, isInCart, cartItems } = useContext(AppContext);
+  const { userProfile } = useUsers({ fetchProfile: true });
+  const isOwnItem = useMemo(
+    () => !!(userProfile?._id && item.ownerId && userProfile._id === item.ownerId),
+    [userProfile?._id, item.ownerId]
+  );
 
   const itemInCart = isInCart(item?.id);
   const maxQuantity = item?.quantity ?? 1;
@@ -494,7 +501,7 @@ Price: ${formattedPrice}`;
           </div>
 
           {/* Action Buttons — conditional on isBuyable */}
-          {!isSellerView && (
+          {!isSellerView && !isOwnItem && (
             <div className="absolute w-[90%] flex flex-col gap-2 bottom-0 bg-white dark:bg-neutral-800 py-4 mt-6 border-t">
               {item.isBuyable ? (
                 <>

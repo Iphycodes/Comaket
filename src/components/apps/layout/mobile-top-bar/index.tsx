@@ -4,6 +4,7 @@ import React, { Dispatch, SetStateAction, useContext } from 'react';
 import { Dropdown } from 'antd';
 import type { MenuProps } from 'antd';
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 import {
   Store,
   ChevronDown,
@@ -157,56 +158,74 @@ const MobileTopBar: React.FC<MobileTopBarProps> = ({
 
   return (
     <div className="fixed w-full top-0 z-[1000] bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700/60">
-      <div className="flex items-center justify-end gap-1 px-3 h-8">
-        {/* Left: My Stores dropdown — only if user is a creator WITH stores */}
-        {hasStores && (
-          <Dropdown menu={{ items: storeMenuItems }} trigger={['click']} placement="bottomLeft">
-            <button className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-semibold text-neutral-800 dark:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
-              <Store size={16} className="text-purple-500" />
-              <span>My Stores</span>
-              <ChevronDown size={14} className="text-neutral-400" />
-            </button>
-          </Dropdown>
-        )}
+      <div className="flex items-center justify-between gap-1 px-3 h-10">
+        {/* Left: Logo */}
+        <span className="cursor-pointer flex-shrink-0" onClick={() => router.push('/')}>
+          <Image
+            priority
+            src={
+              theme === 'dark'
+                ? '/assets/imgs/logos/kraft-logo-dark.png'
+                : '/assets/imgs/logos/kraft-logo-light.png'
+            }
+            alt="Kraft logo"
+            width={60}
+            height={36}
+            style={{ width: '60px', height: 'auto' }}
+          />
+        </span>
 
-        {/* Theme toggle */}
-        <button
-          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
-          className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
-          aria-label="Toggle theme"
-        >
-          {theme === 'dark' ? (
-            <Sun size={16} className="text-amber-400" />
-          ) : (
-            <Moon size={16} className="text-neutral-500" />
+        <div className="flex items-center gap-1">
+          {/* My Stores dropdown — only if user is a creator WITH stores */}
+          {hasStores && (
+            <Dropdown menu={{ items: storeMenuItems }} trigger={['click']} placement="bottomLeft">
+              <button className="flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-sm font-semibold text-neutral-800 dark:text-neutral-100 hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors">
+                <Store size={16} className="text-purple-500" />
+                <span>My Stores</span>
+                <ChevronDown size={14} className="text-neutral-400" />
+              </button>
+            </Dropdown>
           )}
-        </button>
 
-        {/* Right: User avatar / emoji dropdown */}
-        <Dropdown menu={{ items: userMenuItems }} trigger={['click']} placement="bottomRight">
-          <button className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors overflow-hidden">
-            {userProfile ? (
-              avatarUrl ? (
-                <img
-                  src={avatarUrl}
-                  alt={fullName}
-                  className="w-7 h-7 rounded-full object-cover ring-1 ring-neutral-200 dark:ring-neutral-700"
-                />
-              ) : (
-                <div
-                  className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[11px] font-bold"
-                  style={{ backgroundColor: getRandomColorByString(firstName || 'U') }}
-                >
-                  {getFirstCharacter(firstName || 'U')}
-                </div>
-              )
+          {/* Theme toggle */}
+          <button
+            onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+            className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+            aria-label="Toggle theme"
+          >
+            {theme === 'dark' ? (
+              <Sun size={16} className="text-amber-400" />
             ) : (
-              <span className="text-lg leading-none" role="img" aria-label="user">
-                👤
-              </span>
+              <Moon size={16} className="text-neutral-500" />
             )}
           </button>
-        </Dropdown>
+
+          {/* Right: User avatar / emoji dropdown */}
+          <Dropdown menu={{ items: userMenuItems }} trigger={['click']} placement="bottomRight">
+            <button className="w-8 h-8 rounded-full flex items-center justify-center hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors overflow-hidden">
+              {userProfile ? (
+                avatarUrl ? (
+                  <img
+                    src={avatarUrl}
+                    alt={fullName}
+                    className="w-7 h-7 rounded-full object-cover ring-1 ring-neutral-200 dark:ring-neutral-700"
+                  />
+                ) : (
+                  <div
+                    className="w-7 h-7 rounded-full flex items-center justify-center text-white text-[11px] font-bold"
+                    style={{ backgroundColor: getRandomColorByString(firstName || 'U') }}
+                  >
+                    {getFirstCharacter(firstName || 'U')}
+                  </div>
+                )
+              ) : (
+                <span className="text-lg leading-none" role="img" aria-label="user">
+                  👤
+                </span>
+              )}
+            </button>
+          </Dropdown>
+        </div>
       </div>
     </div>
   );

@@ -36,6 +36,7 @@ interface ProductProps {
   onShare?: () => void;
   onGoBack?: () => void;
 
+  isOwnItem?: boolean;
   // Legacy support — if rendered from Market list view with setSelectedProductId
   setSelectedProductId?: React.Dispatch<React.SetStateAction<string>>;
 }
@@ -51,6 +52,7 @@ const Product = ({
   onWhatsAppMessage,
   onShare,
   onGoBack,
+  isOwnItem = false,
   setSelectedProductId,
 }: ProductProps) => {
   const isMobile = useMediaQuery(mediaSize.mobile);
@@ -378,7 +380,7 @@ const Product = ({
                   {item.productTags.map((tag, index) => (
                     <span
                       key={index}
-                      className="px-3 py-1 text-xs font-medium bg-neutral-100 dark:bg-zinc-800 text-neutral-700 dark:text-neutral-300 rounded-full"
+                      className="px-2.5 py-0.5 text-[11px] font-medium bg-neutral-100 dark:bg-zinc-800 text-neutral-700 dark:text-neutral-300 rounded-full"
                     >
                       {tag}
                     </span>
@@ -408,154 +410,160 @@ const Product = ({
             </div>
 
             {/* ─── Bottom actions ─── */}
-            <div
-              className={`${
-                isMobile ? 'pt-4 mt-4 pb-6' : 'sticky bottom-0 pt-4 mt-6'
-              } bg-white dark:bg-neutral-800 border-t border-neutral-100 dark:border-zinc-800 z-40`}
-            >
-              {isBuyable ? (
-                <div className="space-y-2">
-                  <div className="flex items-center gap-1.5">
-                    <motion.button
-                      whileHover={{ scale: 1.02 }}
-                      whileTap={{ scale: 0.98 }}
-                      onClick={onBuyNow}
-                      disabled={isSoldOut}
-                      className={`flex-1 py-3 rounded-lg font-medium flex items-center justify-center gap-1.5 shadow-sm text-sm transition-all ${
-                        isSoldOut
-                          ? 'bg-neutral-200 dark:bg-zinc-700 text-neutral-400 cursor-not-allowed'
-                          : 'bg-gradient-to-r from-blue to-indigo-700 hover:from-blue hover:to-indigo-800 text-white hover:shadow-md'
-                      }`}
-                    >
-                      <ShoppingBag size={16} />
-                      Buy Now
-                    </motion.button>
-
-                    <Tooltip
-                      title={
-                        isSoldOut
-                          ? 'Sold out'
-                          : isMaxQuantityReached
-                            ? `Max quantity (${quantity}) reached`
-                            : itemInCart
-                              ? 'Already in cart'
-                              : 'Add to cart'
-                      }
-                    >
+            {isOwnItem ? (
+              <div className="pt-4 mt-4 text-center">
+                <span className="text-sm text-neutral-400 italic">Your listing</span>
+              </div>
+            ) : (
+              <div
+                className={`${
+                  isMobile ? 'pt-4 mt-4 pb-6' : 'sticky bottom-0 pt-4 mt-6'
+                } bg-white dark:bg-neutral-800 border-t border-neutral-100 dark:border-zinc-800 z-40`}
+              >
+                {isBuyable ? (
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-1.5">
                       <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={onAddToCart}
-                        disabled={isSoldOut || isMaxQuantityReached}
-                        className={`p-3 rounded-lg border shadow-sm transition-colors ${
-                          isSoldOut || isMaxQuantityReached
-                            ? 'bg-neutral-100 dark:bg-zinc-800 border-neutral-200 dark:border-zinc-700 text-neutral-300 cursor-not-allowed'
-                            : itemInCart
-                              ? 'bg-indigo-50 border-blue text-blue dark:bg-blue/20 dark:border-blue'
-                              : 'bg-neutral-100 border-neutral-200 dark:bg-neutral-700 dark:border-neutral-600 text-neutral-600 dark:text-neutral-400 hover:border-blue '
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={onBuyNow}
+                        disabled={isSoldOut}
+                        className={`flex-1 py-3 rounded-lg font-medium flex items-center justify-center gap-1.5 shadow-sm text-sm transition-all ${
+                          isSoldOut
+                            ? 'bg-neutral-200 dark:bg-zinc-700 text-neutral-400 cursor-not-allowed'
+                            : 'bg-gradient-to-r from-blue to-indigo-700 hover:from-blue hover:to-indigo-800 text-white hover:shadow-md'
                         }`}
                       >
-                        <ShoppingCart size={18} />
+                        <ShoppingBag size={16} />
+                        Buy Now
                       </motion.button>
-                    </Tooltip>
-                  </div>
 
-                  <div className="flex items-center gap-1.5">
+                      <Tooltip
+                        title={
+                          isSoldOut
+                            ? 'Sold out'
+                            : isMaxQuantityReached
+                              ? `Max quantity (${quantity}) reached`
+                              : itemInCart
+                                ? 'Already in cart'
+                                : 'Add to cart'
+                        }
+                      >
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          onClick={onAddToCart}
+                          disabled={isSoldOut || isMaxQuantityReached}
+                          className={`p-3 rounded-lg border shadow-sm transition-colors ${
+                            isSoldOut || isMaxQuantityReached
+                              ? 'bg-neutral-100 dark:bg-zinc-800 border-neutral-200 dark:border-zinc-700 text-neutral-300 cursor-not-allowed'
+                              : itemInCart
+                                ? 'bg-indigo-50 border-blue text-blue dark:bg-blue/20 dark:border-blue'
+                                : 'bg-neutral-100 border-neutral-200 dark:bg-neutral-700 dark:border-neutral-600 text-neutral-600 dark:text-neutral-400 hover:border-blue '
+                          }`}
+                        >
+                          <ShoppingCart size={18} />
+                        </motion.button>
+                      </Tooltip>
+                    </div>
+
+                    <div className="flex items-center gap-1.5">
+                      <motion.button
+                        whileHover={{ scale: 1.02 }}
+                        whileTap={{ scale: 0.98 }}
+                        onClick={onWhatsAppMessage}
+                        className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-1.5 shadow-sm text-sm"
+                      >
+                        <MessageCircle size={16} />
+                        WhatsApp
+                      </motion.button>
+
+                      <Tooltip title={isSaved ? 'Remove from saved' : 'Save item'}>
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          onClick={onToggleSave}
+                          className={`p-3 rounded-lg border shadow-sm transition-colors ${
+                            isSaved
+                              ? 'bg-pink-50 border-pink-200 dark:bg-pink-900/20 dark:border-pink-800'
+                              : 'bg-neutral-100 border-neutral-200 dark:bg-neutral-700 dark:border-neutral-600'
+                          }`}
+                        >
+                          <Bookmark
+                            size={18}
+                            className={`${
+                              isSaved
+                                ? 'fill-pink-500 text-pink-500'
+                                : 'text-neutral-500 dark:text-neutral-400'
+                            } transition-colors`}
+                          />
+                        </motion.button>
+                      </Tooltip>
+
+                      <Tooltip title="Share">
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          onClick={onShare}
+                          className="p-3 rounded-lg border border-neutral-200 dark:border-neutral-600 bg-neutral-100 dark:bg-neutral-700 shadow-sm"
+                        >
+                          <Share2 size={18} className="text-neutral-500 dark:text-neutral-400" />
+                        </motion.button>
+                      </Tooltip>
+                    </div>
+                  </div>
+                ) : (
+                  <div className="space-y-2">
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
                       onClick={onWhatsAppMessage}
-                      className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-1.5 shadow-sm text-sm"
+                      className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-1.5 shadow-sm text-sm"
                     >
                       <MessageCircle size={16} />
-                      WhatsApp
+                      Message on WhatsApp
                     </motion.button>
 
-                    <Tooltip title={isSaved ? 'Remove from saved' : 'Save item'}>
-                      <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={onToggleSave}
-                        className={`p-3 rounded-lg border shadow-sm transition-colors ${
-                          isSaved
-                            ? 'bg-pink-50 border-pink-200 dark:bg-pink-900/20 dark:border-pink-800'
-                            : 'bg-neutral-100 border-neutral-200 dark:bg-neutral-700 dark:border-neutral-600'
-                        }`}
-                      >
-                        <Bookmark
-                          size={18}
-                          className={`${
+                    <div className="flex items-center gap-1.5">
+                      <Tooltip title={isSaved ? 'Remove from saved' : 'Save item'}>
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          onClick={onToggleSave}
+                          className={`flex-1 p-3 rounded-lg border shadow-sm transition-colors flex items-center justify-center gap-1.5 text-sm ${
                             isSaved
-                              ? 'fill-pink-500 text-pink-500'
-                              : 'text-neutral-500 dark:text-neutral-400'
-                          } transition-colors`}
-                        />
-                      </motion.button>
-                    </Tooltip>
+                              ? 'bg-pink-50 border-pink-200 dark:bg-pink-900/20 dark:border-pink-800 text-pink-500'
+                              : 'bg-neutral-100 border-neutral-200 dark:bg-neutral-700 dark:border-neutral-600 text-neutral-500'
+                          }`}
+                        >
+                          <Bookmark
+                            size={16}
+                            className={
+                              isSaved
+                                ? 'fill-pink-500 text-pink-500'
+                                : 'text-neutral-500 dark:text-neutral-400'
+                            }
+                          />
+                          Save
+                        </motion.button>
+                      </Tooltip>
 
-                    <Tooltip title="Share">
-                      <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={onShare}
-                        className="p-3 rounded-lg border border-neutral-200 dark:border-neutral-600 bg-neutral-100 dark:bg-neutral-700 shadow-sm"
-                      >
-                        <Share2 size={18} className="text-neutral-500 dark:text-neutral-400" />
-                      </motion.button>
-                    </Tooltip>
+                      <Tooltip title="Share">
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          onClick={onShare}
+                          className="flex-1 p-3 rounded-lg border border-neutral-200 dark:border-neutral-600 bg-neutral-100 dark:bg-neutral-700 shadow-sm flex items-center justify-center gap-1.5 text-sm text-neutral-500"
+                        >
+                          <Share2 size={16} className="text-neutral-500 dark:text-neutral-400" />
+                          Share
+                        </motion.button>
+                      </Tooltip>
+                    </div>
                   </div>
-                </div>
-              ) : (
-                <div className="space-y-2">
-                  <motion.button
-                    whileHover={{ scale: 1.02 }}
-                    whileTap={{ scale: 0.98 }}
-                    onClick={onWhatsAppMessage}
-                    className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-1.5 shadow-sm text-sm"
-                  >
-                    <MessageCircle size={16} />
-                    Message on WhatsApp
-                  </motion.button>
-
-                  <div className="flex items-center gap-1.5">
-                    <Tooltip title={isSaved ? 'Remove from saved' : 'Save item'}>
-                      <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={onToggleSave}
-                        className={`flex-1 p-3 rounded-lg border shadow-sm transition-colors flex items-center justify-center gap-1.5 text-sm ${
-                          isSaved
-                            ? 'bg-pink-50 border-pink-200 dark:bg-pink-900/20 dark:border-pink-800 text-pink-500'
-                            : 'bg-neutral-100 border-neutral-200 dark:bg-neutral-700 dark:border-neutral-600 text-neutral-500'
-                        }`}
-                      >
-                        <Bookmark
-                          size={16}
-                          className={
-                            isSaved
-                              ? 'fill-pink-500 text-pink-500'
-                              : 'text-neutral-500 dark:text-neutral-400'
-                          }
-                        />
-                        Save
-                      </motion.button>
-                    </Tooltip>
-
-                    <Tooltip title="Share">
-                      <motion.button
-                        whileHover={{ scale: 1.1 }}
-                        whileTap={{ scale: 0.9 }}
-                        onClick={onShare}
-                        className="flex-1 p-3 rounded-lg border border-neutral-200 dark:border-neutral-600 bg-neutral-100 dark:bg-neutral-700 shadow-sm flex items-center justify-center gap-1.5 text-sm text-neutral-500"
-                      >
-                        <Share2 size={16} className="text-neutral-500 dark:text-neutral-400" />
-                        Share
-                      </motion.button>
-                    </Tooltip>
-                  </div>
-                </div>
-              )}
-            </div>
+                )}
+              </div>
+            )}
           </div>
         </div>
       </div>
