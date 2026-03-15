@@ -272,7 +272,7 @@ const WorkDetailView: React.FC<WorkDetailViewProps> = ({ work, onDelete, isDelet
       {/* Caption & meta */}
       <div
         className={`${
-          isMobile ? 'bg-black px-5 py-4 pb-8' : 'bg-white dark:bg-neutral-800 px-6 py-5'
+          isMobile ? 'bg-black px-5 py-4 pb-20' : 'bg-white dark:bg-neutral-800 px-6 py-5'
         }`}
       >
         {/* Stats */}

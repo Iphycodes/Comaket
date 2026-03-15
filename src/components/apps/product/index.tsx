@@ -142,7 +142,7 @@ const Product = ({
       {/* Back header */}
       <div
         className={`sticky top-0 left-0 w-full z-50 bg-white/90 dark:bg-neutral-800/90 backdrop-blur-md border-b border-neutral-100 dark:border-zinc-800 ${
-          isMobile ? 'px-3 pt-8 pb-2' : 'py-3 px-0'
+          isMobile ? 'px-3 pt-12 pb-2' : 'py-3 px-0'
         }`}
       >
         <button

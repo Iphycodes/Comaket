@@ -59,8 +59,9 @@ const stagger = {
 // ═══════════════════════════════════════════════════════════════════════════
 
 const CATEGORY_IMAGES: Record<string, string> = {
-  fashion: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=600&h=400&fit=crop&q=80',
-  clothing: 'https://images.unsplash.com/photo-1558618666-fcd25c85f82e?w=600&h=400&fit=crop&q=80',
+  fashion: 'https://images.unsplash.com/photo-1590735213920-68192a487bc2?w=600&h=400&fit=crop&q=80',
+  clothing:
+    'https://images.unsplash.com/photo-1590735213920-68192a487bc2?w=600&h=400&fit=crop&q=80',
   textiles:
     'https://images.unsplash.com/photo-1606722590583-6951b5ea92ad?w=600&h=400&fit=crop&q=80',
   woodwork:
@@ -79,9 +80,9 @@ const CATEGORY_IMAGES: Record<string, string> = {
     'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&h=400&fit=crop&q=80',
   skincare: 'https://images.unsplash.com/photo-1556228578-0d85b1a4d571?w=600&h=400&fit=crop&q=80',
   beauty: 'https://images.unsplash.com/photo-1596462502278-27bfdc403348?w=600&h=400&fit=crop&q=80',
-  jewelry: 'https://images.unsplash.com/photo-1515562141589-67f0d569b6c6?w=600&h=400&fit=crop&q=80',
+  jewelry: 'https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=600&h=400&fit=crop&q=80',
   jewellery:
-    'https://images.unsplash.com/photo-1515562141589-67f0d569b6c6?w=600&h=400&fit=crop&q=80',
+    'https://images.unsplash.com/photo-1611085583191-a3b181a88401?w=600&h=400&fit=crop&q=80',
   food: 'https://images.unsplash.com/photo-1504674900247-0877df9cc836?w=600&h=400&fit=crop&q=80',
   art: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=600&h=400&fit=crop&q=80',
   furniture: 'https://images.unsplash.com/photo-1555041469-a586c61ea9bc?w=600&h=400&fit=crop&q=80',
@@ -168,23 +169,21 @@ function Navbar({ onSignIn, onSignUp }: { onSignIn: () => void; onSignUp: () => 
     >
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex items-center justify-between h-16 sm:h-20">
-          <Link href="/landing" className="flex items-center gap-2.5 group">
-            <div className="w-9 h-9 sm:w-10 sm:h-10 rounded-xl bg-gradient-to-br from-blue to-indigo-600 flex items-center justify-center shadow-lg shadow-blue/25">
-              <Image
-                src="/assets/imgs/kraft-logo-icon.png"
-                alt="Kraft"
-                width={28}
-                height={28}
-                className="brightness-0 invert"
-              />
-            </div>
-            <span
-              className={`text-xl sm:text-2xl font-extrabold tracking-tight transition-colors ${
-                scrolled ? 'text-neutral-900 dark:text-white' : 'text-white'
-              }`}
-            >
-              Kraft
-            </span>
+          <Link href="/landing" className="flex items-center group">
+            <Image
+              src={
+                scrolled
+                  ? theme === 'dark'
+                    ? '/assets/imgs/logos/kraft-logo-dark.png'
+                    : '/assets/imgs/logos/kraft-logo-light.png'
+                  : '/assets/imgs/logos/kraft-logo-dark.png'
+              }
+              alt="Kraft"
+              width={90}
+              height={36}
+              style={{ width: '90px', height: 'auto' }}
+              priority
+            />
           </Link>
 
           <div className="hidden md:flex items-center gap-1">
@@ -228,7 +227,7 @@ function Navbar({ onSignIn, onSignUp }: { onSignIn: () => void; onSignUp: () => 
 
             <button
               onClick={onSignUp}
-              className="hidden sm:inline-flex px-5 py-2.5 rounded-xl text-sm font-semibold bg-white text-neutral-900 hover:bg-neutral-100 shadow-lg shadow-black/10 transition-all hover:shadow-xl"
+              className="hidden sm:inline-flex px-5 py-2.5 rounded-xl text-sm font-semibold bg-white dark:!bg-neutral-700 text-neutral-900 dark:text-white hover:bg-neutral-100 shadow-lg shadow-black/10 transition-all hover:shadow-xl"
             >
               Get Started
             </button>
@@ -390,8 +389,9 @@ function HeroSection({
             transition={{ duration: 0.8, delay: 0.3 }}
             className="mt-6 sm:mt-8 text-lg sm:text-xl text-white/60 max-w-2xl leading-relaxed"
           >
-            Connect directly with skilled artisans and creators. From hand-woven Aso-Oke to custom
-            leather goods, find one-of-a-kind products made with passion and purpose.
+            The marketplace for Nigerian brands, clothing labels, tailors, shoe makers, and skilled
+            artisans. From hand-woven Aso-Oke to custom leather goods, discover authentic products
+            made with passion and purpose.
           </motion.p>
 
           <motion.div
@@ -402,7 +402,7 @@ function HeroSection({
           >
             <button
               onClick={onBrowseMarket}
-              className="group inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-2xl text-base font-bold bg-white text-neutral-900 hover:bg-neutral-100 shadow-2xl shadow-black/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
+              className="group inline-flex items-center justify-center gap-2.5 px-7 py-4 rounded-2xl text-base font-bold bg-white dark:bg-neutral-900 text-neutral-900 dark:text-white hover:bg-neutral-100 dark:hover:bg-neutral-800 shadow-2xl shadow-black/20 transition-all hover:scale-[1.02] active:scale-[0.98]"
             >
               <ShoppingBag size={18} />
               Browse Market
@@ -518,7 +518,7 @@ function PromotionsSection() {
       category: 'fashion',
       gradient: 'from-rose-600 via-pink-600 to-fuchsia-600',
       image:
-        'https://images.unsplash.com/photo-1483985988355-763728e1935b?w=800&h=500&fit=crop&q=80',
+        'https://images.unsplash.com/photo-1590735213920-68192a487bc2?w=800&h=500&fit=crop&q=80',
       badge: '35% OFF',
       badgeColor: 'bg-rose-500',
     },
