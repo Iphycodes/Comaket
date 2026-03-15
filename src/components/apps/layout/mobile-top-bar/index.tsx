@@ -157,7 +157,7 @@ const MobileTopBar: React.FC<MobileTopBarProps> = ({
   // ── Render ──────────────────────────────────────────────────────────
 
   return (
-    <div className="fixed w-full top-0 z-[1000] bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700/60">
+    <div className="fixed top-0 left-0 right-0 z-[1000] bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700/60">
       <div className="flex items-center justify-between gap-1 px-3 h-10">
         {/* Left: Logo */}
         <span className="cursor-pointer flex-shrink-0" onClick={() => router.push('/')}>

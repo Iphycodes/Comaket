@@ -231,8 +231,8 @@ const Cart: React.FC<CartProps> = ({
   if (cartItems.length === 0) {
     return (
       <div
-        className={`h-screen flex flex-col items-center justify-center overflow-hidden ${
-          isMobile ? 'px-4 pt-10' : ''
+        className={`flex flex-col items-center justify-center overflow-hidden ${
+          isMobile ? 'px-4 pt-10 h-[calc(100vh-100px)]' : 'h-[calc(100vh-80px)]'
         }`}
       >
         <Empty

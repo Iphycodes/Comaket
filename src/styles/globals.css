@@ -8,6 +8,16 @@
     color: inherit;
   }
 
+  /* Dark theme antd message toasts */
+  .dark .ant-message .ant-message-notice-content {
+    background-color: #262626 !important;
+    color: #e5e5e5 !important;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.4) !important;
+  }
+  .dark .ant-message .ant-message-notice-content .anticon {
+    color: inherit !important;
+  }
+
   /* Prevent Ant Design from forcing black text on hover for text/link buttons */
   .ant-btn-text:not(:disabled):hover,
   .ant-btn-link:not(:disabled):hover,
