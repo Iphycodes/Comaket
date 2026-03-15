@@ -31,6 +31,8 @@ export interface CheckoutCartPayload {
   email?: string;
   buyerNote?: string;
   callbackUrl?: string;
+  deliveryFee?: number;
+  paymentMethod?: 'paystack' | 'opay';
 }
 
 // ─── Cart Item (from GET /cart) ──────────────────────────────────────────

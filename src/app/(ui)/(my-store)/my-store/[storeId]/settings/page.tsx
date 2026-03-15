@@ -52,7 +52,7 @@ export default function StoreSettingsRoute() {
   const handleDeleteStore = useCallback(async () => {
     try {
       await deleteStore?.(storeId);
-      router.push('/');
+      router.push('/market');
     } catch {}
   }, [deleteStore, storeId, router]);
 

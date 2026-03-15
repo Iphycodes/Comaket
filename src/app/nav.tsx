@@ -83,7 +83,7 @@ const menuItems: NavItem[] = [
   {
     label: 'Market',
     key: 'market',
-    destination: '/',
+    destination: '/market',
     icon: <Shop variant="Bulk" color="#6366f1" size={22} />,
   },
   {
@@ -112,7 +112,7 @@ const mobileMenuItems: NavItem[] = [
   {
     label: 'Market',
     key: 'market',
-    destination: '/',
+    destination: '/market',
     icon: <ShoppingBag />,
   },
   {

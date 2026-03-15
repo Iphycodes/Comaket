@@ -477,7 +477,7 @@ const SideNav: React.FC<SideNavProps> = (props) => {
         items={filteredMenuItems}
         defaultSelectedKeys={[]}
         selectedKeys={
-          urlPath?.[1] === '' && selectedKey === ''
+          (urlPath?.[1] === '' || urlPath?.[1] === 'market') && selectedKey === ''
             ? ['market']
             : selectedKey !== ''
               ? [selectedKey]

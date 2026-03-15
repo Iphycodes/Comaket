@@ -394,6 +394,7 @@ interface ProfileOrdersTabProps {
     page?: number;
     perPage?: number;
   }) => void;
+  tab?: 'my-orders' | 'my-purchases';
 }
 
 const ProfileOrdersTab: React.FC<ProfileOrdersTabProps> = ({
@@ -409,6 +410,7 @@ const ProfileOrdersTab: React.FC<ProfileOrdersTabProps> = ({
   pagination,
   variant = 'seller',
   onRefetch,
+  tab,
 }) => {
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
   const [isOrderDetailOpen, setIsOrderDetailOpen] = useState(false);
@@ -482,7 +484,7 @@ const ProfileOrdersTab: React.FC<ProfileOrdersTabProps> = ({
         className={`flex w-full ${
           isMobile ? 'gap-2 items-center' : 'items-center gap-2'
         } mb-4 sticky ${
-          isMobile ? 'top-[75px]' : 'top-[45px]'
+          isMobile ? 'top-[95px]' : 'top-[45px]'
         } z-10 bg-white dark:bg-neutral-900 py-2 -mx-4 px-4`}
       >
         <div className={`${isMobile ? 'flex-1' : 'flex-2 w-full'}`}>
@@ -669,7 +671,7 @@ const ProfileOrdersTab: React.FC<ProfileOrdersTabProps> = ({
                   <OrderDetailView
                     order={selectedOrder}
                     isLoading={isLoadingOrderDetail}
-                    isSellerView={true}
+                    isSellerView={variant === 'seller' && tab === 'my-orders'}
                   />
                 </div>
               )}
@@ -713,7 +715,7 @@ const ProfileOrdersTab: React.FC<ProfileOrdersTabProps> = ({
                   <OrderDetailView
                     order={selectedOrder}
                     isLoading={isLoadingOrderDetail}
-                    isSellerView={true}
+                    isSellerView={variant === 'seller' && tab === 'my-orders'}
                   />
                 </div>
               )}

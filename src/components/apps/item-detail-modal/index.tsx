@@ -29,6 +29,7 @@ interface ItemDetailModalProps {
       | undefined;
     platformFee?: number;
     live?: boolean;
+    ownerId?: string | null;
   };
   isSellerView?: boolean;
 }

@@ -1,7 +1,7 @@
 'use client';
 
-import React, { useState, useRef, useEffect, useCallback } from 'react';
-import { Select } from 'antd';
+import React, { useState, useRef, useEffect, useCallback, RefObject } from 'react';
+import { Select, Dropdown } from 'antd';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
   Search,
@@ -15,6 +15,7 @@ import {
   UserCircle,
   Loader2,
   Sparkles,
+  MapPin,
 } from 'lucide-react';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 import { CREATOR_INDUSTRIES } from '@grc/_shared/constant';
@@ -65,6 +66,8 @@ interface CreatorsProps {
   // Navigation
   onSelectCreator: (id: string) => void;
   onSelectStore: (id: string) => void;
+  // Scroll restore
+  scrollContainerRef?: RefObject<HTMLDivElement>;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -577,7 +580,8 @@ const Creators: React.FC<CreatorsProps> = (props) => {
   // ── Scroll-hide header (mobile only, Twitter-style) ───────────────
   const [headerMode, setHeaderMode] = useState<'static' | 'visible' | 'hidden'>('static');
   const lastScrollYRef = useRef(0);
-  const scrollContainerRef = useRef<HTMLDivElement>(null);
+  const internalScrollRef = useRef<HTMLDivElement>(null);
+  const scrollContainerRef = props.scrollContainerRef || internalScrollRef;
   const headerRef = useRef<HTMLDivElement>(null);
   const headerHeightRef = useRef(0);
 
@@ -672,13 +676,13 @@ const Creators: React.FC<CreatorsProps> = (props) => {
     // Mobile modes
     switch (headerMode) {
       case 'static':
-        return `relative ${base} pt-8 pb-0`;
+        return `relative ${base} pt-14 pb-0`;
       case 'visible':
-        return `fixed top-0 left-0 right-0 shadow-md ${base} pt-8 pb-0`;
+        return `fixed top-0 left-0 right-0 shadow-md ${base} pt-14 pb-0`;
       case 'hidden':
-        return `fixed top-0 left-0 right-0 shadow-md ${base} pt-8 pb-0`;
+        return `fixed top-0 left-0 right-0 shadow-md ${base} pt-14 pb-0`;
       default:
-        return `relative ${base} pt-8 pb-0`;
+        return `relative ${base} pt-14 pb-0`;
     }
   };
 
@@ -723,85 +727,209 @@ const Creators: React.FC<CreatorsProps> = (props) => {
           <div
             className={isMobile ? 'flex-col items-start gap-1' : 'flex w-full items-center gap-2'}
           >
-            {/* Search bar */}
-            <div className="relative mb-3 flex-2 w-full">
-              <Search
-                size={16}
-                className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400"
-              />
-              <input
-                type="text"
-                placeholder="Search by name, industry, keyword..."
-                value={searchInput}
-                onChange={(e) => handleSearchInput(e.target.value)}
-                className={`w-full ${
-                  isMobile ? 'h-9' : 'h-12'
-                } pl-10 pr-10 border border-neutral-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 text-sm text-neutral-900 dark:text-white placeholder-neutral-400 focus:ring-2 focus:ring-blue/20 focus:border-blue outline-none transition-all`}
-              />
-              {searchInput && (
-                <button
-                  onClick={() => handleSearchInput('')}
-                  className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-300 hover:text-neutral-500 transition-colors"
+            {/* Search bar + location (same row on mobile; on desktop, search merges into filters row below) */}
+            <div className={`flex items-center gap-2 w-full ${isMobile ? 'mb-3' : 'hidden'}`}>
+              <div className="relative flex-1">
+                <Search
+                  size={16}
+                  className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400"
+                />
+                <input
+                  type="text"
+                  placeholder="Search by name, industry, keyword..."
+                  value={searchInput}
+                  onChange={(e) => handleSearchInput(e.target.value)}
+                  className="w-full h-9 pl-10 pr-10 border border-neutral-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 text-sm text-neutral-900 dark:text-white placeholder-neutral-400 focus:ring-2 focus:ring-blue/20 focus:border-blue outline-none transition-all"
+                />
+                {searchInput && (
+                  <button
+                    onClick={() => handleSearchInput('')}
+                    className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-300 hover:text-neutral-500 transition-colors"
+                  >
+                    <X size={16} />
+                  </button>
+                )}
+              </div>
+
+              {/* Location button — inline on mobile */}
+              {isMobile && (
+                <Dropdown
+                  trigger={['click']}
+                  placement="bottomRight"
+                  dropdownRender={() => (
+                    <div className="bg-white dark:bg-neutral-800 rounded-xl shadow-xl border border-neutral-200 dark:border-neutral-700 p-3 min-w-[240px] space-y-2">
+                      <FilterSelect
+                        options={states}
+                        value={filterState}
+                        onChange={onStateChange}
+                        placeholder="State"
+                        loading={loadingStates}
+                        className="w-full !h-9"
+                      />
+                      <FilterSelect
+                        options={cities}
+                        value={filterCity}
+                        onChange={onCityChange}
+                        placeholder="City"
+                        loading={loadingCities}
+                        disabled={!filterState}
+                        className="w-full !h-9"
+                      />
+                    </div>
+                  )}
                 >
-                  <X size={16} />
-                </button>
+                  <button
+                    className={`flex-shrink-0 flex items-center justify-center w-9 h-9 rounded-xl border transition-colors ${
+                      filterState
+                        ? 'bg-blue/10 text-blue border-blue/30'
+                        : 'bg-white dark:bg-neutral-800 text-neutral-500 border-neutral-200 dark:border-neutral-700'
+                    }`}
+                  >
+                    <MapPin size={16} />
+                  </button>
+                </Dropdown>
               )}
             </div>
 
             {/* Filters row */}
-            <div
-              className={`flex w-full items-center gap-2 pb-3 ${isMobile ? 'flex-wrap' : 'flex-1'}`}
-            >
-              {/* Industry — use antd Select directly for proper value/label */}
-              <Select
-                allowClear
-                showSearch
-                placeholder="Industry"
-                value={filterIndustry}
-                onChange={(val) => onIndustryChange(val || null)}
-                filterOption={(input, option) =>
-                  (option?.label as string)?.toLowerCase().includes(input.toLowerCase())
-                }
-                options={industryOptions}
-                className={`${isMobile ? 'flex-1 min-w-[100px]' : 'w-[160px]'} ${
-                  isMobile ? '!h-9' : '!h-12'
-                } [&_.ant-select-selector]:!rounded-lg [&_.ant-select-selector]:!border-neutral-200 dark:[&_.ant-select-selector]:!border-neutral-700 [&_.ant-select-selector]:!bg-white dark:[&_.ant-select-selector]:!bg-neutral-800`}
-              />
-
-              <FilterSelect
-                options={states}
-                value={filterState}
-                onChange={onStateChange}
-                placeholder="State"
-                loading={loadingStates}
-                className={isMobile ? 'flex-1 min-w-[100px] !h-9' : 'w-[150px] !h-12'}
-              />
-
-              <FilterSelect
-                options={cities}
-                value={filterCity}
-                onChange={onCityChange}
-                placeholder="City"
-                loading={loadingCities}
-                disabled={!filterState}
-                className={isMobile ? 'flex-1 min-w-[100px] !h-9' : 'w-[150px] !h-12'}
-              />
-
-              {hasActiveFilters && (
-                <button
-                  onClick={() => {
-                    onClearFilters();
-                    setSearchInput('');
-                  }}
-                  className={`flex items-center gap-1 px-3 ${
-                    isMobile ? 'h-9' : 'h-12'
-                  } text-xs font-medium text-neutral-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg border border-neutral-200 dark:border-neutral-700 transition-colors flex-shrink-0`}
+            {isMobile ? (
+              <div className="pb-2 space-y-2">
+                {/* Industry tags — horizontal scroll */}
+                <div
+                  className="flex items-center gap-1.5 overflow-x-auto pb-1"
+                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                 >
-                  <X size={12} />
-                  Clear
-                </button>
-              )}
-            </div>
+                  <button
+                    onClick={() => onIndustryChange(null)}
+                    className={`flex-shrink-0 px-2.5 py-1 rounded-full text-[11px] font-medium transition-all border whitespace-nowrap ${
+                      !filterIndustry
+                        ? 'bg-blue text-white border-blue'
+                        : 'bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-700'
+                    }`}
+                  >
+                    All
+                  </button>
+                  {industryOptions.map((ind) => (
+                    <button
+                      key={ind.value}
+                      onClick={() =>
+                        onIndustryChange(filterIndustry === ind.value ? null : ind.value)
+                      }
+                      className={`flex-shrink-0 px-2.5 py-1 rounded-full text-[11px] font-medium transition-all border whitespace-nowrap ${
+                        filterIndustry === ind.value
+                          ? 'bg-blue text-white border-blue'
+                          : 'bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-700'
+                      }`}
+                    >
+                      {ind.label}
+                    </button>
+                  ))}
+
+                  {hasActiveFilters && (
+                    <button
+                      onClick={() => {
+                        onClearFilters();
+                        setSearchInput('');
+                      }}
+                      className="flex-shrink-0 flex items-center gap-1 px-2.5 py-1 text-[11px] font-medium text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-full border border-red-200 dark:border-red-800/40 transition-colors whitespace-nowrap"
+                    >
+                      <X size={11} />
+                      Clear
+                    </button>
+                  )}
+                </div>
+              </div>
+            ) : (
+              <div className="pb-3 space-y-2">
+                {/* Row 1: Search + Location filters */}
+                <div className="flex items-center gap-2">
+                  <div className="relative flex-1">
+                    <Search
+                      size={16}
+                      className="absolute left-3.5 top-1/2 -translate-y-1/2 text-neutral-400"
+                    />
+                    <input
+                      type="text"
+                      placeholder="Search by name, industry, keyword..."
+                      value={searchInput}
+                      onChange={(e) => handleSearchInput(e.target.value)}
+                      className="w-full h-10 pl-10 pr-10 border border-neutral-200 dark:border-neutral-700 rounded-xl bg-white dark:bg-neutral-800 text-sm text-neutral-900 dark:text-white placeholder-neutral-400 focus:ring-2 focus:ring-blue/20 focus:border-blue outline-none transition-all"
+                    />
+                    {searchInput && (
+                      <button
+                        onClick={() => handleSearchInput('')}
+                        className="absolute right-3 top-1/2 -translate-y-1/2 text-neutral-300 hover:text-neutral-500 transition-colors"
+                      >
+                        <X size={16} />
+                      </button>
+                    )}
+                  </div>
+                  <FilterSelect
+                    options={states}
+                    value={filterState}
+                    onChange={onStateChange}
+                    placeholder="State"
+                    loading={loadingStates}
+                    className="w-[150px] !h-10"
+                  />
+
+                  <FilterSelect
+                    options={cities}
+                    value={filterCity}
+                    onChange={onCityChange}
+                    placeholder="City"
+                    loading={loadingCities}
+                    disabled={!filterState}
+                    className="w-[150px] !h-10"
+                  />
+
+                  {hasActiveFilters && (
+                    <button
+                      onClick={() => {
+                        onClearFilters();
+                        setSearchInput('');
+                      }}
+                      className="flex items-center gap-1 px-3 h-10 text-xs font-medium text-neutral-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg border border-neutral-200 dark:border-neutral-700 transition-colors flex-shrink-0"
+                    >
+                      <X size={12} />
+                      Clear
+                    </button>
+                  )}
+                </div>
+
+                {/* Row 2: Industry tags — horizontal scroll */}
+                <div
+                  className="flex items-center gap-1.5 overflow-x-auto"
+                  style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
+                >
+                  <button
+                    onClick={() => onIndustryChange(null)}
+                    className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all border whitespace-nowrap ${
+                      !filterIndustry
+                        ? 'bg-blue text-white border-blue shadow-sm'
+                        : 'bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-700 hover:border-blue/30'
+                    }`}
+                  >
+                    All
+                  </button>
+                  {industryOptions.map((ind) => (
+                    <button
+                      key={ind.value}
+                      onClick={() =>
+                        onIndustryChange(filterIndustry === ind.value ? null : ind.value)
+                      }
+                      className={`flex-shrink-0 px-3 py-1.5 rounded-full text-xs font-medium transition-all border whitespace-nowrap ${
+                        filterIndustry === ind.value
+                          ? 'bg-blue text-white border-blue shadow-sm'
+                          : 'bg-white dark:bg-neutral-800 text-neutral-600 dark:text-neutral-400 border-neutral-200 dark:border-neutral-700 hover:border-blue/30'
+                      }`}
+                    >
+                      {ind.label}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
 
           {/* Tabs */}

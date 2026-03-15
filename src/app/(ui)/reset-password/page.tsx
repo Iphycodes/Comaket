@@ -166,7 +166,7 @@ const ResetPasswordContent = () => {
   // ── No token ────────────────────────────────────────────────────────
   if (!token) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-neutral-50 dark:bg-neutral-950 relative">
+      <div className="h-screen overflow-hidden flex items-center justify-center bg-neutral-50 dark:bg-neutral-950 relative">
         <FloatingShapes />
         <div className="relative z-10 w-full max-w-md mx-4">
           <div className="bg-white dark:bg-neutral-900 rounded-2xl shadow-xl border border-neutral-100 dark:border-neutral-800 p-8 text-center">
@@ -194,7 +194,7 @@ const ResetPasswordContent = () => {
   // ── Success ─────────────────────────────────────────────────────────
   if (isSuccess) {
     return (
-      <div className="min-h-screen flex items-center justify-center bg-neutral-50 dark:bg-neutral-950 relative">
+      <div className="h-screen overflow-hidden flex items-center justify-center bg-neutral-50 dark:bg-neutral-950 relative">
         <FloatingShapes />
         <div className="relative z-10 w-full max-w-md mx-4">
           <motion.div
@@ -230,7 +230,7 @@ const ResetPasswordContent = () => {
 
   // ── Form ────────────────────────────────────────────────────────────
   return (
-    <div className="min-h-screen flex items-center justify-center bg-neutral-50 dark:bg-neutral-950 relative py-10">
+    <div className="h-screen overflow-hidden flex items-center justify-center bg-neutral-50 dark:bg-neutral-950 relative py-10">
       <FloatingShapes />
       <div className="relative z-10 w-full max-w-md mx-4">
         <motion.div
