@@ -38,7 +38,7 @@ export const disbursementAnalyticsUrl = 'analytics/disbursements';
 
 /**Token**/
 
-export const AUTH_TOKEN_KEY = process.env.NEXT_PUBLIC_TOKEN_STORAGE_KEY as string;
+export const AUTH_TOKEN_KEY = process.env.NEXT_PUBLIC_TOKEN_STORAGE_KEY || 'token';
 export const appName = 'Comarket';
 export const dateFormat = 'DD-MM-YYYY';
 

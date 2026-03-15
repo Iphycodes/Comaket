@@ -142,7 +142,7 @@ const CaptionUploadScreen: React.FC<CaptionUploadScreenProps> = ({
       )}
 
       {/* Caption input area — WhatsApp style */}
-      <div className="px-4 py-4 pb-8 bg-gradient-to-t from-black via-black/95 to-black/80">
+      <div className="px-4 py-4 pb-12 bg-gradient-to-t from-black via-black/95 to-black/80">
         <div className="flex items-center gap-3">
           <div className="flex-1 relative">
             <textarea
@@ -506,7 +506,7 @@ const FeaturedWorks: React.FC<FeaturedWorksProps> = ({
   // ════════════════════════════════════════════════════════════════════════
 
   return (
-    <div className={`${isMobile ? 'px-0' : 'p-4'}`}>
+    <div className={`${isMobile ? 'px-0 pb-10' : 'p-4'}`}>
       {/* Hidden file input */}
       <input
         ref={fileInputRef}

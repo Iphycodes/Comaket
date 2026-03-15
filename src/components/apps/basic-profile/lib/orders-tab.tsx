@@ -314,7 +314,7 @@ const OrdersTab: React.FC<OrdersTabProps> = ({
             <>
               <p className="text-xs text-neutral-400 mt-1">Your purchases will appear here.</p>
               <button
-                onClick={() => push('/')}
+                onClick={() => push('/market')}
                 className="mt-4 inline-flex items-center gap-1.5 px-4 py-2 text-sm font-medium text-blue hover:bg-blue-50 dark:hover:bg-blue-900/20 rounded-lg transition-colors"
               >
                 Browse Market <ExternalLink size={14} />

@@ -118,7 +118,7 @@ const Profile: React.FC<ProfileProps> = ({
       const { profileImageFile, ...profileData } = payload;
       if (profileImageFile) {
         const imageUrl = await uploadImage(profileImageFile, true);
-        if (imageUrl) (profileData as any).avatar = imageUrl;
+        if (imageUrl) (profileData as any).profileImageUrl = imageUrl;
       }
       if (updateCreatorProfile) {
         await updateCreatorProfile(profileData);
@@ -216,6 +216,7 @@ const Profile: React.FC<ProfileProps> = ({
             pagination={sellerOrdersPagination}
             variant="seller"
             onRefetch={onRefetchSellerOrders}
+            tab="my-orders"
           />
         </div>
       ),
@@ -251,6 +252,7 @@ const Profile: React.FC<ProfileProps> = ({
             pagination={buyerOrdersPagination}
             variant="buyer"
             onRefetch={onRefetchBuyerOrders}
+            tab="my-purchases"
           />
         </div>
       ),
@@ -354,7 +356,7 @@ const Profile: React.FC<ProfileProps> = ({
             defaultActiveKey={defaultTab}
             className={`[&_.ant-tabs-nav]:!mb-4 [&_.ant-tabs-tab]:!text-sm [&_.ant-tabs-tab]:!font-medium [&_.ant-tabs-tab-active]:!font-semibold [&_.ant-tabs-ink-bar]:!bg-blue [&_.ant-tabs-nav]:!sticky [&_.ant-tabs-nav]:!z-[100] [&_.ant-tabs-nav]:!bg-white [&_.ant-tabs-nav]:dark:!bg-neutral-900 [&_.ant-tabs-tab]:!text-black dark:[&_.ant-tabs-tab]:!text-white [&_.ant-tabs-tab:hover]:!text-black dark:[&_.ant-tabs-tab:hover]:!text-white [&_.ant-tabs-tab-btn]:!text-inherit hover:[&_.ant-tabs-tab-btn]:!text-inherit [&_.ant-tabs-tab-active_.ant-tabs-tab-btn]:!text-black dark:[&_.ant-tabs-tab-active_.ant-tabs-tab-btn]:!text-white ${
               isMobile
-                ? '[&_.ant-tabs-nav-list]:!flex-nowrap [&_.ant-tabs-nav-list]:!gap-1 [&_.ant-tabs-nav-wrap]:!overflow-x-auto [&_.ant-tabs-nav-wrap]:!flex-nowrap [&_.ant-tabs-nav-operations]:!hidden [&_.ant-tabs-nav]:!top-[0px] [&_.ant-tabs-tab]:!flex-shrink-0 [&_.ant-tabs-tab]:!px-3 [&_.ant-tabs-nav-list]:!justify-between [&_.ant-tabs-nav]:!px-4 [&_.ant-tabs-tab:last-child]:!mr-[30px]'
+                ? '[&_.ant-tabs-nav-list]:!flex-nowrap [&_.ant-tabs-nav-list]:!gap-1 [&_.ant-tabs-nav-wrap]:!overflow-x-auto [&_.ant-tabs-nav-wrap]:!flex-nowrap [&_.ant-tabs-nav-operations]:!hidden [&_.ant-tabs-nav]:!top-[40px] [&_.ant-tabs-tab]:!flex-shrink-0 [&_.ant-tabs-tab]:!px-3 [&_.ant-tabs-nav-list]:!justify-between [&_.ant-tabs-nav]:!px-4 [&_.ant-tabs-tab:last-child]:!mr-[30px]'
                 : '[&_.ant-tabs-nav]:!px-4 [&_.ant-tabs-nav]:!top-0'
             }`}
             items={tabItems}

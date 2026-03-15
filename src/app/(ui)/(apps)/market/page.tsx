@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect, useCallback, useMemo } from 'react';
+import React, { useState, useEffect, useCallback, useMemo, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { message as antMessage } from 'antd';
 import { useListings } from '@grc/hooks/useListings';
@@ -14,25 +14,44 @@ import Market from '@grc/components/apps/market';
 import { useGetCategoryTreeQuery, Category } from '@grc/services/categories';
 import { transformListing, MarketFilters } from '@grc/_shared/helpers/transform-listing';
 import { useScrollRestore } from '@grc/hooks/useScrollRestore';
+import { useUsers } from '@grc/hooks/useUser';
 
 const PER_PAGE = 20;
 
 const MarketPage = () => {
   const router = useRouter();
+  const { userProfile } = useUsers({ fetchProfile: true });
   const searchParams = useSearchParams();
   const isMobile = useMediaQuery(mediaSize.mobile);
 
   const [viewType, setViewType] = useState(searchParams?.get('view') || 'grid');
   const [showFilters, setShowFilters] = useState(false);
-  const [filters, setFilters] = useState<MarketFilters>({});
+  const initialCategory = searchParams?.get('category') || undefined;
+  const [filters, setFilters] = useState<MarketFilters>(
+    initialCategory ? { category: initialCategory } : {}
+  );
   const [page, setPage] = useState(1);
   const [accumulatedListings, setAccumulatedListings] = useState<any[]>([]);
   const [selectedProductId, setSelectedProductId] = useState<string>('');
   const [gridModalOpen, setGridModalOpen] = useState(false);
   const [gridModalItem, setGridModalItem] = useState<any>(null);
 
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const { searchValue, setSearchValue } = useSearch(600);
-  const { saveScrollPosition } = useScrollRestore(accumulatedListings.length > 0);
+  const { saveScrollPosition } = useScrollRestore(
+    accumulatedListings.length > 0,
+    scrollContainerRef
+  );
+
+  // Quietly remove the category query param from URL after reading it
+  useEffect(() => {
+    if (searchParams?.get('category')) {
+      const newParams = new URLSearchParams(searchParams.toString());
+      newParams.delete('category');
+      const newUrl = newParams.toString() ? `/market?${newParams.toString()}` : '/market';
+      router.replace(newUrl, { scroll: false });
+    }
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Fetch category tree from backend
   const { data: categoryTreeResponse } = useGetCategoryTreeQuery();
@@ -60,12 +79,12 @@ const MarketPage = () => {
     customPaginate: { page, perPage: PER_PAGE },
   });
 
-  const { addToCart, isInCart, cartItems, refetchCount, isAddingToCart } = useCart({
+  const { addToCart, isInCart, cartItems, refetchCount } = useCart({
     fetchCart: true,
     fetchCount: true,
   });
 
-  const { toggleSave, checkSavedStatus, savedStatusMap, isToggling } = useSavedProducts({});
+  const { toggleSave, checkSavedStatus, savedStatusMap } = useSavedProducts({});
 
   // Accumulate for infinite scroll
   useEffect(() => {
@@ -81,10 +100,10 @@ const MarketPage = () => {
     }
   }, [rawListings, page]);
 
-  // Reset on search/filter change
+  // Reset on search/filter change — clear listings so skeleton shows
   useEffect(() => {
     setPage(1);
-    // setAccumulatedListings([]);
+    setAccumulatedListings([]);
   }, [searchValue, JSON.stringify(filters)]);
 
   // Check saved status for visible listings
@@ -108,7 +127,6 @@ const MarketPage = () => {
   const hasMore = accumulatedListings.length < listingsTotal;
   const handleLoadMore = useCallback(() => {
     if (!isFetchingListings && hasMore) setPage((prev) => prev + 1);
-    console.log('load more fired:::::', hasMore);
   }, [isFetchingListings, hasMore]);
 
   const handleSearch = useCallback(
@@ -218,7 +236,6 @@ const MarketPage = () => {
 
   const handleVendorClick = useCallback(
     (item: any) => {
-      console.log('post user data::::::', item?.postUserProfile);
       saveScrollPosition();
       if (item?.postUserProfile?.isStore) {
         router.push(`/stores/${encodeURIComponent(item?.postUserProfile?.id)}`);
@@ -268,20 +285,18 @@ const MarketPage = () => {
     } catch {}
   }, []);
 
-  // Covers the 1-frame gap where rawListings arrived but useEffect hasn't populated accumulatedListings yet
-  const isDataPending = !!rawListings && rawListings.length > 0 && accumulatedListings.length === 0;
-
-  const showFullSkeleton =
-    ((isLoadingListings || isFetchingListings) && accumulatedListings.length === 0) ||
-    isDataPending;
+  // Show skeleton when no listings to display, unless a fetch completed with genuinely 0 results
+  const hasCompletedEmptyFetch =
+    !isLoadingListings &&
+    !isFetchingListings &&
+    Array.isArray(rawListings) &&
+    rawListings.length === 0;
+  const showFullSkeleton = accumulatedListings.length === 0 && !hasCompletedEmptyFetch;
 
   return (
     <Market
       listings={transformedListings}
       totalListings={listingsTotal}
-      // isLoading={isInitialLoading || isFetchingListings || isLoadingListings}
-      // isLoadingMore={isLoadingMore || isFetchingListings}
-      // isFetchingListings={isFetchingListings || isLoadingListings || isInitialLoading}
       isLoading={showFullSkeleton}
       isLoadingMore={isFetchingListings && accumulatedListings.length > 0 && page > 1}
       isFetchingListings={isFetchingListings}
@@ -315,8 +330,8 @@ const MarketPage = () => {
       isInCart={checkItemInCart}
       isSaved={checkItemSaved}
       cartItems={cartItems}
-      isAddingToCart={isAddingToCart}
-      isTogglingSave={isToggling}
+      currentUserId={userProfile?._id}
+      scrollContainerRef={scrollContainerRef}
     />
   );
 };

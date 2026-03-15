@@ -575,7 +575,7 @@ const StoreDetails: React.FC<StoreDetailsProps> = ({
                   {categories.map((cat: string) => (
                     <span
                       key={cat}
-                      className="px-3 py-1.5 bg-neutral-50 dark:bg-neutral-700/50 rounded-lg text-sm font-medium text-neutral-600 dark:text-neutral-300"
+                      className="px-2.5 py-1 bg-neutral-50 dark:bg-neutral-700/50 rounded-full text-xs font-medium text-neutral-600 dark:text-neutral-300"
                     >
                       {getIndustryLabel(cat)}
                     </span>

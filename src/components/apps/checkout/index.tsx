@@ -16,6 +16,7 @@ import {
   ChevronDown,
   Search,
   Globe,
+  CreditCard,
 } from 'lucide-react';
 import Image from 'next/image';
 import { numberFormat } from '@grc/_shared/helpers';
@@ -26,7 +27,7 @@ import type {
   CheckoutCartItem,
   ShippingFormData,
   LocationOption,
-} from '@grc/app/(ui)/(apps)/checkout/page';
+} from '@grc/app/(ui)/(apps)/checkout/types';
 
 const { TextArea } = Input;
 
@@ -246,6 +247,20 @@ interface CheckoutProps {
   onCountryChange: (country: string) => void;
   onStateChange: (state: string) => void;
   onCityChange: (city: string) => void;
+  // Delivery fee
+  deliveryFee?: number;
+  deliveryZoneName?: string | null;
+  loadingDeliveryFee?: boolean;
+  // Saved addresses
+  savedAddresses?: any[];
+  isLoadingSavedAddresses?: boolean;
+  selectedAddressId?: string | null;
+  onSelectSavedAddress?: (id: string | null) => void;
+  onSaveAddress?: (label?: string) => void;
+  isSavingAddress?: boolean;
+  // Payment method
+  paymentMethod?: 'paystack' | 'opay';
+  onPaymentMethodChange?: (method: 'paystack' | 'opay') => void;
 }
 
 // ═══════════════════════════════════════════════════════════════════════════
@@ -271,6 +286,16 @@ const Checkout: React.FC<CheckoutProps> = ({
   onCountryChange,
   onStateChange,
   onCityChange,
+  deliveryFee = 0,
+  deliveryZoneName,
+  loadingDeliveryFee,
+  savedAddresses = [],
+  selectedAddressId,
+  onSelectSavedAddress,
+  onSaveAddress,
+  isSavingAddress,
+  paymentMethod = 'paystack',
+  onPaymentMethodChange,
 }) => {
   const isMobile = useMediaQuery(mediaSize.mobile);
   const [errors, setErrors] = useState<Partial<Record<keyof ShippingFormData, string>>>({});
@@ -391,6 +416,51 @@ const Checkout: React.FC<CheckoutProps> = ({
               Shipping Address
             </h3>
 
+            {/* Saved Address Cards */}
+            {savedAddresses.length > 0 && (
+              <div className="mb-5">
+                <p className="text-xs text-neutral-500 dark:text-neutral-400 mb-2">
+                  Saved addresses
+                </p>
+                <div className="flex gap-2 overflow-x-auto pb-2">
+                  {savedAddresses.map((addr: any) => (
+                    <button
+                      key={addr._id}
+                      type="button"
+                      onClick={() =>
+                        onSelectSavedAddress?.(selectedAddressId === addr._id ? null : addr._id)
+                      }
+                      className={`flex-shrink-0 w-48 p-3 rounded-lg border text-left text-xs transition-all ${
+                        selectedAddressId === addr._id
+                          ? 'border-blue bg-blue-50 dark:bg-blue/10'
+                          : 'border-neutral-200 dark:border-neutral-700 bg-neutral-50 dark:bg-neutral-800 hover:border-neutral-300'
+                      }`}
+                    >
+                      {addr.label && (
+                        <span className="font-semibold text-neutral-700 dark:text-neutral-300 block mb-1">
+                          {addr.label}
+                        </span>
+                      )}
+                      <span className="text-neutral-600 dark:text-neutral-400 line-clamp-1">
+                        {addr.fullName}
+                      </span>
+                      <span className="text-neutral-400 dark:text-neutral-500 line-clamp-1 mt-0.5">
+                        {addr.address}
+                      </span>
+                      <span className="text-neutral-400 dark:text-neutral-500 line-clamp-1">
+                        {addr.city}, {addr.state}
+                      </span>
+                      {addr.isDefault && (
+                        <span className="inline-block mt-1 text-[10px] text-blue font-medium">
+                          Default
+                        </span>
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
+
             <div className="space-y-4">
               <FormField
                 label="Full Name"
@@ -484,6 +554,24 @@ const Checkout: React.FC<CheckoutProps> = ({
             </div>
           </div>
 
+          {/* Save address checkbox */}
+          {onSaveAddress && !selectedAddressId && shipping.address && shipping.state && (
+            <label className="mb-6 flex items-center gap-2.5 cursor-pointer group">
+              <input
+                type="checkbox"
+                onChange={(e) => {
+                  if (e.target.checked) onSaveAddress();
+                }}
+                disabled={isSavingAddress}
+                checked={isSavingAddress}
+                className="w-4 h-4 rounded border-neutral-300 dark:border-neutral-600 text-blue focus:ring-blue/30 cursor-pointer accent-blue"
+              />
+              <span className="text-xs text-neutral-600 dark:text-neutral-400 group-hover:text-neutral-800 dark:group-hover:text-neutral-200 transition-colors select-none">
+                {isSavingAddress ? 'Saving address...' : 'Save this address for next time'}
+              </span>
+            </label>
+          )}
+
           {/* Buyer Note */}
           <div className="bg-white dark:bg-neutral-800 rounded-xl border border-neutral-100 dark:border-neutral-700 p-5">
             <h3 className="font-semibold text-base dark:text-white mb-4 flex items-center gap-2">
@@ -548,18 +636,128 @@ const Checkout: React.FC<CheckoutProps> = ({
                 </span>
               </div>
               <div className="flex justify-between text-sm">
-                <span className="text-neutral-500 dark:text-neutral-400">Delivery</span>
-                <span className="font-medium text-green-500">Free</span>
+                <span className="text-neutral-500 dark:text-neutral-400">
+                  Delivery{deliveryZoneName ? ` (${deliveryZoneName})` : ''}
+                </span>
+                {loadingDeliveryFee ? (
+                  <span className="text-neutral-400 text-xs">Calculating...</span>
+                ) : deliveryFee > 0 ? (
+                  <span className="font-medium dark:text-white">
+                    {numberFormat(deliveryFee / 100, Currencies.NGN)}
+                  </span>
+                ) : (
+                  <span className="font-medium text-green-500">Free</span>
+                )}
               </div>
               <div className="border-t border-neutral-100 dark:border-neutral-700 pt-2">
                 <div className="flex justify-between">
                   <span className="font-semibold dark:text-white">Total</span>
                   <span className="font-bold text-lg bg-gradient-to-r from-orange-500 to-rose-500 bg-clip-text text-transparent">
-                    {numberFormat(cartTotal / 100, Currencies.NGN)}
+                    {numberFormat((cartTotal + deliveryFee) / 100, Currencies.NGN)}
                   </span>
                 </div>
               </div>
             </div>
+
+            {/* Payment Method Selector */}
+            {onPaymentMethodChange && (
+              <div className="mt-4 pt-3 border-t border-neutral-100 dark:border-neutral-700">
+                <p className="text-xs font-medium text-neutral-500 dark:text-neutral-400 mb-2 flex items-center gap-1.5">
+                  <CreditCard size={13} />
+                  Payment Method
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    type="button"
+                    onClick={() => onPaymentMethodChange('paystack')}
+                    className={`relative px-3 py-3 rounded-xl border-2 text-left transition-all ${
+                      paymentMethod === 'paystack'
+                        ? 'border-[#00C3F7] bg-[#00C3F7]/5 dark:bg-[#00C3F7]/10 ring-1 ring-[#00C3F7]/20'
+                        : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600'
+                    }`}
+                  >
+                    {paymentMethod === 'paystack' && (
+                      <div className="absolute top-1.5 right-1.5 w-4 h-4 bg-[#00C3F7] rounded-full flex items-center justify-center">
+                        <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                          <path
+                            d="M1 4L3.5 6.5L9 1"
+                            stroke="white"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2 mb-1">
+                      <Image
+                        src="/assets/imgs/paystack/paystack-logo-with-text.png"
+                        alt="Paystack"
+                        width={22}
+                        height={22}
+                        className="rounded flex-shrink-0"
+                      />
+                      <span
+                        className={`font-semibold text-sm ${
+                          paymentMethod === 'paystack'
+                            ? 'text-[#011B33] dark:text-[#00C3F7]'
+                            : 'text-neutral-700 dark:text-neutral-300'
+                        }`}
+                      >
+                        Paystack
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-neutral-400 dark:text-neutral-500 pl-8">
+                      Cards, Bank, USSD, QR
+                    </span>
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => onPaymentMethodChange('opay')}
+                    className={`relative px-3 py-3 rounded-xl border-2 text-left transition-all ${
+                      paymentMethod === 'opay'
+                        ? 'border-[#1DCF9F] bg-[#1DCF9F]/5 dark:bg-[#1DCF9F]/10 ring-1 ring-[#1DCF9F]/20'
+                        : 'border-neutral-200 dark:border-neutral-700 hover:border-neutral-300 dark:hover:border-neutral-600'
+                    }`}
+                  >
+                    {paymentMethod === 'opay' && (
+                      <div className="absolute top-1.5 right-1.5 w-4 h-4 bg-[#1DCF9F] rounded-full flex items-center justify-center">
+                        <svg width="10" height="8" viewBox="0 0 10 8" fill="none">
+                          <path
+                            d="M1 4L3.5 6.5L9 1"
+                            stroke="white"
+                            strokeWidth="1.5"
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                          />
+                        </svg>
+                      </div>
+                    )}
+                    <div className="flex items-center gap-2 mb-1">
+                      <Image
+                        src="/assets/imgs/opay/opay-logo.png"
+                        alt="OPay"
+                        width={34}
+                        height={34}
+                        className="rounded flex-shrink-0"
+                      />
+                      <span
+                        className={`font-semibold text-sm ${
+                          paymentMethod === 'opay'
+                            ? 'text-[#1DCF9F] dark:text-[#1DCF9F]'
+                            : 'text-neutral-700 dark:text-neutral-300'
+                        }`}
+                      >
+                        OPay
+                      </span>
+                    </div>
+                    <span className="text-[10px] text-neutral-400 dark:text-neutral-500 pl-8">
+                      Cards, Transfer, OPay Wallet
+                    </span>
+                  </button>
+                </div>
+              </div>
+            )}
 
             {/* Pay Button */}
             <motion.button
@@ -577,17 +775,27 @@ const Checkout: React.FC<CheckoutProps> = ({
               ) : (
                 <>
                   <Lock size={16} />
-                  Pay {numberFormat(cartTotal / 100, Currencies.NGN)}
+                  Pay {numberFormat((cartTotal + deliveryFee) / 100, Currencies.NGN)}
                 </>
               )}
             </motion.button>
 
             {/* Security note */}
-            <div className="flex items-center justify-center gap-1.5 mt-3">
+            <div className="flex items-center justify-center gap-2 mt-3">
               <ShieldCheck size={13} className="text-emerald-500" />
-              <span className="text-[11px] text-neutral-400">
-                Secured by Paystack · SSL encrypted
-              </span>
+              <span className="text-[11px] text-neutral-400">Secured by</span>
+              <Image
+                src={
+                  paymentMethod === 'opay'
+                    ? '/assets/imgs/opay/Opay-logo-with-text.png'
+                    : '/assets/imgs/paystack/paystack-logo.png'
+                }
+                alt={paymentMethod === 'opay' ? 'OPay' : 'Paystack'}
+                width={60}
+                height={16}
+                className="opacity-50 dark:invert dark:opacity-40"
+              />
+              <span className="text-[11px] text-neutral-400">· SSL encrypted</span>
             </div>
           </div>
         </div>

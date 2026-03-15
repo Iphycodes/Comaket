@@ -3,6 +3,7 @@
 import React, { useEffect, useState } from 'react';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { usePayments } from '@grc/hooks/usePayments';
+import { useLazyVerifyOPayPaymentQuery } from '@grc/services/payments';
 import { motion } from 'framer-motion';
 import {
   CheckCircle2,
@@ -16,22 +17,40 @@ import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness
 
 // ═══════════════════════════════════════════════════════════════════════════
 // PAYMENT VERIFICATION PAGE — /checkout/verify?reference=xxx
+// Also supports OPay: /checkout/verify?provider=opay&reference=xxx
 // ═══════════════════════════════════════════════════════════════════════════
 
 const PaymentVerifyPage = () => {
   const router = useRouter();
   const searchParams = useSearchParams();
   const isMobile = useMediaQuery(mediaSize.mobile);
-  const reference = searchParams?.get('reference') || searchParams?.get('trxref') || '';
+  const reference =
+    searchParams?.get('reference') ||
+    searchParams?.get('trxref') ||
+    searchParams?.get('orderNo') ||
+    '';
+  const provider = searchParams?.get('provider') || 'paystack';
+  const isOPay = provider === 'opay';
 
   const [verificationStatus, setVerificationStatus] = useState<
     'loading' | 'success' | 'failed' | 'error'
   >('loading');
   const [statusMessage, setStatusMessage] = useState('');
 
+  // Paystack verify (only used if not OPay)
   const { verifyPayment, isVerifyingPayment, paymentVerification } = usePayments({
-    verifyReference: reference || undefined,
+    verifyReference: !isOPay && reference ? reference : undefined,
   });
+
+  // OPay verify
+  const [triggerVerifyOPay, opayVerifyResponse] = useLazyVerifyOPayPaymentQuery();
+
+  // ── Auto-verify OPay on mount ──────────────────────────────────────
+  useEffect(() => {
+    if (isOPay && reference) {
+      triggerVerifyOPay(reference);
+    }
+  }, [isOPay, reference]);
 
   // ── Watch verification result ───────────────────────────────────────
   useEffect(() => {
@@ -42,8 +61,9 @@ const PaymentVerifyPage = () => {
     }
   }, [reference]);
 
+  // Paystack result
   useEffect(() => {
-    if (!paymentVerification) return;
+    if (isOPay || !paymentVerification) return;
 
     if (paymentVerification.verified && paymentVerification.status === 'success') {
       setVerificationStatus('success');
@@ -57,21 +77,55 @@ const PaymentVerifyPage = () => {
       setVerificationStatus('failed');
       setStatusMessage(paymentVerification.message || 'Payment could not be verified.');
     }
-  }, [paymentVerification]);
+  }, [paymentVerification, isOPay]);
+
+  // OPay result
+  useEffect(() => {
+    if (!isOPay) return;
+    const opayData = opayVerifyResponse?.data?.data;
+    if (!opayData) return;
+
+    if (opayData.verified && opayData.status === 'success') {
+      setVerificationStatus('success');
+      setStatusMessage('Your payment was successful! Your order is being processed.');
+    } else if (opayData.status === 'pending') {
+      setVerificationStatus('loading');
+      setStatusMessage('Payment is still being processed...');
+      // Retry after a few seconds
+      setTimeout(() => {
+        if (reference) triggerVerifyOPay(reference);
+      }, 5000);
+    } else {
+      setVerificationStatus('failed');
+      setStatusMessage(opayData.message || 'Payment could not be verified.');
+    }
+  }, [opayVerifyResponse?.data, isOPay]);
 
   // ── Handle retry ────────────────────────────────────────────────────
   const handleRetry = async () => {
     if (!reference) return;
     setVerificationStatus('loading');
     try {
-      const result = await verifyPayment(reference);
-      const data = result?.data;
-      if (data?.verified && data?.status === 'success') {
-        setVerificationStatus('success');
-        setStatusMessage('Your payment was successful!');
+      if (isOPay) {
+        const result = await triggerVerifyOPay(reference).unwrap();
+        const data = result?.data;
+        if (data?.verified && data?.status === 'success') {
+          setVerificationStatus('success');
+          setStatusMessage('Your payment was successful!');
+        } else {
+          setVerificationStatus('failed');
+          setStatusMessage(data?.message || 'Payment could not be verified.');
+        }
       } else {
-        setVerificationStatus('failed');
-        setStatusMessage(data?.message || 'Payment could not be verified.');
+        const result = await verifyPayment(reference);
+        const data = result?.data;
+        if (data?.verified && data?.status === 'success') {
+          setVerificationStatus('success');
+          setStatusMessage('Your payment was successful!');
+        } else {
+          setVerificationStatus('failed');
+          setStatusMessage(data?.message || 'Payment could not be verified.');
+        }
       }
     } catch {
       setVerificationStatus('error');
@@ -111,7 +165,7 @@ const PaymentVerifyPage = () => {
 
   return (
     <div
-      className={`min-h-screen flex items-center justify-center ${
+      className={`h-screen overflow-hidden flex items-center justify-center ${
         isMobile ? 'px-4' : ''
       } dark:bg-neutral-900/50`}
     >
@@ -159,7 +213,7 @@ const PaymentVerifyPage = () => {
               <motion.button
                 whileHover={{ scale: 1.02 }}
                 whileTap={{ scale: 0.98 }}
-                onClick={() => router.push('/')}
+                onClick={() => router.push('/market')}
                 className="w-full bg-neutral-100 dark:bg-neutral-800 text-neutral-700 dark:text-neutral-200 py-3 rounded-xl font-medium flex items-center justify-center gap-2"
               >
                 <ShoppingBag size={18} />

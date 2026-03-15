@@ -3,11 +3,16 @@
 @import 'tailwindcss/utilities';
 
 @layer base {
-  /* Prevent default blue hover on links and buttons — Tailwind utilities override this */
-  a:hover,
-  button:hover,
-  [role='button']:hover {
+  /* Prevent default blue hover on Ant Design buttons — scoped to avoid overriding Tailwind hover utilities */
+  a:hover {
     color: inherit;
+  }
+
+  /* Prevent Ant Design from forcing black text on hover for text/link buttons */
+  .ant-btn-text:not(:disabled):hover,
+  .ant-btn-link:not(:disabled):hover,
+  .ant-btn-default:not(:disabled):hover {
+    color: inherit !important;
   }
 
   :root {
@@ -116,6 +121,20 @@ a {
 html {
   --font-family: Jost, -apple-system, BlinkMacSystemFont, Segoe UI, Roboto, Oxygen, Ubuntu,
     Cantarell, Fira Sans, Droid Sans, Helvetica Neue, sans-serif;
+}
+
+/* Smaller, nicer antd messages on mobile */
+@media (max-width: 640px) {
+  .ant-message .ant-message-notice-content {
+    padding: 6px 12px;
+    font-size: 12px;
+    border-radius: 10px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+
+  .ant-message .ant-message-notice-content .anticon {
+    font-size: 14px;
+  }
 }
 
 ::-webkit-scrollbar {

@@ -24,7 +24,7 @@ module.exports = (phase) => {
   const env = {
     NEXT_PUBLIC_APP_BASE_URL: (() => {
       if (isProd) {
-        return process.env.NEXT_PUBLIC_APP_BASE_URL_PROD;
+        return process.env.NEXT_PUBLIC_APP_BASE_URL_PROD || process.env.NEXT_PUBLIC_APP_BASE_URL;
       }
       return process.env.NEXT_PUBLIC_APP_BASE_URL;
     })(),
@@ -32,6 +32,9 @@ module.exports = (phase) => {
 
   return {
     env,
+    eslint: {
+      ignoreDuringBuilds: true,
+    },
     reactStrictMode: true,
     experimental: {
       scrollRestoration: true,

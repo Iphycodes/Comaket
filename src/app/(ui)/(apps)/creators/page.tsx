@@ -52,8 +52,9 @@ const CreatorsPage = () => {
 
   // ── Track if this is a "load more" vs fresh search ──────────────────
   const isLoadingMoreRef = useRef(false);
+  const scrollContainerRef = useRef<HTMLDivElement>(null);
   const dataReady = creatorsList.length > 0 || storesList.length > 0;
-  const { saveScrollPosition } = useScrollRestore(dataReady);
+  const { saveScrollPosition } = useScrollRestore(dataReady, scrollContainerRef);
 
   // ── Fetch Nigerian states on mount ──────────────────────────────────
   useEffect(() => {
@@ -274,6 +275,8 @@ const CreatorsPage = () => {
       // Navigation
       onSelectCreator={handleSelectCreator}
       onSelectStore={handleSelectStore}
+      // Scroll restore
+      scrollContainerRef={scrollContainerRef}
     />
   );
 };

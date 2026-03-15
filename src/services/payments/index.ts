@@ -198,6 +198,15 @@ export const paymentsApi = api?.injectEndpoints({
         params,
       }),
     }),
+
+    // Verify OPay payment by reference
+    verifyOPayPayment: builder.query<Record<string, any>, string>({
+      query: (reference) => ({
+        url: `/payments/verify-opay/${reference}`,
+        method: 'GET',
+      }),
+      providesTags: [orderTag],
+    }),
   }),
 });
 
@@ -217,4 +226,6 @@ export const {
   useLazyListBanksQuery,
   useVerifyBankAccountQuery,
   useLazyVerifyBankAccountQuery,
+  useVerifyOPayPaymentQuery,
+  useLazyVerifyOPayPaymentQuery,
 } = paymentsApi;

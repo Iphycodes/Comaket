@@ -320,7 +320,7 @@ const CartPage = () => {
       onRemoveItem={handleRemoveItem}
       onClearCart={handleClearCart}
       onCheckout={handleCheckout}
-      onContinueShopping={() => router.push('/')}
+      onContinueShopping={() => router.push('/market')}
     />
   );
 };

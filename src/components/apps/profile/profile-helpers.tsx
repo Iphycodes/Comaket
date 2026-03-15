@@ -375,7 +375,7 @@ export const MobileOverlay: React.FC<MobileOverlayProps> = ({
               <X size={16} className="text-neutral-500" />
             </button>
           </div>
-          <div className="flex-1 overflow-y-auto">{children}</div>
+          <div className="flex-1 overflow-y-auto pb-20">{children}</div>
         </motion.div>
       )}
     </AnimatePresence>

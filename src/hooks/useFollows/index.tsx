@@ -59,7 +59,7 @@ export const useFollows = ({
     try {
       const result = await toggleFollow({
         payload: data,
-        options: {},
+        options: { noSuccessMessage: true },
       }).unwrap();
       return result?.data as { followed: boolean; totalFollowers: number };
     } catch (error) {
