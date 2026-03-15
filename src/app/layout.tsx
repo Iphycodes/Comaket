@@ -16,8 +16,8 @@ const nunito = Nunito({
   display: 'swap',
 });
 export const metadata: Metadata = {
-  title: 'Comaket',
-  description: 'Biggest Network of Buyers and Sellers',
+  title: 'Kraft',
+  description: "Nigeria's Creators Marketplace - Strictly Nigerian Brands",
   viewport: { width: 'device-width', initialScale: 1, maximumScale: 1, userScalable: false },
   icons: { icon: '/kraft-logo-icon.ico' },
 };
@@ -41,7 +41,7 @@ export default function RootLayout({ children }: LayoutProps) {
       >
         <ThemeProvider
           attribute="class"
-          defaultTheme="light"
+          defaultTheme="dark"
           enableSystem
           storageKey="sample-key"
           disableTransitionOnChange

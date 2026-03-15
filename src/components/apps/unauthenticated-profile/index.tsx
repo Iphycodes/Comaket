@@ -18,8 +18,8 @@ const UnauthenticatedProfile: React.FC = () => {
 
   return (
     <div
-      className={`dark:bg-neutral-900/50 min-h-[80vh] flex items-center justify-center ${
-        isMobile ? 'px-5 mb-14 pt-8' : 'px-4'
+      className={`dark:bg-neutral-900/50 flex items-center justify-center ${
+        isMobile ? 'px-5 pt-8 h-[calc(100vh-100px)]' : 'px-4 h-[calc(100vh-80px)]'
       }`}
     >
       <motion.div

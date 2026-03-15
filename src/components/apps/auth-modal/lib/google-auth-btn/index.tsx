@@ -63,7 +63,7 @@ export const GoogleAuthButton = ({ onSuccess, disabled }: GoogleAuthButtonProps)
   return (
     <Button
       onClick={() => handleLogin()}
-      className="w-full !h-12 py-3 rounded-xl text-sm font-medium flex items-center justify-center gap-3 bg-white dark:!bg-neutral-800 !border !border-neutral-200 dark:border-neutral-700 !text-neutral-700 dark:!text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-750 hover:border-neutral-300 dark:hover:border-neutral-600 transition-all shadow-sm"
+      className="w-full !h-12 py-3 rounded-xl text-sm font-medium flex items-center justify-center gap-3 bg-white dark:!bg-neutral-800 !border !border-neutral-200 dark:!border-neutral-700 !text-neutral-700 dark:!text-neutral-200 hover:bg-neutral-50 dark:hover:bg-neutral-750 hover:border-neutral-300 dark:hover:!border-neutral-600 transition-all shadow-sm"
       disabled={disabled || googleAuthResponse?.isLoading}
     >
       <GoogleIcon size={18} />

@@ -2,7 +2,7 @@
 
 import React, { useContext } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { Store, Tag, User, ShoppingCart, Users } from 'lucide-react';
 import { AppContext } from '@grc/app-context';
 
@@ -69,29 +69,16 @@ const MobileNav: React.FC<MobileNavProps> = ({ setSelectedKey, isCreatorAccount 
               className="relative flex flex-col items-center justify-center flex-1 py-1 group"
               aria-label={tab.label}
             >
-              {/* Active pill behind icon */}
-              <AnimatePresence>
-                {active && (
-                  <motion.div
-                    layoutId="mobile-nav-pill"
-                    initial={{ opacity: 0, scale: 0.8 }}
-                    animate={{ opacity: 1, scale: 1 }}
-                    exit={{ opacity: 0, scale: 0.8 }}
-                    transition={{ type: 'spring', stiffness: 400, damping: 28 }}
-                    className="absolute top-1 w-10 h-7 rounded-full bg-blue/10 dark:bg-blue/15"
-                  />
-                )}
-              </AnimatePresence>
-
               {/* Icon + Badge */}
               <div className="relative z-10">
                 <Icon
                   className={`w-[20px] h-[20px] transition-colors duration-150 ${
                     active
-                      ? 'text-blue'
+                      ? 'text-black dark:text-white'
                       : 'text-neutral-400 dark:text-neutral-500 group-active:text-neutral-600'
                   }`}
-                  strokeWidth={active ? 2.2 : 1.8}
+                  strokeWidth={active ? 2.5 : 1.8}
+                  fill={active ? 'currentColor' : 'none'}
                 />
 
                 {/* Cart badge */}
@@ -111,7 +98,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ setSelectedKey, isCreatorAccount 
               <span
                 className={`text-[9px] mt-0.5 relative z-10 transition-colors duration-150 ${
                   active
-                    ? 'font-semibold text-blue'
+                    ? 'font-bold text-black dark:text-white'
                     : 'font-medium text-neutral-400 dark:text-neutral-500'
                 }`}
               >
