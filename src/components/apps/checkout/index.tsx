@@ -27,7 +27,7 @@ import type {
   CheckoutCartItem,
   ShippingFormData,
   LocationOption,
-} from '@grc/app/(ui)/(apps)/checkout/page';
+} from '@grc/app/(ui)/(apps)/checkout/types';
 
 const { TextArea } = Input;
 

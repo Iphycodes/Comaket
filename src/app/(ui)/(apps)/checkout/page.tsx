@@ -13,36 +13,9 @@ import { CheckoutCartPayload } from '@grc/services/cart';
 import { useLazyGetDeliveryFeeQuery } from '@grc/services/delivery-zones';
 import { useShippingAddresses } from '@grc/hooks/useShippingAddresses';
 
-// ═══════════════════════════════════════════════════════════════════════════
-// TYPES
-// ═══════════════════════════════════════════════════════════════════════════
-
-export interface ShippingFormData {
-  fullName: string;
-  phoneNumber: string;
-  email: string;
-  address: string;
-  country: string;
-  state: string;
-  city: string;
-  zipCode: string;
-  buyerNote: string;
-}
-
-export interface CheckoutCartItem {
-  listingId: string;
-  itemName: string;
-  quantity: number;
-  unitPrice: number;
-  totalPrice: number;
-  image: string;
-  storeName: string;
-}
-
-export interface LocationOption {
-  name: string;
-  iso2?: string;
-}
+// Types in ./types.ts to avoid circular dependency (component imports from page)
+import type { ShippingFormData, CheckoutCartItem, LocationOption } from './types';
+export type { ShippingFormData, CheckoutCartItem, LocationOption };
 
 // ═══════════════════════════════════════════════════════════════════════════
 // CHECKOUT PAGE
@@ -501,7 +474,13 @@ const CheckoutPage = () => {
 };
 
 const CheckoutPageWrapper = () => (
-  <Suspense fallback={null}>
+  <Suspense
+    fallback={
+      <div className="min-h-[80vh] flex items-center justify-center">
+        <div className="w-8 h-8 border-2 border-blue border-t-transparent rounded-full animate-spin" />
+      </div>
+    }
+  >
     <CheckoutPage />
   </Suspense>
 );
