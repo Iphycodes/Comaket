@@ -64,8 +64,54 @@ export const usersApi = api?.injectEndpoints({
       }),
       invalidatesTags: [userTag],
     }),
+
+    // Delete account (soft delete)
+    deleteAccount: builder.mutation<Record<string, any>, { password: string }>({
+      query: (payload) => ({
+        url: `/users/me`,
+        method: 'DELETE',
+        body: payload,
+      }),
+      invalidatesTags: [userTag],
+    }),
+
+    // Change password
+    changePassword: builder.mutation<
+      Record<string, any>,
+      { currentPassword: string; newPassword: string }
+    >({
+      query: (payload) => ({
+        url: `/users/me/password`,
+        method: 'PATCH',
+        body: payload,
+      }),
+    }),
+
+    // Update notification preferences
+    updateNotificationPreferences: builder.mutation<
+      Record<string, any>,
+      {
+        emailNotifications?: boolean;
+        pushNotifications?: boolean;
+        orderUpdates?: boolean;
+        promotions?: boolean;
+      }
+    >({
+      query: (payload) => ({
+        url: `/users/me/notifications`,
+        method: 'PATCH',
+        body: payload,
+      }),
+      invalidatesTags: [userTag],
+    }),
   }),
 });
 
-export const { useGetUserProfileQuery, useLazyGetUserProfileQuery, useUpdateUserProfileMutation } =
-  usersApi;
+export const {
+  useGetUserProfileQuery,
+  useLazyGetUserProfileQuery,
+  useUpdateUserProfileMutation,
+  useDeleteAccountMutation,
+  useChangePasswordMutation,
+  useUpdateNotificationPreferencesMutation,
+} = usersApi;

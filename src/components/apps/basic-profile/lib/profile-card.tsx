@@ -83,14 +83,14 @@ const ProfileCard: React.FC<ProfileCardProps> = ({ userProfile, onEditClick, isM
             <div className="flex items-center gap-2 mt-5">
               <button
                 onClick={onEditClick}
-                className="flex items-center gap-1.5 px-5 py-2 !bg-neutral-50 rounded-xl text-sm font-semibold shadow-sm shadow-blue/20 hover:shadow-md transition-all"
+                className="flex items-center gap-1.5 px-5 py-2 bg-neutral-50 dark:bg-neutral-700 rounded-xl text-sm font-semibold shadow-sm shadow-blue/20 hover:shadow-md transition-all"
               >
                 <Edit3 size={14} />
                 Edit Profile
               </button>
               <Tooltip title="Settings">
                 <button className="w-9 h-9 flex items-center justify-center bg-neutral-50 dark:bg-neutral-700 border border-neutral-200 dark:border-neutral-600 rounded-xl hover:bg-neutral-100 dark:hover:bg-neutral-600 transition-all">
-                  <Settings size={16} className="text-neutral-500" />
+                  <Settings size={16} className="text-neutral-500 dark:text-neutral-100" />
                 </button>
               </Tooltip>
             </div>

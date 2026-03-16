@@ -3,7 +3,7 @@
 import React, { useContext } from 'react';
 import { usePathname, useRouter } from 'next/navigation';
 import { motion } from 'framer-motion';
-import { Store, Tag, User, ShoppingCart, Users } from 'lucide-react';
+import { Compass, Tag, User, ShoppingCart, Users } from 'lucide-react';
 import { AppContext } from '@grc/app-context';
 
 interface MobileNavProps {
@@ -24,7 +24,7 @@ const MobileNav: React.FC<MobileNavProps> = ({ setSelectedKey, isCreatorAccount 
   console.log('cart count:::::', cartCount);
 
   const allTabs = [
-    { key: 'market', label: 'Market', href: '/market', icon: Store },
+    { key: 'market', label: 'Market', href: '/market', icon: Compass },
     { key: 'creators', label: 'Creators', href: '/creators', icon: Users },
     { key: 'sell', label: 'Sell', href: '/sell-item', icon: Tag, creatorOnly: true },
     { key: 'cart', label: 'Cart', href: '/cart', icon: ShoppingCart, badge: cartCount },
@@ -70,16 +70,26 @@ const MobileNav: React.FC<MobileNavProps> = ({ setSelectedKey, isCreatorAccount 
               aria-label={tab.label}
             >
               {/* Icon + Badge */}
-              <div className="relative z-10">
-                <Icon
-                  className={`w-[20px] h-[20px] transition-colors duration-150 ${
-                    active
-                      ? 'text-black dark:text-white'
-                      : 'text-neutral-400 dark:text-neutral-500 group-active:text-neutral-600'
-                  }`}
-                  strokeWidth={active ? 2.5 : 1.8}
-                  fill={active ? 'currentColor' : 'none'}
-                />
+              <div className={`relative z-10 ${tab.key === 'market' && 'mt-[-5px]'}`}>
+                {tab.key === 'market' ? (
+                  <>
+                    {active ? (
+                      <i className="ri-store-fill !text-xl"></i>
+                    ) : (
+                      <i className="ri-store-line text-[21px] text-neutral-500"></i>
+                    )}
+                  </>
+                ) : (
+                  <Icon
+                    className={`w-[20px] h-[20px] transition-colors duration-150 ${
+                      active
+                        ? 'text-black dark:text-white'
+                        : 'text-neutral-400 dark:text-neutral-500 group-active:text-neutral-600'
+                    }`}
+                    strokeWidth={active ? 2.5 : 1.8}
+                    fill={active ? 'currentColor' : 'none'}
+                  />
+                )}
 
                 {/* Cart badge */}
                 {tab.badge !== undefined && tab.badge > 0 && (
@@ -96,7 +106,9 @@ const MobileNav: React.FC<MobileNavProps> = ({ setSelectedKey, isCreatorAccount 
 
               {/* Label */}
               <span
-                className={`text-[9px] mt-0.5 relative z-10 transition-colors duration-150 ${
+                className={`text-[9px] ${
+                  tab?.key === 'market' ? '!mt-[-4px]' : 'mt-0.5'
+                } relative z-10 transition-colors duration-150 ${
                   active
                     ? 'font-bold text-black dark:text-white'
                     : 'font-medium text-neutral-400 dark:text-neutral-500'

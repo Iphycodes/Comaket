@@ -246,7 +246,7 @@ const CreatorDetailsProductsTab: React.FC<CreatorDetailsProductsTabProps> = ({
   }
 
   const renderProductGrid = () => (
-    <div className={`grid gap-4 ${isMobile ? 'grid-cols-2' : 'grid-cols-2 lg:grid-cols-4'}`}>
+    <div className={`grid ${isMobile ? 'grid-cols-2 gap-2' : 'grid-cols-2 gap-4 lg:grid-cols-4'}`}>
       {products.map((item) => {
         const isSaved = savedItems.includes(item?.id);
         const itemInCart = isInCart(item?.id ?? '');

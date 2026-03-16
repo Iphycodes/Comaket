@@ -707,9 +707,7 @@ const StoreDetails: React.FC<StoreDetailsProps> = ({
 
   return (
     <div
-      className={`dark:bg-neutral-900/50 ${
-        isMobile ? 'max-w-[100vw] mb-14 pt-0 pb-4' : 'min-h-screen'
-      }`}
+      className={`dark:bg-neutral-900/50 ${isMobile ? 'max-w-[100vw] pt-0 pb-10' : 'min-h-screen'}`}
     >
       <div className={`w-full ${!isMobile ? 'w-full px-4' : ''}`}>
         {/* Cover */}
