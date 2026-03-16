@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useContext, useMemo } from 'react';
+import React, { useState, useEffect, useContext, useMemo, useRef } from 'react';
 import { Tag, Tooltip, message as antMessage } from 'antd';
 import { motion, AnimatePresence } from 'framer-motion';
 import {
@@ -58,6 +58,8 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ item, isSellerView }) => {
   const router = useRouter();
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [isDescriptionExpanded, setIsDescriptionExpanded] = useState(false);
+  const [isDescriptionClamped, setIsDescriptionClamped] = useState(false);
+  const descriptionRef = useRef<HTMLParagraphElement>(null);
   const [slideDirection, setSlideDirection] = useState(0);
   const [isSaved, setIsSaved] = useState(false);
   const isMobile = useMediaQuery(mediaSize.mobile);
@@ -73,6 +75,11 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ item, isSellerView }) => {
   const cartItem = cartItems?.find((i: CartItem) => i.id === item?.id);
   const cartQuantity = cartItem?.quantity || 0;
   const isMaxQuantityReached = cartQuantity >= maxQuantity;
+
+  useEffect(() => {
+    const el = descriptionRef.current;
+    if (el) setIsDescriptionClamped(el.scrollHeight > el.clientHeight);
+  }, [item.description]);
 
   const currentMedia = item.media[currentMediaIndex];
 
@@ -251,7 +258,10 @@ Price: ${formattedPrice}`;
     >
       {/* Seller Info - Mobile */}
       {isMobile && (
-        <div className="flex items-center gap-3 mb-6">
+        <div
+          className="flex items-center gap-3 mb-6 cursor-pointer"
+          onClick={handleCreatorOrStoreClick}
+        >
           <div className="relative w-12 h-12">
             <Image
               src={item.postUserProfile?.profilePicUrl}
@@ -485,17 +495,24 @@ Price: ${formattedPrice}`;
                 !isMobile ? 'max-h-[500px] overflow-y-scroll' : 'max-h-[500px] overflow-y-scroll'
               }`}
             >
-              <div className="bg-neutral-50 rounded-lg p-3 mb-3">
-                <h4 className="font-medium mb-2">Description</h4>
-                <p className={`text-neutral-600 ${!isDescriptionExpanded && 'line-clamp-3'}`}>
+              <div className="bg-neutral-50 dark:bg-neutral-800/60 rounded-lg p-3 mb-3">
+                <h4 className="font-medium mb-2 dark:text-neutral-200">Description</h4>
+                <p
+                  ref={descriptionRef}
+                  className={`text-neutral-600 dark:text-neutral-400 ${
+                    !isDescriptionExpanded && 'line-clamp-3'
+                  }`}
+                >
                   {item.description}
                 </p>
-                <button
-                  onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
-                  className="text-blue text-sm mt-2"
-                >
-                  Show {isDescriptionExpanded ? 'less' : 'more'}
-                </button>
+                {isDescriptionClamped && (
+                  <button
+                    onClick={() => setIsDescriptionExpanded(!isDescriptionExpanded)}
+                    className="text-blue text-sm mt-2"
+                  >
+                    Show {isDescriptionExpanded ? 'less' : 'more'}
+                  </button>
+                )}
               </div>
             </div>
           </div>

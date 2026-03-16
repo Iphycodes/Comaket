@@ -37,6 +37,7 @@ import { useTheme } from 'next-themes';
 import { useGetCategoryTreeQuery, Category } from '@grc/services/categories';
 import AuthModal from '@grc/components/apps/auth-modal';
 import { useAppSelector } from '@grc/redux/store';
+import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // ANIMATION VARIANTS
@@ -145,6 +146,7 @@ function Navbar({ onSignIn, onSignUp }: { onSignIn: () => void; onSignUp: () => 
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { theme, setTheme } = useTheme();
   const router = useRouter();
+  const isMobile = useMediaQuery(mediaSize?.mobile);
 
   useEffect(() => {
     const handler = () => setScrolled(window.scrollY > 20);
@@ -183,7 +185,7 @@ function Navbar({ onSignIn, onSignUp }: { onSignIn: () => void; onSignUp: () => 
               alt="Kraft"
               width={90}
               height={36}
-              style={{ width: '50px', height: 'auto' }}
+              style={{ width: isMobile ? '70px' : '100px', height: 'auto' }}
               priority
             />
           </Link>

@@ -1349,16 +1349,13 @@ function Footer() {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-8 sm:gap-12">
           <div className="col-span-2 sm:col-span-1">
             <div className="flex items-center gap-2.5 mb-4">
-              <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue to-indigo-600 flex items-center justify-center">
-                <Image
-                  src="/assets/imgs/kraft-logo-icon.png"
-                  alt="Kraft"
-                  width={24}
-                  height={24}
-                  className="brightness-0 invert"
-                />
-              </div>
-              <span className="text-xl font-extrabold text-white">Kraft</span>
+              <Image
+                src="/assets/imgs/logos/kraft-logo-dark.png"
+                alt="Kraft"
+                width={120}
+                height={36}
+                className="h-9 w-auto"
+              />
             </div>
             <p className="text-sm text-neutral-400 leading-relaxed max-w-xs">
               Empowering Nigerian artisans and creators with a world-class digital marketplace.

@@ -440,7 +440,7 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
 
   // ─── Product Grid (identical to Market grid) ───────────────────────
   const renderProductGrid = () => (
-    <div className={`grid gap-4 ${isMobile ? 'grid-cols-2' : 'grid-cols-2 lg:grid-cols-3'}`}>
+    <div className={`grid ${isMobile ? 'grid-cols-2 gap-2' : 'grid-cols-2 gap-4 lg:grid-cols-3'}`}>
       {vendorProducts.map((item) => {
         const isSaved = savedItems.includes(item?.id);
         const itemInCart = isInCart(item?.id ?? '');
@@ -731,7 +731,7 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
   return (
     <div
       className={`dark:bg-neutral-900/50 min-h-screen ${
-        isMobile ? 'max-w-[100vw] mb-14 pt-8' : ''
+        isMobile ? 'max-w-[100vw] pb-10 pt-8' : ''
       }`}
     >
       <div className={`w-full ${!isMobile ? 'max-w-4xl mx-auto px-4' : ''}`}>

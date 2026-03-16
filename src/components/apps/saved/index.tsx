@@ -448,7 +448,9 @@ const SavedItems: React.FC = () => {
           variants={containerVariants}
           initial="hidden"
           animate="visible"
-          className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 gap-4"
+          className={`grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 ${
+            isMobile ? 'gap-2' : 'gap-4'
+          }`}
         >
           {filteredItems.map((item: MarketItem) => {
             const itemInCart = isInCart(item?.id ?? '');

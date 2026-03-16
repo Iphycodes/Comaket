@@ -44,10 +44,11 @@ export const authSlice = createSlice({
       state.sessionToken = action.payload.meta?.token ?? null;
       state.isAuthenticated = action.payload.meta?.token ? true : false;
     });
-    builder.addMatcher(authApi.endpoints.signUp.matchFulfilled, (state, action) => {
-      state.authData = action.payload.meta?.token ? action.payload.data : null;
-      state.sessionToken = action.payload.meta?.token ?? null;
-      state.isAuthenticated = action.payload.meta?.token ? true : false;
+    builder.addMatcher(authApi.endpoints.signUp.matchFulfilled, (state) => {
+      // Signup does NOT authenticate — user must verify email first
+      state.authData = null;
+      state.sessionToken = null;
+      state.isAuthenticated = false;
     });
     builder.addMatcher(authApi.endpoints.verifyOtp.matchFulfilled, (state, action) => {
       state.authData = action.payload.meta?.token ? action.payload.data : null;
