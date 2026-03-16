@@ -231,8 +231,8 @@ const Market: React.FC<MarketProps> = ({
     visible: { opacity: 1, transition: { staggerChildren: 0.06, duration: 0.3 } },
   };
   const itemVariants = {
-    hidden: { opacity: 0, y: 20 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
+    hidden: { opacity: 0 },
+    visible: { opacity: 1, transition: { duration: 0.2 } },
   };
 
   // ── EMPTY STATE ──
@@ -305,7 +305,7 @@ const Market: React.FC<MarketProps> = ({
     return (
       <motion.div
         variants={containerVariants}
-        initial="hidden"
+        initial={false}
         animate="visible"
         className={`grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 ${
           isMobile ? 'gap-2' : 'gap-4'
@@ -936,23 +936,19 @@ const Market: React.FC<MarketProps> = ({
             </div>
 
             {/* Items */}
-            <div className={`${isMobile ? 'px-0 mb-10' : 'px-4'} py-6`}>
-              {isLoading ? (
-                viewType === 'grid' ? (
-                  renderSkeletonGrid()
-                ) : (
-                  renderSkeletonList()
-                )
-              ) : (
-                <motion.div variants={containerVariants} initial="hidden" animate="visible">
-                  {viewType === 'grid' ? renderProductGrid() : renderProductList()}
-                </motion.div>
-              )}
+            <div className={`${isMobile ? 'px-0' : 'px-4'} py-6`}>
+              {isLoading
+                ? viewType === 'grid'
+                  ? renderSkeletonGrid()
+                  : renderSkeletonList()
+                : viewType === 'grid'
+                  ? renderProductGrid()
+                  : renderProductList()}
 
               {/* Loading more skeletons */}
               {isLoadingMore && (
-                <div className="py-8">
-                  {viewType === 'grid' ? renderSkeletonGrid() : renderSkeletonList()}
+                <div className="flex justify-center py-6">
+                  <div className="w-6 h-6 border-2 border-neutral-300 dark:border-neutral-600 border-t-blue rounded-full animate-spin" />
                 </div>
               )}
 
