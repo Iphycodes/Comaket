@@ -189,7 +189,7 @@ const AppBaseLayout: React.FC<AppBaseLayoutProps> = ({ children }) => {
                 onLogout={handleLogout}
               />
             )}
-            <div className={mobileResponsive ? 'pt-12 pb-20' : ''}>{children}</div>
+            <div className={mobileResponsive ? 'pb-20' : ''}>{children}</div>
           </div>
         </Content>
       </Layout>
