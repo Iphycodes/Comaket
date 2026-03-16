@@ -308,7 +308,7 @@ const Market: React.FC<MarketProps> = ({
         initial={false}
         animate="visible"
         className={`grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 ${
-          isMobile ? 'gap-2' : 'gap-4'
+          isMobile ? 'gap-2 pb-20' : 'gap-4'
         }`}
       >
         {listings.map((item: any) => {
@@ -956,13 +956,13 @@ const Market: React.FC<MarketProps> = ({
               {hasMore && !isLoading && <div ref={setSentinelRef} className="h-4 w-full" />}
 
               {/* End of results */}
-              {!hasMore && listings.length > 0 && !isLoading && (
+              {/* {!hasMore && listings.length > 0 && !isLoading && (
                 <div className="text-center py-8">
                   <p className="text-sm text-neutral-400">
                     You&apos;ve seen all {totalListings} items
                   </p>
                 </div>
-              )}
+              )} */}
             </div>
           </Col>
         </Row>
