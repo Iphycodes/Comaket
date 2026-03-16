@@ -562,7 +562,7 @@ const Market: React.FC<MarketProps> = ({
                           className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all shadow-sm hover:shadow-md"
                         >
                           <MessageCircle size={14} />
-                          Message on WhatsApp
+                          WhatsApp
                         </button>
                         <motion.button
                           whileTap={{ scale: 0.9 }}
@@ -597,7 +597,7 @@ const Market: React.FC<MarketProps> = ({
     if (!isLoading && listings.length === 0) return renderEmptyState();
 
     return (
-      <div className="space-y-6 max-w-4xl mx-auto">
+      <div className={`space-y-6 ${isMobile ? 'pb-20' : ''} max-w-4xl mx-auto`}>
         {listings.map((item: any) => (
           <div key={item.id}>
             <ModernItemPost
