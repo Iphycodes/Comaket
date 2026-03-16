@@ -11,6 +11,7 @@ import {
   Send,
   ChevronLeft,
   FileText,
+  X,
 } from 'lucide-react';
 import { useUsers } from '@grc/hooks/useUser';
 import {
@@ -19,6 +20,7 @@ import {
   useLazyGetDisputeQuery,
   useAddDisputeMessageMutation,
 } from '@grc/services/disputes';
+import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 
 const disputeTypes = [
   { value: 'order_issue', label: 'Order Issue' },
@@ -54,6 +56,7 @@ const statusConfig: Record<string, { color: string; icon: React.ReactNode; label
 
 const DisputesPage = () => {
   const { userProfile } = useUsers({ fetchProfile: true });
+  const isMobile = useMediaQuery(mediaSize.mobile);
 
   // List view
   const [statusFilter, setStatusFilter] = useState<string | undefined>(undefined);
@@ -325,70 +328,118 @@ const DisputesPage = () => {
         </div>
       )}
 
-      {/* Create Dispute Modal */}
-      <Modal
-        open={showCreateModal}
-        onCancel={() => setShowCreateModal(false)}
-        footer={null}
-        centered
-        title={<span className="dark:text-white">Submit a Dispute</span>}
-        className="dark-modal"
-      >
-        <div className="space-y-3 mt-4">
-          <div>
-            <label className="text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1 block">
-              Type <span className="text-red-500">*</span>
-            </label>
-            <Select
-              placeholder="Select dispute type"
-              value={createForm.type || undefined}
-              onChange={(val) => setCreateForm((p) => ({ ...p, type: val }))}
-              options={disputeTypes}
-              className="w-full"
+      {/* Create Dispute — Full-page on mobile, modal on desktop */}
+      {isMobile && showCreateModal ? (
+        <div className="fixed inset-0 z-[1100] bg-white dark:bg-neutral-900 overflow-y-auto">
+          <div className="sticky top-0 z-10 flex items-center justify-between px-4 h-12 bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700/60">
+            <h2 className="text-base font-bold dark:text-white">Submit a Dispute</h2>
+            <button
+              onClick={() => setShowCreateModal(false)}
+              className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-neutral-100 dark:hover:bg-neutral-800"
+            >
+              <X size={18} className="text-neutral-500 dark:text-neutral-400" />
+            </button>
+          </div>
+          <div className="px-4 py-5 space-y-4 pb-28">
+            <CreateDisputeForm
+              createForm={createForm}
+              setCreateForm={setCreateForm}
+              handleCreate={handleCreate}
+              creating={creating}
             />
           </div>
-          <div>
-            <label className="text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1 block">
-              Subject <span className="text-red-500">*</span>
-            </label>
-            <Input
-              placeholder="Brief summary of the issue"
-              value={createForm.subject}
-              onChange={(e) => setCreateForm((p) => ({ ...p, subject: e.target.value }))}
-            />
-          </div>
-          <div>
-            <label className="text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1 block">
-              Order ID <span className="text-neutral-400">(optional)</span>
-            </label>
-            <Input
-              placeholder="Related order ID if applicable"
-              value={createForm.orderId}
-              onChange={(e) => setCreateForm((p) => ({ ...p, orderId: e.target.value }))}
-            />
-          </div>
-          <div>
-            <label className="text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1 block">
-              Description <span className="text-red-500">*</span>
-            </label>
-            <Input.TextArea
-              rows={4}
-              placeholder="Describe the issue in detail..."
-              value={createForm.description}
-              onChange={(e) => setCreateForm((p) => ({ ...p, description: e.target.value }))}
-            />
-          </div>
-          <button
-            onClick={handleCreate}
-            disabled={creating}
-            className="w-full py-2.5 bg-blue text-white text-sm font-medium rounded-lg hover:bg-blue/90 transition-colors disabled:opacity-50"
-          >
-            {creating ? 'Submitting...' : 'Submit Dispute'}
-          </button>
         </div>
-      </Modal>
+      ) : (
+        <Modal
+          open={showCreateModal}
+          onCancel={() => setShowCreateModal(false)}
+          footer={null}
+          centered
+          title={<span className="dark:text-white">Submit a Dispute</span>}
+          className="dark-modal"
+        >
+          <div className="space-y-3 mt-4">
+            <CreateDisputeForm
+              createForm={createForm}
+              setCreateForm={setCreateForm}
+              handleCreate={handleCreate}
+              creating={creating}
+            />
+          </div>
+        </Modal>
+      )}
     </div>
   );
 };
+
+const CreateDisputeForm = ({
+  createForm,
+  setCreateForm,
+  handleCreate,
+  creating,
+}: {
+  createForm: { type: string; subject: string; description: string; orderId: string };
+  setCreateForm: React.Dispatch<
+    React.SetStateAction<{ type: string; subject: string; description: string; orderId: string }>
+  >;
+  handleCreate: () => void;
+  creating: boolean;
+}) => (
+  <>
+    <div>
+      <label className="text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1 block">
+        Type <span className="text-red-500">*</span>
+      </label>
+      <Select
+        placeholder="Select dispute type"
+        value={createForm.type || undefined}
+        onChange={(val) => setCreateForm((p) => ({ ...p, type: val }))}
+        options={disputeTypes}
+        className="w-full !h-11"
+      />
+    </div>
+    <div>
+      <label className="text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1 block">
+        Subject <span className="text-red-500">*</span>
+      </label>
+      <Input
+        placeholder="Brief summary of the issue"
+        value={createForm.subject}
+        onChange={(e) => setCreateForm((p) => ({ ...p, subject: e.target.value }))}
+        className="!h-11"
+      />
+    </div>
+    <div>
+      <label className="text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1 block">
+        Order ID <span className="text-neutral-400">(optional)</span>
+      </label>
+      <Input
+        placeholder="Related order ID if applicable"
+        value={createForm.orderId}
+        onChange={(e) => setCreateForm((p) => ({ ...p, orderId: e.target.value }))}
+        className="!h-11"
+      />
+    </div>
+    <div>
+      <label className="text-xs font-medium text-neutral-600 dark:text-neutral-400 mb-1 block">
+        Description <span className="text-red-500">*</span>
+      </label>
+      <Input.TextArea
+        rows={5}
+        placeholder="Describe the issue in detail..."
+        value={createForm.description}
+        onChange={(e) => setCreateForm((p) => ({ ...p, description: e.target.value }))}
+        className="!min-h-[120px]"
+      />
+    </div>
+    <button
+      onClick={handleCreate}
+      disabled={creating}
+      className="w-full py-3 bg-blue text-white text-sm font-medium rounded-lg hover:bg-blue/90 transition-colors disabled:opacity-50"
+    >
+      {creating ? 'Submitting...' : 'Submit Dispute'}
+    </button>
+  </>
+);
 
 export default DisputesPage;
