@@ -703,7 +703,7 @@ const Creators: React.FC<CreatorsProps> = (props) => {
       ref={scrollContainerRef}
       style={isMobile ? { height: '100vh', overflowY: 'auto' } : undefined}
       className={`dark:bg-neutral-900/50 bg-neutral-50 min-h-screen ${
-        isMobile ? 'max-w-[100vw]' : 'w-full pt-8'
+        isMobile ? 'max-w-[100vw] pb-20' : 'w-full pt-8'
       }`}
     >
       <div className={`w-full ${!isMobile ? 'mx-auto px-4' : 'px-3'}`}>

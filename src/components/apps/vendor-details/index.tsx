@@ -673,7 +673,7 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
                       className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all shadow-sm hover:shadow-md"
                     >
                       <MessageCircle size={14} />
-                      Message on WhatsApp
+                      WhatsApp
                     </button>
                     <motion.button
                       whileTap={{ scale: 0.9 }}

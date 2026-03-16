@@ -537,7 +537,7 @@ const Product = ({
                       className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-1.5 shadow-sm text-sm"
                     >
                       <MessageCircle size={16} />
-                      Message on WhatsApp
+                      WhatsApp
                     </motion.button>
 
                     <div className="flex items-center gap-1.5">

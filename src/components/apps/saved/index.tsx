@@ -408,14 +408,14 @@ const SavedItems: React.FC = () => {
       <Empty
         image={
           <Shop
-            size={80}
+            size={50}
             className="mx-auto text-neutral-300 dark:text-neutral-600"
             strokeWidth={1}
           />
         }
         description={
           <div className="text-center">
-            <h3 className="text-lg font-medium text-neutral-900 dark:text-neutral-100 mb-2">
+            <h3 className="text-base font-medium text-neutral-900 dark:text-neutral-100 mb-2">
               {searchValue ? 'No items match your search' : 'No saved items'}
             </h3>
             <p className="text-neutral-500 dark:text-neutral-400">
@@ -718,7 +718,7 @@ const SavedItems: React.FC = () => {
                           }}
                           className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all shadow-sm hover:shadow-md"
                         >
-                          <MessageCircle size={14} /> Message on WhatsApp
+                          <MessageCircle size={14} /> WhatsApp
                         </button>
                         <Tooltip title="Remove from saved">
                           <motion.button
@@ -876,7 +876,7 @@ const SavedItems: React.FC = () => {
                 placeholder="Search Saved Products..."
                 className={`${
                   isMobile ? 'h-9' : 'h-12'
-                } !w-full pl-11 pr-4 rounded-xl border-neutral-200 hover:border-blue focus:border-blue transition-colors`}
+                } !w-full pl-11 pr-4 rounded-xl border-neutral-200 dark:border-neutral-700 hover:border-blue focus:border-blue transition-colors`}
                 suffix={
                   searchValue && (
                     <X
