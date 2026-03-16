@@ -106,7 +106,7 @@ const SettingsPage = () => {
   }
 
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 pb-28">
+    <div className="max-w-2xl mx-auto px-4 py-6 pb-28 pt-14 md:pt-6">
       <h1 className="text-xl font-bold mb-1 dark:text-white">Settings</h1>
       <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-6">
         Manage your account preferences and security

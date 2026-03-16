@@ -137,7 +137,7 @@ const DisputesPage = () => {
   if (selectedDispute) {
     const status = statusConfig[selectedDispute.status] || statusConfig.open;
     return (
-      <div className="max-w-2xl mx-auto px-4 py-6 pb-28">
+      <div className="max-w-2xl mx-auto px-4 py-6 pb-28 pt-14 md:pt-6">
         <button
           onClick={() => setSelectedDispute(null)}
           className="flex items-center gap-1 text-sm text-neutral-500 hover:text-neutral-700 dark:hover:text-neutral-300 mb-4"
@@ -238,7 +238,7 @@ const DisputesPage = () => {
 
   // List View
   return (
-    <div className="max-w-2xl mx-auto px-4 py-6 pb-28">
+    <div className="max-w-2xl mx-auto px-4 py-6 pb-28 pt-14 md:pt-6">
       <div className="flex items-center justify-between mb-4">
         <div>
           <h1 className="text-xl font-bold dark:text-white">Disputes</h1>
