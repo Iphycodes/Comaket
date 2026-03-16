@@ -107,7 +107,7 @@ const BasicProfile: React.FC<BasicProfileProps> = ({
   return (
     <div
       className={`dark:bg-neutral-900/50 ${
-        isMobile ? 'max-w-[100vw] mb-14 pt-2' : 'min-h-screen px-40'
+        isMobile ? 'max-w-[100vw] pb-5 pt-6' : 'min-h-screen px-40'
       }`}
     >
       <div className={`w-full ${!isMobile ? 'mx-auto px-4' : ''}`}>

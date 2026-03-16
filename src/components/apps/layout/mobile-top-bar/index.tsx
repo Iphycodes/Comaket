@@ -16,6 +16,7 @@ import {
   LogIn,
   Sun,
   Moon,
+  User,
 } from 'lucide-react';
 import { AppContext } from '@grc/app-context';
 import { getFirstCharacter, getRandomColorByString } from '@grc/_shared/helpers';
@@ -145,7 +146,7 @@ const MobileTopBar: React.FC<MobileTopBarProps> = ({
       : {
           key: 'signin',
           label: (
-            <span className="flex items-center gap-2 text-sm font-semibold text-blue">
+            <span className="flex items-center justify-center gap-2 text-sm font-semibold text-white bg-blue rounded-md px-3 py-1.5 -mx-1">
               <LogIn size={15} />
               Sign in
             </span>
@@ -219,9 +220,7 @@ const MobileTopBar: React.FC<MobileTopBarProps> = ({
                   </div>
                 )
               ) : (
-                <span className="text-lg leading-none" role="img" aria-label="user">
-                  👤
-                </span>
+                <User size={18} className="text-neutral-500 dark:text-neutral-400" />
               )}
             </button>
           </Dropdown>

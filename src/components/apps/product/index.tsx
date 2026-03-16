@@ -19,6 +19,7 @@ import { MarketItem, MediaItem } from '@grc/_shared/namespace';
 import { numberFormat } from '@grc/_shared/helpers';
 import { Badge, Tooltip } from 'antd';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
+import { useRouter } from 'next/navigation';
 import MediaRenderer from '../media-renderer';
 
 interface ProductProps {
@@ -35,6 +36,7 @@ interface ProductProps {
   onWhatsAppMessage?: () => void;
   onShare?: () => void;
   onGoBack?: () => void;
+  onCreatorClick?: () => void;
 
   isOwnItem?: boolean;
   // Legacy support — if rendered from Market list view with setSelectedProductId
@@ -52,10 +54,21 @@ const Product = ({
   onWhatsAppMessage,
   onShare,
   onGoBack,
+  onCreatorClick,
   isOwnItem = false,
   setSelectedProductId,
 }: ProductProps) => {
   const isMobile = useMediaQuery(mediaSize.mobile);
+  const router = useRouter();
+
+  const handleCreatorOrStoreClick = () => {
+    if (onCreatorClick) return onCreatorClick();
+    if (item?.postUserProfile?.isStore) {
+      router.push(`/stores/${encodeURIComponent(item?.postUserProfile?.id || '')}`);
+    } else if (item?.postUserProfile?.userName) {
+      router.push(`/creators/${encodeURIComponent(item.postUserProfile.userName)}`);
+    }
+  };
 
   const [currentMediaIndex, setCurrentMediaIndex] = useState(0);
   const [slideDirection, setSlideDirection] = useState(0);
@@ -158,7 +171,10 @@ const Product = ({
 
       <div className={`${isMobile ? 'pb-20' : 'pb-6'}`}>
         {/* Seller Info */}
-        <div className={`flex items-center gap-2.5 my-3 ${isMobile ? 'px-3' : ''}`}>
+        <div
+          className={`flex items-center gap-2.5 my-3 ${isMobile ? 'px-3' : ''} cursor-pointer`}
+          onClick={handleCreatorOrStoreClick}
+        >
           <div className="relative w-8 h-8">
             <img
               src={item.postUserProfile?.profilePicUrl ?? ''}

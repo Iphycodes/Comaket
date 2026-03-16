@@ -335,7 +335,7 @@ const Profile: React.FC<ProfileProps> = ({
 
   return (
     <div
-      className={`dark:bg-neutral-900/50 ${isMobile ? 'max-w-[100vw] mb-14 pt-0' : 'min-h-screen'}`}
+      className={`dark:bg-neutral-900/50 ${isMobile ? 'max-w-[100vw] pb-10 pt-0' : 'min-h-screen'}`}
     >
       <div className={`w-full ${!isMobile ? 'mx-auto px-4' : ''}`}>
         <ProfileHeader

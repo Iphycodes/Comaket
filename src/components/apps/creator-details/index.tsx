@@ -820,7 +820,7 @@ const CreatorDetails: React.FC<CreatorDetailsProps> = ({
 
   return (
     <div
-      className={`dark:bg-neutral-900/50 ${isMobile ? 'max-w-[100vw] mb-14 pt-0' : 'min-h-screen'}`}
+      className={`dark:bg-neutral-900/50 ${isMobile ? 'max-w-[100vw] pb-14 pt-0' : 'min-h-screen'}`}
     >
       <div className={`w-full ${!isMobile ? 'w-full mx-auto px-4' : ''}`}>
         {/* Cover */}
