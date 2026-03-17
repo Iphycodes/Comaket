@@ -20,48 +20,55 @@ export const PostRequestSuccessful: React.FC<PostRequestSuccessfulProps> = ({
 }) => {
   return (
     <div className="flex flex-col items-center justify-center py-8 px-4">
-      <div className="w-16 h-16 bg-green-100 rounded-full flex items-center justify-center mb-6">
+      <div className="w-16 h-16 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mb-6">
         <i className="ri-check-line text-3xl text-green-500"></i>
       </div>
 
       {type === 'new' && (
-        <h2 className="text-2xl font-bold text-center mb-2">Item Post Request Sent!</h2>
+        <h2 className="text-2xl font-bold text-center mb-2 dark:text-white">
+          Item Post Request Sent!
+        </h2>
       )}
       {type === 'update' && (
-        <h2 className="text-2xl font-bold text-center mb-2">Item Update Request Sent!</h2>
+        <h2 className="text-2xl font-bold text-center mb-2 dark:text-white">
+          Item Update Request Sent!
+        </h2>
       )}
 
       {type === 'new' && (
-        <p className="text-center text-neutral-600 max-w-md mb-2">
-          Your request to sell <span className="font-medium">{itemName ?? 'New Product'}</span> with
-          ID <span className="font-medium">{itemId}</span> has been submitted successfully.
-        </p>
-      )}
-
-      {type === 'update' && (
-        <p className="text-center text-neutral-600 max-w-md mb-2">
-          Your request to update Product <span className="font-medium">{itemId}</span> has been
+        <p className="text-center text-neutral-600 dark:text-neutral-400 max-w-md mb-2">
+          Your request to sell{' '}
+          <span className="font-medium dark:text-neutral-300">{itemName ?? 'New Product'}</span>{' '}
+          with ID <span className="font-medium dark:text-neutral-300">{itemId}</span> has been
           submitted successfully.
         </p>
       )}
 
+      {type === 'update' && (
+        <p className="text-center text-neutral-600 dark:text-neutral-400 max-w-md mb-2">
+          Your request to update Product{' '}
+          <span className="font-medium dark:text-neutral-300">{itemId}</span> has been submitted
+          successfully.
+        </p>
+      )}
+
       {sellingModel && (
-        <p className="text-sm text-neutral-500 mb-8">
+        <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-8">
           Selling via <span className="font-medium">{getSellingModelLabel(sellingModel)}</span>
         </p>
       )}
 
       {!sellingModel && <div className="mb-6" />}
 
-      <div className="bg-neutral-50 rounded-lg p-4 mb-8 w-full max-w-md">
+      <div className="bg-neutral-50 dark:bg-neutral-800/60 rounded-lg p-4 mb-8 w-full max-w-md">
         {type === 'new' && (
-          <p className="text-sm text-neutral-600 text-center">
+          <p className="text-sm text-neutral-600 dark:text-neutral-400 text-center">
             Your item will be listed on the marketplace once all verifications are complete and the
             platform fee is processed. We'll notify you of any updates.
           </p>
         )}
         {type === 'update' && (
-          <p className="text-sm text-neutral-600 text-center">
+          <p className="text-sm text-neutral-600 dark:text-neutral-400 text-center">
             Your item will be updated on the marketplace once all verifications are complete. We'll
             notify you of any updates.
           </p>
@@ -71,7 +78,7 @@ export const PostRequestSuccessful: React.FC<PostRequestSuccessfulProps> = ({
       <div className="flex gap-4">
         <button
           onClick={onClose}
-          className="px-6 py-2 border border-neutral-300 rounded-md hover:bg-neutral-50 transition-colors"
+          className="px-6 py-2 border border-neutral-300 dark:border-neutral-700 rounded-md hover:bg-neutral-50 dark:hover:bg-neutral-800 transition-colors dark:text-white"
         >
           Close
         </button>
@@ -80,7 +87,7 @@ export const PostRequestSuccessful: React.FC<PostRequestSuccessfulProps> = ({
             onClose();
             onTrackStatus(itemId);
           }}
-          className="px-6 py-2 bg-black text-white rounded-md hover:bg-neutral-800 transition-colors"
+          className="px-6 py-2 bg-gradient-to-r from-blue to-indigo-600 text-white rounded-md hover:from-blue/90 hover:to-indigo-600/90 transition-all shadow-sm"
         >
           Track Status
         </button>

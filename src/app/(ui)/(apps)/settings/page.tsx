@@ -2,7 +2,17 @@
 
 import React, { useState } from 'react';
 import { Input, Modal, Switch, message } from 'antd';
-import { Shield, Bell, Trash2, Lock, Eye, EyeOff, AlertTriangle, ChevronRight } from 'lucide-react';
+import {
+  Shield,
+  Bell,
+  Trash2,
+  Lock,
+  Eye,
+  EyeOff,
+  AlertTriangle,
+  ChevronRight,
+  ChevronDown,
+} from 'lucide-react';
 import { useRouter } from 'next/navigation';
 import { useUsers } from '@grc/hooks/useUser';
 import {
@@ -11,11 +21,18 @@ import {
   useUpdateNotificationPreferencesMutation,
 } from '@grc/services/users';
 import { useAuth } from '@grc/hooks/useAuth';
+import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 
 const SettingsPage = () => {
   const router = useRouter();
   const { logout } = useAuth();
   const { userProfile } = useUsers({ fetchProfile: true });
+  const isMobile = useMediaQuery(mediaSize.mobile);
+
+  // Sections collapsed by default on mobile
+  const [securityOpen, setSecurityOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
+  const [dangerOpen, setDangerOpen] = useState(false);
 
   // Password change
   const [showPasswordSection, setShowPasswordSection] = useState(false);
@@ -114,138 +131,183 @@ const SettingsPage = () => {
 
       {/* Security Section */}
       <section className="mb-6">
-        <div className="flex items-center gap-2 mb-3">
-          <Shield size={16} className="text-blue" />
-          <h2 className="text-sm font-semibold dark:text-white">Security</h2>
-        </div>
-        <div className="bg-white dark:bg-neutral-800/60 rounded-xl border border-neutral-200 dark:border-neutral-700/60 overflow-hidden">
-          {/* Change Password */}
-          <button
-            onClick={() => setShowPasswordSection(!showPasswordSection)}
-            disabled={isGoogleAuth}
-            className="w-full flex items-center justify-between p-4 hover:bg-neutral-50 dark:hover:bg-neutral-700/30 transition-colors disabled:opacity-50"
-          >
-            <div className="flex items-center gap-3">
-              <Lock size={18} className="text-neutral-500" />
-              <div className="text-left">
-                <p className="text-sm font-medium dark:text-white">Change Password</p>
-                <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                  {isGoogleAuth ? 'Not available for Google accounts' : 'Update your password'}
-                </p>
-              </div>
-            </div>
-            <ChevronRight
+        <button
+          className="flex items-center justify-between w-full mb-3"
+          onClick={() => isMobile && setSecurityOpen(!securityOpen)}
+        >
+          <div className="flex items-center gap-2">
+            <Shield size={16} className="text-blue" />
+            <h2 className="text-sm font-semibold dark:text-white">Security</h2>
+          </div>
+          {isMobile && (
+            <ChevronDown
               size={16}
               className={`text-neutral-400 transition-transform ${
-                showPasswordSection ? 'rotate-90' : ''
+                securityOpen ? 'rotate-180' : ''
               }`}
             />
-          </button>
+          )}
+        </button>
+        {(!isMobile || securityOpen) && (
+          <div className="bg-white dark:bg-neutral-800/60 rounded-xl border border-neutral-200 dark:border-neutral-700/60 overflow-hidden">
+            {/* Change Password */}
+            <button
+              onClick={() => setShowPasswordSection(!showPasswordSection)}
+              disabled={isGoogleAuth}
+              className="w-full flex items-center justify-between p-4 hover:bg-neutral-50 dark:hover:bg-neutral-700/30 transition-colors disabled:opacity-50"
+            >
+              <div className="flex items-center gap-3">
+                <Lock size={18} className="text-neutral-500" />
+                <div className="text-left">
+                  <p className="text-sm font-medium dark:text-white">Change Password</p>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                    {isGoogleAuth ? 'Not available for Google accounts' : 'Update your password'}
+                  </p>
+                </div>
+              </div>
+              <ChevronRight
+                size={16}
+                className={`text-neutral-400 transition-transform ${
+                  showPasswordSection ? 'rotate-90' : ''
+                }`}
+              />
+            </button>
 
-          {showPasswordSection && !isGoogleAuth && (
-            <div className="px-4 pb-4 space-y-3 border-t border-neutral-100 dark:border-neutral-700/40 pt-3">
-              <div className="relative">
+            {showPasswordSection && !isGoogleAuth && (
+              <div className="px-4 pb-4 space-y-3 border-t border-neutral-100 dark:border-neutral-700/40 pt-3">
+                <div className="relative">
+                  <Input.Password
+                    placeholder="Current password"
+                    value={currentPassword}
+                    onChange={(e) => setCurrentPassword(e.target.value)}
+                    iconRender={(visible) => (visible ? <Eye size={14} /> : <EyeOff size={14} />)}
+                    className="!bg-neutral-50 dark:!bg-neutral-700/40"
+                  />
+                </div>
                 <Input.Password
-                  placeholder="Current password"
-                  value={currentPassword}
-                  onChange={(e) => setCurrentPassword(e.target.value)}
+                  placeholder="New password"
+                  value={newPassword}
+                  onChange={(e) => setNewPassword(e.target.value)}
                   iconRender={(visible) => (visible ? <Eye size={14} /> : <EyeOff size={14} />)}
                   className="!bg-neutral-50 dark:!bg-neutral-700/40"
                 />
+                <Input.Password
+                  placeholder="Confirm new password"
+                  value={confirmPassword}
+                  onChange={(e) => setConfirmPassword(e.target.value)}
+                  iconRender={(visible) => (visible ? <Eye size={14} /> : <EyeOff size={14} />)}
+                  className="!bg-neutral-50 dark:!bg-neutral-700/40"
+                />
+                <button
+                  onClick={handleChangePassword}
+                  disabled={changingPassword}
+                  className="w-full py-2 bg-blue text-white text-sm font-medium rounded-lg hover:bg-blue/90 transition-colors disabled:opacity-50"
+                >
+                  {changingPassword ? 'Updating...' : 'Update Password'}
+                </button>
               </div>
-              <Input.Password
-                placeholder="New password"
-                value={newPassword}
-                onChange={(e) => setNewPassword(e.target.value)}
-                iconRender={(visible) => (visible ? <Eye size={14} /> : <EyeOff size={14} />)}
-                className="!bg-neutral-50 dark:!bg-neutral-700/40"
-              />
-              <Input.Password
-                placeholder="Confirm new password"
-                value={confirmPassword}
-                onChange={(e) => setConfirmPassword(e.target.value)}
-                iconRender={(visible) => (visible ? <Eye size={14} /> : <EyeOff size={14} />)}
-                className="!bg-neutral-50 dark:!bg-neutral-700/40"
-              />
-              <button
-                onClick={handleChangePassword}
-                disabled={changingPassword}
-                className="w-full py-2 bg-blue text-white text-sm font-medium rounded-lg hover:bg-blue/90 transition-colors disabled:opacity-50"
-              >
-                {changingPassword ? 'Updating...' : 'Update Password'}
-              </button>
-            </div>
-          )}
-        </div>
+            )}
+          </div>
+        )}
       </section>
 
       {/* Notifications Section */}
       <section className="mb-6">
-        <div className="flex items-center gap-2 mb-3">
-          <Bell size={16} className="text-blue" />
-          <h2 className="text-sm font-semibold dark:text-white">Notifications</h2>
-        </div>
-        <div className="bg-white dark:bg-neutral-800/60 rounded-xl border border-neutral-200 dark:border-neutral-700/60 divide-y divide-neutral-100 dark:divide-neutral-700/40">
-          {[
-            {
-              key: 'emailNotifications',
-              label: 'Email Notifications',
-              desc: 'Receive updates via email',
-            },
-            {
-              key: 'pushNotifications',
-              label: 'Push Notifications',
-              desc: 'Browser push notifications',
-            },
-            {
-              key: 'orderUpdates',
-              label: 'Order Updates',
-              desc: 'Get notified about order status changes',
-            },
-            {
-              key: 'promotions',
-              label: 'Promotions',
-              desc: 'Receive promotional offers and deals',
-            },
-          ].map((item) => (
-            <div key={item.key} className="flex items-center justify-between p-4">
-              <div>
-                <p className="text-sm font-medium dark:text-white">{item.label}</p>
-                <p className="text-xs text-neutral-500 dark:text-neutral-400">{item.desc}</p>
+        <button
+          className="flex items-center justify-between w-full mb-3"
+          onClick={() => isMobile && setNotificationsOpen(!notificationsOpen)}
+        >
+          <div className="flex items-center gap-2">
+            <Bell size={16} className="text-blue" />
+            <h2 className="text-sm font-semibold dark:text-white">Notifications</h2>
+          </div>
+          {isMobile && (
+            <ChevronDown
+              size={16}
+              className={`text-neutral-400 transition-transform ${
+                notificationsOpen ? 'rotate-180' : ''
+              }`}
+            />
+          )}
+        </button>
+        {(!isMobile || notificationsOpen) && (
+          <div className="bg-white dark:bg-neutral-800/60 rounded-xl border border-neutral-200 dark:border-neutral-700/60 divide-y divide-neutral-100 dark:divide-neutral-700/40">
+            {[
+              {
+                key: 'emailNotifications',
+                label: 'Email Notifications',
+                desc: 'Receive updates via email',
+              },
+              {
+                key: 'pushNotifications',
+                label: 'Push Notifications',
+                desc: 'Browser push notifications',
+              },
+              {
+                key: 'orderUpdates',
+                label: 'Order Updates',
+                desc: 'Get notified about order status changes',
+              },
+              {
+                key: 'promotions',
+                label: 'Promotions',
+                desc: 'Receive promotional offers and deals',
+              },
+            ].map((item) => (
+              <div key={item.key} className="flex items-center justify-between p-4">
+                <div>
+                  <p className="text-sm font-medium dark:text-white">{item.label}</p>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400">{item.desc}</p>
+                </div>
+                <Switch
+                  size="small"
+                  checked={notificationPrefs[item.key]}
+                  onChange={(checked) => handleToggleNotification(item.key, checked)}
+                />
               </div>
-              <Switch
-                size="small"
-                checked={notificationPrefs[item.key]}
-                onChange={(checked) => handleToggleNotification(item.key, checked)}
-              />
-            </div>
-          ))}
-        </div>
+            ))}
+          </div>
+        )}
       </section>
 
       {/* Danger Zone */}
       <section>
-        <div className="flex items-center gap-2 mb-3">
-          <AlertTriangle size={16} className="text-red-500" />
-          <h2 className="text-sm font-semibold text-red-500">Danger Zone</h2>
-        </div>
-        <div className="bg-white dark:bg-neutral-800/60 rounded-xl border border-red-200 dark:border-red-800/40 overflow-hidden">
-          <button
-            onClick={() => setShowDeleteModal(true)}
-            className="w-full flex items-center justify-between p-4 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
-          >
-            <div className="flex items-center gap-3">
-              <Trash2 size={18} className="text-red-500" />
-              <div className="text-left">
-                <p className="text-sm font-medium text-red-600 dark:text-red-400">Delete Account</p>
-                <p className="text-xs text-neutral-500 dark:text-neutral-400">
-                  Permanently delete your account and all data
-                </p>
+        <button
+          className="flex items-center justify-between w-full mb-3"
+          onClick={() => isMobile && setDangerOpen(!dangerOpen)}
+        >
+          <div className="flex items-center gap-2">
+            <AlertTriangle size={16} className="text-red-500" />
+            <h2 className="text-sm font-semibold text-red-500">Danger Zone</h2>
+          </div>
+          {isMobile && (
+            <ChevronDown
+              size={16}
+              className={`text-neutral-400 transition-transform ${dangerOpen ? 'rotate-180' : ''}`}
+            />
+          )}
+        </button>
+        {(!isMobile || dangerOpen) && (
+          <div className="bg-white dark:bg-neutral-800/60 rounded-xl border border-red-200 dark:border-red-800/40 overflow-hidden">
+            <button
+              onClick={() => setShowDeleteModal(true)}
+              className="w-full flex items-center justify-between p-4 hover:bg-red-50 dark:hover:bg-red-900/10 transition-colors"
+            >
+              <div className="flex items-center gap-3">
+                <Trash2 size={18} className="text-red-500" />
+                <div className="text-left">
+                  <p className="text-sm font-medium text-red-600 dark:text-red-400">
+                    Delete Account
+                  </p>
+                  <p className="text-xs text-neutral-500 dark:text-neutral-400">
+                    Permanently delete your account and all data
+                  </p>
+                </div>
               </div>
-            </div>
-            <ChevronRight size={16} className="text-red-400" />
-          </button>
-        </div>
+              <ChevronRight size={16} className="text-red-400" />
+            </button>
+          </div>
+        )}
       </section>
 
       {/* Delete Account Modal */}

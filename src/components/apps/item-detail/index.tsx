@@ -397,10 +397,10 @@ Price: ${formattedPrice}`;
                   <span
                     className={`inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded-full ${
                       item.listingType === 'direct-purchase'
-                        ? 'bg-blue-50 dark:bg-blue/20 text-blue dark:text-blue'
+                        ? 'bg-blue-50 dark:bg-blue-900/40 text-blue dark:text-blue-300'
                         : item.listingType === 'consignment'
-                          ? 'bg-purple-50 dark:bg-purple-900/20 text-purple-600 dark:text-purple-400'
-                          : 'bg-amber-50 dark:bg-amber-900/20 text-amber-600 dark:text-amber-400'
+                          ? 'bg-purple-50 dark:bg-purple-900/40 text-purple-600 dark:text-purple-300'
+                          : 'bg-amber-50 dark:bg-amber-900/40 text-amber-600 dark:text-amber-300'
                     }`}
                   >
                     {getListingTypeLabel(item.listingType)}

@@ -242,17 +242,16 @@ const SellItemModal: React.FC<Props> = ({
 
   const handleCancel = () => {
     setIsSellItemModalOpen(false);
-    setTimeout(() => {
-      setCurrentStep('sell-type');
-      setSellingModel(undefined);
-      setIsPostRequestSuccessful(false);
-      setIsSubmitting(false);
-      setCreatedListingId('');
-      basicInfoForm.resetFields();
-      pricingForm.resetFields();
-      setBasicInfoData({});
-      setPricingData({});
-    }, 300);
+    // Reset immediately so state is clean if modal reopens
+    setCurrentStep('sell-type');
+    setSellingModel(undefined);
+    setIsPostRequestSuccessful(false);
+    setIsSubmitting(false);
+    setCreatedListingId('');
+    basicInfoForm.resetFields();
+    pricingForm.resetFields();
+    setBasicInfoData({});
+    setPricingData({});
   };
 
   // ── Step progress indicator ─────────────────────────────────────────────
@@ -331,14 +330,7 @@ const SellItemModal: React.FC<Props> = ({
           transition={{ duration: 0.25 }}
         >
           {currentStep === 'sell-type' && (
-            <div className="space-y-2">
-              <SellTypeSelector onSelect={handleSelectSellType} selected={sellingModel} />
-              {isMobile && (
-                <div className="flex items-center justify-end">
-                  <ContinueButton />
-                </div>
-              )}
-            </div>
+            <SellTypeSelector onSelect={handleSelectSellType} selected={sellingModel} />
           )}
 
           {currentStep === 'basic-info' && (

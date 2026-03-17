@@ -200,7 +200,12 @@ const StoreSettingsPage: React.FC<StoreSettingsProps> = ({
   const [form, setForm] = useState<FormData>(() => buildFormFromStore(store));
   const [isDeleteModalOpen, setIsDeleteModalOpen] = useState(false);
   const [deleteConfirmText, setDeleteConfirmText] = useState('');
-  const [activeSection, setActiveSection] = useState<string | null>(isMobile ? null : 'details');
+  const [activeSection, setActiveSection] = useState<string | null>(null);
+
+  // Reset to section list on mobile, auto-open details on desktop
+  useEffect(() => {
+    setActiveSection(isMobile ? null : 'details');
+  }, [isMobile]);
 
   // ── Sync form when store data changes ───────────────────────────────
   useEffect(() => {
