@@ -95,7 +95,7 @@ const AppBaseLayout: React.FC<AppBaseLayoutProps> = ({ children }) => {
       centered: true,
       width: 380,
       className:
-        '[&_.ant-modal-content]:!rounded-2xl [&_.ant-modal-content]:!p-6 [&_.ant-modal-confirm-btns]:!flex [&_.ant-modal-confirm-btns]:!justify-center [&_.ant-modal-confirm-btns]:!mt-4',
+        'dark-modal [&_.ant-modal-content]:!rounded-2xl [&_.ant-modal-content]:!p-6 [&_.ant-modal-confirm-btns]:!flex [&_.ant-modal-confirm-btns]:!justify-center [&_.ant-modal-confirm-btns]:!mt-4',
       content: (
         <div className="text-center py-2">
           <div className="w-14 h-14 rounded-full bg-red-50 dark:bg-red-900/20 flex items-center justify-center mx-auto mb-4">

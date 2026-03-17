@@ -23,6 +23,7 @@ import { Pagination } from '@grc/_shared/namespace';
 
 export type OrderStatus =
   | 'pending'
+  | 'confirmed'
   | 'processing'
   | 'shipped'
   | 'delivered'
@@ -291,6 +292,12 @@ export const orderStatusConfig: Record<
     bg: 'bg-amber-50 dark:bg-amber-900/20',
     icon: <Timer size={14} />,
   },
+  confirmed: {
+    label: 'Confirmed',
+    color: 'text-emerald-600 dark:text-emerald-400',
+    bg: 'bg-emerald-50 dark:bg-emerald-900/20',
+    icon: <CheckCircle size={14} />,
+  },
   processing: {
     label: 'Processing',
     color: 'text-blue dark:text-blue',
@@ -315,6 +322,7 @@ export const orderStatusConfig: Record<
     bg: 'bg-indigo-50 dark:bg-indigo-900/20',
     icon: <CheckCircle size={14} />,
   },
+
   cancelled: {
     label: 'Cancelled',
     color: 'text-red-600 dark:text-red-400',

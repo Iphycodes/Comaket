@@ -19,9 +19,6 @@ import {
   Store,
   Handshake,
   BadgeDollarSign,
-  Heart,
-  MessageCircle,
-  Bookmark,
   ExternalLink,
   Edit2,
   Trash2,
@@ -914,41 +911,6 @@ const SellItemDetail: React.FC<Props> = ({
           {item.description}
         </p>
       </motion.div>
-
-      {/* ─── Engagement Stats ───────────────────────────────────────────── */}
-      {(item.status === 'live' || item.status === 'sold') && (
-        <motion.div
-          initial={{ opacity: 0, y: 12 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ delay: 0.2 }}
-          className="mb-6 grid grid-cols-3 gap-3"
-        >
-          {[
-            { icon: Heart, label: 'Likes', count: item.likes?.length || 0, color: 'text-red-500' },
-            {
-              icon: MessageCircle,
-              label: 'Comments',
-              count: item.comments?.length || 0,
-              color: 'text-blue',
-            },
-            {
-              icon: Bookmark,
-              label: 'Saves',
-              count: item.bookMarks?.length || 0,
-              color: 'text-purple-500',
-            },
-          ].map(({ icon: Icon, label, count, color }) => (
-            <div
-              key={label}
-              className="bg-neutral-50 dark:bg-neutral-800/50 rounded-xl p-3 text-center"
-            >
-              <Icon size={18} className={`${color} mx-auto mb-1`} />
-              <p className="text-lg font-bold text-neutral-900 dark:text-white">{count}</p>
-              <p className="text-[10px] text-neutral-400 uppercase tracking-wider">{label}</p>
-            </div>
-          ))}
-        </motion.div>
-      )}
 
       {/* ─── Pricing Summary ────────────────────────────────────────────── */}
       <motion.div

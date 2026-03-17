@@ -18,6 +18,36 @@
     color: inherit !important;
   }
 
+  /* Dark theme for Ant Design modals (Modal, Modal.confirm, etc.) */
+  .dark .ant-modal .ant-modal-content,
+  .dark .ant-modal-confirm .ant-modal-content {
+    background-color: #1a1a1a !important;
+    color: #e5e5e5 !important;
+  }
+  .dark .ant-modal .ant-modal-header,
+  .dark .ant-modal-confirm .ant-modal-header {
+    background-color: #1a1a1a !important;
+  }
+  .dark .ant-modal .ant-modal-title,
+  .dark .ant-modal-confirm .ant-modal-confirm-title {
+    color: #fff !important;
+  }
+  .dark .ant-modal .ant-modal-close-icon,
+  .dark .ant-modal-confirm .ant-modal-close-icon {
+    color: #a3a3a3 !important;
+  }
+  .dark .ant-modal .ant-btn-default,
+  .dark .ant-modal-confirm .ant-btn-default {
+    background-color: #262626 !important;
+    border-color: #404040 !important;
+    color: #e5e5e5 !important;
+  }
+  .dark .ant-modal .ant-btn-default:hover,
+  .dark .ant-modal-confirm .ant-btn-default:hover {
+    background-color: #333 !important;
+    border-color: #525252 !important;
+  }
+
   /* Prevent Ant Design from forcing black text on hover for text/link buttons */
   .ant-btn-text:not(:disabled):hover,
   .ant-btn-link:not(:disabled):hover,

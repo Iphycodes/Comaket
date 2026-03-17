@@ -338,6 +338,7 @@ const CheckoutPage = () => {
     async (shipping: ShippingFormData) => {
       if (isProcessing) return;
       setIsProcessing(true);
+      let isRedirecting = false;
 
       try {
         const callbackUrl = `${window.location.origin}/checkout/verify${
@@ -374,6 +375,7 @@ const CheckoutPage = () => {
           const authUrl =
             checkoutResult?.data?.payment?.authorizationUrl || checkoutResult?.authorizationUrl;
           if (authUrl) {
+            isRedirecting = true;
             window.location.href = authUrl;
             return;
           }
@@ -382,14 +384,21 @@ const CheckoutPage = () => {
           return;
         }
 
-        // Initialize payment with orderId
+        // Initialize payment with orderId — redirect happens inside the hook
+        isRedirecting = true;
         await initializePayment({ orderId, callbackUrl });
       } catch (err: any) {
-        const message =
-          err?.data?.message || err?.message || 'Failed to process your order. Please try again.';
-        antMessage.error(message);
+        // Don't show error if we're already redirecting to payment page
+        if (!isRedirecting) {
+          const message =
+            err?.data?.message || err?.message || 'Failed to process your order. Please try again.';
+          antMessage.error(message);
+        }
       } finally {
-        setIsProcessing(false);
+        // Don't reset state if redirecting — prevents flash/re-render on mobile
+        if (!isRedirecting) {
+          setIsProcessing(false);
+        }
       }
     },
     [validateCart, checkoutCart, initializePayment, isProcessing, selectedItemIds]
