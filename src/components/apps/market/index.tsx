@@ -947,7 +947,7 @@ const Market: React.FC<MarketProps> = ({
 
               {/* Loading more skeletons */}
               {isLoadingMore && (
-                <div className="flex justify-center py-6">
+                <div className={`flex justify-center py-6 ${isMobile ? '!pb-12' : ''}`}>
                   <div className="w-6 h-6 border-2 border-neutral-300 dark:border-neutral-600 border-t-blue rounded-full animate-spin" />
                 </div>
               )}

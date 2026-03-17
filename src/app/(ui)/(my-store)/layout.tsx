@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useMemo } from 'react';
+import React, { useContext, useMemo } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 import { useAuth } from '@grc/hooks/useAuth';
@@ -9,6 +9,8 @@ import { useStores } from '@grc/hooks/useStores';
 import { useCreators } from '@grc/hooks/useCreators';
 import { useStoreBadge } from '@grc/components/my-store/context/store-badge-context';
 import StoreConfirmModal from '@grc/components/apps/layout/side-nav/lib/store-confirm-modal';
+import SellItemModal from '@grc/components/apps/sell-item-modal';
+import { AppContext } from '@grc/app-context';
 import {
   DesktopSidebar,
   MobileTopBar,
@@ -17,6 +19,7 @@ import {
 } from '@grc/components/my-store/layout/store-sidebar';
 
 const MyStoreLayout: React.FC<{ children: React.ReactNode }> = ({ children }) => {
+  const { isSellItemModalOpen, setIsSellItemModalOpen } = useContext(AppContext);
   const params = useParams();
   const router = useRouter();
   const isMobile = useMediaQuery(mediaSize.mobile);
@@ -112,6 +115,14 @@ const MyStoreLayout: React.FC<{ children: React.ReactNode }> = ({ children }) =>
 
       {/* Create Store Modal */}
       <StoreConfirmModal showConfirm={showStoreConfirm} setShowConfirm={setShowStoreConfirm} />
+
+      {/* Sell Item Modal */}
+      <SellItemModal
+        isSellItemModalOpen={isSellItemModalOpen}
+        setIsSellItemModalOpen={setIsSellItemModalOpen}
+        handleTrackStatus={() => {}}
+        storeId={storeId}
+      />
     </div>
   );
 };

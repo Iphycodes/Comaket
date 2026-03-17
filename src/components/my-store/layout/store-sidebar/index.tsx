@@ -404,7 +404,7 @@ const MobileTopBar: React.FC<StoreSidebarProps & { storeId: string }> = ({
 }) => {
   const router = useRouter();
   return (
-    <div className="sticky top-0 z-30 bg-neutral-900 border-b border-neutral-800 px-4 py-3 pt-12">
+    <div className="sticky top-0 z-30 bg-neutral-900 border-b border-neutral-800 px-4 py-2">
       <div className="flex items-center justify-between gap-3">
         <button
           onClick={() => router.push('/market')}
@@ -452,7 +452,7 @@ const MobileBottomNav: React.FC<{ storeId: string; badgeCounts?: NavBadgeCounts 
   const activeKey = getActiveKey();
 
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-30 bg-neutral-900 border-t border-neutral-800 px-2 pb-6 pt-2">
+    <div className="fixed bottom-0 left-0 right-0 z-30 bg-neutral-900 border-t border-neutral-800 px-2 pb-[env(safe-area-inset-bottom)] pt-1.5">
       <div className="flex items-center justify-around">
         {mobileNavItems.map((item) => {
           const isActive = activeKey === item.key;
