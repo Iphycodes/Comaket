@@ -33,7 +33,13 @@ export const appMiddleware =
       get(action, ['payload', 'data', 'error_details'])?.[0]?.message ||
       get(action, ['payload', 'data', 'error_description']);
 
-    if (isRejectedWithValue(action) && !noErrorMessage) {
+    // Skip error toasts for aborted requests (e.g., page navigating away to payment)
+    const isAborted =
+      action?.meta?.condition === true ||
+      action?.error?.name === 'AbortError' ||
+      action?.payload?.status === 'FETCH_ERROR';
+
+    if (isRejectedWithValue(action) && !noErrorMessage && !isAborted) {
       if (isMutation) {
         message.error(errMssg);
       } else {
