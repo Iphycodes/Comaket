@@ -416,7 +416,7 @@ const Market: React.FC<MarketProps> = ({
                   {item?.postUserProfile?.isVerified && (
                     <i
                       className={`ri-verified-badge-fill ${
-                        item?.postUserProfile?.isSuperVerified ? 'text-[#D4A017]' : 'text-[#1D9BF0]'
+                        item?.postUserProfile?.isSuperVerified ? 'text-[#E8A800]' : 'text-[#1D9BF0]'
                       } text-[18px]`}
                     />
                   )}
@@ -435,11 +435,21 @@ const Market: React.FC<MarketProps> = ({
                   </span>
                 )}
 
-                <div className="flex items-center gap-2 mb-2">
+                <div className="flex items-center gap-2 mb-2 flex-wrap">
                   <span className="text-lg font-bold bg-gradient-to-r from-orange-500 to-rose-500 bg-clip-text text-transparent">
                     {numberFormat((item.askingPrice?.price ?? 0) / 100, Currencies.NGN)}
                   </span>
-                  {item.askingPrice?.negotiable && (
+                  {item.formerPrice && (
+                    <span className="text-xs text-neutral-400 line-through">
+                      {numberFormat(item.formerPrice / 100, Currencies.NGN)}
+                    </span>
+                  )}
+                  {item.discountPercent && (
+                    <span className="text-[9px] bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-1.5 py-0.5 rounded-full font-bold">
+                      -{item.discountPercent}%
+                    </span>
+                  )}
+                  {item.askingPrice?.negotiable && !item.formerPrice && (
                     <span className="text-[9px] bg-orange-50 dark:bg-orange-900/20 text-orange-600 dark:text-orange-400 px-1.5 py-0.5 rounded-full font-medium">
                       Negotiable
                     </span>

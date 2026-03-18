@@ -78,7 +78,7 @@ const StarRating: React.FC<{ rating: number; size?: number }> = ({ rating, size 
 const VerifiedBadge: React.FC<{ isSuper?: boolean }> = ({ isSuper = false }) => (
   <i
     className={`ri-verified-badge-fill ${
-      isSuper ? 'text-[#D4A017]' : 'text-[#1D9BF0]'
+      isSuper ? 'text-[#E8A800]' : 'text-[#1D9BF0]'
     } text-[20px]`}
   />
 );

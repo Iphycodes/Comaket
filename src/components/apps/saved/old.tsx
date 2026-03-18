@@ -514,7 +514,7 @@ const SavedItems: React.FC = () => {
                   {item.postUserProfile?.isVerified && (
                     <i
                       className={`ri-verified-badge-fill ${
-                        item.postUserProfile?.isSuperVerified ? 'text-[#D4A017]' : 'text-[#1D9BF0]'
+                        item.postUserProfile?.isSuperVerified ? 'text-[#E8A800]' : 'text-[#1D9BF0]'
                       } text-[14px] flex-shrink-0`}
                     />
                   )}
