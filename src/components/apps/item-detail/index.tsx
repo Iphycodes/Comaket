@@ -49,6 +49,9 @@ interface ItemDetailProps {
     platformFee?: number;
     live?: boolean;
     ownerId?: string | null;
+    formerPrice?: number | null;
+    discountPercent?: number | null;
+    discountPrice?: number | null;
   };
   isSellerView?: boolean;
   onClose?: () => void;
@@ -233,8 +236,12 @@ Price: ${formattedPrice}`;
       case 'consignment':
         return 'Consignment';
       case 'direct-purchase':
+      case 'direct_purchase':
         return 'Comaket Verified';
+      case 'admin':
+        return 'Kraft Official';
       case 'self-listing':
+      case 'self_listing':
         return 'Seller Listing';
       default:
         return '';
@@ -263,12 +270,18 @@ Price: ${formattedPrice}`;
           onClick={handleCreatorOrStoreClick}
         >
           <div className="relative w-12 h-12">
-            <Image
-              src={item.postUserProfile?.profilePicUrl}
-              alt="Seller"
-              fill
-              className="rounded-full object-cover"
-            />
+            {item.postUserProfile?.profilePicUrl ? (
+              <Image
+                src={item.postUserProfile.profilePicUrl}
+                alt="Seller"
+                fill
+                className="rounded-full object-cover"
+              />
+            ) : (
+              <div className="w-full h-full rounded-full bg-gradient-to-br from-blue to-indigo-600 flex items-center justify-center text-white font-bold text-lg">
+                {(item.postUserProfile?.displayName || 'K')?.[0]?.toUpperCase()}
+              </div>
+            )}
             <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" />
           </div>
           <div>
@@ -346,12 +359,18 @@ Price: ${formattedPrice}`;
                 className="relative w-10 h-10 cursor-pointer"
                 onClick={handleCreatorOrStoreClick}
               >
-                <Image
-                  src={item?.postUserProfile?.profilePicUrl}
-                  alt="Seller"
-                  fill
-                  className="rounded-full object-cover"
-                />
+                {item?.postUserProfile?.profilePicUrl ? (
+                  <Image
+                    src={item.postUserProfile.profilePicUrl}
+                    alt="Seller"
+                    fill
+                    className="rounded-full object-cover"
+                  />
+                ) : (
+                  <div className="w-full h-full rounded-full bg-gradient-to-br from-blue to-indigo-600 flex items-center justify-center text-white font-bold text-sm">
+                    {(item?.postUserProfile?.displayName || 'K')?.[0]?.toUpperCase()}
+                  </div>
+                )}
                 {/* <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-500 rounded-full border-2 border-white" /> */}
               </div>
               <div>
@@ -396,22 +415,35 @@ Price: ${formattedPrice}`;
                 <div className="mb-2">
                   <span
                     className={`inline-flex items-center px-2 py-0.5 text-[11px] font-medium rounded-full ${
-                      item.listingType === 'direct-purchase'
+                      item.listingType === 'direct-purchase' ||
+                      item.listingType === 'direct_purchase'
                         ? 'bg-blue-50 dark:bg-blue-900/40 text-blue dark:text-blue-300'
                         : item.listingType === 'consignment'
                           ? 'bg-purple-50 dark:bg-purple-900/40 text-purple-600 dark:text-purple-300'
-                          : 'bg-amber-50 dark:bg-amber-900/40 text-amber-600 dark:text-amber-300'
+                          : item.listingType === 'admin'
+                            ? 'bg-amber-50 dark:bg-amber-900/40 text-amber-600 dark:text-amber-300'
+                            : 'bg-neutral-100 dark:bg-neutral-700/40 text-neutral-600 dark:text-neutral-300'
                     }`}
                   >
                     {getListingTypeLabel(item.listingType)}
                   </span>
                 </div>
 
-                <div className="flex items-center gap-3">
+                <div className="flex items-center gap-3 flex-wrap">
                   <span className="text-2xl font-bold bg-gradient-to-r from-orange-500 to-rose-500 bg-clip-text text-transparent">
                     {numberFormat(item.askingPrice?.price / 100, Currencies?.NGN)}
                   </span>
-                  {item.askingPrice?.negotiable && (
+                  {item.formerPrice && (
+                    <span className="text-sm text-neutral-400 line-through">
+                      {numberFormat(item.formerPrice / 100, Currencies?.NGN)}
+                    </span>
+                  )}
+                  {item.discountPercent && (
+                    <span className="text-xs bg-emerald-50 dark:bg-emerald-900/30 text-emerald-600 dark:text-emerald-400 px-2 py-0.5 rounded-full font-bold">
+                      -{item.discountPercent}% OFF
+                    </span>
+                  )}
+                  {item.askingPrice?.negotiable && !item.formerPrice && (
                     <span className="text-[12px] bg-gradient-to-r from-orange-50 to-rose-50 dark:from-orange-900/20 dark:to-rose-900/20 text-orange-600 dark:text-orange-400 px-2 py-1 rounded-full font-medium">
                       Negotiable
                     </span>

@@ -6,7 +6,7 @@ import { listingTag, storeTag, creatorTag, savedProductTag } from '../tags';
 // TYPES
 // ═══════════════════════════════════════════════════════════════════════════
 
-export type ListingType = 'self_listing' | 'consignment' | 'direct_purchase';
+export type ListingType = 'self_listing' | 'consignment' | 'direct_purchase' | 'admin';
 
 export type ListingStatus =
   | 'draft'

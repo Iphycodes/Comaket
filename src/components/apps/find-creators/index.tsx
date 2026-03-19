@@ -403,15 +403,32 @@ const StoreCard: React.FC<{
               <span className="text-lg font-bold text-white">{nameInitial}</span>
             </div>
           )}
-          {store.status === 'active' && (
+          {store.isVerified || store.isSuperVerified ? (
+            <div className="absolute -bottom-0.5 -right-0.5 w-5 h-5 bg-white dark:bg-neutral-800 rounded-full flex items-center justify-center">
+              {store.isSuperVerified ? (
+                <i className="ri-verified-badge-fill text-[#E8A800] text-sm" />
+              ) : (
+                <VerifiedBadge />
+              )}
+            </div>
+          ) : store.status === 'active' ? (
             <div className="absolute -bottom-1 -right-1 w-3.5 h-3.5 bg-emerald-400 rounded-full ring-2 ring-white dark:ring-neutral-800" />
-          )}
+          ) : null}
         </div>
 
         {/* Info */}
         <div className="flex-1 min-w-0">
           <h3 className="font-bold text-[15px] text-neutral-900 dark:text-white truncate leading-tight">
             {store.name}
+            {(store.isVerified || store.isSuperVerified) && (
+              <span className="inline-flex ml-1 align-middle">
+                {store.isSuperVerified ? (
+                  <i className="ri-verified-badge-fill text-[#E8A800] text-xs" />
+                ) : (
+                  <i className="ri-verified-badge-fill text-[#1D9BF0] text-xs" />
+                )}
+              </span>
+            )}
           </h3>
           {store.creatorId && (
             <p className="text-[11px] text-neutral-500 dark:text-blue/60 mt-0.5 truncate">

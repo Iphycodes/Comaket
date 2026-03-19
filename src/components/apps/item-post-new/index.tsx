@@ -296,7 +296,7 @@ Price: ${formattedPrice}`;
             {postUserProfile?.isVerified && (
               <i
                 className={`ri-verified-badge-fill ${
-                  postUserProfile?.isSuperVerified ? 'text-[#D4A017]' : 'text-[#1D9BF0]'
+                  postUserProfile?.isSuperVerified ? 'text-[#E8A800]' : 'text-[#1D9BF0]'
                 } text-[18px]`}
               />
             )}

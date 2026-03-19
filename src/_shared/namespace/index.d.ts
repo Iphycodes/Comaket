@@ -123,7 +123,13 @@ export interface mockMarketItemType {
   feePaymentStatus: 'processed' | 'pending' | 'awaiting payment' | 'awaiting approval';
 }
 
-export type ListingType = 'self-listing' | 'consignment' | 'direct-purchase';
+export type ListingType =
+  | 'self-listing'
+  | 'consignment'
+  | 'direct-purchase'
+  | 'self_listing'
+  | 'direct_purchase'
+  | 'admin';
 
 export interface MediaItem {
   url: string;
@@ -161,6 +167,9 @@ export interface MarketItem {
   comments: Record<string, any>[];
   isBuyable: boolean;
   listingType: ListingType;
+  formerPrice?: number | null;
+  discountPercent?: number | null;
+  discountPrice?: number | null;
   createdAt?: string;
 }
 
