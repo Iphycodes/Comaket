@@ -43,23 +43,37 @@ export const transformListing = (listing: any) => {
     totalSales: listing.totalSales || 0,
     postUserProfile: {
       isStore: !isEmpty(store),
-      displayName: !isEmpty(store) ? store?.name : `${user?.firstName} ${user?.lastName}`,
-      userName: creator?.username,
+      displayName: !isEmpty(store)
+        ? store?.name || 'Store'
+        : !isEmpty(user)
+          ? `${user?.firstName || ''} ${user?.lastName || ''}`.trim() || 'Seller'
+          : 'Kraft Official',
+      userName: creator?.username || null,
       profilePicUrl: !isEmpty(store)
-        ? store?.logo
-        : creator?.profileImageUrl ?? listing?.userId?.avatar,
-      id: !isEmpty(store) ? store?._id : creator?._id,
-      isVerified: !isEmpty(store) ? store?.isVerified : creator?.isVerified,
-      isSuperVerified: !isEmpty(store) ? store?.isSuperVerified : creator?.isSuperVerified,
+        ? store?.logo || null
+        : creator?.profileImageUrl ?? listing?.userId?.avatar ?? null,
+      id: !isEmpty(store) ? store?._id || null : creator?._id || null,
+      isVerified: !isEmpty(store) ? store?.isVerified ?? false : creator?.isVerified ?? false,
+      isSuperVerified: !isEmpty(store)
+        ? store?.isSuperVerified ?? false
+        : creator?.isSuperVerified ?? false,
       phoneNumber:
-        listing.whatsappNumber || !isEmpty(store)
-          ? store?.whatsappNumber ?? store?.phoneNumber
-          : creator?.whatsappNumber ?? listing?.phoneNumber,
+        listing?.whatsappNumber ||
+        (!isEmpty(store) ? store?.whatsappNumber ?? store?.phoneNumber ?? null : null) ||
+        creator?.whatsappNumber ||
+        listing?.phoneNumber ||
+        null,
       location: !isEmpty(store)
-        ? `${store?.location?.city}, ${store?.location?.state}`
-        : `${creator?.location?.city}, ${creator?.location?.state}`,
+        ? [store?.location?.city, store?.location?.state].filter(Boolean).join(', ') || 'Nigeria'
+        : !isEmpty(creator)
+          ? [creator?.location?.city, creator?.location?.state].filter(Boolean).join(', ') ||
+            'Nigeria'
+          : 'Nigeria',
     },
     ownerId: user?._id || (typeof listing.userId === 'string' ? listing.userId : null),
+    formerPrice: listing.formerPrice || null, // Original price before discount (kobo)
+    discountPercent: listing.discountPercent || null, // e.g. 25 = 25% off
+    discountPrice: listing.discountPrice || null, // Discounted price (kobo)
     _raw: listing,
   };
 };

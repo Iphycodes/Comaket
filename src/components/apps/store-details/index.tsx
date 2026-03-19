@@ -57,7 +57,7 @@ const getIndustryLabel = (key: string): string =>
 const VerifiedBadge: React.FC<{ isSuper?: boolean }> = ({ isSuper = false }) => (
   <i
     className={`ri-verified-badge-fill ${
-      isSuper ? 'text-[#D4A017]' : 'text-[#1D9BF0]'
+      isSuper ? 'text-[#E8A800]' : 'text-[#1D9BF0]'
     } text-[20px]`}
   />
 );
@@ -351,6 +351,7 @@ const StoreDetails: React.FC<StoreDetailsProps> = ({
   const logoUrl = store?.logo || '';
   const coverImageUrl = store?.coverImage || '';
   const isVerified = store?.isVerified || false;
+  const isSuperVerified = store?.isSuperVerified || false;
   const status = store?.status || 'active';
   const categories = store?.categories || store?.industries || [];
   const tags = store?.tags || [];
@@ -798,9 +799,9 @@ const StoreDetails: React.FC<StoreDetailsProps> = ({
                 <h1 className="text-xl sm:text-2xl font-bold text-neutral-900 dark:text-white">
                   {storeName}
                 </h1>
-                {isVerified && (
-                  <Tooltip title="Verified Store">
-                    <VerifiedBadge />
+                {(isVerified || isSuperVerified) && (
+                  <Tooltip title={isSuperVerified ? 'Super Verified Store' : 'Verified Store'}>
+                    <VerifiedBadge isSuper={isSuperVerified} />
                   </Tooltip>
                 )}
               </div>
