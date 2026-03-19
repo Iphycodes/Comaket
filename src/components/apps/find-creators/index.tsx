@@ -430,7 +430,7 @@ const StoreCard: React.FC<{
               </span>
             )}
           </h3>
-          {store.creatorId && (
+          {store.creatorId && !store.creatorId?.isSystemAccount && (
             <p className="text-[11px] text-neutral-500 dark:text-blue/60 mt-0.5 truncate">
               Owned by: @
               <span

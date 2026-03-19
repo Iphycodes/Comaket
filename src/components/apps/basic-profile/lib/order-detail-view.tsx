@@ -225,7 +225,7 @@ const OrderDetailView: React.FC<OrderDetailViewProps> = ({
       {/* ── Seller / Store Card ── */}
       {!isSellerView && (seller || store) && (
         <div
-          onClick={() => store && push(`/store/${store._id || store.id}`)}
+          onClick={() => store && push(`/stores/${store._id || store.id}`)}
           className={`flex items-center gap-3 p-3.5 bg-neutral-50 dark:bg-neutral-800/50 rounded-xl border border-neutral-100 dark:border-neutral-700/40 ${
             store
               ? 'cursor-pointer hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors group'
