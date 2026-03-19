@@ -19,11 +19,11 @@ const SideNavHeader: React.FC<Props> = ({ toggleSider }) => {
               priority
               src={
                 theme === 'dark'
-                  ? '/assets/imgs/logos/kraft-logo-dark.png'
-                  : '/assets/imgs/logos/kraft-logo-light.png'
+                  ? '/assets/imgs/logos/kraft-logo-splash.png'
+                  : '/assets/imgs/logos/kraft-logo-splash.png'
               }
               alt="Kraft logo"
-              style={{ width: '80px', height: '40px' }}
+              style={{ width: '120px', height: '60px' }}
               width={200}
               height={200}
             />

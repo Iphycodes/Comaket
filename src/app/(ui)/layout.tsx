@@ -2,7 +2,6 @@
 import React, { ReactElement, Suspense, useEffect } from 'react';
 import { Provider, useSelector } from 'react-redux';
 import { PersistGate } from 'redux-persist/integration/react';
-import { Rings } from 'react-preloader-icon';
 import { AppLoader } from '@grc/_shared/components/app-loader';
 import NetWorkDetector from '@grc/_shared/components/network-detector';
 import { persistor, store, RootState } from '@grc/redux/store';
@@ -37,8 +36,8 @@ const BaseLayout = ({ children }: LayoutProps) => {
   return (
     <Provider store={store}>
       <CookieSync />
-      <PersistGate loading={null} persistor={persistor}>
-        <Suspense fallback={<AppLoader use={Rings} theme={''} />}>
+      <PersistGate loading={<AppLoader />} persistor={persistor}>
+        <Suspense fallback={<AppLoader />}>
           <ConfigProvider
             theme={{
               algorithm: theme === 'dark' ? darkAlgorithm : defaultAlgorithm,
