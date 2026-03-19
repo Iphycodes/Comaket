@@ -289,7 +289,13 @@ Price: ${formattedPrice}`;
               <h3 className="font-medium text-lg">
                 {item.postUserProfile?.displayName || item.postUserProfile?.userName}
               </h3>
-              {item.postUserProfile?.isVerified && <span className="text-blue text-xs">✓</span>}
+              {(item.postUserProfile?.isVerified || item.postUserProfile?.isSuperVerified) && (
+                <i
+                  className={`ri-verified-badge-fill ${
+                    item.postUserProfile?.isSuperVerified ? 'text-[#E8A800]' : 'text-[#1D9BF0]'
+                  } text-[18px] flex-shrink-0`}
+                />
+              )}
             </div>
             <div className="flex items-center gap-3 text-sm text-neutral-500">
               <span className="flex items-center gap-1">
@@ -381,8 +387,12 @@ Price: ${formattedPrice}`;
                   >
                     {item.postUserProfile?.displayName || item.postUserProfile?.userName}
                   </h3>
-                  {item.postUserProfile?.isVerified && (
-                    <i className="ri-verified-badge-fill text-[#1D9BF0] text-[14px] flex-shrink-0" />
+                  {(item.postUserProfile?.isVerified || item.postUserProfile?.isSuperVerified) && (
+                    <i
+                      className={`ri-verified-badge-fill ${
+                        item.postUserProfile?.isSuperVerified ? 'text-[#E8A800]' : 'text-[#1D9BF0]'
+                      } text-[14px] flex-shrink-0`}
+                    />
                   )}
                 </div>
                 <div className="flex items-center gap-3 text-sm text-neutral-500">

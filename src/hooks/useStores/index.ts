@@ -70,7 +70,7 @@ export const useStores = ({
     if (fetchMyStores && isAuthenticated) {
       triggerGetMyStores();
     }
-  }, [fetchMyStores]);
+  }, [fetchMyStores, isAuthenticated]);
 
   useEffect(() => {
     if (storeId) {

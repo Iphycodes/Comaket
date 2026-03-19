@@ -39,10 +39,14 @@ export const appMiddleware =
       action?.error?.name === 'AbortError' ||
       action?.payload?.status === 'FETCH_ERROR';
 
+    // Suppress error toast for 404s on queries — the page UI handles "not found" states
+    const statusCode = action?.payload?.status || action?.payload?.data?.statusCode;
+    const is404 = statusCode === 404;
+
     if (isRejectedWithValue(action) && !noErrorMessage && !isAborted) {
       if (isMutation) {
         message.error(errMssg);
-      } else {
+      } else if (!is404) {
         message.error('A problem occurred, please refresh');
       }
     }
