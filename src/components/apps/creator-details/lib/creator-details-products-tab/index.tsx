@@ -72,10 +72,15 @@ const transformListingToMarketItem = (listing: any): MarketItem | null => {
     productTags: listing.tags || [],
     quantity: listing.quantity ?? 1,
     availability: listing.status === 'live',
-    isBuyable: listing.type === 'direct_purchase',
+    isBuyable:
+      ['consignment', 'direct_purchase', 'admin'].includes(listing.type) &&
+      listing.status === 'live',
     sponsored: false,
     comments: [],
-    listingType: listing.type === 'consignment' ? 'consignment' : 'self-listing',
+    listingType: listing.type || 'self_listing',
+    formerPrice: listing.formerPrice || null,
+    discountPercent: listing.discountPercent || null,
+    discountPrice: listing.discountPrice || null,
   } as MarketItem;
 };
 

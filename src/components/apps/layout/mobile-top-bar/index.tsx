@@ -166,8 +166,8 @@ const MobileTopBar: React.FC<MobileTopBarProps> = ({
             priority
             src={
               theme === 'dark'
-                ? '/assets/imgs/logos/kraft-logo-dark.png'
-                : '/assets/imgs/logos/kraft-logo-light.png'
+                ? '/assets/imgs/logos/kraft-logo-splash.png'
+                : '/assets/imgs/logos/kraft-logo-splash.png'
             }
             alt="Kraft logo"
             width={60}

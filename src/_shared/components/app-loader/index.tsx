@@ -1,27 +1,13 @@
-import { Preloader, TailSpin } from 'react-preloader-icon';
-import React, { FC } from 'react';
-import { LoaderProps } from 'react-preloader-icon/Preloader';
+import React from 'react';
 
-export const AppLoader = (props: {
-  size?: number;
-  style?: Record<string, any>;
-  use?: FC<LoaderProps>;
-  theme?: string;
-}) => {
-  const { size = 80, style, use } = props;
+export const AppLoader = () => {
   return (
-    <Preloader
-      use={use || TailSpin}
-      size={size}
-      strokeWidth={8}
-      strokeColor={'#F0AD4E'}
-      style={{
-        position: 'absolute',
-        top: '30vh',
-        left: '50vw',
-        zIndex: 10,
-        ...style,
-      }}
-    />
+    <div className="fixed inset-0 z-[9999] flex items-center justify-center bg-white dark:bg-neutral-950">
+      <img
+        src="/assets/imgs/logos/kraft-logo-splash.png"
+        alt="Kraft"
+        className="h-24 object-contain animate-pulse"
+      />
+    </div>
   );
 };

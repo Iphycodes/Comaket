@@ -1,6 +1,4 @@
-import { FC, ReactNode } from 'react';
-import { Rings } from 'react-preloader-icon';
-import { LoaderProps } from 'react-preloader-icon/Preloader';
+import { ReactNode } from 'react';
 import { AppLoader } from '../app-loader';
 import { motion } from 'framer-motion';
 import styled from 'styled-components';
@@ -8,9 +6,7 @@ import styled from 'styled-components';
 interface WithLoaderProps {
   loading: boolean | undefined;
   mobileResponsive: boolean;
-  use?: FC<LoaderProps>;
   children: ReactNode | ReactNode[];
-  theme?: string;
 }
 
 const variants = (loading: boolean | undefined) => ({
@@ -20,16 +16,10 @@ const variants = (loading: boolean | undefined) => ({
 });
 
 export const WithLoaderRender = (props: WithLoaderProps) => {
-  const { loading, mobileResponsive, children, use, theme } = props;
+  const { loading, mobileResponsive, children } = props;
   return (
     <>
-      {loading && (
-        <AppLoader
-          use={use || Rings}
-          theme={theme}
-          style={{ left: mobileResponsive ? '38vw' : '38vw' }}
-        />
-      )}
+      {loading && <AppLoader />}
       <StyledAppContent
         $mobileResponsive={mobileResponsive}
         $loading={loading}

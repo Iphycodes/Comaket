@@ -547,7 +547,7 @@ const StoreDetails: React.FC<StoreDetailsProps> = ({
       children: (
         <div className={isMobile ? 'px-4' : ''}>
           <div className="space-y-5">
-            {creatorProfile && (
+            {creatorProfile && !creatorProfile?.isSystemAccount && (
               <div>
                 <h3 className="text-sm font-semibold text-neutral-500 dark:text-neutral-400 uppercase tracking-wider mb-3">
                   Store Owner

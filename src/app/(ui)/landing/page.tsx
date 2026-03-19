@@ -174,9 +174,9 @@ function Navbar({ onSignIn, onSignUp }: { onSignIn: () => void; onSignUp: () => 
               src={
                 scrolled
                   ? theme === 'dark'
-                    ? '/assets/imgs/logos/kraft-logo-dark.png'
-                    : '/assets/imgs/logos/kraft-logo-light.png'
-                  : '/assets/imgs/logos/kraft-logo-dark.png'
+                    ? '/assets/imgs/logos/kraft-logo-splash.png'
+                    : '/assets/imgs/logos/kraft-logo-splash.png'
+                  : '/assets/imgs/logos/kraft-logo-splash.png'
               }
               alt="Kraft"
               width={90}

@@ -430,7 +430,7 @@ const StoreCard: React.FC<{
               </span>
             )}
           </h3>
-          {store.creatorId && (
+          {store.creatorId && !store.creatorId?.isSystemAccount && (
             <p className="text-[11px] text-neutral-500 dark:text-blue/60 mt-0.5 truncate">
               Owned by: @
               <span
@@ -687,7 +687,7 @@ const Creators: React.FC<CreatorsProps> = (props) => {
       'bg-neutral-50 dark:bg-neutral-900/95 backdrop-blur-md z-20 border-b border-neutral-200 dark:border-neutral-700/60';
 
     if (!isMobile) {
-      return `sticky top-0 ${base} py-0`;
+      return `sticky top-0 ${base} pt-3 pb-0`;
     }
 
     // Mobile modes
@@ -725,22 +725,18 @@ const Creators: React.FC<CreatorsProps> = (props) => {
     >
       <div className={`w-full ${!isMobile ? 'mx-auto px-4' : 'px-3'}`}>
         {/* ── Header ──────────────────────────────────────────────────── */}
-        <div ref={headerRef} className={getHeaderClassName()} style={getHeaderStyle()}>
-          {/* Title + subtitle */}
-          {!isMobile && (
-            <div className={isMobile ? 'pt-2 pb-2' : 'pt-4 pb-3'}>
-              <h1
-                className={`${
-                  isMobile ? 'text-lg' : 'text-xl'
-                } font-bold text-neutral-900 dark:text-white flex items-center gap-2`}
-              >
-                <Sparkles size={20} className="text-blue" />
-                Discover Creators
-              </h1>
-              <p className="text-xs text-neutral-400 mt-0.5">Find creators and stores on KRaft</p>
-            </div>
-          )}
+        {/* Title + subtitle — NOT sticky on desktop */}
+        {!isMobile && (
+          <div className="pt-4 pb-3">
+            <h1 className="text-xl font-bold text-neutral-900 dark:text-white flex items-center gap-2">
+              <Sparkles size={20} className="text-blue" />
+              Discover Creators
+            </h1>
+            <p className="text-xs text-neutral-400 mt-0.5">Find creators and stores on KRaft</p>
+          </div>
+        )}
 
+        <div ref={headerRef} className={getHeaderClassName()} style={getHeaderStyle()}>
           <div
             className={isMobile ? 'flex-col items-start gap-1' : 'flex w-full items-center gap-2'}
           >
@@ -857,7 +853,7 @@ const Creators: React.FC<CreatorsProps> = (props) => {
                 </div>
               </div>
             ) : (
-              <div className="pb-3 space-y-2">
+              <div className="pb-3 space-y-2 overflow-hidden">
                 {/* Row 1: Search + Location filters */}
                 <div className="flex items-center gap-2">
                   <div className="relative flex-1">
@@ -916,7 +912,7 @@ const Creators: React.FC<CreatorsProps> = (props) => {
 
                 {/* Row 2: Industry tags — horizontal scroll */}
                 <div
-                  className="flex items-center gap-1.5 overflow-x-auto"
+                  className="flex items-center gap-1.5 overflow-x-auto max-w-full"
                   style={{ scrollbarWidth: 'none', msOverflowStyle: 'none' }}
                 >
                   <button

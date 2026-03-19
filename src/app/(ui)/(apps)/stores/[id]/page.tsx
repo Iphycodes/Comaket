@@ -35,7 +35,7 @@ const StoreDetailPage = () => {
 
   useEffect(() => {
     if (!storeId || !store) return;
-    setFollowersCount(store?.followersCount || store?.totalFollowers || 0);
+    setFollowersCount(store?.followers || store?.followersCount || store?.totalFollowers || 0);
 
     if (isAuthenticated && storeId) {
       checkFollow({ targetType: 'store', targetIds: [storeId] })
