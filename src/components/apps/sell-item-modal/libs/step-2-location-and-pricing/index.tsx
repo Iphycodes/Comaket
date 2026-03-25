@@ -1,52 +1,15 @@
 'use client';
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useMemo } from 'react';
 import { Form, InputNumber, Select } from 'antd';
 import { FormInstance } from 'antd/lib/form';
 import { Info, Wallet, Percent, HandCoins, PartyPopper } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { SellingModel } from '@grc/_shared/namespace/sell-item';
 import { fetchData } from '@grc/_shared/helpers';
+import { useGetPlatformSettingsQuery } from '@grc/services/payments';
 
-// ═══════════════════════════════════════════════════════════════════════════
-// ENV-BASED CONFIG
-// ═══════════════════════════════════════════════════════════════════════════
-
-const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || 'Comaket';
-
-// Free listing — if true, fees are calculated but struck out
-const IS_FREE_LISTING = process.env.NEXT_PUBLIC_FREE_LISTING === 'true';
-
-// No commission — if true, consignment commission is struck out
-const IS_NO_COMMISSION = process.env.NEXT_PUBLIC_NO_COMMISSION === 'true';
-
-// Fee percentages from env (fallback to defaults)
-const SELF_LISTING_FEE_PERCENT = Number(process.env.NEXT_PUBLIC_SELF_LISTING_FEE_PERCENT) || 5;
-const CONSIGNMENT_COMMISSION_PERCENT =
-  Number(process.env.NEXT_PUBLIC_CONSIGNMENT_COMMISSION_PERCENT) || 20;
-
-// Fee caps — once product price exceeds cap, fee is calculated on the cap amount only
-const LISTING_FEE_CAP_KOBO = Number(process.env.NEXT_PUBLIC_LISTING_FEE_CAP_KOBO) || 0; // 0 = no cap
-const CONSIGNMENT_COMMISSION_CAP_KOBO =
-  Number(process.env.NEXT_PUBLIC_CONSIGNMENT_COMMISSION_CAP_KOBO) || 0;
-
-// ═══════════════════════════════════════════════════════════════════════════
-// FEE CALCULATIONS — capped: fee = percent × min(price, cap)
-// ═══════════════════════════════════════════════════════════════════════════
-
-const calculateListingFee = (priceInKobo: number) => {
-  const base = LISTING_FEE_CAP_KOBO > 0 ? Math.min(priceInKobo, LISTING_FEE_CAP_KOBO) : priceInKobo;
-  return Math.round(base * (SELF_LISTING_FEE_PERCENT / 100));
-};
-
-const calculateConsignmentCut = (priceInKobo: number) => {
-  const base =
-    CONSIGNMENT_COMMISSION_CAP_KOBO > 0
-      ? Math.min(priceInKobo, CONSIGNMENT_COMMISSION_CAP_KOBO)
-      : priceInKobo;
-  const platformCut = Math.round(base * (CONSIGNMENT_COMMISSION_PERCENT / 100));
-  return { platformCut, sellerCut: priceInKobo - platformCut };
-};
+const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || 'Kraft';
 
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -76,6 +39,38 @@ const SellItemPricing: React.FC<Props> = ({
   quantity = 1,
 }) => {
   const [askPrice, setAskPrice] = useState<number>(initialData?.askPrice || 0);
+
+  // ── Platform Settings (from API) ────────────────────────────────────
+  const { data: platformSettingsData } = useGetPlatformSettingsQuery();
+  const ps = platformSettingsData?.data || {};
+
+  const IS_FREE_LISTING = ps.freeListing ?? false;
+  const IS_NO_COMMISSION = ps.noCommission ?? false;
+  const SELF_LISTING_FEE_PERCENT = ps.selfListingFeePercent ?? 5;
+  const CONSIGNMENT_COMMISSION_PERCENT = ps.consignmentCommissionPercent ?? 15;
+  const LISTING_FEE_CAP_KOBO = ps.listingFeeCapKobo ?? 0;
+  const CONSIGNMENT_COMMISSION_CAP_KOBO = ps.consignmentCommissionCapKobo ?? 0;
+
+  const calculateListingFee = useMemo(
+    () => (priceInKobo: number) => {
+      const base =
+        LISTING_FEE_CAP_KOBO > 0 ? Math.min(priceInKobo, LISTING_FEE_CAP_KOBO) : priceInKobo;
+      return Math.round(base * (SELF_LISTING_FEE_PERCENT / 100));
+    },
+    [LISTING_FEE_CAP_KOBO, SELF_LISTING_FEE_PERCENT]
+  );
+
+  const calculateConsignmentCut = useMemo(
+    () => (priceInKobo: number) => {
+      const base =
+        CONSIGNMENT_COMMISSION_CAP_KOBO > 0
+          ? Math.min(priceInKobo, CONSIGNMENT_COMMISSION_CAP_KOBO)
+          : priceInKobo;
+      const platformCut = Math.round(base * (CONSIGNMENT_COMMISSION_PERCENT / 100));
+      return { platformCut, sellerCut: priceInKobo - platformCut };
+    },
+    [CONSIGNMENT_COMMISSION_CAP_KOBO, CONSIGNMENT_COMMISSION_PERCENT]
+  );
 
   // ── Location state ──────────────────────────────────────────────────
   const [states, setStates] = useState<LocationOption[]>([]);

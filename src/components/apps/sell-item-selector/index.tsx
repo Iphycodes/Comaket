@@ -3,11 +3,8 @@
 import React from 'react';
 import { motion } from 'framer-motion';
 import { Store, Handshake, BadgeDollarSign, ArrowRight, Shield, Clock, Zap } from 'lucide-react';
-import {
-  CONSIGNMENT_COMMISSION_PERCENT,
-  LISTING_FEE_PERCENT,
-  SellingModel,
-} from '@grc/_shared/namespace/sell-item';
+import { SellingModel } from '@grc/_shared/namespace/sell-item';
+import { useGetPlatformSettingsQuery } from '@grc/services/payments';
 
 interface SellTypeSelectorProps {
   onSelect: (model: SellingModel) => void;
@@ -41,7 +38,7 @@ const sellOptions: {
       'Set your own price & terms',
       'Item goes live after fee payment',
     ],
-    fee: `${LISTING_FEE_PERCENT}% listing fee`,
+    fee: '__SELF_FEE__',
     gradient: 'from-blue to-indigo-600',
     accentColor: 'blue',
     bgPattern: 'radial-gradient(circle at 80% 20%, rgba(99,102,241,0.08) 0%, transparent 50%)',
@@ -57,10 +54,10 @@ const sellOptions: {
     features: [
       'Zero upfront cost',
       'We handle everything',
-      `You get ${100 - CONSIGNMENT_COMMISSION_PERCENT}% when it sells`,
+      '__CONSIGNMENT_SELLER_CUT__',
       'Professional product photography',
     ],
-    fee: `${CONSIGNMENT_COMMISSION_PERCENT}% commission on sale`,
+    fee: '__CONSIGNMENT_FEE__',
     gradient: 'from-violet-500 to-purple-600',
     accentColor: 'violet',
     bgPattern: 'radial-gradient(circle at 20% 80%, rgba(139,92,246,0.08) 0%, transparent 50%)',
@@ -87,6 +84,22 @@ const sellOptions: {
 ];
 
 const SellTypeSelector: React.FC<SellTypeSelectorProps> = ({ onSelect, selected }) => {
+  const { data: platformSettingsData } = useGetPlatformSettingsQuery();
+  const ps = platformSettingsData?.data || {};
+  const selfFeePercent = ps.selfListingFeePercent ?? 5;
+  const consignmentPercent = ps.consignmentCommissionPercent ?? 15;
+
+  // Replace placeholders with dynamic values
+  const options = sellOptions.map((opt) => ({
+    ...opt,
+    fee: opt.fee
+      .replace('__SELF_FEE__', `${selfFeePercent}% listing fee`)
+      .replace('__CONSIGNMENT_FEE__', `${consignmentPercent}% commission on sale`),
+    features: opt.features.map((f) =>
+      f.replace('__CONSIGNMENT_SELLER_CUT__', `You get ${100 - consignmentPercent}% when it sells`)
+    ),
+  }));
+
   return (
     <div className="space-y-4">
       <div className="mb-6">
@@ -99,7 +112,7 @@ const SellTypeSelector: React.FC<SellTypeSelectorProps> = ({ onSelect, selected 
       </div>
 
       <div className="grid grid-cols-1 gap-4">
-        {sellOptions.map((option, index) => {
+        {options.map((option, index) => {
           const Icon = option.icon;
           const AccentIcon = option.accentIcon;
           const isSelected = selected === option.model;

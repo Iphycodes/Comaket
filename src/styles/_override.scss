@@ -99,6 +99,20 @@
 .dash-sider {
   transition: all 0.4s ease !important;
 
+  // Make sider a proper flex column so bottom section stays pinned
+  & > div {
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+
+  .sidebar-bottom-fixed {
+    background: inherit !important;
+    position: relative;
+    z-index: 2;
+  }
+
   .ant-select-selector {
     // border: 1px solid black !important;
     box-shadow: 0 2px 4px rgba(0, 0, 0, 0.09);

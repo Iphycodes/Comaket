@@ -20,6 +20,8 @@ export const savedProductTag = 'SavedProduct' as const;
 export const shippingAddressTag = 'ShippingAddress' as const;
 export const deliveryZoneTag = 'DeliveryZone' as const;
 export const disputeTag = 'Dispute' as const;
+export const alertTag = 'Alert' as const;
+export const chatTag = 'Chat' as const;
 
 export default [
   accountTag,
@@ -36,4 +38,6 @@ export default [
   shippingAddressTag,
   deliveryZoneTag,
   disputeTag,
+  alertTag,
+  chatTag,
 ];

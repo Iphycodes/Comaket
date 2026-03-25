@@ -17,10 +17,12 @@ import {
   Sun,
   Moon,
   User,
+  Bell,
 } from 'lucide-react';
 import { AppContext } from '@grc/app-context';
 import { getFirstCharacter, getRandomColorByString } from '@grc/_shared/helpers';
 import { useTheme } from 'next-themes';
+import { useGetUnreadAlertCountQuery } from '@grc/services/alerts';
 
 interface MobileTopBarProps {
   setIsCreateStoreModalOpen: Dispatch<SetStateAction<boolean>>;
@@ -40,6 +42,11 @@ const MobileTopBar: React.FC<MobileTopBarProps> = ({
   const router = useRouter();
   const { setIsAuthModalOpen } = useContext(AppContext);
   const { theme, setTheme } = useTheme();
+  const { data: unreadData } = useGetUnreadAlertCountQuery(undefined, {
+    skip: !userProfile,
+    pollingInterval: 30000,
+  });
+  const unreadCount = unreadData?.data?.count || 0;
 
   const firstName = userProfile?.firstName || '';
   const avatarUrl = userProfile?.avatarUrl;
@@ -161,7 +168,10 @@ const MobileTopBar: React.FC<MobileTopBarProps> = ({
     <div className="fixed top-0 left-0 right-0 z-[1000] bg-white dark:bg-neutral-900 border-b border-neutral-200 dark:border-neutral-700/60">
       <div className="flex items-center justify-between gap-1 px-3 h-10">
         {/* Left: Logo */}
-        <span className="cursor-pointer flex-shrink-0" onClick={() => router.push('/')}>
+        <span
+          className="cursor-pointer flex-shrink-0"
+          onClick={() => router.push(userProfile ? '/market' : '/')}
+        >
           <Image
             priority
             src={
@@ -176,7 +186,7 @@ const MobileTopBar: React.FC<MobileTopBarProps> = ({
           />
         </span>
 
-        <div className="flex items-center gap-1">
+        <div className="flex items-center gap-2">
           {/* My Stores dropdown — only if user is a creator WITH stores */}
           {hasStores && (
             <Dropdown menu={{ items: storeMenuItems }} trigger={['click']} placement="bottomLeft">
@@ -200,6 +210,22 @@ const MobileTopBar: React.FC<MobileTopBarProps> = ({
               <Moon size={16} className="text-neutral-500" />
             )}
           </button>
+
+          {/* Bell icon — alerts */}
+          {userProfile && (
+            <button
+              onClick={() => router.push('/alerts')}
+              className="relative w-8 h-8 rounded-full flex items-center justify-center hover:bg-neutral-100 dark:hover:bg-neutral-800 transition-colors"
+              aria-label="Notifications"
+            >
+              <Bell size={16} className="text-neutral-600 dark:text-neutral-400" />
+              {unreadCount > 0 && (
+                <span className="absolute -top-0.5 -right-0.5 min-w-[16px] h-4 flex items-center justify-center rounded-full bg-red-500 text-white text-[9px] font-bold px-1">
+                  {unreadCount > 99 ? '99+' : unreadCount}
+                </span>
+              )}
+            </button>
+          )}
 
           {/* Right: User avatar / emoji dropdown */}
           <Dropdown menu={{ items: userMenuItems }} trigger={['click']} placement="bottomRight">

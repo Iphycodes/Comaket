@@ -57,6 +57,8 @@ interface MarketProps {
   onBuyNow: (item: any) => void;
   onToggleSave: (item: any) => void;
   onWhatsAppMessage: (item: any) => void;
+  onMessage?: (item: any) => void;
+  isMessageLoading?: boolean;
   onVendorClick: (item: any) => void;
   onGridItemClick: (item: any) => void;
   onCloseGridModal: () => void;
@@ -97,6 +99,8 @@ const Market: React.FC<MarketProps> = ({
   onBuyNow,
   onToggleSave,
   onWhatsAppMessage,
+  onMessage,
+  isMessageLoading,
   onVendorClick,
   onGridItemClick,
   onCloseGridModal,
@@ -308,7 +312,7 @@ const Market: React.FC<MarketProps> = ({
         initial={false}
         animate="visible"
         className={`grid grid-cols-2 md:grid-cols-2 lg:grid-cols-2 xl:grid-cols-3 ${
-          isMobile ? 'gap-2 pb-20' : 'gap-4'
+          isMobile ? 'gap-2 pb-2' : 'gap-4'
         }`}
       >
         {listings.map((item: any) => {
@@ -538,12 +542,12 @@ const Market: React.FC<MarketProps> = ({
                           <button
                             onClick={(e) => {
                               e.stopPropagation();
-                              onWhatsAppMessage(item);
+                              onMessage ? onMessage(item) : onWhatsAppMessage(item);
                             }}
-                            className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all shadow-sm hover:shadow-md"
+                            className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all shadow-sm hover:shadow-md"
                           >
                             <MessageCircle size={14} />
-                            WhatsApp
+                            Chat Seller
                           </button>
                           <motion.button
                             whileTap={{ scale: 0.9 }}
@@ -567,12 +571,12 @@ const Market: React.FC<MarketProps> = ({
                         <button
                           onClick={(e) => {
                             e.stopPropagation();
-                            onWhatsAppMessage(item);
+                            onMessage ? onMessage(item) : onWhatsAppMessage(item);
                           }}
-                          className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all shadow-sm hover:shadow-md"
+                          className="w-full bg-gradient-to-r from-blue to-indigo-600 hover:from-blue hover:to-indigo-700 text-white py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all shadow-sm hover:shadow-md"
                         >
                           <MessageCircle size={14} />
-                          WhatsApp
+                          Chat Seller
                         </button>
                         <motion.button
                           whileTap={{ scale: 0.9 }}
@@ -672,6 +676,8 @@ const Market: React.FC<MarketProps> = ({
           onBuyNow={() => onBuyNow(selectedProduct)}
           onToggleSave={() => onToggleSave(selectedProduct)}
           onWhatsAppMessage={() => onWhatsAppMessage(selectedProduct)}
+          onMessage={onMessage ? () => onMessage(selectedProduct) : undefined}
+          isMessageLoading={isMessageLoading}
           onShare={() => onShare(selectedProduct)}
           onGoBack={() => onSelectProduct('')}
         />
@@ -957,8 +963,8 @@ const Market: React.FC<MarketProps> = ({
 
               {/* Loading more skeletons */}
               {isLoadingMore && (
-                <div className={`flex justify-center py-6 ${isMobile ? '!pb-12' : ''}`}>
-                  <div className="w-6 h-6 border-2 border-neutral-300 dark:border-neutral-600 border-t-blue rounded-full animate-spin" />
+                <div className={`flex justify-center py-3 ${isMobile ? 'pb-16' : ''}`}>
+                  <div className="w-5 h-5 border-2 border-neutral-300 dark:border-neutral-600 border-t-blue rounded-full animate-spin" />
                 </div>
               )}
 

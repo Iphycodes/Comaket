@@ -3,6 +3,7 @@
 import React, { useState } from 'react';
 import { Tabs, Tooltip, Modal } from 'antd';
 import { ClipboardList, Bookmark } from 'lucide-react';
+import { useSearchParams } from 'next/navigation';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 import { useMedia } from '@grc/hooks/useMedia';
 import SavedItems from '../saved';
@@ -42,9 +43,12 @@ const BasicProfile: React.FC<BasicProfileProps> = ({
   onRefetchOrders,
 }) => {
   const isMobile = useMediaQuery(mediaSize.mobile);
+  const searchParams = useSearchParams();
+  const tabFromUrl = searchParams?.get('tab') || 'orders';
 
   const [isEditOpen, setIsEditOpen] = useState(false);
   const [selectedOrder, setSelectedOrder] = useState<any>(null);
+  const [activeTab, setActiveTab] = useState(tabFromUrl);
   const [isOrderDetailOpen, setIsOrderDetailOpen] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
 
@@ -124,7 +128,8 @@ const BasicProfile: React.FC<BasicProfileProps> = ({
         {/* Tabs — sticky on BOTH mobile and desktop */}
         <div className={`mt-2 ${isMobile ? 'px-0' : ''} pb-10`}>
           <Tabs
-            defaultActiveKey="orders"
+            activeKey={activeTab}
+            onChange={setActiveTab}
             className={`[&_.ant-tabs-nav]:!mb-4 !text-black [&_.ant-tabs-nav]:!px-4 [&_.ant-tabs-nav]:!sticky [&_.ant-tabs-nav]:!z-20 [&_.ant-tabs-nav]:!bg-white [&_.ant-tabs-nav]:dark:!bg-neutral-900 [&_.ant-tabs-ink-bar]:!hidden [&_.ant-tabs-nav-list]:!w-full [&_.ant-tabs-nav-list]:!flex [&_.ant-tabs-tab]:!flex-1 [&_.ant-tabs-tab]:!justify-center [&_.ant-tabs-tab]:!text-sm [&_.ant-tabs-tab]:!text-black dark:[&_.ant-tabs-tab]:!text-white [&_.ant-tabs-tab]:!font-medium [&_.ant-tabs-tab]:!m-0 [&_.ant-tabs-tab]:!px-4 [&_.ant-tabs-tab]:!py-2.5 [&_.ant-tabs-tab]:!rounded-lg [&_.ant-tabs-tab]:!transition-all [&_.ant-tabs-tab-active]:!font-semibold [&_.ant-tabs-tab-active]:!bg-neutral-100 [&_.ant-tabs-tab-active]:dark:!bg-neutral-700 [&_.ant-tabs-nav-list]:!bg-nutral-50 [&_.ant-tabs-nav-list]:!text-black [&_.ant-tabs-nav-list]:dark:!bg-neutral-800 [&_.ant-tabs-nav-list]:!rounded-xl [&_.ant-tabs-nav-list]:!p-1 [&_.ant-tabs-tab:hover]:!text-black dark:[&_.ant-tabs-tab:hover]:!text-white [&_.ant-tabs-tab-btn]:!text-inherit hover:[&_.ant-tabs-tab-btn]:!text-inherit [&_.ant-tabs-tab-active_.ant-tabs-tab-btn]:!text-black dark:[&_.ant-tabs-tab-active_.ant-tabs-tab-btn]:!text-white ${
               isMobile ? '[&_.ant-tabs-nav]:!top-[30px]' : '[&_.ant-tabs-nav]:!top-0'
             }`}
