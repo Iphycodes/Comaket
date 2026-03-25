@@ -19,29 +19,32 @@ export type SellItemStatus =
   | 'delisted'; // All models: item removed from marketplace
 
 // ─── Fee / Commission Config ─────────────────────────────────────────────────
-// Read from env with fallbacks
+// These are DEFAULTS only — actual values come from the platform settings API.
+// Components should use useGetPlatformSettingsQuery() from @grc/services/payments.
 
-export const LISTING_FEE_PERCENT = Number(process.env.NEXT_PUBLIC_LISTING_FEE_PERCENT ?? 5);
-export const LISTING_FEE_CAP_KOBO = Number(process.env.NEXT_PUBLIC_LISTING_FEE_CAP_KOBO ?? 500000); // ₦5,000
-export const CONSIGNMENT_COMMISSION_PERCENT = Number(
-  process.env.NEXT_PUBLIC_CONSIGNMENT_COMMISSION_PERCENT ?? 10
-);
-export const CONSIGNMENT_COMMISSION_CAP_KOBO = Number(
-  process.env.NEXT_PUBLIC_CONSIGNMENT_COMMISSION_CAP_KOBO ?? 2000000
-); // ₦20,000
+export const DEFAULT_LISTING_FEE_PERCENT = 5;
+export const DEFAULT_LISTING_FEE_CAP_KOBO = 500000; // ₦5,000
+export const DEFAULT_CONSIGNMENT_COMMISSION_PERCENT = 15;
+export const DEFAULT_CONSIGNMENT_COMMISSION_CAP_KOBO = 2000000; // ₦20,000
 
-// ─── Helper to calculate listing fee ─────────────────────────────────────────
-export const calculateListingFee = (priceKobo: number): number => {
-  const fee = Math.round((priceKobo * LISTING_FEE_PERCENT) / 100);
-  return Math.min(fee, LISTING_FEE_CAP_KOBO);
+// ─── Helper to calculate listing fee (use with API-sourced values) ───────────
+export const calculateListingFee = (
+  priceKobo: number,
+  feePercent = DEFAULT_LISTING_FEE_PERCENT,
+  capKobo = DEFAULT_LISTING_FEE_CAP_KOBO
+): number => {
+  const fee = Math.round((priceKobo * feePercent) / 100);
+  return capKobo > 0 ? Math.min(fee, capKobo) : fee;
 };
 
-/** Returns { platformCut, sellerCut } in kobo, commission capped at CONSIGNMENT_COMMISSION_CAP_KOBO */
-export const calculateConsignmentCut = (priceKobo: number) => {
-  const platformCut = Math.min(
-    Math.round((priceKobo * CONSIGNMENT_COMMISSION_PERCENT) / 100),
-    CONSIGNMENT_COMMISSION_CAP_KOBO
-  );
+/** Returns { platformCut, sellerCut } in kobo (use with API-sourced values) */
+export const calculateConsignmentCut = (
+  priceKobo: number,
+  commissionPercent = DEFAULT_CONSIGNMENT_COMMISSION_PERCENT,
+  capKobo = DEFAULT_CONSIGNMENT_COMMISSION_CAP_KOBO
+) => {
+  const base = capKobo > 0 ? Math.min(priceKobo, capKobo) : priceKobo;
+  const platformCut = Math.round((base * commissionPercent) / 100);
   const sellerCut = priceKobo - platformCut;
   return { platformCut, sellerCut };
 };

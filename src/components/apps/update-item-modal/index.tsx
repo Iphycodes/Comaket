@@ -11,8 +11,8 @@ import { useListings } from '@grc/hooks/useListings';
 import { useMedia } from '@grc/hooks/useMedia';
 import { fetchData } from '@grc/_shared/helpers';
 import {
-  LISTING_FEE_PERCENT,
-  CONSIGNMENT_COMMISSION_PERCENT,
+  DEFAULT_LISTING_FEE_PERCENT as LISTING_FEE_PERCENT,
+  DEFAULT_CONSIGNMENT_COMMISSION_PERCENT as CONSIGNMENT_COMMISSION_PERCENT,
   calculateListingFee,
   calculateConsignmentCut,
   SellItemStatus,

@@ -13,6 +13,11 @@ import { Currencies } from '@grc/_shared/constant';
 import Market from '@grc/components/apps/market';
 import { useGetCategoryTreeQuery, Category } from '@grc/services/categories';
 import { transformListing, MarketFilters } from '@grc/_shared/helpers/transform-listing';
+import { useCreateConversationMutation } from '@grc/services/chat';
+import { useSelector } from 'react-redux';
+import { useContext } from 'react';
+import { AppContext } from '@grc/app-context';
+// import { getFirstImageUrl } from '@grc/components/apps/media-renderer';
 import { useScrollRestore } from '@grc/hooks/useScrollRestore';
 import { useUsers } from '@grc/hooks/useUser';
 
@@ -234,6 +239,41 @@ const MarketPage = () => {
     window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(msg)}`, '_blank');
   }, []);
 
+  const [createConversation, { isLoading: isCreatingChat }] = useCreateConversationMutation();
+  const isAuthenticated = useSelector((state: any) => state.auth?.isAuthenticated);
+  const { setIsAuthModalOpen } = useContext(AppContext);
+
+  const handleMessage = useCallback(
+    async (item: any) => {
+      if (!isAuthenticated) {
+        setIsAuthModalOpen(true);
+        return;
+      }
+      const sellerId = item.ownerId || item.postUserProfile?.id;
+      if (!sellerId) {
+        handleWhatsAppMessage(item);
+        return;
+      }
+      try {
+        const result = await createConversation({
+          participantId: sellerId,
+          productContext: {
+            listingId: item.id,
+            itemName: item.itemName,
+            price: item.askingPrice?.price || 0,
+            image: item.media?.[0]?.url || '',
+          },
+          options: { noSuccessMessage: true },
+        }).unwrap();
+        const conversationId = result?.data?._id || result?._id;
+        if (conversationId) router.push(`/chats?conversation=${conversationId}`);
+      } catch {
+        handleWhatsAppMessage(item);
+      }
+    },
+    [isAuthenticated, createConversation, router, handleWhatsAppMessage, setIsAuthModalOpen]
+  );
+
   const handleVendorClick = useCallback(
     (item: any) => {
       saveScrollPosition();
@@ -322,6 +362,8 @@ const MarketPage = () => {
       onBuyNow={handleBuyNow}
       onToggleSave={handleToggleSave}
       onWhatsAppMessage={handleWhatsAppMessage}
+      onMessage={handleMessage}
+      isMessageLoading={isCreatingChat}
       onVendorClick={handleVendorClick}
       onGridItemClick={handleGridItemClick}
       onCloseGridModal={handleCloseGridModal}

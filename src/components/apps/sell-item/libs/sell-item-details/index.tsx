@@ -33,8 +33,8 @@ import {
   getStatusLabel,
   getStatusColor,
   getSellingModelLabel,
-  LISTING_FEE_PERCENT,
-  CONSIGNMENT_COMMISSION_PERCENT,
+  DEFAULT_LISTING_FEE_PERCENT as LISTING_FEE_PERCENT,
+  DEFAULT_CONSIGNMENT_COMMISSION_PERCENT as CONSIGNMENT_COMMISSION_PERCENT,
 } from '@grc/_shared/namespace/sell-item';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
 

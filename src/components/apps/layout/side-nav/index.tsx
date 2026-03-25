@@ -9,6 +9,8 @@ import { getFirstCharacter, getRandomColorByString } from '@grc/_shared/helpers'
 import { LogIn, LogOut, ChevronRight, Sparkles, Store, Plus, Sun, Moon } from 'lucide-react';
 import StoreConfirmModal from './lib/store-confirm-modal';
 import { useTheme } from 'next-themes';
+import { useGetUnreadAlertCountQuery } from '@grc/services/alerts';
+import { useSocket } from '@grc/providers/socket-provider';
 
 const { Sider } = Layout;
 
@@ -187,7 +189,7 @@ const SideNavUserSection: React.FC<{
       <div className="rounded-2xl w-full border border-neutral-100 dark:border-neutral-800 bg-neutral-50/80 dark:bg-neutral-800/40 overflow-hidden">
         <button
           onClick={onProfileClick}
-          className="w-full flex items-center gap-3 px-4 py-3 hover:bg-neutral-100/80 dark:hover:bg-neutral-700/30 transition-colors text-left"
+          className="w-full flex items-center gap-3 px-4 py-3 hover:bg-neutral-100/80 bg-neutral-100 dark:bg-neutral-900 dark:hover:bg-neutral-700 transition-colors text-left"
         >
           <div className="relative flex-shrink-0">
             {avatarUrl ? (
@@ -214,7 +216,7 @@ const SideNavUserSection: React.FC<{
           </div>
           <ChevronRight size={14} className="text-neutral-400 flex-shrink-0" />
         </button>
-        <div className="border-t border-neutral-100 dark:border-neutral-700/50">
+        <div className="border-t border-neutral-100 bg-neutral-100 dark:bg-neutral-800 dark:border-neutral-700/50">
           <button
             onClick={onLogout}
             className="w-full flex items-center gap-2.5 px-4 py-2.5 text-red-500 hover:bg-red-50 dark:hover:bg-red-950/20 transition-colors"
@@ -286,7 +288,6 @@ const SideNav: React.FC<SideNavProps> = (props) => {
     setToggleSider,
     setIsCreateStoreModalOpen,
     setIsSellItemModalOpen,
-    setIsChatsModalOpen,
     userProfile,
     isLoadingProfile,
     onLogout,
@@ -301,6 +302,12 @@ const SideNav: React.FC<SideNavProps> = (props) => {
     useContext(AppContext);
   const isMobile = useMediaQuery(mediaSize.mobile);
   const [showStoreConfirmModal, setShowStoreConfirmModal] = useState<boolean>(false);
+  const { data: unreadData } = useGetUnreadAlertCountQuery(undefined, {
+    skip: !userProfile,
+    pollingInterval: 30000,
+  });
+  const unreadAlertCount = unreadData?.data?.count || 0;
+  const { totalUnread: unreadChatCount } = useSocket();
 
   // ── Filter menu items based on user role ────────────────────────────
   const filteredMenuItems = useMemo(() => {
@@ -326,9 +333,35 @@ const SideNav: React.FC<SideNavProps> = (props) => {
           ),
         };
       }
+      if (item.key === 'alerts' && unreadAlertCount > 0) {
+        return {
+          ...item,
+          label: (
+            <span className="flex items-center gap-2">
+              Notifications
+              <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-gradient-to-r from-rose-500 to-pink-500 text-white text-[10px] font-bold flex items-center justify-center leading-none">
+                {unreadAlertCount > 99 ? '99+' : unreadAlertCount}
+              </span>
+            </span>
+          ),
+        };
+      }
+      if (item.key === 'chats' && unreadChatCount > 0) {
+        return {
+          ...item,
+          label: (
+            <span className="flex items-center gap-2">
+              Chats
+              <span className="min-w-[18px] h-[18px] px-1 rounded-full bg-gradient-to-r from-emerald-500 to-teal-500 text-white text-[10px] font-bold flex items-center justify-center leading-none">
+                {unreadChatCount > 99 ? '99+' : unreadChatCount}
+              </span>
+            </span>
+          ),
+        };
+      }
       return item;
     });
-  }, [appNav?.items, isCreatorAccount, cartCount]);
+  }, [appNav?.items, isCreatorAccount, cartCount, unreadAlertCount, unreadChatCount]);
 
   // ── Build dynamic footer menu items with real stores ────────────────
   const footerMenuItems = useMemo(() => {
@@ -437,7 +470,7 @@ const SideNav: React.FC<SideNavProps> = (props) => {
     }
 
     if (key === 'chats') {
-      setIsChatsModalOpen(true);
+      push('/chats');
       setSelectedKey(key);
       return;
     }
@@ -457,10 +490,9 @@ const SideNav: React.FC<SideNavProps> = (props) => {
       className="dash-sider border-r p-0 text-lg shadow-sm border-border/100 relative"
       width={300}
       style={{
-        overflow: 'auto',
+        overflow: 'hidden',
         position: 'fixed',
         height: '100vh',
-        scrollbarWidth: 'none',
         left: 0,
         top: 0,
         bottom: 0,
@@ -471,48 +503,52 @@ const SideNav: React.FC<SideNavProps> = (props) => {
     >
       <SideNavHeader toggleSider={toggleSider} />
 
-      <Menu
-        className="sider-menu mt-10 mb-16 text-card-foreground text-[16px]"
-        mode="inline"
-        items={filteredMenuItems}
-        defaultSelectedKeys={[]}
-        selectedKeys={
-          (urlPath?.[1] === '' || urlPath?.[1] === 'market') && selectedKey === ''
-            ? ['market']
-            : selectedKey !== ''
-              ? [selectedKey]
-              : [urlPath?.[1] ?? '']
-        }
-        onClick={handleMenuClick}
-      />
+      {/* Scrollable menu area */}
+      <div className="flex-1 overflow-y-auto mb-[120px]" style={{ scrollbarWidth: 'none' }}>
+        <Menu
+          className="sider-menu mt-10 mb-4 text-card-foreground text-[16px]"
+          mode="inline"
+          items={filteredMenuItems}
+          defaultSelectedKeys={[]}
+          selectedKeys={
+            (urlPath?.[1] === '' || urlPath?.[1] === 'market') && selectedKey === ''
+              ? ['market']
+              : selectedKey !== ''
+                ? [selectedKey]
+                : [urlPath?.[1] ?? '']
+          }
+          onClick={handleMenuClick}
+        />
 
-      <Menu
-        className="text-card-foreground text-[16px]"
-        mode="inline"
-        items={footerMenuItems}
-        defaultSelectedKeys={[]}
-        selectedKeys={
-          urlPath?.[1] === '' && selectedKey === ''
-            ? []
-            : selectedKey !== ''
-              ? [selectedKey]
-              : [urlPath?.[1] ?? '']
-        }
-        onClick={handleMenuClick}
-      />
+        <Menu
+          className="text-card-foreground text-[16px]"
+          mode="inline"
+          items={footerMenuItems}
+          defaultSelectedKeys={[]}
+          selectedKeys={
+            urlPath?.[1] === '' && selectedKey === ''
+              ? []
+              : selectedKey !== ''
+                ? [selectedKey]
+                : [urlPath?.[1] ?? '']
+          }
+          onClick={handleMenuClick}
+        />
 
-      <div className="flex-1" />
+        <ThemeToggle isCollapsed={toggleSider} />
+      </div>
 
-      <ThemeToggle isCollapsed={toggleSider} />
-
-      <SideNavUserSection
-        userProfile={userProfile}
-        isLoading={isLoadingProfile}
-        isCollapsed={toggleSider}
-        onSignIn={() => setIsAuthModalOpen(true)}
-        onLogout={() => onLogout?.()}
-        onProfileClick={() => push('/profile')}
-      />
+      {/* Fixed bottom section */}
+      <div className="sidebar-bottom-fixed flex-shrink-0 border-t border-neutral-200 dark:border-neutral-700/60">
+        <SideNavUserSection
+          userProfile={userProfile}
+          isLoading={isLoadingProfile}
+          isCollapsed={toggleSider}
+          onSignIn={() => setIsAuthModalOpen(true)}
+          onLogout={() => onLogout?.()}
+          onProfileClick={() => push('/profile')}
+        />
+      </div>
 
       <StoreConfirmModal
         showConfirm={showStoreConfirmModal}

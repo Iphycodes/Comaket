@@ -34,6 +34,8 @@ interface ProductProps {
   onBuyNow?: () => void;
   onToggleSave?: () => void;
   onWhatsAppMessage?: () => void;
+  onMessage?: () => void;
+  isMessageLoading?: boolean;
   onShare?: () => void;
   onGoBack?: () => void;
   onCreatorClick?: () => void;
@@ -52,6 +54,8 @@ const Product = ({
   onBuyNow,
   onToggleSave,
   onWhatsAppMessage,
+  onMessage,
+  isMessageLoading = false,
   onShare,
   onGoBack,
   onCreatorClick,
@@ -487,12 +491,24 @@ const Product = ({
                       <motion.button
                         whileHover={{ scale: 1.02 }}
                         whileTap={{ scale: 0.98 }}
-                        onClick={onWhatsAppMessage}
-                        className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-1.5 shadow-sm text-sm"
+                        onClick={onMessage || onWhatsAppMessage}
+                        disabled={isMessageLoading}
+                        className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-1.5 shadow-sm text-sm"
                       >
                         <MessageCircle size={16} />
-                        WhatsApp
+                        {isMessageLoading ? 'Opening...' : 'Chat Seller'}
                       </motion.button>
+
+                      <Tooltip title="WhatsApp">
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          onClick={onWhatsAppMessage}
+                          className="p-3 rounded-lg border shadow-sm transition-colors bg-neutral-100 border-neutral-200 dark:bg-neutral-700 dark:border-neutral-600"
+                        >
+                          <MessageCircle size={18} className="text-green-500" />
+                        </motion.button>
+                      </Tooltip>
 
                       <Tooltip title={isSaved ? 'Remove from saved' : 'Save item'}>
                         <motion.button
@@ -533,14 +549,25 @@ const Product = ({
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={onWhatsAppMessage}
-                      className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-1.5 shadow-sm text-sm"
+                      onClick={onMessage || onWhatsAppMessage}
+                      disabled={isMessageLoading}
+                      className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-1.5 shadow-sm text-sm"
                     >
                       <MessageCircle size={16} />
-                      WhatsApp
+                      {isMessageLoading ? 'Opening...' : 'Chat Seller'}
                     </motion.button>
 
                     <div className="flex items-center gap-1.5">
+                      <Tooltip title="WhatsApp">
+                        <motion.button
+                          whileHover={{ scale: 1.1 }}
+                          whileTap={{ scale: 0.9 }}
+                          onClick={onWhatsAppMessage}
+                          className="p-3 rounded-lg border shadow-sm transition-colors bg-neutral-100 border-neutral-200 dark:bg-neutral-700 dark:border-neutral-600"
+                        >
+                          <MessageCircle size={18} className="text-green-500" />
+                        </motion.button>
+                      </Tooltip>
                       <Tooltip title={isSaved ? 'Remove from saved' : 'Save item'}>
                         <motion.button
                           whileHover={{ scale: 1.1 }}

@@ -23,6 +23,8 @@ import { setBuyNowItem } from '@grc/_shared/namespace/buy';
 import { ListingType, MediaItem } from '@grc/_shared/namespace';
 import MediaRenderer, { getFirstImageUrl } from '../media-renderer';
 import { useUsers } from '@grc/hooks/useUser';
+import { useCreateConversationMutation } from '@grc/services/chat';
+import { useSelector } from 'react-redux';
 
 interface ItemDetailProps {
   item: {
@@ -66,7 +68,8 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ item, isSellerView }) => {
   const [slideDirection, setSlideDirection] = useState(0);
   const [isSaved, setIsSaved] = useState(false);
   const isMobile = useMediaQuery(mediaSize.mobile);
-  const { addToCart, isInCart, cartItems } = useContext(AppContext);
+  const { addToCart, isInCart, cartItems, setIsAuthModalOpen } = useContext(AppContext);
+  const isAuthenticated = useSelector((state: any) => state.auth?.isAuthenticated);
   const { userProfile } = useUsers({ fetchProfile: true });
   const isOwnItem = useMemo(
     () => !!(userProfile?._id && item.ownerId && userProfile._id === item.ownerId),
@@ -137,6 +140,43 @@ Price: ${formattedPrice}`;
     const encodedMessage = encodeURIComponent(message);
     const whatsappUrl = `https://wa.me/${phoneNumber}?text=${encodedMessage}`;
     window.open(whatsappUrl, '_blank');
+  };
+
+  const [createConversation, { isLoading: isCreatingChat }] = useCreateConversationMutation();
+
+  const handleMessage = async () => {
+    if (!isAuthenticated) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+
+    const sellerId = item.ownerId || item.postUserProfile?.id;
+    if (!sellerId) {
+      // Fallback to WhatsApp
+      handleWhatsAppMessage();
+      return;
+    }
+
+    try {
+      const result = await createConversation({
+        participantId: sellerId,
+        productContext: {
+          listingId: item.id as string,
+          itemName: item.itemName,
+          price: item.askingPrice?.price || 0,
+          image: getFirstImageUrl(item.media),
+        },
+        options: { noSuccessMessage: true },
+      }).unwrap();
+
+      const conversationId = result?.data?._id || result?._id;
+      if (conversationId) {
+        router.push(`/chats?conversation=${conversationId}`);
+      }
+    } catch {
+      // Fallback to WhatsApp
+      handleWhatsAppMessage();
+    }
   };
 
   const nextMedia = () => {
@@ -561,7 +601,11 @@ Price: ${formattedPrice}`;
 
           {/* Action Buttons — conditional on isBuyable */}
           {!isSellerView && !isOwnItem && (
-            <div className="absolute w-[90%] flex flex-col gap-2 bottom-0 bg-white dark:bg-neutral-800 py-4 mt-6 border-t">
+            <div
+              className={`absolute w-[90%] flex flex-col gap-2 bottom-0 bg-white dark:bg-neutral-800 ${
+                isMobile ? 'py-2 mb-2' : 'py-4 mt-6'
+              } border-t`}
+            >
               {item.isBuyable ? (
                 <>
                   {/* BUYABLE: Buy Now + Add to Cart */}
@@ -603,16 +647,17 @@ Price: ${formattedPrice}`;
                     </Tooltip>
                   </div>
 
-                  {/* BUYABLE: WhatsApp + Save + Share */}
+                  {/* BUYABLE: Message + Save + Share */}
                   <div className="flex items-center gap-1.5">
                     <motion.button
                       whileHover={{ scale: 1.02 }}
                       whileTap={{ scale: 0.98 }}
-                      onClick={handleWhatsAppMessage}
-                      className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-2 shadow-sm"
+                      onClick={handleMessage}
+                      disabled={isCreatingChat}
+                      className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-2 shadow-sm"
                     >
                       <MessageCircle size={20} />
-                      WhatsApp
+                      {isCreatingChat ? 'Opening...' : 'Chat Seller'}
                     </motion.button>
 
                     <Tooltip title={isSaved ? 'Remove from saved' : 'Save item'}>
@@ -649,15 +694,16 @@ Price: ${formattedPrice}`;
                 </>
               ) : (
                 <>
-                  {/* NOT BUYABLE: WhatsApp only */}
+                  {/* NOT BUYABLE: Message seller */}
                   <motion.button
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
-                    onClick={handleWhatsAppMessage}
-                    className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-2 shadow-sm"
+                    onClick={handleMessage}
+                    disabled={isCreatingChat}
+                    className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-2 shadow-sm"
                   >
                     <MessageCircle size={20} />
-                    WhatsApp
+                    {isCreatingChat ? 'Opening...' : 'Chat Seller'}
                   </motion.button>
 
                   <div className="flex items-center gap-1.5">

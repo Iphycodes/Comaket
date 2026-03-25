@@ -2,7 +2,7 @@
 import React from 'react';
 import { SiderTheme } from 'antd/es/layout/Sider';
 import { NavItem } from '@grc/_shared/helpers';
-import { Bookmark, Shop, BagHappy, People, Tag2 } from 'iconsax-react';
+import { Bookmark, Shop, BagHappy, People, Tag2, Notification, Messages1 } from 'iconsax-react';
 import {
   Crown,
   HandCoins,
@@ -91,6 +91,18 @@ const menuItems: NavItem[] = [
     key: 'cart',
     destination: '/cart',
     icon: <BagHappy variant="Bulk" color="#22c55e" size={22} />,
+  },
+  {
+    label: 'Notifications',
+    key: 'alerts',
+    destination: '/alerts',
+    icon: <Notification variant="Bulk" color="#f43f5e" size={22} />,
+  },
+  {
+    label: 'Chats',
+    key: 'chats',
+    destination: '/chats',
+    icon: <Messages1 variant="Bulk" color="#10b981" size={22} />,
   },
   {
     label: 'Find Creators',
