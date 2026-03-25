@@ -22,12 +22,7 @@ module.exports = (phase) => {
   console.log(`isDev:${isDev}  isProd:${isProd}   isStaging:${isStaging}   phase:${phase}`);
 
   const env = {
-    NEXT_PUBLIC_APP_BASE_URL: (() => {
-      if (isProd) {
-        return process.env.NEXT_PUBLIC_APP_BASE_URL_PROD || process.env.NEXT_PUBLIC_APP_BASE_URL;
-      }
-      return process.env.NEXT_PUBLIC_APP_BASE_URL;
-    })(),
+    NEXT_PUBLIC_APP_BASE_URL: process.env.NEXT_PUBLIC_APP_BASE_URL,
   };
 
   return {

@@ -7,7 +7,7 @@ import { Layout, Modal } from 'antd';
 import React, { ReactElement, useCallback, useContext, useEffect, useState } from 'react';
 import NotificationsDrawer from '@grc/components/apps/notification-drawer';
 import CreateStoreModal from '@grc/components/apps/create-store-modal';
-import ChatsModal from '@grc/components/apps/chats-modal';
+// ChatWidget removed — chat accessed via sidebar/nav
 import MobileNav from '@grc/components/apps/layout/mobile-nav';
 import { usePathname } from 'next/navigation';
 import SellItemModal from '@grc/components/apps/sell-item-modal';
@@ -17,6 +17,7 @@ import { useAuth } from '@grc/hooks/useAuth';
 import { useUsers } from '@grc/hooks/useUser';
 import { useStores } from '@grc/hooks/useStores';
 import { LogOut } from 'lucide-react';
+import { SocketProvider } from '@grc/providers/socket-provider';
 
 const { Content } = Layout;
 
@@ -37,7 +38,7 @@ const AppBaseLayout: React.FC<AppBaseLayoutProps> = ({ children }) => {
     setIsCreateStoreModalOpen,
     setIsSellItemModalOpen,
     isSellItemModalOpen,
-    isChatsModalOpen,
+    isChatsModalOpen: _isChatsModalOpen,
     setIsChatsModalOpen,
     // Auth modal (UI state only)
     isAuthModalOpen,
@@ -125,93 +126,89 @@ const AppBaseLayout: React.FC<AppBaseLayoutProps> = ({ children }) => {
   const fullRoutes = ['profile', 'sell-item', 'vendors', 'creators', 'stores'];
 
   return (
-    <Layout hasSider={true} className="bg-background max-w-[100vw] overflow-x-clip">
-      {/* Only show SideNav on non-mobile screens */}
-      {!mobileResponsive && (
-        <SideNav
-          appNav={appNav}
-          toggleSider={toggleSider}
-          selectedKey={selectedKey}
+    <SocketProvider>
+      <Layout hasSider={true} className="bg-background max-w-[100vw] overflow-x-clip">
+        {/* Only show SideNav on non-mobile screens */}
+        {!mobileResponsive && (
+          <SideNav
+            appNav={appNav}
+            toggleSider={toggleSider}
+            selectedKey={selectedKey}
+            setSelectedKey={setSelectedKey}
+            setToggleSider={setToggleSider}
+            setIsCreateStoreModalOpen={setIsCreateStoreModalOpen}
+            setIsSellItemModalOpen={setIsSellItemModalOpen}
+            setIsChatsModalOpen={setIsChatsModalOpen}
+            userProfile={userProfile}
+            isLoadingProfile={isLoadingProfile}
+            onLogout={handleLogout}
+            stores={isCreatorAccount ? myStores : []}
+            isCreatorAccount={isCreatorAccount}
+          />
+        )}
+        <NotificationsDrawer />
+        <CreateStoreModal
           setSelectedKey={setSelectedKey}
-          setToggleSider={setToggleSider}
+          isCreateStoreModalOpen={isCreateStoreModalOpen}
           setIsCreateStoreModalOpen={setIsCreateStoreModalOpen}
-          setIsSellItemModalOpen={setIsSellItemModalOpen}
-          setIsChatsModalOpen={setIsChatsModalOpen}
-          userProfile={userProfile}
-          isLoadingProfile={isLoadingProfile}
-          onLogout={handleLogout}
-          stores={isCreatorAccount ? myStores : []}
-          isCreatorAccount={isCreatorAccount}
         />
-      )}
-      <NotificationsDrawer />
-      <CreateStoreModal
-        setSelectedKey={setSelectedKey}
-        isCreateStoreModalOpen={isCreateStoreModalOpen}
-        setIsCreateStoreModalOpen={setIsCreateStoreModalOpen}
-      />
-      <ChatsModal
-        setSelectedKey={setSelectedKey}
-        isChatsModalOpen={isChatsModalOpen}
-        setIsChatsModalOpen={setIsChatsModalOpen}
-      />
+        {/* Auth Modal — handles all auth flows internally */}
+        <AuthModal
+          isOpen={isAuthModalOpen}
+          onClose={() => setIsAuthModalOpen(false)}
+          // onAuthSuccess={handleAuthSuccess}
+        />
 
-      {/* Auth Modal — handles all auth flows internally */}
-      <AuthModal
-        isOpen={isAuthModalOpen}
-        onClose={() => setIsAuthModalOpen(false)}
-        // onAuthSuccess={handleAuthSuccess}
-      />
+        <Layout
+          className="body-layout relative z-0 bg-background"
+          style={{
+            marginLeft: `${mobileResponsive ? 0 : tabletResponsive ? 0 : '300px'}`,
+            transition: 'margin-left 0.3s ease',
+          }}
+          onClick={handleLayoutBodyClick}
+        >
+          <Content className="main-content">
+            <div
+              className={`dark:text-white ${
+                mobileResponsive
+                  ? 'px-0 !max-w-[100vw] !overflow-x-clip'
+                  : fullRoutes?.includes(path?.split('/')?.[1] ?? '')
+                    ? 'px-[20px]'
+                    : 'px-[12%]'
+              }`}
+              style={{ minHeight: '100vh' }}
+            >
+              {mobileResponsive && (
+                <MobileTopBar
+                  setIsCreateStoreModalOpen={setIsCreateStoreModalOpen}
+                  userProfile={userProfile}
+                  onLogout={handleLogout}
+                />
+              )}
+              <div className={mobileResponsive ? '' : ''}>{children}</div>
+            </div>
+          </Content>
+        </Layout>
 
-      <Layout
-        className="body-layout relative z-0 bg-background"
-        style={{
-          marginLeft: `${mobileResponsive ? 0 : tabletResponsive ? 0 : '300px'}`,
-          transition: 'margin-left 0.3s ease',
-        }}
-        onClick={handleLayoutBodyClick}
-      >
-        <Content className="main-content">
-          <div
-            className={`dark:text-white ${
-              mobileResponsive
-                ? 'px-0 !max-w-[100vw] !overflow-x-clip'
-                : fullRoutes?.includes(path?.split('/')?.[1] ?? '')
-                  ? 'px-[20px]'
-                  : 'px-[12%]'
-            }`}
-            style={{ minHeight: '100vh' }}
-          >
-            {mobileResponsive && (
-              <MobileTopBar
-                setIsCreateStoreModalOpen={setIsCreateStoreModalOpen}
-                userProfile={userProfile}
-                onLogout={handleLogout}
-              />
-            )}
-            <div className={mobileResponsive ? '' : ''}>{children}</div>
-          </div>
-        </Content>
+        <SellItemModal
+          isSellItemModalOpen={isSellItemModalOpen}
+          setIsSellItemModalOpen={setIsSellItemModalOpen}
+          handleTrackStatus={() => {}}
+          storeId=""
+        />
+
+        {/* Show mobile navigation only on mobile screens */}
+        {mobileResponsive && (
+          <MobileNav
+            appNav={appNav}
+            setSelectedKey={setSelectedKey}
+            setIsCreateStoreModalOpen={setIsCreateStoreModalOpen}
+            setIsSellItemModalOpen={setIsSellItemModalOpen}
+            setIsChatsModalOpen={setIsChatsModalOpen}
+          />
+        )}
       </Layout>
-
-      <SellItemModal
-        isSellItemModalOpen={isSellItemModalOpen}
-        setIsSellItemModalOpen={setIsSellItemModalOpen}
-        handleTrackStatus={() => {}}
-        storeId=""
-      />
-
-      {/* Show mobile navigation only on mobile screens */}
-      {mobileResponsive && (
-        <MobileNav
-          appNav={appNav}
-          setSelectedKey={setSelectedKey}
-          setIsCreateStoreModalOpen={setIsCreateStoreModalOpen}
-          setIsSellItemModalOpen={setIsSellItemModalOpen}
-          setIsChatsModalOpen={setIsChatsModalOpen}
-        />
-      )}
-    </Layout>
+    </SocketProvider>
   );
 };
 

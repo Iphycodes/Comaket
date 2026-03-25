@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { Modal } from 'antd';
 import { motion } from 'framer-motion';
 import {
@@ -19,33 +19,7 @@ import {
 } from 'lucide-react';
 import { SellingModel, getSellingModelLabel } from '@grc/_shared/namespace/sell-item';
 import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness';
-
-// ═══════════════════════════════════════════════════════════════════════════
-// ENV CONFIG
-// ═══════════════════════════════════════════════════════════════════════════
-
-const IS_FREE_LISTING = process.env.NEXT_PUBLIC_FREE_LISTING === 'true';
-const IS_NO_COMMISSION = process.env.NEXT_PUBLIC_NO_COMMISSION === 'true';
-const SELF_LISTING_FEE_PERCENT = Number(process.env.NEXT_PUBLIC_SELF_LISTING_FEE_PERCENT) || 5;
-const CONSIGNMENT_COMMISSION_PERCENT =
-  Number(process.env.NEXT_PUBLIC_CONSIGNMENT_COMMISSION_PERCENT) || 20;
-const LISTING_FEE_CAP_KOBO = Number(process.env.NEXT_PUBLIC_LISTING_FEE_CAP_KOBO) || 0;
-const CONSIGNMENT_COMMISSION_CAP_KOBO =
-  Number(process.env.NEXT_PUBLIC_CONSIGNMENT_COMMISSION_CAP_KOBO) || 0;
-
-const calculateListingFee = (priceInKobo: number) => {
-  const base = LISTING_FEE_CAP_KOBO > 0 ? Math.min(priceInKobo, LISTING_FEE_CAP_KOBO) : priceInKobo;
-  return Math.round(base * (SELF_LISTING_FEE_PERCENT / 100));
-};
-
-const calculateConsignmentCut = (priceInKobo: number) => {
-  const base =
-    CONSIGNMENT_COMMISSION_CAP_KOBO > 0
-      ? Math.min(priceInKobo, CONSIGNMENT_COMMISSION_CAP_KOBO)
-      : priceInKobo;
-  const platformCut = Math.round(base * (CONSIGNMENT_COMMISSION_PERCENT / 100));
-  return { platformCut, sellerCut: priceInKobo - platformCut };
-};
+import { useGetPlatformSettingsQuery } from '@grc/services/payments';
 
 // ═══════════════════════════════════════════════════════════════════════════
 
@@ -212,51 +186,6 @@ interface Props {
   isSubmitting?: boolean;
 }
 
-const modelConfig: Record<
-  SellingModel,
-  { icon: React.ElementType; color: string; gradient: string; whatHappensNext: string[] }
-> = {
-  'self-listing': {
-    icon: Store,
-    color: 'blue',
-    gradient: 'from-blue to-indigo-500',
-    whatHappensNext: [
-      'Your item will be reviewed by our team (usually within 24 hours)',
-      IS_FREE_LISTING
-        ? 'Once approved, your item will go live immediately — no fee required!'
-        : "Once approved, you'll need to pay the listing fee to go live",
-      `After ${
-        IS_FREE_LISTING ? 'approval' : 'payment'
-      }, your item will be visible on the marketplace`,
-      'Buyers will contact you directly to purchase',
-    ],
-  },
-  consignment: {
-    icon: Handshake,
-    color: 'violet',
-    gradient: 'from-violet-500 to-purple-500',
-    whatHappensNext: [
-      'Your item will be reviewed by our team (usually within 24 hours)',
-      "Once approved, we'll arrange pickup or drop-off of your item",
-      "We'll photograph and list your item professionally",
-      IS_NO_COMMISSION
-        ? 'When sold, you keep 100% of the proceeds — commission is currently waived!'
-        : 'When sold, your share will be sent directly to your account',
-    ],
-  },
-  'direct-sale': {
-    icon: BadgeDollarSign,
-    color: 'emerald',
-    gradient: 'from-emerald-500 to-teal-500',
-    whatHappensNext: [
-      'Your item will be reviewed by our team (usually within 24 hours)',
-      "We'll send you a price offer based on market value",
-      'You can accept, counter-offer, or decline',
-      "If accepted, we'll arrange payment and pickup",
-    ],
-  },
-};
-
 const SellItemReview: React.FC<Props> = ({
   basicInfoData,
   pricingData,
@@ -265,8 +194,86 @@ const SellItemReview: React.FC<Props> = ({
   onBack,
   isSubmitting = false,
 }) => {
+  // ── Platform Settings (from API) ────────────────────────────────────
+  const { data: platformSettingsData } = useGetPlatformSettingsQuery();
+  const ps = platformSettingsData?.data || {};
+
+  const IS_FREE_LISTING = ps.freeListing ?? false;
+  const IS_NO_COMMISSION = ps.noCommission ?? false;
+  const SELF_LISTING_FEE_PERCENT = ps.selfListingFeePercent ?? 5;
+  const CONSIGNMENT_COMMISSION_PERCENT = ps.consignmentCommissionPercent ?? 15;
+  const LISTING_FEE_CAP_KOBO = ps.listingFeeCapKobo ?? 0;
+  const CONSIGNMENT_COMMISSION_CAP_KOBO = ps.consignmentCommissionCapKobo ?? 0;
+
+  const modelConfig: Record<
+    SellingModel,
+    { icon: React.ElementType; color: string; gradient: string; whatHappensNext: string[] }
+  > = {
+    'self-listing': {
+      icon: Store,
+      color: 'blue',
+      gradient: 'from-blue to-indigo-500',
+      whatHappensNext: [
+        'Your item will be reviewed by our team (usually within 24 hours)',
+        IS_FREE_LISTING
+          ? 'Once approved, your item will go live immediately — no fee required!'
+          : "Once approved, you'll need to pay the listing fee to go live",
+        `After ${
+          IS_FREE_LISTING ? 'approval' : 'payment'
+        }, your item will be visible on the marketplace`,
+        'Buyers will contact you directly to purchase',
+      ],
+    },
+    consignment: {
+      icon: Handshake,
+      color: 'violet',
+      gradient: 'from-violet-500 to-purple-500',
+      whatHappensNext: [
+        'Your item will be reviewed by our team (usually within 24 hours)',
+        "Once approved, we'll arrange pickup or drop-off of your item",
+        "We'll photograph and list your item professionally",
+        IS_NO_COMMISSION
+          ? 'When sold, you keep 100% of the proceeds — commission is currently waived!'
+          : 'When sold, your share will be sent directly to your account',
+      ],
+    },
+    'direct-sale': {
+      icon: BadgeDollarSign,
+      color: 'emerald',
+      gradient: 'from-emerald-500 to-teal-500',
+      whatHappensNext: [
+        'Your item will be reviewed by our team (usually within 24 hours)',
+        "We'll send you a price offer based on market value",
+        'You can accept, counter-offer, or decline',
+        "If accepted, we'll arrange payment and pickup",
+      ],
+    },
+  };
+
   const config = modelConfig[sellingModel];
   const ModelIcon = config.icon;
+
+  const calculateListingFee = useMemo(
+    () => (priceInKobo: number) => {
+      const base =
+        LISTING_FEE_CAP_KOBO > 0 ? Math.min(priceInKobo, LISTING_FEE_CAP_KOBO) : priceInKobo;
+      return Math.round(base * (SELF_LISTING_FEE_PERCENT / 100));
+    },
+    [LISTING_FEE_CAP_KOBO, SELF_LISTING_FEE_PERCENT]
+  );
+
+  const calculateConsignmentCut = useMemo(
+    () => (priceInKobo: number) => {
+      const base =
+        CONSIGNMENT_COMMISSION_CAP_KOBO > 0
+          ? Math.min(priceInKobo, CONSIGNMENT_COMMISSION_CAP_KOBO)
+          : priceInKobo;
+      const platformCut = Math.round(base * (CONSIGNMENT_COMMISSION_PERCENT / 100));
+      return { platformCut, sellerCut: priceInKobo - platformCut };
+    },
+    [CONSIGNMENT_COMMISSION_CAP_KOBO, CONSIGNMENT_COMMISSION_PERCENT]
+  );
+
   const quantity = basicInfoData.quantity || 1;
   const unitPriceKobo = (pricingData.askPrice || 0) * 100;
   const totalValueKobo = unitPriceKobo * quantity;
