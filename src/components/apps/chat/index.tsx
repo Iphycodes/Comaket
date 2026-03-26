@@ -317,6 +317,7 @@ const ChatPage: React.FC = () => {
   const conversationIdParam = searchParams?.get('conversation');
 
   const authState = useSelector((state: any) => state.auth);
+  const isAuthenticated = authState?.isAuthenticated;
   const currentUserId = authState?.authData?.user?._id || authState?.authData?._id;
   const sessionToken = authState?.sessionToken;
   const {
@@ -341,11 +342,13 @@ const ChatPage: React.FC = () => {
   const [typingUsers, setTypingUsers] = useState<Set<string>>(new Set());
   const [localMessages, setLocalMessages] = useState<ChatMessage[]>([]);
   const [showNewChatSearch, setShowNewChatSearch] = useState(false);
-  const [pendingAttachment, setPendingAttachment] = useState<{
-    url: string;
-    preview: string;
-    isVideo: boolean;
-  } | null>(null);
+  const [pendingAttachments, setPendingAttachments] = useState<
+    {
+      url: string;
+      preview: string;
+      isVideo: boolean;
+    }[]
+  >([]);
   const [isUploading, setIsUploading] = useState(false);
   const [newChatQuery, setNewChatQuery] = useState('');
   const [newChatResults, setNewChatResults] = useState<any[]>([]);
@@ -365,14 +368,14 @@ const ChatPage: React.FC = () => {
     data: conversationsData,
     isLoading: loadingConversations,
     refetch: refetchConversations,
-  } = useGetConversationsQuery({ perPage: 50 }, { pollingInterval: 10000 });
+  } = useGetConversationsQuery({ perPage: 50 }, { skip: !isAuthenticated, pollingInterval: 10000 });
   const {
     data: messagesData,
     isLoading: loadingMessages,
     refetch: refetchMessages,
   } = useGetMessagesQuery(
     { conversationId: activeConversationId!, perPage: 100 },
-    { skip: !activeConversationId, pollingInterval: 5000 }
+    { skip: !activeConversationId || !isAuthenticated, pollingInterval: 5000 }
   );
 
   // Mutations
@@ -562,17 +565,17 @@ const ChatPage: React.FC = () => {
   // ─── Send message ─────────────────────────────────────────────
   const handleSend = useCallback(async () => {
     const text = messageInput.trim();
-    const hasAttachment = !!pendingAttachment;
-    if ((!text && !hasAttachment) || !activeConversationId) return;
+    const hasAttachments = pendingAttachments.length > 0;
+    if ((!text && !hasAttachments) || !activeConversationId) return;
 
-    const attachment = pendingAttachment;
+    const attachments = [...pendingAttachments];
     setMessageInput('');
-    setPendingAttachment(null);
+    setPendingAttachments([]);
     emitStopTyping(activeConversationId);
 
-    const msgContent = text || (attachment?.isVideo ? '🎥 Video' : '📷 Photo');
-    const msgType = hasAttachment ? 'image' : 'text';
-    const msgAttachments = attachment ? [attachment.url] : [];
+    const msgContent = text || (attachments.some((a) => a.isVideo) ? '🎥 Video' : '📷 Photo');
+    const msgType = hasAttachments ? 'image' : 'text';
+    const msgAttachments = attachments.map((a) => a.url);
 
     // Optimistic local message
     const tempMsg: ChatMessage = {
@@ -612,7 +615,7 @@ const ChatPage: React.FC = () => {
     socketSendMessage,
     sendMessageRest,
     emitStopTyping,
-    pendingAttachment,
+    pendingAttachments,
   ]);
 
   // ─── Typing indicator ─────────────────────────────────────────
@@ -1038,27 +1041,31 @@ const ChatPage: React.FC = () => {
 
         {/* Input — pinned to bottom */}
         <div className="border-t border-neutral-200 dark:border-neutral-700/60 bg-white dark:bg-neutral-900 flex-shrink-0 px-3 py-2.5">
-          {/* Attachment preview */}
-          {pendingAttachment && (
-            <div className="mb-2 relative inline-block">
-              {pendingAttachment.isVideo ? (
-                <video src={pendingAttachment.preview} className="h-32 rounded-lg object-cover" />
-              ) : (
-                <img
-                  src={pendingAttachment.preview}
-                  alt="Attachment"
-                  className="h-32 rounded-lg object-cover"
-                />
-              )}
-              <button
-                onClick={() => {
-                  URL.revokeObjectURL(pendingAttachment.preview);
-                  setPendingAttachment(null);
-                }}
-                className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center shadow-sm"
-              >
-                <X size={12} />
-              </button>
+          {/* Attachment previews */}
+          {pendingAttachments.length > 0 && (
+            <div className="mb-2 flex gap-2 flex-wrap">
+              {pendingAttachments.map((att, i) => (
+                <div key={i} className="relative inline-block">
+                  {att.isVideo ? (
+                    <video src={att.preview} className="h-20 w-20 rounded-lg object-cover" />
+                  ) : (
+                    <img
+                      src={att.preview}
+                      alt="Attachment"
+                      className="h-20 w-20 rounded-lg object-cover"
+                    />
+                  )}
+                  <button
+                    onClick={() => {
+                      URL.revokeObjectURL(att.preview);
+                      setPendingAttachments((prev) => prev.filter((_, idx) => idx !== i));
+                    }}
+                    className="absolute -top-1.5 -right-1.5 w-5 h-5 rounded-full bg-red-500 text-white flex items-center justify-center shadow-sm"
+                  >
+                    <X size={10} />
+                  </button>
+                </div>
+              ))}
             </div>
           )}
           {isUploading && (
@@ -1073,36 +1080,42 @@ const ChatPage: React.FC = () => {
               type="file"
               accept="image/*,video/*"
               className="hidden"
+              multiple
               onChange={async (e) => {
-                const file = e.target.files?.[0];
-                if (!file) return;
+                const files = Array.from(e.target.files || []);
+                if (files.length === 0) return;
                 setIsUploading(true);
-                const localPreview = URL.createObjectURL(file);
-                const isVideo = file.type.startsWith('video');
-                try {
-                  const formData = new FormData();
-                  formData.append('file', file);
-                  const baseUrl =
-                    process.env.NEXT_PUBLIC_APP_BASE_URL || 'http://localhost:5000/api/v1';
-                  const res = await fetch(`${baseUrl}/media/upload-general`, {
-                    method: 'POST',
-                    headers: sessionToken ? { Authorization: `Bearer ${sessionToken}` } : {},
-                    body: formData,
-                  });
-                  const data = await res.json();
-                  const url = data?.data?.url || data?.url;
-                  if (url) {
-                    setPendingAttachment({ url, preview: localPreview, isVideo });
-                    messageInputRef.current?.focus();
-                  } else {
-                    antMessage.error('Upload failed');
+                const baseUrl =
+                  process.env.NEXT_PUBLIC_APP_BASE_URL || 'http://localhost:5000/api/v1';
+                for (const file of files) {
+                  const localPreview = URL.createObjectURL(file);
+                  const isVideo = file.type.startsWith('video');
+                  try {
+                    const formData = new FormData();
+                    formData.append('file', file);
+                    const res = await fetch(`${baseUrl}/media/upload-general`, {
+                      method: 'POST',
+                      headers: sessionToken ? { Authorization: `Bearer ${sessionToken}` } : {},
+                      body: formData,
+                    });
+                    const data = await res.json();
+                    const url = data?.data?.url || data?.url;
+                    if (url) {
+                      setPendingAttachments((prev) => [
+                        ...prev,
+                        { url, preview: localPreview, isVideo },
+                      ]);
+                    } else {
+                      antMessage.error('Upload failed');
+                      URL.revokeObjectURL(localPreview);
+                    }
+                  } catch {
+                    antMessage.error('Failed to upload file');
                     URL.revokeObjectURL(localPreview);
                   }
-                } catch {
-                  antMessage.error('Failed to upload file');
-                  URL.revokeObjectURL(localPreview);
                 }
                 setIsUploading(false);
+                messageInputRef.current?.focus();
                 e.target.value = '';
               }}
             />
@@ -1123,9 +1136,9 @@ const ChatPage: React.FC = () => {
             />
             <button
               onClick={handleSend}
-              disabled={!messageInput.trim() && !pendingAttachment}
+              disabled={!messageInput.trim() && pendingAttachments.length === 0}
               className={`p-2 rounded-full transition-colors ${
-                messageInput.trim() || pendingAttachment
+                messageInput.trim() || pendingAttachments.length > 0
                   ? 'bg-emerald-500 text-white hover:bg-emerald-600'
                   : 'text-neutral-300 dark:text-neutral-600'
               }`}
@@ -1139,6 +1152,35 @@ const ChatPage: React.FC = () => {
   };
 
   // ─── Render ───────────────────────────────────────────────────
+
+  // Unauthenticated state
+  if (!isAuthenticated) {
+    return (
+      <div
+        className={`flex flex-col items-center justify-center text-center ${
+          isMobile ? 'pt-20 pb-28 px-6' : 'py-20'
+        }`}
+      >
+        <div className="w-20 h-20 rounded-full bg-neutral-100 dark:bg-neutral-800 flex items-center justify-center mb-5">
+          <MessageCircle size={36} className="text-neutral-400" />
+        </div>
+        <h2 className="text-lg font-bold text-neutral-900 dark:text-neutral-100 mb-2">
+          Sign in to chat
+        </h2>
+        <p className="text-sm text-neutral-500 dark:text-neutral-400 mb-6 max-w-sm">
+          Message sellers directly, negotiate prices, and track your conversations — all in one
+          place.
+        </p>
+        <button
+          onClick={() => router.push('/profile')}
+          className="px-6 py-2.5 bg-[#25D366] hover:bg-[#20BD5A] text-white rounded-lg text-sm font-medium transition-colors"
+        >
+          Sign In
+        </button>
+      </div>
+    );
+  }
+
   if (isMobile) {
     return (
       <div className="fixed inset-0 top-10 bottom-12 z-10 bg-white dark:bg-neutral-900 flex flex-col">

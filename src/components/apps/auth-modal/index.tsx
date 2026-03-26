@@ -703,7 +703,9 @@ const SignupForm = ({
           <Sparkles size={24} className="text-white" />
         </motion.div>
         <h2 className="text-xl font-bold text-neutral-900 dark:text-white">Create your account</h2>
-        <p className="text-sm text-neutral-500">Join the Comaket community</p>
+        <p className="text-sm text-neutral-500">
+          Join the {process.env.NEXT_PUBLIC_APP_NAME || 'Kraft'} community
+        </p>
       </div>
 
       {/* Auth error */}
@@ -915,7 +917,9 @@ const LoginForm = ({
           <Lock size={24} className="text-white" />
         </motion.div>
         <h2 className="text-xl font-bold text-neutral-900 dark:text-white">Welcome back</h2>
-        <p className="text-sm text-neutral-500">Sign in to your Comaket account</p>
+        <p className="text-sm text-neutral-500">
+          Sign in to your {process.env.NEXT_PUBLIC_APP_NAME || 'Kraft'} account
+        </p>
       </div>
 
       {/* Auth error */}
@@ -1311,7 +1315,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             {/* Bottom brand */}
             <div className="px-5 py-4 border-t border-neutral-100 dark:border-neutral-800">
               <p className="text-center text-[11px] text-neutral-400">
-                By continuing, you agree to Comaket&apos;s Terms of Service & Privacy Policy
+                By continuing, you agree to {process.env.NEXT_PUBLIC_APP_NAME || 'Kraft'}&apos;s
+                Terms of Service & Privacy Policy
               </p>
             </div>
           </motion.div>
@@ -1360,7 +1365,8 @@ export const AuthModal: React.FC<AuthModalProps> = ({
             {/* Bottom terms */}
             <div className="px-8 pb-6">
               <p className="text-center text-[11px] text-neutral-400">
-                By continuing, you agree to Comaket&apos;s Terms of Service & Privacy Policy
+                By continuing, you agree to {process.env.NEXT_PUBLIC_APP_NAME || 'Kraft'}&apos;s
+                Terms of Service & Privacy Policy
               </p>
             </div>
           </motion.div>

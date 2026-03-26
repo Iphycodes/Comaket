@@ -732,7 +732,9 @@ const Creators: React.FC<CreatorsProps> = (props) => {
               <Sparkles size={20} className="text-blue" />
               Discover Creators
             </h1>
-            <p className="text-xs text-neutral-400 mt-0.5">Find creators and stores on KRaft</p>
+            <p className="text-xs text-neutral-400 mt-0.5">
+              Find creators and stores on {process.env.NEXT_PUBLIC_APP_NAME || 'Kraft'}
+            </p>
           </div>
         )}
 

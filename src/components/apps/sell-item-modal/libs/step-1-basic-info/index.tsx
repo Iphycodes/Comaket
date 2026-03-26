@@ -8,7 +8,7 @@ import { Plus, X, Tag } from 'lucide-react';
 import { SellingModel } from '@grc/_shared/namespace/sell-item';
 import { ImageUploadSection } from '../image-upload-section';
 
-const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || 'Comaket';
+const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || 'Kraft';
 
 interface CreatorIndustryOption {
   id: string;

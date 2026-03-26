@@ -15,7 +15,7 @@ import {
 } from 'lucide-react';
 import { usePayments } from '@grc/hooks/usePayments';
 
-const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || 'Comaket';
+const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || 'Kraft';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TYPES

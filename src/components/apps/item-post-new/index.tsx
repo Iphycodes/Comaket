@@ -150,7 +150,7 @@ const ModernItemPost: React.FC<ItemPostProps> = ({
     const sellerName = postUserProfile?.displayName || postUserProfile?.userName || 'Seller';
 
     const msg = `Hi, ${sellerName},
-I am interested in this item on Comaket.
+I am interested in this item on ${process.env.NEXT_PUBLIC_APP_NAME || 'Kraft'}.
 
 Item Id: ${id}
 Name: ${itemName}

@@ -7,6 +7,7 @@ import { Tag, User, ShoppingCart, Users, MessageCircle } from 'lucide-react';
 import { Shop } from 'iconsax-react';
 import { AppContext } from '@grc/app-context';
 import { useSocket } from '@grc/providers/socket-provider';
+import { useSelector } from 'react-redux';
 
 interface MobileNavProps {
   appNav?: any;
@@ -39,8 +40,14 @@ const MobileNav: React.FC<MobileNavProps> = ({ setSelectedKey, isCreatorAccount 
     { key: 'profile', label: 'Profile', href: '/profile', icon: User },
   ];
 
-  // Filter out sell-item if not a creator
-  const tabs = allTabs.filter((tab) => !tab.creatorOnly || isCreatorAccount);
+  const isAuthenticated = useSelector((state: any) => state.auth?.isAuthenticated);
+
+  // Filter out sell-item if not a creator, and chats if not authenticated
+  const tabs = allTabs.filter((tab) => {
+    if (tab.creatorOnly && !isCreatorAccount) return false;
+    if (tab.key === 'chats' && !isAuthenticated) return false;
+    return true;
+  });
 
   const isActive = (key: string, href: string) => {
     if (key === 'market') return path === '' || path === 'market';

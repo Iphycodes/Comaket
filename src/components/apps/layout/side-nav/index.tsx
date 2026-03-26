@@ -138,7 +138,7 @@ const SideNavUserSection: React.FC<{
             </div>
             <div className="flex-1 text-left">
               <p className="text-sm font-bold text-neutral-900 dark:text-white mb-[-5px]">
-                Login to KRaft
+                Login to {process.env.NEXT_PUBLIC_APP_NAME || 'Kraft'}
               </p>
               <p className="text-[11px] text-neutral-500 dark:text-neutral-400">
                 Sign in to start buying/selling
@@ -310,12 +310,19 @@ const SideNav: React.FC<SideNavProps> = (props) => {
   const { totalUnread: unreadChatCount } = useSocket();
 
   // ── Filter menu items based on user role ────────────────────────────
+  const isAuthenticated = !!userProfile;
+
   const filteredMenuItems = useMemo(() => {
     let items = [...(appNav?.items || [])];
 
     // Hide sell-item if user is not a creator
     if (!isCreatorAccount) {
       items = items.filter((item) => item.key !== 'sell-item');
+    }
+
+    // Hide chats, alerts, and notifications if not authenticated
+    if (!isAuthenticated) {
+      items = items.filter((item) => !['chats', 'alerts'].includes(item.key));
     }
 
     // Add cart count badge to cart item
@@ -361,7 +368,14 @@ const SideNav: React.FC<SideNavProps> = (props) => {
       }
       return item;
     });
-  }, [appNav?.items, isCreatorAccount, cartCount, unreadAlertCount, unreadChatCount]);
+  }, [
+    appNav?.items,
+    isCreatorAccount,
+    isAuthenticated,
+    cartCount,
+    unreadAlertCount,
+    unreadChatCount,
+  ]);
 
   // ── Build dynamic footer menu items with real stores ────────────────
   const footerMenuItems = useMemo(() => {

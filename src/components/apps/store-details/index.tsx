@@ -401,7 +401,9 @@ const StoreDetails: React.FC<StoreDetailsProps> = ({
     }
     window.open(
       `https://wa.me/${num}?text=${encodeURIComponent(
-        `Hi,\nI found ${storeName} on Comaket and I'm interested in your products.`
+        `Hi,\nI found ${storeName} on ${
+          process.env.NEXT_PUBLIC_APP_NAME || 'Kraft'
+        } and I'm interested in your products.`
       )}`,
       '_blank'
     );
@@ -903,9 +905,11 @@ const StoreDetails: React.FC<StoreDetailsProps> = ({
             {email && (
               <a
                 href={`mailto:${email}?subject=${encodeURIComponent(
-                  `Inquiry from Comaket - ${storeName}`
+                  `Inquiry from ${process.env.NEXT_PUBLIC_APP_NAME || 'Kraft'} - ${storeName}`
                 )}&body=${encodeURIComponent(
-                  `Hi,\n\nI found your store "${storeName}" on Comaket and I'm interested in your products.\n\nLooking forward to hearing from you.`
+                  `Hi,\n\nI found your store "${storeName}" on ${
+                    process.env.NEXT_PUBLIC_APP_NAME || 'Kraft'
+                  } and I'm interested in your products.\n\nLooking forward to hearing from you.`
                 )}`}
                 className={`flex items-center ${
                   isMobile

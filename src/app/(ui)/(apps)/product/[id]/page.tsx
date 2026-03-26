@@ -127,7 +127,11 @@ const ProductPage = ({ params }: ProductPageProps) => {
     const sellerName =
       item.postUserProfile?.displayName || item.postUserProfile?.userName || 'Seller';
 
-    const msg = `Hi, ${sellerName},\nI am interested in this item on Comaket.\n\nItem Id: ${listingId}\nName: ${item.itemName}\nDescription: ${item.description}\nPrice: ${formattedPrice}`;
+    const msg = `Hi, ${sellerName},\nI am interested in this item on ${
+      process.env.NEXT_PUBLIC_APP_NAME || 'Kraft'
+    }.\n\nItem Id: ${listingId}\nName: ${item.itemName}\nDescription: ${
+      item.description
+    }\nPrice: ${formattedPrice}`;
     window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(msg)}`, '_blank');
   }, [item, listingId]);
 

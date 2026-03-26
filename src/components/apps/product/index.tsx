@@ -493,7 +493,7 @@ const Product = ({
                         whileTap={{ scale: 0.98 }}
                         onClick={onMessage || onWhatsAppMessage}
                         disabled={isMessageLoading}
-                        className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-1.5 shadow-sm text-sm"
+                        className="flex-1 bg-[#25D366] hover:bg-[#20BD5A] text-white py-3 rounded-lg font-medium flex items-center justify-center gap-1.5 shadow-sm text-sm"
                       >
                         <MessageCircle size={16} />
                         {isMessageLoading ? 'Opening...' : 'Chat Seller'}
@@ -551,7 +551,7 @@ const Product = ({
                       whileTap={{ scale: 0.98 }}
                       onClick={onMessage || onWhatsAppMessage}
                       disabled={isMessageLoading}
-                      className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-1.5 shadow-sm text-sm"
+                      className="w-full bg-[#25D366] hover:bg-[#20BD5A] text-white py-3 rounded-lg font-medium flex items-center justify-center gap-1.5 shadow-sm text-sm"
                     >
                       <MessageCircle size={16} />
                       {isMessageLoading ? 'Opening...' : 'Chat Seller'}

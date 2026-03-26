@@ -130,7 +130,7 @@ const ItemDetail: React.FC<ItemDetailProps> = ({ item, isSellerView }) => {
     const sellerName = item.postUserProfile?.displayName || 'Seller';
 
     const message = `Hi, ${sellerName},
-I am interested in this item on Comaket.
+I am interested in this item on ${process.env.NEXT_PUBLIC_APP_NAME || 'Kraft'}.
 
 Item Id: ${item?.id}
 Name: ${item?.itemName}
@@ -277,7 +277,7 @@ Price: ${formattedPrice}`;
         return 'Consignment';
       case 'direct-purchase':
       case 'direct_purchase':
-        return 'Comaket Verified';
+        return `${process.env.NEXT_PUBLIC_APP_NAME || 'Kraft'} Verified`;
       case 'admin':
         return 'Kraft Official';
       case 'self-listing':
@@ -654,7 +654,7 @@ Price: ${formattedPrice}`;
                       whileTap={{ scale: 0.98 }}
                       onClick={handleMessage}
                       disabled={isCreatingChat}
-                      className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-2 shadow-sm"
+                      className="flex-1 bg-[#25D366] hover:bg-[#20BD5A] text-white py-3 rounded-lg font-medium flex items-center justify-center gap-2 shadow-sm"
                     >
                       <MessageCircle size={20} />
                       {isCreatingChat ? 'Opening...' : 'Chat Seller'}
@@ -700,7 +700,7 @@ Price: ${formattedPrice}`;
                     whileTap={{ scale: 0.98 }}
                     onClick={handleMessage}
                     disabled={isCreatingChat}
-                    className="w-full bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white py-3 rounded-lg font-medium flex items-center justify-center gap-2 shadow-sm"
+                    className="w-full bg-[#25D366] hover:bg-[#20BD5A] text-white py-3 rounded-lg font-medium flex items-center justify-center gap-2 shadow-sm"
                   >
                     <MessageCircle size={20} />
                     {isCreatingChat ? 'Opening...' : 'Chat Seller'}
