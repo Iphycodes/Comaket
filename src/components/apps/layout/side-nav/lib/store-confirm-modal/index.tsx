@@ -117,7 +117,8 @@ const StoreConfirmModal = ({ showConfirm, setShowConfirm }: StoreConfirmModalPro
             {/* Bottom brand */}
             <div className="px-5 py-4 border-t border-neutral-100 dark:border-neutral-800">
               <p className="text-center text-[11px] text-neutral-400">
-                By continuing, you agree to Comaket&apos;s Terms of Service & Privacy Policy
+                By continuing, you agree to {process.env.NEXT_PUBLIC_APP_NAME || 'Kraft'}&apos;s
+                Terms of Service & Privacy Policy
               </p>
             </div>
           </motion.div>

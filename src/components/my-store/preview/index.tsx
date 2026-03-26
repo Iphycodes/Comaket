@@ -11,7 +11,7 @@ import { useListings } from '@grc/hooks/useListings';
 import { useCreators } from '@grc/hooks/useCreators';
 import StoreDetails from '@grc/components/apps/store-details';
 
-const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || 'Comaket';
+const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || 'Kraft';
 
 interface StorePreviewProps {
   storeId: string;

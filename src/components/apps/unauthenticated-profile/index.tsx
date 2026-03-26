@@ -37,7 +37,7 @@ const UnauthenticatedProfile: React.FC = () => {
 
         {/* Text */}
         <h2 className="text-xl font-bold text-neutral-900 dark:text-white mb-1.5">
-          Welcome to Comaket
+          Welcome to {process.env.NEXT_PUBLIC_APP_NAME || 'Kraft'}
         </h2>
         <p className="text-sm text-neutral-500 dark:text-neutral-400 leading-relaxed mb-6">
           Sign in to access your profile, manage orders, and explore everything the marketplace has

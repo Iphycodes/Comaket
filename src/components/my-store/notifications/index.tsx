@@ -252,8 +252,9 @@ const mockNotifications: StoreNotification[] = [
     id: 'n12',
     type: 'system',
     title: 'Scheduled Maintenance',
-    message:
-      'Comaket will undergo maintenance on Feb 20, 2-4 AM WAT. Your store may be briefly unavailable.',
+    message: `${
+      process.env.NEXT_PUBLIC_APP_NAME || 'Kraft'
+    } will undergo maintenance on Feb 20, 2-4 AM WAT. Your store may be briefly unavailable.`,
     timestamp: daysAgo(2),
     read: true,
   },

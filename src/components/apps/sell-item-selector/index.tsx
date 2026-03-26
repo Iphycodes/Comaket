@@ -66,8 +66,9 @@ const sellOptions: {
     model: 'direct-sale',
     title: 'Sell To Us',
     subtitle: 'Instant Cash Offer',
-    description:
-      'Sell your item directly to Comaket. Submit your item for review and receive a price offer from us. Accept, counter, or decline — your choice.',
+    description: `Sell your item directly to ${
+      process.env.NEXT_PUBLIC_APP_NAME || 'Kraft'
+    }. Submit your item for review and receive a price offer from us. Accept, counter, or decline — your choice.`,
     icon: BadgeDollarSign,
     accentIcon: Clock,
     features: [

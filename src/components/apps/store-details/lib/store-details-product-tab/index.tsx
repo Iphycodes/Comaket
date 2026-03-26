@@ -23,6 +23,8 @@ import Product from '@grc/components/apps/product';
 import ModernItemPost from '@grc/components/apps/item-post-new';
 import ItemDetailModal from '@grc/components/apps/item-detail-modal';
 import { isEmpty } from 'lodash';
+import { useCreateConversationMutation } from '@grc/services/chat';
+import { useSelector } from 'react-redux';
 
 const formatConditionLabel = (condition?: string): string => {
   if (!condition) return '';
@@ -106,7 +108,9 @@ const StoreDetailsProductsTab: React.FC<StoreDetailsProductsTabProps> = ({
   storeWhatsApp,
 }) => {
   const router = useRouter();
-  const { addToCart, isInCart, cartItems } = useContext(AppContext);
+  const { addToCart, isInCart, cartItems, setIsAuthModalOpen } = useContext(AppContext);
+  const isAuthenticated = useSelector((state: any) => state.auth?.isAuthenticated);
+  const [createConversation, { isLoading: isCreatingChat }] = useCreateConversationMutation();
 
   const [viewType, setViewType] = useState<'grid' | 'list'>('grid');
   const [selectedProductId, setSelectedProductId] = useState<string>('');
@@ -146,8 +150,45 @@ const StoreDetailsProductsTab: React.FC<StoreDetailsProductsTabProps> = ({
     }
     const formattedPrice = numberFormat(item.askingPrice?.price / 100, Currencies.NGN);
     const sellerName = item.postUserProfile?.displayName || storeName || 'Seller';
-    const message = `Hi, ${sellerName},\nI am interested in this item on Comaket.\n\n${item.itemName}\n${item.description}\nPrice: ${formattedPrice}`;
+    const message = `Hi, ${sellerName},\nI am interested in this item on ${
+      process.env.NEXT_PUBLIC_APP_NAME || 'Kraft'
+    }.\n\n${item.itemName}\n${item.description}\nPrice: ${formattedPrice}`;
     window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, '_blank');
+  };
+
+  const handleMessage = async (item: MarketItem) => {
+    if (!isAuthenticated) {
+      setIsAuthModalOpen(true);
+      return;
+    }
+
+    const sellerId = item.postUserProfile?.id;
+    const isStore = item.postUserProfile?.isStore;
+    if (!sellerId) {
+      handleWhatsAppMessage(item);
+      return;
+    }
+
+    try {
+      const result = await createConversation({
+        participantId: sellerId,
+        participantType: isStore ? 'store' : 'creator',
+        productContext: {
+          listingId: item.id as string,
+          itemName: item.itemName,
+          price: item.askingPrice?.price || 0,
+          image: item.media?.[0]?.url || '',
+        },
+        options: { noSuccessMessage: true },
+      }).unwrap();
+
+      const conversationId = result?.data?._id || result?._id;
+      if (conversationId) {
+        router.push(`/chats?conversation=${conversationId}`);
+      }
+    } catch {
+      handleWhatsAppMessage(item);
+    }
   };
 
   const handleAddToCart = (item: MarketItem) => {
@@ -215,6 +256,8 @@ const StoreDetailsProductsTab: React.FC<StoreDetailsProductsTabProps> = ({
           onBuyNow={() => handleBuyNow(selectedProduct)}
           onToggleSave={() => handleBookmark(selectedProduct)}
           onWhatsAppMessage={() => handleWhatsAppMessage(selectedProduct)}
+          onMessage={() => handleMessage(selectedProduct)}
+          isMessageLoading={isCreatingChat}
           onShare={() => handleShare(selectedProduct)}
           onGoBack={() => setSelectedProductId('')}
           setSelectedProductId={setSelectedProductId}
@@ -425,12 +468,24 @@ const StoreDetailsProductsTab: React.FC<StoreDetailsProductsTabProps> = ({
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          handleWhatsAppMessage(item);
+                          handleMessage(item);
                         }}
-                        className="flex-1 bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all shadow-sm hover:shadow-md"
+                        disabled={isCreatingChat}
+                        className="flex-1 bg-[#25D366] hover:bg-[#20BD5A] text-white py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all shadow-sm hover:shadow-md"
                       >
-                        <MessageCircle size={14} /> WhatsApp
+                        <MessageCircle size={14} /> {isCreatingChat ? 'Opening...' : 'Chat Seller'}
                       </button>
+                      <Tooltip title="WhatsApp">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleWhatsAppMessage(item);
+                          }}
+                          className="p-2 rounded-lg border border-[#25D366] bg-white dark:bg-neutral-700 shadow-sm transition-colors hover:bg-green-50"
+                        >
+                          <MessageCircle size={14} className="text-[#25D366]" />
+                        </button>
+                      </Tooltip>
                       <motion.button
                         whileTap={{ scale: 0.9 }}
                         onClick={(e) => {
@@ -450,15 +505,29 @@ const StoreDetailsProductsTab: React.FC<StoreDetailsProductsTabProps> = ({
                   </>
                 ) : (
                   <>
-                    <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        handleWhatsAppMessage(item);
-                      }}
-                      className="w-full bg-gradient-to-r from-green-500 to-green-600 hover:from-green-600 hover:to-green-700 text-white py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all shadow-sm hover:shadow-md"
-                    >
-                      <MessageCircle size={14} /> WhatsApp
-                    </button>
+                    <div className="flex items-center gap-1.5">
+                      <button
+                        onClick={(e) => {
+                          e.stopPropagation();
+                          handleMessage(item);
+                        }}
+                        disabled={isCreatingChat}
+                        className="flex-1 bg-[#25D366] hover:bg-[#20BD5A] text-white py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all shadow-sm hover:shadow-md"
+                      >
+                        <MessageCircle size={14} /> {isCreatingChat ? 'Opening...' : 'Chat Seller'}
+                      </button>
+                      <Tooltip title="WhatsApp">
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            handleWhatsAppMessage(item);
+                          }}
+                          className="p-2 rounded-lg border border-[#25D366] bg-white dark:bg-neutral-700 shadow-sm transition-colors hover:bg-green-50"
+                        >
+                          <MessageCircle size={14} className="text-[#25D366]" />
+                        </button>
+                      </Tooltip>
+                    </div>
                     <motion.button
                       whileTap={{ scale: 0.9 }}
                       onClick={(e) => {

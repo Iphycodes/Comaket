@@ -544,7 +544,7 @@ const Market: React.FC<MarketProps> = ({
                               e.stopPropagation();
                               onMessage ? onMessage(item) : onWhatsAppMessage(item);
                             }}
-                            className="flex-1 bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 text-white py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all shadow-sm hover:shadow-md"
+                            className="flex-1 bg-[#25D366] hover:bg-[#20BD5A] text-white py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all shadow-sm hover:shadow-md"
                           >
                             <MessageCircle size={14} />
                             Chat Seller
@@ -573,7 +573,7 @@ const Market: React.FC<MarketProps> = ({
                             e.stopPropagation();
                             onMessage ? onMessage(item) : onWhatsAppMessage(item);
                           }}
-                          className="w-full bg-gradient-to-r from-blue to-indigo-600 hover:from-blue hover:to-indigo-700 text-white py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all shadow-sm hover:shadow-md"
+                          className="w-full bg-[#25D366] hover:bg-[#20BD5A] text-white py-2 rounded-lg text-xs font-medium flex items-center justify-center gap-1.5 transition-all shadow-sm hover:shadow-md"
                         >
                           <MessageCircle size={14} />
                           Chat Seller

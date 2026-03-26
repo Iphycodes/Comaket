@@ -155,7 +155,7 @@ export const mockMarketItems: MarketItem[] = [
     productTags: ['Apple', 'iPhone 15 Pro Max', 'Smartphone'],
     postUserProfile: {
       userName: 'comaket_store',
-      businessName: 'Comaket Official',
+      businessName: 'Kraft Official',
       profilePicUrl: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200',
       phoneNumber: '2349011223344',
       location: 'Abuja, Nigeria',
@@ -226,7 +226,7 @@ export const mockMarketItems: MarketItem[] = [
     productTags: ['Sony', 'Headphones', 'Noise Cancelling', 'Wireless'],
     postUserProfile: {
       userName: 'comaket_store',
-      businessName: 'Comaket Official',
+      businessName: 'Kraft Official',
       profilePicUrl: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200',
       phoneNumber: '2349011223344',
       location: 'Abuja, Nigeria',
@@ -378,12 +378,12 @@ export const mockVendors: Vendor[] = [
   },
   {
     id: 'v2',
-    name: 'Comaket Official',
-    businessName: 'Comaket Store',
+    name: 'Kraft Official',
+    businessName: 'Kraft Store',
     profilePicUrl: 'https://images.unsplash.com/photo-1560250097-0b93528c311a?w=200',
     coverImageUrl: 'https://images.unsplash.com/photo-1531297484001-80022131f5a1?w=1200',
     description:
-      'The official Comaket storefront. Every product is quality-verified, comes with guaranteed returns, and ships within 24 hours. We handle consignment and direct-purchase items with full buyer protection.',
+      'The official Kraft storefront. Every product is quality-verified, comes with guaranteed returns, and ships within 24 hours. We handle consignment and direct-purchase items with full buyer protection.',
     tagline: 'Quality verified. Buyer protected.',
     location: 'Abuja, Nigeria',
     rating: 4.9,

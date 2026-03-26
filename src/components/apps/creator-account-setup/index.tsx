@@ -289,7 +289,8 @@ const Step1Profile: React.FC<Step1Props> = ({
           Create Your Creator Profile
         </h2>
         <p className="text-sm text-neutral-500 mt-1">
-          This is your personal identity as a creator on Comaket
+          This is your personal identity as a creator on{' '}
+          {process.env.NEXT_PUBLIC_APP_NAME || 'Kraft'}
         </p>
       </div>
 
@@ -826,8 +827,9 @@ const Step3Tags: React.FC<{
         </div>
         <h2 className="text-xl font-bold text-neutral-900 dark:text-white">Add Your Tags</h2>
         <p className="text-sm text-neutral-500 mt-1 max-w-sm mx-auto">
-          These keywords help buyers find you when searching on Comaket. The more relevant your
-          tags, the easier it is for the right customers to discover your products and stores.
+          These keywords help buyers find you when searching on{' '}
+          {process.env.NEXT_PUBLIC_APP_NAME || 'Kraft'}. The more relevant your tags, the easier it
+          is for the right customers to discover your products and stores.
         </p>
       </div>
 
@@ -1190,7 +1192,7 @@ const Step5Success: React.FC<{
           transition={{ delay: 0.4 }}
           className="text-sm text-neutral-500 mt-2"
         >
-          <strong>@{data.username}</strong> is live on Comaket
+          <strong>@{data.username}</strong> is live on {process.env.NEXT_PUBLIC_APP_NAME || 'Kraft'}
         </motion.p>
       </div>
 

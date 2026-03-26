@@ -25,7 +25,7 @@ import { mediaSize, useMediaQuery } from '@grc/_shared/components/responsiveness
 import PhoneInput from '@grc/_shared/components/phone-input';
 
 const { TextArea } = Input;
-const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || 'Comaket';
+const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || 'Kraft';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // SECTION CARD
