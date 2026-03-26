@@ -346,7 +346,8 @@ const MyStore = () => {
                 <Store size={48} className="mx-auto text-neutral-200 dark:text-neutral-700 mb-4" />
                 <p className="text-neutral-500 dark:text-neutral-400 font-medium">No stores yet</p>
                 <p className="text-xs text-neutral-400 mt-1">
-                  Create your first vendor store to start selling on Comaket
+                  Create your first vendor store to start selling on{' '}
+                  {process.env.NEXT_PUBLIC_APP_NAME || 'Kraft'}
                 </p>
                 <button
                   onClick={handleCreateStore}

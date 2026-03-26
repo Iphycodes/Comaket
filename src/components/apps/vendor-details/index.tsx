@@ -348,7 +348,9 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
     const formattedPrice = numberFormat(item.askingPrice?.price / 100, Currencies.NGN);
     const sellerName =
       item.postUserProfile?.displayName || item.postUserProfile?.userName || 'Seller';
-    const message = `Hi, ${sellerName},\nI am interested in this item on Comaket.\n\n${item.itemName}\n${item.description}\nPrice: ${formattedPrice}`;
+    const message = `Hi, ${sellerName},\nI am interested in this item on ${
+      process.env.NEXT_PUBLIC_APP_NAME || 'Kraft'
+    }.\n\n${item.itemName}\n${item.description}\nPrice: ${formattedPrice}`;
     window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
@@ -893,9 +895,13 @@ const VendorDetail: React.FC<Props> = ({ vendor, onBack }) => {
             {vendor.email && (
               <a
                 href={`mailto:${vendor.email}?subject=${encodeURIComponent(
-                  `Inquiry from Comaket - ${vendor.businessName}`
+                  `Inquiry from ${process.env.NEXT_PUBLIC_APP_NAME || 'Kraft'} - ${
+                    vendor.businessName
+                  }`
                 )}&body=${encodeURIComponent(
-                  `Hi ${vendor.name},\n\nI found your store on Comaket and I'm interested in your products.\n\nLooking forward to hearing from you.`
+                  `Hi ${vendor.name},\n\nI found your store on ${
+                    process.env.NEXT_PUBLIC_APP_NAME || 'Kraft'
+                  } and I'm interested in your products.\n\nLooking forward to hearing from you.`
                 )}`}
                 className="flex items-center gap-2 px-5 py-2.5 bg-white dark:bg-neutral-800 border border-neutral-200 dark:border-neutral-700 text-neutral-700 dark:text-neutral-300 rounded-xl text-sm font-semibold hover:bg-neutral-50 dark:hover:bg-neutral-700 transition-all"
               >

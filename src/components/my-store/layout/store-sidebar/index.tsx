@@ -17,7 +17,7 @@ import {
 import { usePathname, useRouter } from 'next/navigation';
 import { getFirstCharacter, getRandomColorByString } from '@grc/_shared/helpers';
 
-const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || 'Comaket';
+const APP_NAME = process.env.NEXT_PUBLIC_APP_NAME || 'Kraft';
 
 // ═══════════════════════════════════════════════════════════════════════════
 // TYPES

@@ -279,7 +279,9 @@ const SavedItems: React.FC = () => {
     const formattedPrice = numberFormat(item.askingPrice?.price / 100, Currencies.NGN);
     const sellerName =
       item.postUserProfile?.displayName || item.postUserProfile?.userName || 'Seller';
-    const message = `Hi, ${sellerName},\nI am interested in this item on Comaket.\n\n${item.itemName}\n${item.description}\nPrice: ${formattedPrice}`;
+    const message = `Hi, ${sellerName},\nI am interested in this item on ${
+      process.env.NEXT_PUBLIC_APP_NAME || 'Kraft'
+    }.\n\n${item.itemName}\n${item.description}\nPrice: ${formattedPrice}`;
     window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(message)}`, '_blank');
   };
 

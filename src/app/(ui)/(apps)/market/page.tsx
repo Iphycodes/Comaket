@@ -235,7 +235,9 @@ const MarketPage = () => {
     const formattedPrice = numberFormat((item.askingPrice?.price || 0) / 100, Currencies.NGN);
     const sellerName =
       item.postUserProfile?.displayName || item.postUserProfile?.userName || 'Seller';
-    const msg = `Hi ${sellerName},\nI'm interested in this item on Comaket.\n\n${item.itemName}\n${item.description}\nPrice: ${formattedPrice}`;
+    const msg = `Hi ${sellerName},\nI'm interested in this item on ${
+      process.env.NEXT_PUBLIC_APP_NAME || 'Kraft'
+    }.\n\n${item.itemName}\n${item.description}\nPrice: ${formattedPrice}`;
     window.open(`https://wa.me/${phoneNumber}?text=${encodeURIComponent(msg)}`, '_blank');
   }, []);
 
@@ -249,7 +251,8 @@ const MarketPage = () => {
         setIsAuthModalOpen(true);
         return;
       }
-      const sellerId = item.ownerId || item.postUserProfile?.id;
+      const sellerId = item.ownerId;
+      const isStore = item.postUserProfile?.isStore;
       if (!sellerId) {
         handleWhatsAppMessage(item);
         return;
@@ -257,6 +260,7 @@ const MarketPage = () => {
       try {
         const result = await createConversation({
           participantId: sellerId,
+          participantType: isStore ? 'store' : 'creator',
           productContext: {
             listingId: item.id,
             itemName: item.itemName,

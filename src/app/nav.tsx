@@ -148,7 +148,7 @@ const mobileMenuItems: NavItem[] = [
 ];
 
 const appNav: Nav = {
-  appName: 'Comaket',
+  appName: process.env.NEXT_PUBLIC_APP_NAME || 'Kraft',
   theme: 'light',
   items: menuItems,
   mobileMenuItems,

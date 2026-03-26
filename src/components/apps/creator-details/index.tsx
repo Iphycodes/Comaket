@@ -529,7 +529,9 @@ const CreatorDetails: React.FC<CreatorDetailsProps> = ({
       antMessage.warning('WhatsApp number not available');
       return;
     }
-    const message = `Hi ${fullName},\nI found your profile on Comaket and I'm interested in your work.`;
+    const message = `Hi ${fullName},\nI found your profile on ${
+      process.env.NEXT_PUBLIC_APP_NAME || 'Kraft'
+    } and I'm interested in your work.`;
     window.open(`https://wa.me/${num}?text=${encodeURIComponent(message)}`, '_blank');
   };
 
@@ -1007,9 +1009,11 @@ const CreatorDetails: React.FC<CreatorDetailsProps> = ({
             {contactEmail && (
               <a
                 href={`mailto:${contactEmail}?subject=${encodeURIComponent(
-                  `Inquiry from Comaket - ${fullName}`
+                  `Inquiry from ${process.env.NEXT_PUBLIC_APP_NAME || 'Kraft'} - ${fullName}`
                 )}&body=${encodeURIComponent(
-                  `Hi ${firstName},\n\nI found your creator profile on Comaket and I'm interested in your work.\n\nLooking forward to hearing from you.`
+                  `Hi ${firstName},\n\nI found your creator profile on ${
+                    process.env.NEXT_PUBLIC_APP_NAME || 'Kraft'
+                  } and I'm interested in your work.\n\nLooking forward to hearing from you.`
                 )}`}
                 className={`flex items-center ${
                   isMobile

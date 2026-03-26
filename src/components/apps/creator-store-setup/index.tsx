@@ -759,8 +759,8 @@ const Step3Tags: React.FC<{
         </div>
         <h2 className="text-xl font-bold text-neutral-900 dark:text-white">Add Store Tags</h2>
         <p className="text-sm text-neutral-500 mt-1 max-w-sm mx-auto">
-          Tags help buyers discover your store when they search on Comaket. Pick keywords that match
-          what you sell.
+          Tags help buyers discover your store when they search on{' '}
+          {process.env.NEXT_PUBLIC_APP_NAME || 'Kraft'}. Pick keywords that match what you sell.
         </p>
       </div>
 
@@ -983,7 +983,7 @@ const Step4Success: React.FC<{ data: CreatorStoreSetupData; isMobile: boolean }>
           transition={{ delay: 0.4 }}
           className="text-sm text-neutral-500 mt-2"
         >
-          <strong>{data.storeName}</strong> is live on Comaket
+          <strong>{data.storeName}</strong> is live on {process.env.NEXT_PUBLIC_APP_NAME || 'Kraft'}
         </motion.p>
       </div>
 
