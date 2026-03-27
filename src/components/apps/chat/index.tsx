@@ -945,7 +945,12 @@ const ChatPage: React.FC = () => {
       );
     }
 
-    const otherName = activeDisplayInfo?.displayName || 'User';
+    const isLoadingConversation =
+      !activeDisplayInfo?.displayName || activeDisplayInfo?.displayName === 'User';
+    const otherName =
+      activeDisplayInfo?.displayName && activeDisplayInfo.displayName !== 'User'
+        ? activeDisplayInfo.displayName
+        : '';
     const otherAvatar = activeDisplayInfo?.avatar || null;
     const otherType = activeDisplayInfo?.type;
     const otherEntityId = activeDisplayInfo?.entityId;
@@ -982,18 +987,27 @@ const ChatPage: React.FC = () => {
               )}
             </div>
             <div>
-              <h3 className="text-sm font-semibold text-neutral-900 dark:text-white flex items-center gap-1">
-                {otherName}
-                <VerifiedBadge
-                  isVerified={activeDisplayInfo?.isVerified}
-                  isSuperVerified={activeDisplayInfo?.isSuperVerified}
-                  size={15}
-                />
-              </h3>
-              <p className="text-[11px] text-neutral-500">
-                {otherUsername ? `@${otherUsername} · ` : ''}
-                {isOtherOnline ? <span className="text-emerald-500">Online</span> : 'Offline'}
-              </p>
+              {isLoadingConversation && !otherName ? (
+                <>
+                  <div className="h-4 w-32 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse" />
+                  <div className="h-3 w-20 bg-neutral-200 dark:bg-neutral-700 rounded animate-pulse mt-1" />
+                </>
+              ) : (
+                <>
+                  <h3 className="text-sm font-semibold text-neutral-900 dark:text-white flex items-center gap-1">
+                    {otherName}
+                    <VerifiedBadge
+                      isVerified={activeDisplayInfo?.isVerified}
+                      isSuperVerified={activeDisplayInfo?.isSuperVerified}
+                      size={15}
+                    />
+                  </h3>
+                  <p className="text-[11px] text-neutral-500">
+                    {otherUsername ? `@${otherUsername} · ` : ''}
+                    {isOtherOnline ? <span className="text-emerald-500">Online</span> : 'Offline'}
+                  </p>
+                </>
+              )}
             </div>
           </div>
           {/* View Profile/Store button */}
