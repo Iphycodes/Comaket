@@ -57,7 +57,11 @@ export const SocketProvider: React.FC<SocketProviderProps> = ({ children }) => {
   const isAuthenticated = authState?.isAuthenticated;
 
   // Derive the socket URL from the API base URL
-  const baseUrl = process.env.NEXT_PUBLIC_APP_BASE_URL || 'http://localhost:5000/api/v1';
+  let baseUrl = process.env.NEXT_PUBLIC_APP_BASE_URL || 'http://localhost:5000/api/v1';
+  // Rewrite localhost for Android emulator (Capacitor)
+  if (typeof window !== 'undefined' && window.location?.hostname === '10.0.2.2') {
+    baseUrl = baseUrl.replace('localhost', '10.0.2.2');
+  }
   // Socket connects to the root, not the /api/v1 path
   const socketUrl = baseUrl.replace(/\/api\/v1$/, '');
 

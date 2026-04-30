@@ -4,7 +4,7 @@ import '../styles/globals.css';
 import '../styles/_override.scss';
 import 'remixicon/fonts/remixicon.css';
 import React, { ReactElement } from 'react';
-import type { Metadata } from 'next';
+import type { Metadata, Viewport } from 'next';
 import { Nunito } from 'next/font/google';
 import { ThemeProvider } from '@grc/_shared/components/theme-provider';
 import SplashScreen from '@grc/components/splash-screen';
@@ -18,8 +18,14 @@ const nunito = Nunito({
 export const metadata: Metadata = {
   title: 'Kraft',
   description: "Nigeria's Creators Marketplace - Strictly Nigerian Brands",
-  viewport: { width: 'device-width', initialScale: 1, maximumScale: 1, userScalable: false },
   icons: { icon: '/kraft-logo-icon.ico' },
+};
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 1,
+  userScalable: false,
 };
 
 export interface LayoutProps {

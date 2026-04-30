@@ -12,16 +12,33 @@ import { AppCookie } from '@grc/_shared/helpers';
 import { RootState } from '@grc/redux/store';
 
 /**Create our baseQuery instance - similar to axios**/
-const baseQuery = fetchBaseQuery({
-  baseUrl: process.env.NEXT_PUBLIC_APP_BASE_URL,
-  prepareHeaders: (headers, { getState }) => {
-    const token = (getState() as RootState).auth.sessionToken;
-    headers.set('x-api-key', process.env.NEXT_PUBLIC_APP_API_KEY as string);
-    if (token) headers.set('Authorization', `Bearer ${token}`);
-    headers.set('accept', 'application/json');
-    return headers;
-  },
-});
+// Resolve API base URL: rewrite localhost for Android emulator
+const getApiBaseUrl = (): string => {
+  const envUrl = process.env.NEXT_PUBLIC_APP_BASE_URL || 'http://localhost:5000/api/v1';
+  if (typeof window !== 'undefined' && window.location?.hostname === '10.0.2.2') {
+    return envUrl.replace('localhost', '10.0.2.2');
+  }
+  return envUrl;
+};
+
+// Use a custom baseQuery that resolves the URL dynamically per-request
+const baseQuery: BaseQueryFn<FetchArgs, unknown, FetchBaseQueryError> = async (
+  args,
+  api,
+  extraOptions
+) => {
+  const dynamicBaseQuery = fetchBaseQuery({
+    baseUrl: getApiBaseUrl(),
+    prepareHeaders: (headers, { getState }) => {
+      const token = (getState() as RootState).auth.sessionToken;
+      headers.set('x-api-key', process.env.NEXT_PUBLIC_APP_API_KEY as string);
+      if (token) headers.set('Authorization', `Bearer ${token}`);
+      headers.set('accept', 'application/json');
+      return headers;
+    },
+  });
+  return dynamicBaseQuery(args, api, extraOptions);
+};
 
 /**change the returned data**/
 const baseQueryWithResponse: BaseQueryFn<FetchArgs, unknown, FetchBaseQueryError> = async (
