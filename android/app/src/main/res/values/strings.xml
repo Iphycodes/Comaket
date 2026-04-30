@@ -1,0 +1,8 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Kraft</string>
+    <string name="title_activity_main">Kraft</string>
+    <string name="package_name">ng.kraft.app</string>
+    <string name="custom_url_scheme">ng.kraft.app</string>
+    <string name="server_client_id">989886797521-bhomg3o0qpccp1sn80q338gs7r7of5r5.apps.googleusercontent.com</string>
+</resources>

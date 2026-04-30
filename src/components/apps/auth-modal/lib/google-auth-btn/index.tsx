@@ -1,8 +1,8 @@
-// src/components/auth/google-auth-button.tsx
 import { Button, message } from 'antd';
 import { useGoogleLogin } from '@react-oauth/google';
-import { useEffect } from 'react';
+import { useEffect, useCallback } from 'react';
 import { useAuth } from '@grc/hooks/useAuth';
+import { Capacitor } from '@capacitor/core';
 
 interface GoogleAuthButtonProps {
   onSuccess?: () => void;
@@ -12,6 +12,7 @@ interface GoogleAuthButtonProps {
 
 export const GoogleAuthButton = ({ onSuccess, disabled }: GoogleAuthButtonProps) => {
   const { isAuthenticated, googleAuth, googleAuthResponse } = useAuth();
+  const isNative = Capacitor.isNativePlatform();
 
   useEffect(() => {
     if (googleAuthResponse?.isSuccess && isAuthenticated) {
@@ -19,24 +20,51 @@ export const GoogleAuthButton = ({ onSuccess, disabled }: GoogleAuthButtonProps)
     }
   }, [googleAuthResponse?.isSuccess, isAuthenticated]);
 
-  const login = useGoogleLogin({
+  // Web-based Google login (popup)
+  const webLogin = useGoogleLogin({
     onSuccess: async (response) => {
       try {
-        await googleAuth({ token: response?.access_token })
-          .then(() => {
-            onSuccess?.();
-          })
-          .catch((err: any) => {
-            message.error(err.data?.message || 'Something went wrong. Please try again.');
-          });
+        await googleAuth({ token: response?.access_token });
+        onSuccess?.();
       } catch (error: any) {
         message.error(error.data?.message || 'Something went wrong. Please try again.');
       }
     },
   });
 
+  // Native Google login (Capacitor plugin)
+  const nativeLogin = useCallback(async () => {
+    try {
+      // Dynamically import to avoid SSR issues
+      const { GoogleAuth } = await import('@codetrix-studio/capacitor-google-auth');
+      const result = await GoogleAuth.signIn();
+
+      if (result?.authentication?.accessToken) {
+        // Use access token — same as web flow
+        await googleAuth({ token: result.authentication.accessToken });
+        onSuccess?.();
+      } else if (result?.authentication?.idToken) {
+        // Fallback to ID token if access token not available
+        await googleAuth({ token: result.authentication.idToken });
+        onSuccess?.();
+      } else {
+        message.error('Google sign-in failed. Please try again.');
+      }
+    } catch (error: any) {
+      if (error?.message?.includes('canceled') || error?.message?.includes('cancelled')) {
+        // User cancelled — don't show error
+        return;
+      }
+      message.error('Google sign-in failed. Please try again.');
+    }
+  }, [googleAuth, onSuccess]);
+
   const handleLogin = () => {
-    login();
+    if (isNative) {
+      nativeLogin();
+    } else {
+      webLogin();
+    }
   };
 
   const GoogleIcon = ({ size = 18 }: { size?: number }) => (

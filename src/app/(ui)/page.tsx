@@ -158,6 +158,7 @@ function Navbar({ onSignIn, onSignUp }: { onSignIn: () => void; onSignUp: () => 
     { label: 'Categories', href: '#categories' },
     { label: 'How It Works', href: '#how-it-works' },
     { label: 'For Creators', href: '#for-creators' },
+    { label: 'About', href: '/about' },
   ];
 
   return (
@@ -1340,7 +1341,7 @@ function Footer() {
       { label: 'Creator Dashboard', href: '/my-store' },
     ],
     Company: [
-      { label: 'About Kraft', href: '#' },
+      { label: 'About Kraft', href: '/about' },
       { label: 'Contact Us', href: '#' },
       { label: 'Terms of Service', href: '#' },
       { label: 'Privacy Policy', href: '#' },
